@@ -22,7 +22,7 @@
 		<div class="alert alert-error">Login failed</div>
 	</c:if>
      <div class="area">
-      <form class="form-horizontal" action="j_spring_security_check" method="POST">
+      <form class="form-horizontal" action="<c:url value="j_spring_security_check" />" method="POST">
        <div class="heading">
         <h4 class="form-heading">
          Sign In
@@ -55,6 +55,7 @@
         </div>
        </div>
       </form>
+	<p>Tapestry v0.5</p>
      </div>
     </div>
     <div id="modalWarnLogin" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="warnLabel" aria-hidden="true">
@@ -78,9 +79,6 @@
      </div>
     </div>
    </div>
-  </div>
-  <div class="text-center">
-    <p>Tapestry version 0.1</p>
   </div>
  </body>
 </html>
