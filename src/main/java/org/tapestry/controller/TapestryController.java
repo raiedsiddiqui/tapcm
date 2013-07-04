@@ -10,14 +10,33 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 @Controller
 public class TapestryController{
 
+	@RequestMapping(value="/login", method=RequestMethod.GET)
+	public String loginView(ModelMap model){
+		return "login";
+	}
+
 	@RequestMapping(value="/", method=RequestMethod.GET)
-	public String welcome(SecurityContextHolderAwareRequestWrapper request){
-		if (request.isUserInRole("ROLE_USER"))
+	public String welcome(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		if (request.isUserInRole("ROLE_USER")){
+			String name = request.getUserPrincipal().getName();
+			model.addAttribute("name", name);
 			return "caretaker/index";
-		else if (request.isUserInRole("ROLE_ADMIN"))
+		}
+		else if (request.isUserInRole("ROLE_ADMIN")){
+			String name = request.getUserPrincipal().getName();
+			model.addAttribute("name", name);
 			return "admin/index";
-		else
-			return "error";
+		}
+		else{
+			model.addAttribute("error", "true");
+			return "login";
+		}
+	}
+
+	@RequestMapping(value="/loginfailed", method=RequestMethod.GET)
+	public String failed(ModelMap model){
+		model.addAttribute("error", "true");
+		return "login";
 	}
 
 }

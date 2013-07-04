@@ -17,7 +17,10 @@
   <img src="${pageContext.request.contextPath}/resources/images/logo.png" />
   <div class="container-fluid">
    <div class="row-fluid">
-    <div class="span4 offset3">
+    <div class="span12">
+	<c:if test="${not empty error}">
+		<div class="alert alert-error">Login failed</div>
+	</c:if>
      <div class="area">
       <form class="form-horizontal" action="j_spring_security_check" method="POST">
        <div class="heading">

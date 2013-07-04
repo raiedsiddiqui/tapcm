@@ -81,7 +81,7 @@
 		</div>
 		<div class="row-fluid">
 			<div class="span6" style="padding:0px 15px;">
-				<h2>Welcome, Dinah C.</h2>
+				<h2>Welcome, ${name}</h2>
 				<p><strong>Today's Appointments:</strong></p>
 				<table class="table">
 					<tr>
