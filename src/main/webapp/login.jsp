@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -11,27 +12,14 @@
   </script>
   <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js">
   </script>
-  <script language="javascript">
-   //<![CDATA[
-		function login(form) {
-			if (form.username.value=="test" && form.password.value=="test") {             
-				location="/tapestry/caretaker/index.xhtml";
-			} else if (form.username.value=="admin" && form.password.value=="admin") {
-				location="/tapestry/admin/index.xhtml";
-			} else{
-				$('#modalWarnLogin').modal('show');
-			}
-		}
-		//]]>
-  </script>
  </head>
  <body>
-  <img src="resources/images/logo.png" />
+  <img src="${pageContext.request.contextPath}/resources/images/logo.png" />
   <div class="container-fluid">
    <div class="row-fluid">
     <div class="span4 offset3">
      <div class="area">
-      <form class="form-horizontal">
+      <form class="form-horizontal" action="j_spring_security_check" method="POST">
        <div class="heading">
         <h4 class="form-heading">
          Sign In
@@ -42,7 +30,7 @@
          Username
         </label>
         <div class="controls">
-         <input type="text" name="username" placeholder="E.g. ashwinhegde" />
+         <input type="text" name="j_username" placeholder="E.g. ashwinhegde" />
         </div>
        </div>
        <div class="control-group">
@@ -50,7 +38,7 @@
          Password
         </label>
         <div class="controls">
-         <input type="password" name="password" placeholder="Min. 8 Characters" />
+         <input type="password" name="j_password" placeholder="Min. 8 Characters" />
         </div>
        </div>
        <div class="control-group">
@@ -60,9 +48,7 @@
          </a>
          <br />
          <br />
-         <button type="button" class="btn btn-success" onclick="login(this.form)">
-          Sign In
-         </button>
+	<input type="submit" value="Login"></input>
         </div>
        </div>
       </form>
@@ -89,6 +75,9 @@
      </div>
     </div>
    </div>
+  </div>
+  <div class="text-center">
+    <p>Tapestry version 0.1</p>
   </div>
  </body>
 </html>

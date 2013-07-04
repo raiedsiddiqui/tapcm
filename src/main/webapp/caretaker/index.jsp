@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -53,7 +54,7 @@
 </head>
 	
 <body>	
-	<img src="/tapestry/resources/images/logo.png"/>
+  <img src="${pageContext.request.contextPath}/resources/images/logo.png" />
 	<div class="content">
 		<div class="navbar navbar-inverse">
 			<div class="navbar-inner">
@@ -67,11 +68,12 @@
      					<a class="brand" href="index.xhtml">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li><a href="1.html">Angie O.</a></li>
-							<li><a href="2.html">Kandi A.</a></li>
-							<li><a href="3.html">Earl B.</a></li>
-							<li><a href="4.html">Tess T.</a></li>
-							<li><a href="/tapestry/">Log Out</a></li>
+							<li><a href="#">Angie O.</a></li>
+							<li><a href="#">Kandi A.</a></li>
+							<li><a href="#">Earl B.</a></li>
+							<li><a href="#">Tess T.</a></li>
+							<li><a href="#">My Profile</a></li>
+							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>
 				</div>	
