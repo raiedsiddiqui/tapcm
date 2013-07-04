@@ -18,8 +18,9 @@
 		<intercept-url pattern="/admin/*" access="ROLE_ADMIN" />
 		<intercept-url pattern="/caretaker/*" access="ROLE_USER" />
 		<intercept-url pattern="/login" filters="none" />
+		<intercept-url pattern="/loginfailed" filters="none" />
 		<intercept-url pattern="/resources/**" filters="none" />
-		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
+		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess"/>
 	</http>
  
 	<authentication-manager>
