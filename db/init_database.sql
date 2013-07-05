@@ -8,24 +8,13 @@ CREATE TABLE IF NOT EXISTS users (
 	password VARCHAR(20) NOT NULL,
 	enabled BOOLEAN NOT NULL,
 	email VARCHAR(50) NOT NULL,
+	role VARCHAR(45),
 	PRIMARY KEY (user_ID)
 );
 
-CREATE TABLE IF NOT EXISTS user_roles (
-    user_role_ID TINYINT UNSIGNED NOT NULL,
-    user TINYINT UNSIGNED NOT NULL,
-    authority VARCHAR(45) NOT NULL,
-    PRIMARY KEY (user_role_id),
-    KEY FK_user_roles (user),
-    CONSTRAINT FK_user_roles FOREIGN KEY (user) REFERENCES users (user_ID)
-);
-
 /*Create a default admin user*/
-INSERT INTO users (user_ID, username, password, enabled, name, email)
-VALUES (100, 'admin', 'admin', TRUE, 'Adam Gignac', 'gignac.adam@gmail.com');
-
-INSERT INTO user_roles (user_role_ID, user, authority)
-VALUES (1, 100, 'ROLE_USER');
+INSERT INTO users (user_ID, username, password, enabled, name, email, role)
+VALUES (100, 'admin', 'admin', TRUE, 'Adam Gignac', 'gignac.adam@gmail.com', "ROLE_ADMIN");
 
 CREATE TABLE IF NOT EXISTS patients (
 	patient_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 patients*/
