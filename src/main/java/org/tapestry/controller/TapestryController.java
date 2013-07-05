@@ -15,7 +15,7 @@ public class TapestryController{
 		return "login";
 	}
 
-	@RequestMapping(value={"/", "/loginsuccess"}, method=RequestMethod.GET)
+	@RequestMapping(value="/loginsuccess", method=RequestMethod.GET)
 	public String welcome(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
 			String name = request.getUserPrincipal().getName();

@@ -20,7 +20,7 @@
 		<intercept-url pattern="/login" filters="none" />
 		<intercept-url pattern="/loginfailed" filters="none" />
 		<intercept-url pattern="/resources/**" filters="none" />
-		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess"/>
+		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
 	</http>
  
 	<authentication-manager>
