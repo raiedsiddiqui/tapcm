@@ -20,7 +20,7 @@ public class TapestryController{
 		if (request.isUserInRole("ROLE_USER")){
 			String name = request.getUserPrincipal().getName();
 			model.addAttribute("name", name);
-			return "caretaker/index";
+			return "volunteer/index";
 		}
 		else if (request.isUserInRole("ROLE_ADMIN")){
 			String name = request.getUserPrincipal().getName();
@@ -42,6 +42,14 @@ public class TapestryController{
 	public String manageUsers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_ADMIN")){
 			return "admin/manage_users";
+		} else {
+			return "login";
+		}
+	}
+	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
+	public String managePatients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		if (request.isUserInRole("ROLE_ADMIN")){
+			return "admin/manage_patients";
 		} else {
 			return "login";
 		}

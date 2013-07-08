@@ -65,7 +65,7 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="index.xhtml">Home</a>
+     					<a class="brand" href="/tapestry/caretaker/index">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<li><a href="#">Angie O.</a></li>
