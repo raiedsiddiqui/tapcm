@@ -15,7 +15,7 @@ public class TapestryController{
 		return "login";
 	}
 
-	@RequestMapping(value="/loginsuccess", method=RequestMethod.GET)
+	@RequestMapping(value={"/", "/loginsuccess"}, method=RequestMethod.GET)
 	public String welcome(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
 			String name = request.getUserPrincipal().getName();
@@ -28,7 +28,6 @@ public class TapestryController{
 			return "admin/index";
 		}
 		else{
-			model.addAttribute("error", "true");
 			return "login";
 		}
 	}
@@ -37,6 +36,15 @@ public class TapestryController{
 	public String failed(ModelMap model){
 		model.addAttribute("error", "true");
 		return "login";
+	}
+
+	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
+	public String manageUsers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		if (request.isUserInRole("ROLE_ADMIN")){
+			return "admin/manage_users";
+		} else {
+			return "login";
+		}
 	}
 
 }

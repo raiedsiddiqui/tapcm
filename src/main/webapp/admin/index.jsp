@@ -9,6 +9,11 @@
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 
+	<style type="text/css">
+		.row-fluid{
+			margin:10px;
+		}
+	</style>
 </head>
 	
 <body>	
@@ -23,11 +28,11 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="index.xhtml">Home</a>
+     					<a class="brand" href="${pageContext.request.contextPath}/">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li><a href="#">Add Caretaker</a></li>
-							<li><a href="#">Add Patient</a></li>
+							<li><a href="${pageContext.request.contextPath}/manage_users">Manage Caretakers</a></li>
+							<li><a href="#">Manage Patients</a></li>
 							<li><a href="#">Manage Surveys</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
