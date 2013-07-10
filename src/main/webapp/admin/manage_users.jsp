@@ -1,7 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets">
 <head>
 	<title>Tapestry Admin</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
@@ -53,16 +54,18 @@
 					<th>Name</th>
 					<th>Username</th>
 					<th>Role</th>
-					<th>Added</th>
+					<th>Enabled?</th>
 					<th></th>
 				</tr>
+				<ui:repeat value="${users}" var="u" styleClass="table">
 				<tr>
-					<td>Admin</td>
-					<td>admin</td>
-					<td>ROLE_ADMIN</td>
-					<td>2013-07-03 12:00</td>
+					<td>${u.name}</td>
+					<td>${u.username}</td>
+					<td>${u.role}</td>
+					<td>${u.enabled}</td>
 					<td><a href="#" class="btn btn-danger">Remove</a></td>
 				</tr>
+				</ui:repeat>
 			</table>
 			<a class="btn btn-primary" onClick="showAddUser()">Add new</a>
 		</div>

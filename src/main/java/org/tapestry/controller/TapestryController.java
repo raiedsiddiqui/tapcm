@@ -6,9 +6,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
+import org.tapestry.dao.UserDao;
+import org.tapestry.objects.User;
+import java.util.ArrayList;
 
 @Controller
 public class TapestryController{
+
+	private UserDao dao = new UserDao("jdbc:mysql://localhost:3306", "root", "root");
 
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String loginView(ModelMap model){
@@ -41,6 +46,8 @@ public class TapestryController{
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
 	public String manageUsers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_ADMIN")){
+			ArrayList<User> userList = dao.getAllUsers();
+			model.addAttribute("users", userList);
 			return "admin/manage_users";
 		} else {
 			return "login";
@@ -50,6 +57,22 @@ public class TapestryController{
 	public String managePatients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_ADMIN")){
 			return "admin/manage_patients";
+		} else {
+			return "login";
+		}
+	}
+
+	@RequestMapping(value="/add_user", method=RequestMethod.POST)
+	public String addUser(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		if (request.isUserInRole("ROLE_ADMIN")){
+			//Add a new user
+			User u = new User();
+			u.setName(request.getParameter("name"));
+			u.setUsername(request.getParameter("username"));
+			u.setRole(request.getParameter("role"));
+			dao.createUser(u);
+			//Display page again
+			return "admin/manage_users";
 		} else {
 			return "login";
 		}
