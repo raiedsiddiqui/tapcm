@@ -47,18 +47,20 @@
 			</div>
 		</div>
 		<div class="row-fluid">
-			<h2>Users</h2>
+			<h2>Patients</h2>
 			<table class="table">
 				<tr>
 					<th>Name</th>
-					<th>Caretaker</th>
+					<th>Volunteer</th>
 					<th></th>
 				</tr>
-				<tr>
-					<td>Angie O'Graham</td>
-					<td>Dinah Cancer</td>
-					<td><a href="#" class="btn btn-danger">Remove</a></td>
-				</tr>
+                <c:forEach items="${patients}" var="p">
+                <tr>
+                    <td>${p.firstName} ${p.lastName}</td>
+                    <td>${p.volunteer}</td>
+                    <td><a href="#" class="btn btn-danger">Remove</a></td>
+                </tr>
+                </c:forEach>
 			</table>
 			<a class="btn btn-primary" onClick="showAddPatient()">Add new</a>
 		</div>

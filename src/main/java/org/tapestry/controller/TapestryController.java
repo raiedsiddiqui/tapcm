@@ -7,13 +7,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.tapestry.dao.UserDao;
+import org.tapestry.dao.PatientDao;
 import org.tapestry.objects.User;
+import org.tapestry.objects.Patient;
 import java.util.ArrayList;
 
 @Controller
 public class TapestryController{
 
-	private UserDao dao = new UserDao("jdbc:mysql://localhost:3306", "root", "root");
+	private UserDao userDao = new UserDao("jdbc:mysql://localhost:3306", "root", "root");
+    private PatientDao patientDao = new PatientDao("jdbc:mysql://localhost:3306", "root", "root");
 
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String loginView(ModelMap model){
@@ -46,7 +49,7 @@ public class TapestryController{
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
 	public String manageUsers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_ADMIN")){
-			ArrayList<User> userList = dao.getAllUsers();
+			ArrayList<User> userList = userDao.getAllUsers();
 			model.addAttribute("users", userList);
 			return "admin/manage_users";
 		} else {
@@ -56,6 +59,8 @@ public class TapestryController{
 	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
 	public String managePatients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_ADMIN")){
+            ArrayList<Patient> patientList = patientDao.getAllPatients();
+            model.addAttribute("patients", patientList);
 			return "admin/manage_patients";
 		} else {
 			return "login";
@@ -70,7 +75,7 @@ public class TapestryController{
 			u.setName(request.getParameter("name"));
 			u.setUsername(request.getParameter("username"));
 			u.setRole(request.getParameter("role"));
-			dao.createUser(u);
+			userDao.createUser(u);
 			//Display page again
 			return "admin/manage_users";
 		} else {

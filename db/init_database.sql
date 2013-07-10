@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS patients (
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
 	age TINYINT UNSIGNED, /*Using UNSIGNED TINYINT allows ages between 0-255, which is overkill but I can't get any smaller than that*/
 	email VARCHAR(50),
-	caretaker TINYINT,
+	volunteer VARCHAR(255) NOT NULL, /*Same as users.name*/
 	PRIMARY KEY (patient_ID)
 );
 
