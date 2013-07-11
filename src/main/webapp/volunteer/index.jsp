@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -65,13 +67,12 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="/tapestry/caretaker/index">Home</a>
+     					<a class="brand" href="${pageContext.request.contextPath}">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li><a href="#">Angie O.</a></li>
-							<li><a href="#">Kandi A.</a></li>
-							<li><a href="#">Earl B.</a></li>
-							<li><a href="#">Tess T.</a></li>
+							<c:forEach items="${patients}" var="p">
+							<li><a href="#">${p.firstName} ${p.lastInitial}.</a></li>
+							</c:forEach>
 							<li><a href="#">My Profile</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>

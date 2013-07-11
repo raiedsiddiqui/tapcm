@@ -73,38 +73,28 @@ public class UserDao implements AbstractUserDao {
 		}
 	}
 
-	public void modifyUser(User u){
-		try{
-			statement = con.prepareStatement("UPDATE survey_app.users SET VALUES username=?, name=?, password=?, role=?, email=?, enabled=? WHERE user_ID=?");
-			statement.setString(1, u.getUsername());
-			statement.setString(2, u.getName());
-			statement.setString(3, u.getPassword());
-			statement.setString(4, u.getRole());
-			statement.setString(5, u.getEmail());
-			if (u.isEnabled())
-				statement.setString(6, "1");
-			else
-				statement.setString(6, "0");
-			statement.setString(7, "" + u.getUserID());
-			statement.executeQuery();
-		} catch (SQLException e){
-			System.out.println("Error: Could not modify user");
-			System.out.println(e.toString());
-		}
-	}
-
 	public void createUser(User u){
 		try{
-			statement = con.prepareStatement("INSERT INTO survey_app.users VALUES username=?, name=?, password=?, role=?, email=?, enabled=1");
+			statement = con.prepareStatement("INSERT INTO survey_app.users (username, name, password, role, email, enabled) VALUES (?, ?, ?, ?, ?, 1)");
 			statement.setString(1, u.getUsername());
 			statement.setString(2, u.getName());
 			statement.setString(3, DEFAULT_PASSWORD);
 			statement.setString(4, u.getRole());
 			statement.setString(5, u.getEmail());
-			statement.executeQuery();
-			con.commit();
+			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create user");
+			System.out.println(e.toString());
+		}
+	}
+
+	public void removeUserWithId(int id){
+		try{
+			statement = con.prepareStatement("DELETE FROM survey_app.users WHERE user_ID=?");
+			statement.setString(1, "" + id);
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not remove user");
 			System.out.println(e.toString());
 		}
 	}
@@ -119,6 +109,24 @@ public class UserDao implements AbstractUserDao {
 				allUsers.add(u);
 			}
 			return allUsers;
+		} catch (SQLException e){
+			System.out.println("Error: Could not retrieve users");
+			System.out.println(e.toString());
+			return null;
+		}
+	}
+
+	public ArrayList<User> getAllUsersWithRole(String role){
+		try{
+			statement = con.prepareStatement("SELECT * FROM survey_app.users WHERE role=?");
+			statement.setString(1, role);
+			ResultSet result = statement.executeQuery();
+			ArrayList<User> foundUsers = new ArrayList<User>();
+			while(result.next()){
+				User u = createFromSearch(result);
+				foundUsers.add(u);
+			}
+			return foundUsers;
 		} catch (SQLException e){
 			System.out.println("Error: Could not retrieve users");
 			System.out.println(e.toString());

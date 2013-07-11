@@ -41,7 +41,7 @@
 			</div>
 		</div>
 		<div class="row-fluid">
-			<h2>Welcome, ${name}</h2>
+			<h2>I'd TAPP that</h2>
 			<p>Click a link in the navbar to begin</p>
 			<p>You can:</p>
 			<ul>

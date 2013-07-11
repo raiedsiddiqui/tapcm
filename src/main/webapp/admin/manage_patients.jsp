@@ -58,20 +58,26 @@
                 <tr>
                     <td>${p.firstName} ${p.lastName}</td>
                     <td>${p.volunteer}</td>
-                    <td><a href="#" class="btn btn-danger">Remove</a></td>
+                    <td><a href="${pageContext.request.contextPath}/remove_patient/${p.patientId}" class="btn btn-danger">Remove</a></td>
                 </tr>
                 </c:forEach>
 			</table>
 			<a class="btn btn-primary" onClick="showAddPatient()">Add new</a>
 		</div>
 		<div class="row-fluid" id="addPatientDiv" style="display:none";>
-			<form>
+			<form id="newPatient" method="post" action="${pageContext.request.contextPath}/add_patient">
 				<fieldset>
 					<legend>Add new patient</legend>
-					<label>Name:</label>
-					<input type="text" name="name"/>
-					<label>Caretaker</label>
-					<input type="text" name="email"/><br />
+					<label>First Name:</label>
+					<input type="text" name="firstname"/>
+					<label>Last Name:</label>
+					<input type="text" name="lastname"/>
+					<label>Volunteer</label>
+					<select name="volunteer" form="newPatient">
+						<c:forEach items="${volunteers}" var="v">
+						<option value="${v.name}">${v.name}</option>
+						</c:forEach>
+					</select><br />
 					<input class="btn btn-primary" type="submit" value="Add" />
 				</fieldset>
 			</form>

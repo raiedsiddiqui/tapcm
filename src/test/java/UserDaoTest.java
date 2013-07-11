@@ -51,4 +51,16 @@ public class UserDaoTest{
 		}
 	}
 
+	@Test
+	public void testGetByRole(){
+		UserDao dao = new UserDao(DB, UN, PW);
+		assertNotNull("DAO is null", dao);
+		ArrayList<User> volunteers = dao.getAllUsersWithRole("ROLE_USER");
+		assertNotNull("No users returned", volunteers);
+		System.out.println("Volunteers:");
+		for (User u : volunteers){
+			System.out.println(u.getName());
+		}
+	}
+
 }

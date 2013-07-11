@@ -54,23 +54,34 @@
 					<th>Name</th>
 					<th>Username</th>
 					<th>Role</th>
-					<th>Enabled?</th>
+					<th>Status</th>
 					<th></th>
 				</tr>
 				<c:forEach items="${users}" var="u">
+				<c:if test="${u.role eq 'ROLE_ADMIN'}">
+				<tr class="info">
+				</c:if>
+				<c:if test="${u.role eq 'ROLE_USER'}">
 				<tr>
+				</c:if>
 					<td>${u.name}</td>
 					<td>${u.username}</td>
-					<td>${u.role}</td>
-					<td>${u.enabled}</td>
-					<td><a href="#" class="btn btn-danger">Remove</a></td>
+					<td>
+						<c:if test="${u.role eq 'ROLE_ADMIN'}">Administrator</c:if>
+						<c:if test="${u.role eq 'ROLE_USER'}">Volunteer</c:if>
+					</td>
+					<td>
+						<c:if test="${u.enabled eq 'true'}">Enabled</c:if>
+						<c:if test="${u.enabled eq 'false'}">Disabled</c:if>
+					</td>
+					<td><a href="${pageContext.request.contextPath}/remove_user/${u.userID}" class="btn btn-danger">Remove</a></td>
 				</tr>
 				</c:forEach>
 			</table>
 			<a class="btn btn-primary" onClick="showAddUser()">Add new</a>
 		</div>
 		<div class="row-fluid" id="addUserDiv" style="display:none";>
-			<form>
+			<form action="add_user" method="post">
 				<fieldset>
 					<legend>Add new user</legend>
 					<label>Name:</label>
@@ -81,7 +92,7 @@
 					<input type="text" name="email"/>
 					<label>Role</label>
 					<input type="radio" name="role" value="ROLE_ADMIN">Administrator</input> <br/>
-					<input type="radio" name="role" value="ROLE_USER">Caretaker</input> <br/>
+					<input type="radio" name="role" value="ROLE_USER">Volunteer</input> <br/>
 					<input class="btn btn-primary" type="submit" value="Add" />
 				</fieldset>
 			</form>

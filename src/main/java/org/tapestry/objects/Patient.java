@@ -28,6 +28,10 @@ public class Patient{
         return lastName;
     }
 
+    public String getLastInitial(){
+	return lastName.substring(0, 1);
+    }
+
     public String getGender(){
         return gender;
     }
