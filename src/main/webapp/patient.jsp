@@ -29,7 +29,7 @@
 			background: linear-gradient(135deg,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* W3C */
 			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 			
-			background-color:#{patient.color};
+			background-color:#ffffff;
 		}
 		.content a{
 			color:#ffffff;
@@ -38,7 +38,7 @@
 </head>
 	
 <body>
-	<img src="resources/images/logo.png"/>
+	<img src="${pageContext.request.contextPath}/resources/images/logo.png"/>
 	<div class="content">
 		<div class="navbar navbar-inverse">
 			<div class="navbar-inner">
@@ -48,14 +48,10 @@
         					<span class="icon-bar"></span>
        				 		<span class="icon-bar"></span>
      					</a>
-     					<a class="brand" href="index.html">Home</a>
+     					<a class="brand" href="${pageContext.request.contextPath}/">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li class="active"><a href="1.html">Angie O.</a></li>
-							<li><a href="2.html">Kandi A.</a></li>
-							<li><a href="3.html">Earl B.</a></li>
-							<li><a href="4.html">Tess T.</a></li>
-							<li><a href="login.html">Log Out</a></li>
+							<li><a href="${pageContext.request.contextPath}/j_spring_security_logout">Log Out</a></li>
 						</ul>
 					</div>
 				</div>	
@@ -63,7 +59,7 @@
 		</div>
 		<div style="padding: 0px 15px;">
 			<div class="row-fluid">
-				<div class="span3"><h2>#{patient.name}</h2></div>
+				<div class="span3"><h2>${patient.firstName} ${patient.lastInitial}</h2></div>
 				<div class="span3 btn-group">
 					<a href="#modalInfo" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 					<a href="#modalWarn" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-exclamation-sign icon-white"></i></a>
@@ -97,8 +93,8 @@
   			<div class="row">
   				<div class="span3"><img src="http://placehold.it/200x200"></img></div>
 				<div class="span2"> 			
-   				<p class="text-info">Gender: F</p>
-   				<p class="text-info">Age: 72</p>
+   				<p class="text-info">Gender: ${patient.gender}</p>
+   				<p class="text-info">Age: ${patient.age}</p>
    			</div>
    		</div>
   		</div>
@@ -109,10 +105,10 @@
 	<div id="modalWarn" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="warnLabel" aria-hidden="true">
 		<div class="modal-header">
    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-   		<h3 id="warnLabel" style="color:#000000;">Patient Warnings: Angie O.</h3>
+   		<h3 id="warnLabel" style="color:#000000;">Patient Warnings: ${patient.firstName} ${patient.lastInitial}</h3>
   		</div>
   		<div class="modal-body">
-  			<p class="text-warning">Patient may bite.</p>
+  			<p class="text-warning"></p>
   		</div>
   		<div class="modal-footer">
    			<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>

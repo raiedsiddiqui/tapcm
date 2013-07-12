@@ -86,25 +86,38 @@ public class User implements java.io.Serializable {
 		this.name = name;
 	}
 
+	/**
+	*@param username The new username for the user
+	*/
 	public void setUsername(String username){
 		this.username = username;
 	}
 
-
+	/**
+	* @param password The new password for the user
+	* NOT YET IMPLEMENTED
+	*/
 	public void setPassword(String password){
 	}
 
-
+	/**
+	* @param enabled The new status for the user
+	*/
 	public void setEnabled(boolean enabled){
 		this.enabled = enabled;
 	}
 
 
+	/**
+	* @param email The new email address for the user
+	*/
 	public void setEmail(String email){
 		this.email = email;
 	}
 
-
+	/**
+	* @param role The new role for the user (either "ROLE_USER" or "ROLE_ADMIN")
+	*/
 	public void setRole(String role){
 		this.role = role;
 	}

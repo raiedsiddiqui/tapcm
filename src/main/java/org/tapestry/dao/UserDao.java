@@ -1,7 +1,6 @@
 package org.tapestry.dao;
 
 import org.tapestry.objects.User;
-import org.tapestry.dao.AbstractUserDao;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -9,13 +8,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class UserDao implements AbstractUserDao {
+/**
+* UserDAO class
+* Allows the application to interface with the 'survey_app.users' table.
+*/
+public class UserDao {
 
 	private PreparedStatement statement;
 	private Connection con;
 
 	private final String DEFAULT_PASSWORD = "changeme";
 
+	/**
+	* Constructor
+	* @param url The url of the database, prefaced with 'jdbc:' (most likely 'jdbc:mysql://localhost:3306')
+	* @param username The username for the database user
+	* @param password The password for the database user
+	*/
 	public UserDao(String url, String username, String password){
 		try{
 			con = DriverManager.getConnection(url, username, password);
@@ -25,6 +34,11 @@ public class UserDao implements AbstractUserDao {
 		}
 	}
 
+	/**
+	* Creates a User object from the result of executing an SQL query
+	* @param result The ResultSet returned by calling PreparedStatement.executeQuery()
+	* @return A User object representing the person
+	*/
 	private User createFromSearch(ResultSet result){
 		User u = new User();
 		try{
@@ -45,6 +59,11 @@ public class UserDao implements AbstractUserDao {
 		return u;
 	}
 
+	/**
+	* Selects a user based off the user ID
+	* @param id The ID of the user to search for
+	* @return A User object representing the person
+	*/
 	public User getUserById(int id){
 		try{
 			statement = con.prepareStatement("SELECT * FROM survey_app.users WHERE user_ID=?");
@@ -59,6 +78,11 @@ public class UserDao implements AbstractUserDao {
 		}
 	}
 
+	/**
+	* Selects a user based off the username
+	* @param username The username to search for
+	* @return A User object representing the person, or null if the request fails
+	*/
 	public User getUserByUsername(String username){
 		try{
 			statement = con.prepareStatement("SELECT * FROM survey_app.users WHERE username=?");
@@ -73,6 +97,10 @@ public class UserDao implements AbstractUserDao {
 		}
 	}
 
+	/**
+	* Stores a user in the database
+	* @param u The User object to store
+	*/
 	public void createUser(User u){
 		try{
 			statement = con.prepareStatement("INSERT INTO survey_app.users (username, name, password, role, email, enabled) VALUES (?, ?, ?, ?, ?, 1)");
@@ -88,6 +116,10 @@ public class UserDao implements AbstractUserDao {
 		}
 	}
 
+	/**
+	* Removes a user from the database
+	* @param id The ID of the user to remove
+	*/
 	public void removeUserWithId(int id){
 		try{
 			statement = con.prepareStatement("DELETE FROM survey_app.users WHERE user_ID=?");
@@ -99,6 +131,10 @@ public class UserDao implements AbstractUserDao {
 		}
 	}
 
+	/**
+	* Lists all the users in the database
+	* @return An ArrayList of User objects, or null if the request fails
+	*/
 	public ArrayList<User> getAllUsers(){
 		try{
 			statement = con.prepareStatement("SELECT * FROM survey_app.users");
@@ -116,6 +152,11 @@ public class UserDao implements AbstractUserDao {
 		}
 	}
 
+	/**
+	* Lists all the users in the database with the specified role
+	* @param role The role to search for ("ROLE_USER" or "ROLE_ADMIN")
+	* @return An ArrayList of User objects, or null if the request fails
+	*/
 	public ArrayList<User> getAllUsersWithRole(String role){
 		try{
 			statement = con.prepareStatement("SELECT * FROM survey_app.users WHERE role=?");
