@@ -95,9 +95,9 @@ public class User implements java.io.Serializable {
 
 	/**
 	* @param password The new password for the user
-	* NOT YET IMPLEMENTED
 	*/
 	public void setPassword(String password){
+		this.password = password;
 	}
 
 	/**

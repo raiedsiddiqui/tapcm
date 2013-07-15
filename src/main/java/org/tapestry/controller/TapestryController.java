@@ -1,6 +1,7 @@
 package org.tapestry.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,6 +83,11 @@ public class TapestryController{
 		u.setName(request.getParameter("name"));
 		u.setUsername(request.getParameter("username"));
 		u.setRole(request.getParameter("role"));
+		
+		ShaPasswordEncoder enc = new ShaPasswordEncoder();
+		String hashedPassword = enc.encodePassword("password", null); //Default
+		
+		u.setPassword(hashedPassword);
 		u.setEmail(request.getParameter("email"));
 		userDao.createUser(u);
 		//Display page again
@@ -101,6 +107,7 @@ public class TapestryController{
 		p.setFirstName(request.getParameter("firstname"));
 		p.setLastName(request.getParameter("lastname"));
 		p.setVolunteer(request.getParameter("volunteer"));
+		p.setColor(request.getParameter("backgroundColor"));
 		patientDao.createPatient(p);
 		return "redirect:/manage_patients";
 	}

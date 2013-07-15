@@ -29,12 +29,20 @@
 		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
 	</http>
  
+ 	<beans:bean id="encoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
+ 
 	<authentication-manager>
 	  <authentication-provider>
+	    <password-encoder ref="encoder" />
 		<jdbc-user-service data-source-ref="dataSource"
 			users-by-username-query="select username, password, enabled from users where username=?"
 			authorities-by-username-query="select username, role from users where username=?"
 		/>
+		<!--
+		<user-service>
+			<user name="admin" password="d033e22ae348aeb5660fc2140aec35850c4da997" authorities="ROLE_ADMIN" />
+		</user-service>
+		-->
 	  </authentication-provider>
 	</authentication-manager>
  

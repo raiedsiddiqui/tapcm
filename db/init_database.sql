@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
 	user_ID TINYINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED TINYINT allows for 255 users*/
 	name VARCHAR(255) NOT NULL,
 	username VARCHAR(30) NOT NULL,
-	password VARCHAR(20) NOT NULL,
+	password VARCHAR(255) NOT NULL,
 	enabled BOOLEAN NOT NULL,
 	email VARCHAR(50) NOT NULL,
 	role VARCHAR(45),
@@ -14,16 +14,17 @@ CREATE TABLE IF NOT EXISTS users (
 
 /*Create a default admin user*/
 INSERT INTO users (user_ID, username, password, enabled, name, email, role)
-VALUES (1, 'admin', 'admin', TRUE, 'Adam Gignac', 'gignac.adam@gmail.com', "ROLE_ADMIN");
+VALUES (1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', TRUE, 'Adam Gignac', 'gignac.adam@gmail.com', "ROLE_ADMIN");
 
 CREATE TABLE IF NOT EXISTS patients (
-	patient_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 patients*/
+	patient_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*zzUsing UNSIGNED SMALLINT allows for 65,535 patients*/
 	firstname VARCHAR(255) NOT NULL,
 	lastname VARCHAR(255) NOT NULL,
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
 	age TINYINT UNSIGNED, /*Using UNSIGNED TINYINT allows ages between 0-255, which is overkill but I can't get any smaller than that*/
 	email VARCHAR(50),
 	volunteer VARCHAR(255) NOT NULL, /*Same as users.name*/
+    color VARCHAR(7), /*Hexcode color string (#ffffff)*/
 	PRIMARY KEY (patient_ID)
 );
 

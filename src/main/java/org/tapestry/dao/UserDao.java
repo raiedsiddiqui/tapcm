@@ -17,7 +17,6 @@ public class UserDao {
 	private PreparedStatement statement;
 	private Connection con;
 
-	private final String DEFAULT_PASSWORD = "changeme";
 
 	/**
 	* Constructor
@@ -106,7 +105,7 @@ public class UserDao {
 			statement = con.prepareStatement("INSERT INTO survey_app.users (username, name, password, role, email, enabled) VALUES (?, ?, ?, ?, ?, 1)");
 			statement.setString(1, u.getUsername());
 			statement.setString(2, u.getName());
-			statement.setString(3, DEFAULT_PASSWORD);
+			statement.setString(3, u.getPassword());
 			statement.setString(4, u.getRole());
 			statement.setString(5, u.getEmail());
 			statement.execute();
