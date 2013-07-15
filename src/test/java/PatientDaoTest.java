@@ -36,7 +36,7 @@ public class PatientDaoTest{
 		assertNotNull("No patients returned", patients);
 		System.out.println("Patients:");
 		for (Patient p : patients){
-			System.out.println("| " + p.getPatientId() + " | "  + p.getFirstName() + " | " + p.getLastName() + " |");
+			System.out.println("| " + p.getPatientId() + " | "  + p.getFirstName() + " | " + p.getLastName() + " | " + p.getColor() + " |");
 		}
 	}
 

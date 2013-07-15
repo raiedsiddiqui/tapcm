@@ -63,6 +63,7 @@ public class PatientDao {
             		p.setFirstName(result.getString("firstname"));
             		p.setLastName(result.getString("lastname"));
             		p.setGender(result.getString("gender"));
+            		p.setColor(result.getString("color"));
 			//String age = result.getString("age");
 			//if (age != null);
 	            	//p.setAge(Integer.parseInt(result.getString("age")));
@@ -124,10 +125,11 @@ public class PatientDao {
 	*/
     	public void createPatient(Patient p){
 		try{
-			statement = con.prepareStatement("INSERT INTO survey_app.patients (firstname, lastname, volunteer) VALUES (?, ?, ?)");
+			statement = con.prepareStatement("INSERT INTO survey_app.patients (firstname, lastname, volunteer, color) VALUES (?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
 			statement.setString(2, p.getLastName());
 			statement.setString(3, p.getVolunteer());
+			statement.setString(4, p.getColor());
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create patient");

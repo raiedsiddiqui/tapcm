@@ -8,6 +8,7 @@ public class Patient{
 	private int age;
 	private String email;
 	private String volunteer;
+	private String color;
 
 	/**
 	* Empty constructor
@@ -71,6 +72,13 @@ public class Patient{
     	public String getVolunteer(){
         	return volunteer;
     	}
+    
+    /**
+     * @return The background color for this patient
+     */
+    	public String getColor(){
+    		return color;
+    	}
 
 	//Mutators
 	/**
@@ -120,5 +128,12 @@ public class Patient{
 	*/
     	public void setVolunteer(String volunteer){
         	this.volunteer = volunteer;
+    	}
+    	
+    /**
+     * @param color The color to use as the background for the patient's page
+     */
+    	public void setColor(String color){
+    		this.color = color;
     	}
 }

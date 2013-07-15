@@ -29,7 +29,7 @@
 			background: linear-gradient(135deg,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* W3C */
 			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 			
-			background-color:#ffffff;
+			background-color:${patient.color};
 		}
 		.content a{
 			color:#ffffff;
@@ -59,7 +59,7 @@
 		</div>
 		<div style="padding: 0px 15px;">
 			<div class="row-fluid">
-				<div class="span3"><h2>${patient.firstName} ${patient.lastInitial}</h2></div>
+				<div class="span3"><h2>${patient.firstName} ${patient.lastInitial}.</h2></div>
 				<div class="span3 btn-group">
 					<a href="#modalInfo" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 					<a href="#modalWarn" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-exclamation-sign icon-white"></i></a>
