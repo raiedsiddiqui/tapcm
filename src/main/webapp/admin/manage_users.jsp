@@ -80,6 +80,7 @@
 			</table>
 			<a class="btn btn-primary" onClick="showAddUser()">Add new</a>
 		</div>
+
 		<div class="row-fluid" id="addUserDiv" style="display:none";>
 			<form action="add_user" method="post">
 				<fieldset>
