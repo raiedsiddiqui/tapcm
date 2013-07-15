@@ -55,27 +55,7 @@
         </div>
        </div>
       </form>
-	<p>Tapestry v0.5</p>
-     </div>
-    </div>
-    <div id="modalWarnLogin" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="warnLabel" aria-hidden="true">
-     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-       x
-      </button>
-      <h3 id="warnLabel" style="color:#000000;">
-       Invalid Login
-      </h3>
-     </div>
-     <div class="modal-body">
-      <p class="muted">
-       Invalid Login/Password. Please try again.
-      </p>
-     </div>
-     <div class="modal-footer">
-      <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">
-       Close
-      </button>
+	<p>Tapestry v0.7</p>
      </div>
     </div>
    </div>
