@@ -4,7 +4,7 @@ USE survey_app;
 CREATE TABLE IF NOT EXISTS users (
 	user_ID TINYINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED TINYINT allows for 255 users*/
 	name VARCHAR(255) NOT NULL,
-	username VARCHAR(30) NOT NULL,
+	username VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL,
 	enabled BOOLEAN NOT NULL,
 	email VARCHAR(50) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS survey_results (
 	result_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 results*/
 	survey SMALLINT UNSIGNED NOT NULL, /*Same as survey_ID field in surveys*/
 	patient SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID in patients*/
-	caretaker SMALLINT UNSIGNED NOT NULL, /*Same as user_ID in users*/
+	volunteer SMALLINT UNSIGNED NOT NULL, /*Same as user_ID in users*/
 	started DATE NOT NULL,
 	completed DATE,
 	results TEXT,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS survey_results (
 CREATE TABLE IF NOT EXISTS activites (
 	event_ID INT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED INT allows for 4,294,967,295 events, which should be enough*/
 	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	caretaker SMALLINT UNSIGNED NOT NULL,
+	volunteer SMALLINT UNSIGNED NOT NULL,
 	patient SMALLINT UNSIGNED NOT NULL,
 	description TEXT,
 	PRIMARY KEY (event_ID)
@@ -58,9 +58,9 @@ CREATE TABLE IF NOT EXISTS activites (
 
 CREATE TABLE IF NOT EXISTS appointments (
 	appointment_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 appointments*/
-	caretaker TINYINT UNSIGNED NOT NULL, /*Same as user_ID from users table*/
-	patient SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID from patients table*/
-	date_time DATETIME NOT NULL,
+	volunteer VARCHAR(255) NOT NULL,
+	patient VARCHAR(255) NOT NULL,
+	date_time DATETIME NOT NULL, /*Contains both date and time, separated using functions in query*/
 	details TEXT,
 	PRIMARY KEY(appointment_ID)
 );

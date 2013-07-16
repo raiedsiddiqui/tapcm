@@ -26,7 +26,6 @@ public class UserDaoTest{
 		User u = dao.getUserById(1);
 		assertNotNull("User is null", u);
 		assertEquals("Username is not correct", "admin", u.getUsername());
-		System.out.println("User with ID 1 is: " + u.getUsername());
 	}
 
 	@Test
@@ -36,7 +35,6 @@ public class UserDaoTest{
 		User u = dao.getUserByUsername("admin");
 		assertNotNull("User is null", u);
 		assertEquals("Username is not correct", "admin", u.getUsername());
-		System.out.println("User ID with username admin is: " + u.getUserID());
 	}
 
 	@Test

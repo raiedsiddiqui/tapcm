@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
+import org.tapestry.dao.AppointmentDao;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
+import org.tapestry.objects.Appointment;
 import java.util.ArrayList;
 
 /**
@@ -27,8 +29,13 @@ import java.util.ArrayList;
 @Controller
 public class TapestryController{
 
-	private UserDao userDao = new UserDao("jdbc:mysql://localhost:3306", "root", "root");
-   	private PatientDao patientDao = new PatientDao("jdbc:mysql://localhost:3306", "root", "root");
+	private final String DB = "jdbc:mysql://localhost:3306";
+	private final String UN = "root";
+	private final String PW = "root";
+	
+	private UserDao userDao = new UserDao(DB, UN, PW);
+   	private PatientDao patientDao = new PatientDao(DB, UN, PW);
+   	private AppointmentDao appointmentDao = new AppointmentDao(DB, UN, PW);
 
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String login(ModelMap model){
@@ -41,8 +48,11 @@ public class TapestryController{
 			String username = request.getUserPrincipal().getName();
 			User u = userDao.getUserByUsername(username);
 			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getName());
+			ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getName());
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
+			model.addAttribute("appointments", appointmentsForToday);
+			
 			return "volunteer/index";
 		}
 		else if (request.isUserInRole("ROLE_ADMIN")){

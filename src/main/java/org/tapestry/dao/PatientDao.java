@@ -81,18 +81,18 @@ public class PatientDao {
 	*/
     	public ArrayList<Patient> getAllPatients(){
         	try{
-            		statement = con.prepareStatement("SELECT * FROM survey_app.patients");
-            		ResultSet result = statement.executeQuery();
-            		ArrayList<Patient> allPatients = new ArrayList<Patient>();
-            		while(result.next()){
-				Patient p = createFromSearch(result);
-				allPatients.add(p);
-			}
-            		return allPatients;
+           		statement = con.prepareStatement("SELECT * FROM survey_app.patients");
+           		ResultSet result = statement.executeQuery();
+           		ArrayList<Patient> allPatients = new ArrayList<Patient>();
+           		while(result.next()){
+           			Patient p = createFromSearch(result);
+           			allPatients.add(p);
+            	}
+            	return allPatients;
         	} catch (SQLException e){
-            		System.out.println("Error: Could not retrieve patients");
-            		System.out.println(e.toString());
-            		return null;
+           		System.out.println("Error: Could not retrieve patients");
+           		System.out.println(e.toString());
+           		return null;
         	}
     	}
 

@@ -71,7 +71,7 @@
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<c:forEach items="${patients}" var="p">
-							<li><a href="${pageContext.request.contextPath}/patient/${p.patientId}">${p.firstName} ${p.lastInitial}.</a></li>
+							<li><a href="${pageContext.request.contextPath}/patient/${p.patientId}">${p.displayName}.</a></li>
 							</c:forEach>
 							<li><a href="#">My Profile</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
@@ -84,16 +84,21 @@
 			<div class="span6" style="padding:0px 15px;">
 				<h2>Welcome, ${name}</h2>
 				<p><strong>Today's Appointments:</strong></p>
-				<table class="table">
-					<tr>
-						<td>Kandi A.</td>
-						<td>8:00</td>
-					</tr>
-					<tr>
-						<td>Tess T.</td>
-						<td>12:00</td>
-					</tr>
-				</table>
+				<c:choose>
+					<c:when test="${not empty appointments}">
+					<table class="table">
+						<c:forEach items="${appointments}" var="a">
+						<tr>
+							<td>${a.patient}</td>
+							<td>${a.time}</td>
+						</tr>
+						</c:forEach>
+					</table>
+					</c:when>
+					<c:otherwise>
+						<p style="margin-left:25px"><strong>No appointments for today</strong></p>
+					</c:otherwise>
+				</c:choose>
 				<p><strong>Recent Activities:</strong></p>
 				<table class="table">
 					<tr>
@@ -109,16 +114,6 @@
 						<td>Added new patient Tess T.</td>
 					</tr>
 				</table>
-			</div>
-			<div class="span4 offset2" style="padding:0px 15px;">
-				<h2>Managing:</h2>
-				<ul class="nav nav-stacked nav-tabs">
-					<li><a href="1.html" style="background-color:#6aaf41;">Angie O.</a></li>
-					<li><a href="2.html" style="background-color:#FBD500;">Kandi A.</a></li>
-					<li><a href="3.html" style="background-color:#00ABD3;">Earl B.</a></li>
-					<li><a href="4.html" style="background-color:#D61B83;">Tess T.</a></li>
-					<li><a href="#">All</a></li>
-				</ul>
 			</div>
 		</div>
 	</div>
