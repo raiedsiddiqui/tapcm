@@ -96,7 +96,7 @@
 					</table>
 					</c:when>
 					<c:otherwise>
-						<p style="margin-left:25px"><strong>No appointments for today</strong></p>
+						<p style="margin-left:25px">No appointments for today</p>
 					</c:otherwise>
 				</c:choose>
 				<p><strong>Recent Activities:</strong></p>
