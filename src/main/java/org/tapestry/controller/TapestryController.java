@@ -121,11 +121,16 @@ public class TapestryController{
 	@RequestMapping(value="/patient/{patient_id}", method=RequestMethod.GET)
 	public String viewPatient(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		Patient patient = patientDao.getPatientById(id);
-		String loggedInUser = request.getUserPrincipal().getName();
+		//Find the name of the current user
+		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		String loggedInUser = u.getName();
+		//Make sure that the user is actually responsible for the patient in question
 		String volunteerForPatient = patient.getVolunteer();
-		//if (!(loggedInUser.equals(volunteerForPatient))){ //Make sure that we actually are responsible for this patient
-		//	return "/error-forbidden";
-		//}
+		if (!(loggedInUser.equals(volunteerForPatient))){
+			model.addAttribute("loggedIn", loggedInUser);
+			model.addAttribute("patientOwner", volunteerForPatient);
+			return "/error-forbidden";
+		}
 		model.addAttribute("patient", patient);
 		return "/patient";
 	}

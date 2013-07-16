@@ -34,6 +34,10 @@
 		.content a{
 			color:#ffffff;
 		}
+		textarea{
+			width:90%;
+			margin-right:10px;
+		}
 	</style>
 </head>
 	
@@ -76,7 +80,7 @@
 			<div class="row-fluid" style="padding-bottom:15px; padding-right:15px;">
 				<div class="span12">
 					<p>General Symptoms:</p>
-					<textarea></textarea>
+					<textarea></textarea><br />
 					<button class="btn">Save</button>
 				</div>
 			</div>
