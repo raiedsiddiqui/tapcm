@@ -91,7 +91,7 @@
 	<div id="modalInfo" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
 		<div class="modal-header">
    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-   		<h3 id="infoLabel" style="color:#000000;">Patient Information: ${patient.displayName}/h3>
+   		<h3 id="infoLabel" style="color:#000000;">Patient Information: ${patient.displayName}</h3>
   		</div>
   		<div class="modal-body">
   			<div class="row">

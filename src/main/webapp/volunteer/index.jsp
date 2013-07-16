@@ -71,7 +71,7 @@
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<c:forEach items="${patients}" var="p">
-							<li><a href="${pageContext.request.contextPath}/patient/${p.patientId}">${p.displayName}.</a></li>
+							<li><a href="${pageContext.request.contextPath}/patient/${p.patientId}">${p.displayName}</a></li>
 							</c:forEach>
 							<li><a href="#">My Profile</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>

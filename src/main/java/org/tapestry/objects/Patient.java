@@ -42,7 +42,7 @@ public class Patient{
 	*@return The first letter of the patient's last name
 	*/
     	public String getDisplayName(){
-		return firstName + " " + lastName.substring(0, 1);
+		return firstName + " " + lastName.substring(0, 1) + ".";
     	}
 
 	/**
