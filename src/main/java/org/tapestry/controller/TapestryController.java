@@ -130,7 +130,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/patient/{patient_id}", method=RequestMethod.GET)
 	public String viewPatient(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		Patient patient = patientDao.getPatientById(id);
+		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		String loggedInUser = u.getName();

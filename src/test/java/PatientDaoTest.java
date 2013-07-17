@@ -23,7 +23,7 @@ public class PatientDaoTest{
 	public void testGetById(){
 		PatientDao dao = new PatientDao(DB, UN, PW);
 		assertNotNull("DAO is null", dao);
-		Patient p = dao.getPatientById(1);
+		Patient p = dao.getPatientByID(1);
 		assertNotNull("Patient is null", p);
 		System.out.println("Patient with ID 1 is: " + p.getFirstName() + " " + p.getLastName());
 	}
@@ -36,7 +36,7 @@ public class PatientDaoTest{
 		assertNotNull("No patients returned", patients);
 		System.out.println("Patients:");
 		for (Patient p : patients){
-			System.out.println("| " + p.getPatientId() + " | "  + p.getFirstName() + " | " + p.getLastName() + " | " + p.getColor() + " |");
+			System.out.println("| " + p.getPatientID() + " | "  + p.getFirstName() + " | " + p.getLastName() + " | " + p.getColor() + " |");
 		}
 	}
 

@@ -1,7 +1,7 @@
 package org.tapestry.objects;
 
 public class Patient{
-	private int patientId;
+	private int patientID;
 	private String firstName;
 	private String lastName;
 	private String gender;
@@ -20,8 +20,8 @@ public class Patient{
 	/**
 	*@return The ID of the patient
 	*/
-	public int getPatientId(){
-		return patientId;
+	public int getPatientID(){
+		return patientID;
 	}
 
 	/**
@@ -84,8 +84,8 @@ public class Patient{
 	/**
 	*@param id The new ID of the patient
 	*/
-    	public void setPatientId(int id){
-        	this.patientId = id;
+    	public void setPatientID(int id){
+        	this.patientID = id;
     	}
 
 	/**

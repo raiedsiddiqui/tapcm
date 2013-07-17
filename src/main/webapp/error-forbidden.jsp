@@ -9,12 +9,12 @@
 </head>
 	
 <body>
-	<img src="${pageContext.request.contextPath}/resources/images/logo.png"/>
+	<img src="<c:url value="/resources/images/logo.png"/>"/>
 	<div class="container">
 		<h1>Access Denied</h1>
 		<h2>You don't have permission to view this page<h2>
 		<button class="btn btn-info" onClick="history.back()">Go back</button>
-		<a href="${pageContext.request.contextPath}/j_spring_security_logout" class="btn btn-primary">Change user</a>
+		<a href="<c:url value="/j_spring_security_logout"/>" class="btn btn-primary">Change user</a>
 	</div>
 </body>
 </html>

@@ -24,7 +24,7 @@
 </head>
 	
 <body>	
-  <img src="${pageContext.request.contextPath}/resources/images/logo.png" />
+  <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<div class="navbar navbar-inverse">
 			<div class="navbar-inner">
@@ -35,11 +35,11 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="${pageContext.request.contextPath}/">Home</a>
+     					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li><a href="${pageContext.request.contextPath}/manage_users">Manage Volunteers</a></li>
-							<li><a href="${pageContext.request.contextPath}/manage_patients">Manage Patients</a></li>
+							<li><a href="<c:url value="/manage_users"/>">Manage Volunteers</a></li>
+							<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
 							<li><a href="#">Manage Surveys</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
@@ -74,7 +74,7 @@
 						<c:if test="${u.enabled eq 'true'}">Enabled</c:if>
 						<c:if test="${u.enabled eq 'false'}">Disabled</c:if>
 					</td>
-					<td><a href="${pageContext.request.contextPath}/remove_user/${u.userID}" class="btn btn-danger">Remove</a></td>
+					<td><a href="<c:url value="/remove_user/${u.userID}"/>" class="btn btn-danger">Remove</a></td>
 				</tr>
 				</c:forEach>
 			</table>

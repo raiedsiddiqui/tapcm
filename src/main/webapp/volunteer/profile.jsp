@@ -56,6 +56,10 @@
 		.btn-primary{
 			margin-bottom:10px;
 		}
+		
+		#changePassword{
+			color:black;
+		}
 	</style>
 	
 	<script type="text/javascript">
@@ -66,7 +70,7 @@
 </head>
 	
 <body>
-  <img src="${pageContext.request.contextPath}/resources/images/logo.png" />
+  <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<div class="navbar navbar-inverse">
 			<div class="navbar-inner">
@@ -77,13 +81,9 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="${pageContext.request.contextPath}">Home</a>
+     					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<c:forEach items="${patients}" var="p">
-							<li><a href="${pageContext.request.contextPath}/patient/${p.patientId}">${p.displayName}</a></li>
-							</c:forEach>
-							<li><a href="${pageContext.request.contextPath}/profile/">My Profile</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>
@@ -92,22 +92,75 @@
 		</div>
 		
 		<div class="container-fluid">
-			<h2>${vol.name}'s Profile</h2>
-			<form id="volunteer-info">
-				<label>Name</label>
-				<input type="text" name="volName" value="${vol.name}" />
-				<label>Username</label>
-				<input type="text" name="volUsername" value="${vol.username}" /><br />
-				<a class="btn btn-success" onClick="showChangePassword()">Change password</a><br />
-				<div id="changePassword" style="display:none;">
-					<label>New password</label>
-					<input type="password" name="newPassword" />
-					<label>Confirm password</label>
-					<input type="password" name="confirmPassword" />
+			<div class="row-fluid">
+				<div class="span4">
+					<h2>${vol.name}'s Profile</h2>	
+					<form id="volunteer-info">
+						<label>Name</label>
+						<input type="text" name="volName" value="${vol.name}" />
+						<label>Username</label>
+						<input type="text" name="volUsername" value="${vol.username}" /><br />
+						<a href="#changePassword" role="button" class="btn btn-success" data-toggle="modal">Change password</a><br />
+					</form>
+					<a href="#" class="btn btn-primary">Save changes</a>
 				</div>
-			</form>
-			<a href="#" class="btn btn-primary">Save changes</a>
+				
+				<div class="span8">
+					<h2>Pictures</h2>
+					<ul class="thumbnails">
+					 	<li>
+    						<a href="#">
+      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
+    						</a>
+  						</li>
+					 	<li>
+    						<a href="#">
+      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
+    						</a>
+  						</li>
+  					 	<li>
+    						<a href="#">
+      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
+    						</a>
+  						</li>
+  						<li>
+    						<a href="#">
+      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
+    						</a>
+  						</li>
+  						<li>
+    						<a href="#">
+      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
+    						</a>
+  						</li>
+					</ul>
+				</div>
+			</div>
 		</div>
+		
+		<!-- Modal -->
+		<div id="changePassword" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+	  		<div class="modal-header">
+	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+	    		<h3 id="modalHeader">Change password</h3>
+	  		</div>
+	  		<div class="modal-body">
+	  			<form id="change-password" method="post" action="<c:url value="/change_password"/>">
+	  				<label>Current password:</label>
+					<input type="password" name="currentPassword"/>
+					<label>New password:</label>
+					<input type="password" name="newPassword"/>
+					<label>New password:</label>
+					<input type="password" name="confirmPassword"/>
+	  			</form>
+	  		</div>
+	  		<div class="modal-footer">
+	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+	    		<button type="submit" value="Book" form="change-password" class="btn btn-primary">Change</button>
+	  		</div>
+		</div>
+		
+		
 	</div>
 
 </body>

@@ -37,7 +37,7 @@ public class PatientDao {
 	* @param id The ID of the patient to find
 	* @return A Patient object representing the result
 	*/
-	public Patient getPatientById(int id){
+	public Patient getPatientByID(int id){
 		try{
 			statement = con.prepareStatement("SELECT * FROM survey_app.patients WHERE patient_ID=?");
 			statement.setString(1, "" + id);
@@ -59,7 +59,7 @@ public class PatientDao {
 	private Patient createFromSearch(ResultSet result){
 		Patient p = new Patient();
 		try{
-            		p.setPatientId(Integer.parseInt(result.getString("patient_ID")));
+            		p.setPatientID(Integer.parseInt(result.getString("patient_ID")));
             		p.setFirstName(result.getString("firstname"));
             		p.setLastName(result.getString("lastname"));
             		p.setGender(result.getString("gender"));

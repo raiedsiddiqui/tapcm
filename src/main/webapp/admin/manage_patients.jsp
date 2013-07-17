@@ -73,7 +73,7 @@
 </head>
 	
 <body>	
-  <img src="${pageContext.request.contextPath}/resources/images/logo.png" />
+  <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<div class="navbar navbar-inverse">
 			<div class="navbar-inner">
@@ -84,11 +84,11 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="${pageContext.request.contextPath}/">Home</a>
+     					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li><a href="${pageContext.request.contextPath}/manage_users">Manage Volunteers</a></li>
-							<li><a href="${pageContext.request.contextPath}/manage_patients">Manage Patients</a></li>
+							<li><a href="<c:url value="/manage_users"/>">Manage Volunteers</a></li>
+							<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
 							<li><a href="#">Manage Surveys</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
@@ -110,14 +110,14 @@
                     <td>${p.firstName} ${p.lastName}</td>
                     <td>${p.volunteer}</td>
                     <td><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
-                    <td><a href="${pageContext.request.contextPath}/remove_patient/${p.patientId}" class="btn btn-danger">Remove</a></td>
+                    <td><a href="${pageContext.request.contextPath}/remove_patient/${p.patientID}" class="btn btn-danger">Remove</a></td>
                 </tr>
                 </c:forEach>
 			</table>
 			<a class="btn btn-primary" onClick="showAddPatient()">Add new</a>
 		</div>
 		<div class="row-fluid" id="addPatientDiv" style="display:none";>
-			<form id="newPatient" method="post" action="${pageContext.request.contextPath}/add_patient">
+			<form id="newPatient" method="post" action="<c:url value="/add_patient"/>">
 				<fieldset>
 					<legend>Add new patient</legend>
 					<label>First Name:</label>
