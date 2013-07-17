@@ -83,4 +83,17 @@ public class AppointmentDao {
     		return null;
     	}   	
     }
+    
+    public void createAppointment(Appointment a){
+    	try{
+    		statement = con.prepareStatement("INSERT INTO survey_app.appointments (volunteer, patient, date_time) values (?,?,?)");
+    		statement.setString(1, a.getVolunteer());
+    		statement.setString(2, a.getPatient());
+    		statement.setString(3, a.getDate() + " " + a.getTime());
+    		statement.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not save appointment");
+    		System.out.println(e.toString());
+    	}
+    }
 }

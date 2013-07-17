@@ -83,7 +83,10 @@
 		<div class="row-fluid">
 			<div class="span6" style="padding:0px 15px;">
 				<h2>Welcome, ${name}</h2>
-				<p><strong>Today's Appointments:</strong></p>
+				<p>
+					<strong>Today's Appointments:</strong>
+					<a href="#bookAppointment" role="button" class="btn btn-primary" data-toggle="modal">Book appointment</a>
+				</p>
 				<c:choose>
 					<c:when test="${not empty appointments}">
 					<table class="table">
@@ -116,6 +119,32 @@
 				</table>
 			</div>
 		</div>
+	</div>
+
+	<!-- Modal -->
+	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+  		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    		<h3 id="modalHeader">Modal header</h3>
+  		</div>
+  		<div class="modal-body">
+  			<form id="appt-form" method="post" action="${pageContext.request.contextPath}/book_appointment">
+  				<label>With patient:</label>
+				<select name="patient" form="appt-form">
+					<c:forEach items="${patients}" var="p">
+					<option value="${p.displayName}">${p.displayName}</option>
+					</c:forEach>
+				</select><br />
+				<label>Date:</label>
+				<input type="date" name="appointmentDate"/>
+				<label>Time:</label>
+				<input type="time" name="appointmentTime"/>
+  			</form>
+  		</div>
+  		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    		<button type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
+  		</div>
 	</div>
 </body>
 </html>

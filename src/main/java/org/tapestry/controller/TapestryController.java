@@ -72,13 +72,13 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
-	public String manageUsers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String manageUsers(ModelMap model){
 		ArrayList<User> userList = userDao.getAllUsers();
 		model.addAttribute("users", userList);
 		return "admin/manage_users";
 	}
 	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
-	public String managePatients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String managePatients(ModelMap model){
 		ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
 		model.addAttribute("volunteers", volunteers);
 	        ArrayList<Patient> patientList = patientDao.getAllPatients();
@@ -105,7 +105,7 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/remove_user/{user_id}", method=RequestMethod.GET)
-	public String removeUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request){
+	public String removeUser(@PathVariable("user_id") int id){
 		userDao.removeUserWithId(id);
 		return "redirect:/manage_users";
 	}
@@ -123,7 +123,7 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/remove_patient/{patient_id}", method=RequestMethod.GET)
-	public String removePatient(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper request){
+	public String removePatient(@PathVariable("patient_id") int id){
 		patientDao.removePatientWithId(id);
 		return "redirect:/manage_patients";
 	}
@@ -143,6 +143,20 @@ public class TapestryController{
 		}
 		model.addAttribute("patient", patient);
 		return "/patient";
+	}
+	
+	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
+	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		String loggedInUser = u.getName();
+		
+		Appointment a = new Appointment();
+		a.setVolunteer(loggedInUser);
+		a.setPatient(request.getParameter("patient"));
+		a.setDate(request.getParameter("appointmentDate"));
+		a.setTime(request.getParameter("appointmentTime"));
+		appointmentDao.createAppointment(a);
+		return "redirect:/";
 	}
 
 	//Error pages

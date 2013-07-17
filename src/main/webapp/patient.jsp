@@ -63,7 +63,7 @@
 		</div>
 		<div style="padding: 0px 15px;">
 			<div class="row-fluid">
-				<div class="span3"><h2>${patient.displayName}.</h2></div>
+				<div class="span3"><h2>${patient.displayName}</h2></div>
 				<div class="span3 btn-group">
 					<a href="#modalInfo" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 					<a href="#modalWarn" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-exclamation-sign icon-white"></i></a>
