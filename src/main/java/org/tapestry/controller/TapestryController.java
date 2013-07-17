@@ -158,6 +158,13 @@ public class TapestryController{
 		appointmentDao.createAppointment(a);
 		return "redirect:/";
 	}
+	
+	@RequestMapping(value="/profile", method=RequestMethod.GET)
+	public String viewProfile(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		model.addAttribute("vol", loggedInUser);
+		return "/volunteer/profile";
+	}
 
 	//Error pages
 	@RequestMapping(value="/403", method=RequestMethod.GET)

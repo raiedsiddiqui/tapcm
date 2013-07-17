@@ -32,7 +32,7 @@
 			background: linear-gradient(135deg,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* W3C */
 			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 			
-			background-color:#4A307B;
+			background-color:#C01FB1;
 		}
 		
 		.nav-tabs.nav-stacked > li > a{
@@ -52,10 +52,20 @@
 		.nav-tabs.nav-stacked > li > a:hover{
 			color:#000000;
 		}
+		
+		.btn-primary{
+			margin-bottom:10px;
+		}
 	</style>
+	
+	<script type="text/javascript">
+		function showChangePassword(){
+			document.getElementById("changePassword").style.display="block";
+		}
+	</script>
 </head>
 	
-<body>	
+<body>
   <img src="${pageContext.request.contextPath}/resources/images/logo.png" />
 	<div class="content">
 		<div class="navbar navbar-inverse">
@@ -77,74 +87,28 @@
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>
-				</div>	
+				</div>
 			</div>
 		</div>
-		<div class="row-fluid">
-			<div class="span6" style="padding:0px 15px;">
-				<h2>Welcome, ${name}</h2>
-				<p>
-					<strong>Today's Appointments:</strong>
-					<a href="#bookAppointment" role="button" class="btn btn-primary" data-toggle="modal">Book appointment</a>
-				</p>
-				<c:choose>
-					<c:when test="${not empty appointments}">
-					<table class="table">
-						<c:forEach items="${appointments}" var="a">
-						<tr>
-							<td>${a.patient}</td>
-							<td>${a.time}</td>
-						</tr>
-						</c:forEach>
-					</table>
-					</c:when>
-					<c:otherwise>
-						<p style="margin-left:25px">No appointments for today</p>
-					</c:otherwise>
-				</c:choose>
-				<p><strong>Recent Activities:</strong></p>
-				<table class="table">
-					<tr>
-						<td>June 9, 2013</td>
-						<td>Filled out Survey 2 for Angie O.</td>
-					</tr>
-					<tr>
-						<td>June 11, 2013</td>
-						<td>Filled out general symptoms for Angie O.</td>
-					</tr>
-					<tr>
-						<td>June 11, 2013</td>
-						<td>Added new patient Tess T.</td>
-					</tr>
-				</table>
-			</div>
+		
+		<div class="container-fluid">
+			<h2>${vol.name}'s Profile</h2>
+			<form id="volunteer-info">
+				<label>Name</label>
+				<input type="text" name="volName" value="${vol.name}" />
+				<label>Username</label>
+				<input type="text" name="volUsername" value="${vol.username}" /><br />
+				<a class="btn btn-success" onClick="showChangePassword()">Change password</a><br />
+				<div id="changePassword" style="display:none;">
+					<label>New password</label>
+					<input type="password" name="newPassword" />
+					<label>Confirm password</label>
+					<input type="password" name="confirmPassword" />
+				</div>
+			</form>
+			<a href="#" class="btn btn-primary">Save changes</a>
 		</div>
 	</div>
 
-	<!-- Modal -->
-	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
-  		<div class="modal-header">
-    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    		<h3 id="modalHeader">Modal header</h3>
-  		</div>
-  		<div class="modal-body">
-  			<form id="appt-form" method="post" action="${pageContext.request.contextPath}/book_appointment">
-  				<label>With patient:</label>
-				<select name="patient" form="appt-form">
-					<c:forEach items="${patients}" var="p">
-					<option value="${p.displayName}">${p.displayName}</option>
-					</c:forEach>
-				</select><br />
-				<label>Date:</label>
-				<input type="date" name="appointmentDate"/>
-				<label>Time:</label>
-				<input type="time" name="appointmentTime"/>
-  			</form>
-  		</div>
-  		<div class="modal-footer">
-    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    		<button type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
-  		</div>
-	</div>
 </body>
 </html>
