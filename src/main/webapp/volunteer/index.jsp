@@ -17,34 +17,13 @@
 		}
 		.content{
 			overflow-x:auto;
-			color:#ffffff;
 			border-radius:5px;
 			-moz-border-radius:5px;
 			-webkit-border-radius:5px;
 			-o-border-radius:5px;
 			-ms-border-radius:5px;
-		
-			background: -moz-linear-gradient(-45deg,  rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%); /* FF3.6+ */
-			background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.65))); /* Chrome,Safari4+ */
-			background: -webkit-linear-gradient(-45deg,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* Chrome10+,Safari5.1+ */
-			background: -o-linear-gradient(-45deg,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* Opera 11.10+ */
-			background: -ms-linear-gradient(-45deg,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* IE10+ */
-			background: linear-gradient(135deg,  rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* W3C */
-			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-			
-			background-color:#4A307B;
 		}
 		
-		.nav-tabs.nav-stacked > li > a{
-			background: -moz-linear-gradient(left, rgba(0,0,0,0) 0%, rgba(0,0,0,0.65) 100%); /* FF3.6+ */
-			background: -webkit-gradient(linear, left top, right top, color-stop(0%,rgba(0,0,0,0)), color-stop(100%,rgba(0,0,0,0.65))); /* Chrome,Safari4+ */
-			background: -webkit-linear-gradient(left, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* Chrome10+,Safari5.1+ */
-			background: -o-linear-gradient(left, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* Opera 11.10+ */
-			background: -ms-linear-gradient(left, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* IE10+ */
-			background: linear-gradient(to right, rgba(0,0,0,0) 0%,rgba(0,0,0,0.65) 100%); /* W3C */
-			filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#a6000000',GradientType=1 ); /* IE6-9 */
-		}
-
 		.content a{
 			color:#ffffff;
 		}
@@ -56,7 +35,7 @@
 </head>
 	
 <body>	
-  <img src="${pageContext.request.contextPath}/resources/images/logo.png" />
+  <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<div class="navbar navbar-inverse">
 			<div class="navbar-inner">
@@ -67,13 +46,13 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="${pageContext.request.contextPath}">Home</a>
+     					<a class="brand" href="<c:url value="/"/>}">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<c:forEach items="${patients}" var="p">
-							<li><a href="${pageContext.request.contextPath}/patient/${p.patientId}">${p.displayName}</a></li>
+							<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.displayName}</a></li>
 							</c:forEach>
-							<li><a href="${pageContext.request.contextPath}/profile/">My Profile</a></li>
+							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>
@@ -124,11 +103,11 @@
 	<!-- Modal -->
 	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
   		<div class="modal-header">
-    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    		<h3 id="modalHeader">Modal header</h3>
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    		<h3 id="modalHeader">Book Appointment</h3>
   		</div>
   		<div class="modal-body">
-  			<form id="appt-form" method="post" action="${pageContext.request.contextPath}/book_appointment">
+  			<form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
   				<label>With patient:</label>
 				<select name="patient" form="appt-form">
 					<c:forEach items="${patients}" var="p">
