@@ -214,6 +214,12 @@ public class TapestryController{
 		messageDao.sendMessage(m);
 		return "redirect:/?success=true";
 	}
+	
+	@RequestMapping(value="/delete_message/{msgID}", method=RequestMethod.GET)
+	public String deleteMessage(@PathVariable("msgID") int id, ModelMap model){
+		messageDao.deleteMessage(id);
+		return "redirect:/inbox";
+	}
 
 	//Error pages
 	@RequestMapping(value="/403", method=RequestMethod.GET)

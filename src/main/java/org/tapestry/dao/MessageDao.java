@@ -122,4 +122,15 @@ public class MessageDao {
 		}
 	}
 	
+	public void deleteMessage(int id){
+		try{
+			statement = con.prepareStatement("DELETE FROM survey_app.messages WHERE message_ID=?");
+			statement.setInt(1, id);
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not delete message");
+			System.out.println(e.toString());
+		}
+	}
+	
 }
