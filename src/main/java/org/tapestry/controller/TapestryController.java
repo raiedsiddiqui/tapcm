@@ -6,6 +6,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
@@ -46,7 +47,8 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value={"/", "/loginsuccess"}, method=RequestMethod.GET)
-	public String welcome(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	//Note that messageSent is Boolean, not boolean, to allow it to be null
+	public String welcome(@RequestParam(value="success", required=false) Boolean messageSent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
 			String username = request.getUserPrincipal().getName();
 			User u = userDao.getUserByUsername(username);
@@ -65,6 +67,8 @@ public class TapestryController{
 			model.addAttribute("name", name);
 			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
 			model.addAttribute("volunteers", volunteers);
+			if (messageSent != null)
+				model.addAttribute("success", messageSent);
 			return "admin/index";
 		}
 		else{ //This should not happen, but catch any unforseen behavior
@@ -189,6 +193,7 @@ public class TapestryController{
 	
 	@RequestMapping(value="/view_message/{msgID}", method=RequestMethod.GET)
 	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = messageDao.getMessageByID(id);
 		if (!(m.isRead()))
 			messageDao.markAsRead(id);

@@ -57,7 +57,7 @@
 				<h3>Message volunteer</h3>
 				<c:if test="${not empty success}">
 					<div class="alert alert-info" style="width:170px;">
-						<p>Send successed!</p>
+						<p>Message sent</p>
 					</div>
 				</c:if>
 				<form id="messageVolunteer" method="post" action="<c:url value="/send_message"/>">
