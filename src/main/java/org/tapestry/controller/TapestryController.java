@@ -17,6 +17,12 @@ import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
 import java.util.ArrayList;
+import org.yaml.snakeyaml.Yaml;
+import java.io.IOException;
+import java.util.Map;
+import org.springframework.core.io.ClassPathResource;
+import javax.annotation.PostConstruct;
+
 
 /**
 * Main controller class
@@ -31,15 +37,42 @@ import java.util.ArrayList;
 */
 @Controller
 public class TapestryController{
-
-	private final String DB = "jdbc:mysql://localhost:3306";
-	private final String UN = "root";
-	private final String PW = "root";
 	
-	private UserDao userDao = new UserDao(DB, UN, PW);
-   	private PatientDao patientDao = new PatientDao(DB, UN, PW);
-   	private AppointmentDao appointmentDao = new AppointmentDao(DB, UN, PW);
-   	private MessageDao messageDao = new MessageDao(DB, UN, PW);
+	private ClassPathResource dbConfigFile;
+	private Map<String, String> config;
+	private Yaml yaml;
+		
+	private UserDao userDao;
+   	private PatientDao patientDao;
+   	private AppointmentDao appointmentDao;
+   	private MessageDao messageDao;
+   	
+   	/**
+   	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
+   	 */
+   	@PostConstruct
+   	public void readDatabaseConfig(){
+   		String DB = "";
+   		String UN = "";
+   		String PW = "";
+		try{
+			dbConfigFile = new ClassPathResource("db.yaml");
+			yaml = new Yaml();
+			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
+			DB = config.get("url");
+			UN = config.get("username");
+			PW = config.get("password");
+		} catch (IOException e) {
+			System.out.println("Error reading from config file");
+			System.out.println(e.toString());
+		}
+		userDao = new UserDao(DB, UN, PW);
+		patientDao = new PatientDao(DB, UN, PW);
+		appointmentDao = new AppointmentDao(DB, UN, PW);
+		messageDao = new MessageDao(DB, UN, PW);
+   	}
+   	
+   	//Everything below this point is a RequestMapping
 
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String login(ModelMap model){
@@ -195,7 +228,7 @@ public class TapestryController{
 	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = messageDao.getMessageByID(id);
-		if (!(m.getRecipient().equals(loggedInUser.getName()))){
+		if (!(m.getRecipient().equals(loggedInUser.getName())))
 			return "redirect:/403";
 		if (!(m.isRead()))
 			messageDao.markAsRead(id);

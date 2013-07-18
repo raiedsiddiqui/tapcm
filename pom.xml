@@ -13,9 +13,22 @@
 	<properties>
 		<spring.version>3.0.5.RELEASE</spring.version>
 	</properties>
+	
+	<repositories>
+  		<repository>
+    		<id>Sonatype-public</id>
+    		<name>SnakeYAML repository</name>
+    		<url>http://oss.sonatype.org/content/groups/public/</url>
+  		</repository>
+	</repositories>
  
 	<dependencies>
-
+  		<dependency>
+    		<groupId>org.yaml</groupId>
+    		<artifactId>snakeyaml</artifactId>
+    		<version>1.13-SNAPSHOT</version>
+  		</dependency>
+ 
 		<dependency>
 			<groupId>com.sun.faces</groupId>
 			<artifactId>jsf-api</artifactId>
