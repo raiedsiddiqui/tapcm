@@ -150,7 +150,7 @@ public class TapestryController{
 		if (!(loggedInUser.equals(volunteerForPatient))){
 			model.addAttribute("loggedIn", loggedInUser);
 			model.addAttribute("patientOwner", volunteerForPatient);
-			return "/error-forbidden";
+			return "redirect:/403";
 		}
 		model.addAttribute("patient", patient);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getName());
@@ -195,6 +195,8 @@ public class TapestryController{
 	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = messageDao.getMessageByID(id);
+		if (!(m.getRecipient().equals(loggedInUser.getName()))){
+			return "redirect:/403";
 		if (!(m.isRead()))
 			messageDao.markAsRead(id);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getName());
