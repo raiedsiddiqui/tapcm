@@ -13,8 +13,10 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 /*Create a default admin user*/
+/*
 INSERT INTO users (user_ID, username, password, enabled, name, email, role)
 VALUES (1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', TRUE, 'Adam Gignac', 'gignac.adam@gmail.com', "ROLE_ADMIN");
+*/
 
 CREATE TABLE IF NOT EXISTS patients (
 	patient_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*zzUsing UNSIGNED SMALLINT allows for 65,535 patients*/
@@ -70,6 +72,17 @@ CREATE TABLE IF NOT EXISTS required_surveys (
 	patient SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID from patients table*/
 	survey SMALLINT UNSIGNED NOT NULL,
 	PRIMARY KEY (req_survey_ID)
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+	message_ID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	recipient VARCHAR(255) NOT NULL,
+	sender VARCHAR(255) NOT NULL,
+	msg TEXT,
+    sent TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	subject VARCHAR(255) NOT NULL,
+	msgRead BOOLEAN NOT NULL DEFAULT 0,
+	PRIMARY KEY (message_ID)
 );
 
 COMMIT;

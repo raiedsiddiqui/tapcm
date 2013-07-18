@@ -23,14 +23,6 @@
 			-o-border-radius:5px;
 			-ms-border-radius:5px;
 		}
-		
-		.content a{
-			color:#ffffff;
-		}
-
-		.nav-tabs.nav-stacked > li > a:hover{
-			color:#000000;
-		}
 	</style>
 </head>
 	
@@ -46,13 +38,14 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="<c:url value="/"/>}">Home</a>
+     					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<c:forEach items="${patients}" var="p">
 							<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.displayName}</a></li>
 							</c:forEach>
 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
+							<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>
@@ -60,11 +53,11 @@
 			</div>
 		</div>
 		<div class="row-fluid">
-			<div class="span6" style="padding:0px 15px;">
+			<div class="span12" style="padding:0px 15px;">
 				<h2>Welcome, ${name}</h2>
 				<p>
 					<strong>Today's Appointments:</strong>
-					<a href="#bookAppointment" role="button" class="btn btn-primary" data-toggle="modal">Book appointment</a>
+					<a href="#bookAppointment" role="button" class="btn btn-primary" style="margin-left:10%;" data-toggle="modal">Book appointment</a>
 				</p>
 				<c:choose>
 					<c:when test="${not empty appointments}">

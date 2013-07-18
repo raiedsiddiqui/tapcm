@@ -40,7 +40,7 @@ public class PatientDao {
 	public Patient getPatientByID(int id){
 		try{
 			statement = con.prepareStatement("SELECT * FROM survey_app.patients WHERE patient_ID=?");
-			statement.setString(1, "" + id);
+			statement.setInt(1, id);
 			ResultSet results = statement.executeQuery();
 			results.first();
 			return createFromSearch(results);
@@ -59,7 +59,7 @@ public class PatientDao {
 	private Patient createFromSearch(ResultSet result){
 		Patient p = new Patient();
 		try{
-            		p.setPatientID(Integer.parseInt(result.getString("patient_ID")));
+            		p.setPatientID(result.getInt("patient_ID"));
             		p.setFirstName(result.getString("firstname"));
             		p.setLastName(result.getString("lastname"));
             		p.setGender(result.getString("gender"));
@@ -144,7 +144,7 @@ public class PatientDao {
 	public void removePatientWithId(int id){
 		try{
 			statement = con.prepareStatement("DELETE FROM survey_app.patients WHERE patient_ID=?");
-			statement.setString(1, "" + id);
+			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not remove patient");

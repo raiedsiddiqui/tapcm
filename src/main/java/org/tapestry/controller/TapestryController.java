@@ -10,9 +10,11 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.AppointmentDao;
+import org.tapestry.dao.MessageDao;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
+import org.tapestry.objects.Message;
 import java.util.ArrayList;
 
 /**
@@ -36,6 +38,7 @@ public class TapestryController{
 	private UserDao userDao = new UserDao(DB, UN, PW);
    	private PatientDao patientDao = new PatientDao(DB, UN, PW);
    	private AppointmentDao appointmentDao = new AppointmentDao(DB, UN, PW);
+   	private MessageDao messageDao = new MessageDao(DB, UN, PW);
 
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String login(ModelMap model){
@@ -52,12 +55,16 @@ public class TapestryController{
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
 			model.addAttribute("appointments", appointmentsForToday);
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getName());
+			model.addAttribute("unread", unreadMessages);
 			
 			return "volunteer/index";
 		}
 		else if (request.isUserInRole("ROLE_ADMIN")){
 			String name = request.getUserPrincipal().getName();
 			model.addAttribute("name", name);
+			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+			model.addAttribute("volunteers", volunteers);
 			return "admin/index";
 		}
 		else{ //This should not happen, but catch any unforseen behavior
@@ -142,6 +149,8 @@ public class TapestryController{
 			return "/error-forbidden";
 		}
 		model.addAttribute("patient", patient);
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getName());
+		model.addAttribute("unread", unreadMessages);
 		return "/patient";
 	}
 	
@@ -163,7 +172,42 @@ public class TapestryController{
 	public String viewProfile(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		model.addAttribute("vol", loggedInUser);
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getName());
+		model.addAttribute("unread", unreadMessages);
 		return "/volunteer/profile";
+	}
+	
+	@RequestMapping(value="/inbox", method=RequestMethod.GET)
+	public String viewInbox(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getName());
+		model.addAttribute("messages", messages);
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getName());
+		model.addAttribute("unread", unreadMessages);
+		return "/volunteer/inbox";
+	}
+	
+	@RequestMapping(value="/view_message/{msgID}", method=RequestMethod.GET)
+	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		Message m = messageDao.getMessageByID(id);
+		if (!(m.isRead()))
+			messageDao.markAsRead(id);
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getName());
+		model.addAttribute("unread", unreadMessages);
+		model.addAttribute("message", m);
+		return "/volunteer/view_message";
+	}
+
+	@RequestMapping(value="/send_message", method=RequestMethod.POST)
+	public String sendMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		Message m = new Message();
+		m.setSender(loggedInUser.getName());
+		m.setRecipient(request.getParameter("recipient"));
+		m.setText(request.getParameter("msgBody"));
+		m.setSubject(request.getParameter("msgSubject"));
+		messageDao.sendMessage(m);
+		return "redirect:/?success=true";
 	}
 
 	//Error pages

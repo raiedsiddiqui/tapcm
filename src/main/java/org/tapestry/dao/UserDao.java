@@ -42,7 +42,7 @@ public class UserDao {
 		User u = new User();
 		try{
 			u.setName(result.getString("name"));
-			u.setUserID(Integer.parseInt(result.getString("user_ID")));
+			u.setUserID(result.getInt("user_ID"));
 			u.setRole(result.getString("role"));
 			u.setUsername(result.getString("username"));
 			u.setEmail(result.getString("email"));
@@ -66,7 +66,7 @@ public class UserDao {
 	public User getUserById(int id){
 		try{
 			statement = con.prepareStatement("SELECT * FROM survey_app.users WHERE user_ID=?");
-			statement.setString(1, "" + id);
+			statement.setInt(1, id);
 			ResultSet result = statement.executeQuery();
 			result.first();
 			return createFromSearch(result);
@@ -122,7 +122,7 @@ public class UserDao {
 	public void removeUserWithId(int id){
 		try{
 			statement = con.prepareStatement("DELETE FROM survey_app.users WHERE user_ID=?");
-			statement.setString(1, "" + id);
+			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not remove user");

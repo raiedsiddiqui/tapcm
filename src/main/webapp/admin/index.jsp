@@ -23,13 +23,13 @@
 			<div class="navbar-inner">
 				<div class="container">
 					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        					<span class="icon-bar"></span>
-        					<span class="icon-bar"></span>
-       				 		<span class="icon-bar"></span>
-     					</a>
+        				<span class="icon-bar"></span>
+        				<span class="icon-bar"></span>
+       			 		<span class="icon-bar"></span>
+     				</a>
      					
-     					<a class="brand" href="<c:url value="/"/>">Home</a>
-     					<div class="nav-collapse collapse">
+     				<a class="brand" href="<c:url value="/"/>">Home</a>
+     				<div class="nav-collapse collapse">
 						<ul class="nav">
 							<li><a href="<c:url value="/manage_users"/>">Manage Volunteers</a></li>
 							<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
@@ -40,15 +40,40 @@
 				</div>	
 			</div>
 		</div>
+		
 		<div class="row-fluid">
-			<h2>Tapestry Admin</h2>
-			<p>Click a link in the navbar to begin</p>
-			<p>You can:</p>
-			<ul>
-				<li>Add a patient</li>
-				<li>Add a caretaker</li>
-				<li>Manage installed surveys</li>
-			</ul>
+			<div class="span6">
+				<h2>Tapestry Admin</h2>
+				<p>Click a link in the navbar to begin</p>
+				<p>You can:</p>
+				<ul>
+					<li>Add a patient</li>
+					<li>Add a caretaker</li>
+					<li>Manage installed surveys</li>
+					<li>Send messages to volunteers</li>
+				</ul>
+			</div>
+			<div class="span6">
+				<h3>Message volunteer</h3>
+				<c:if test="${not empty success}">
+					<div class="alert alert-info" style="width:170px;">
+						<p>Send successed!</p>
+					</div>
+				</c:if>
+				<form id="messageVolunteer" method="post" action="<c:url value="/send_message"/>">
+					<label>Subject:</label>
+					<input type="text" name="msgSubject" />
+					<label>Send to:</label>
+					<select name="recipient" form="messageVolunteer">
+						<c:forEach items="${volunteers}" var="v">
+						<option value="${v.name}">${v.name}</option>
+						</c:forEach>
+					</select><br />
+					<label>Message:</label>
+					<textarea name="msgBody"></textarea><br />
+					<input type="submit" class="btn btn-primary" value="Send" />
+				</form>
+			</div>
 		</div>
 	</div>
 </body>
