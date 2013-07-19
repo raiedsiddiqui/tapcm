@@ -22,6 +22,13 @@ import java.io.IOException;
 import java.util.Map;
 import org.springframework.core.io.ClassPathResource;
 import javax.annotation.PostConstruct;
+import java.util.Properties;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Transport;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 
 /**
@@ -47,29 +54,65 @@ public class TapestryController{
    	private AppointmentDao appointmentDao;
    	private MessageDao messageDao;
    	
+   	//Mail-related settings;
+   	private Properties props;
+   	private String mailAddress;
+   	private Session session;
+   	
    	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
    	 */
    	@PostConstruct
-   	public void readDatabaseConfig(){
-   		String DB = "";
-   		String UN = "";
-   		String PW = "";
+   	public void readConfig(){
+   		String database = "";
+   		String dbUsername = "";
+   		String dbPassword = "";
+   		String mailHost = "";
+   		String mailUser = "";
+   		String mailPassword = "";
+   		String mailPort = "";
+   		String useTLS = "";
+   		String useAuth = "";
+   		mailAddress = "";
 		try{
-			dbConfigFile = new ClassPathResource("db.yaml");
+			dbConfigFile = new ClassPathResource("tapestry.yaml");
 			yaml = new Yaml();
 			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-			DB = config.get("url");
-			UN = config.get("username");
-			PW = config.get("password");
+			database = config.get("url");
+			dbUsername = config.get("username");
+			dbPassword = config.get("password");
+			mailHost = config.get("mailHost");
+			mailUser = config.get("mailUser");
+			mailPassword = config.get("mailPassword");
+			mailAddress = config.get("mailAddress");
+			mailPort = config.get("mailPort");
+			useTLS = config.get("mailUsesTLS");
+			useAuth = config.get("mailRequiresAuth");
 		} catch (IOException e) {
 			System.out.println("Error reading from config file");
 			System.out.println(e.toString());
 		}
-		userDao = new UserDao(DB, UN, PW);
-		patientDao = new PatientDao(DB, UN, PW);
-		appointmentDao = new AppointmentDao(DB, UN, PW);
-		messageDao = new MessageDao(DB, UN, PW);
+		
+		final String username = mailUser;
+		final String password = mailPassword;
+		props = System.getProperties();
+		session = Session.getDefaultInstance(props, 
+				 new javax.mail.Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(username, password);
+					}
+		  		});
+		userDao = new UserDao(database, dbUsername, dbPassword);
+		patientDao = new PatientDao(database, dbUsername, dbPassword);
+		appointmentDao = new AppointmentDao(database, dbUsername, dbPassword);
+		messageDao = new MessageDao(database, dbUsername, dbPassword);
+		props.setProperty("mail.smtp.host", mailHost);
+		props.setProperty("mail.smtp.socketFactory.port", mailPort);
+		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		props.setProperty("mail.smtp.auth", useAuth);
+		props.setProperty("mail.smtp.starttls.enable", useTLS);
+		props.setProperty("mail.user", mailUser);
+		props.setProperty("mail.password", mailPassword);
    	}
    	
    	//Everything below this point is a RequestMapping
@@ -144,6 +187,25 @@ public class TapestryController{
 		u.setPassword(hashedPassword);
 		u.setEmail(request.getParameter("email"));
 		userDao.createUser(u);
+		try{
+			MimeMessage message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(mailAddress));
+			message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(u.getEmail()));
+			message.setSubject("Welcome to Tapestry");
+			String msg = "";
+			msg += "Thank you for volunteering with Tapestry. Your accout has successfully been created.\n";
+			msg += "Your username and password are as follows:\n";
+			msg += "Username: " + u.getUsername() + "\n";
+			msg += "Password: password\n";
+			message.setText(msg);
+			System.out.println(msg);
+			System.out.println("Sending...");
+			Transport.send(message);
+			System.out.println("Email sent containing credentials to " + u.getEmail());
+		} catch (MessagingException e) {
+			System.out.println("Error: Could not send email");
+			System.out.println(e.toString());
+		}
 		//Display page again
 		return "redirect:/manage_users";
 	}

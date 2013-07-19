@@ -12,12 +12,6 @@ CREATE TABLE IF NOT EXISTS users (
 	PRIMARY KEY (user_ID)
 );
 
-/*Create a default admin user*/
-/*
-INSERT INTO users (user_ID, username, password, enabled, name, email, role)
-VALUES (1, 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', TRUE, 'Adam Gignac', 'gignac.adam@gmail.com', "ROLE_ADMIN");
-*/
-
 CREATE TABLE IF NOT EXISTS patients (
 	patient_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*zzUsing UNSIGNED SMALLINT allows for 65,535 patients*/
 	firstname VARCHAR(255) NOT NULL,

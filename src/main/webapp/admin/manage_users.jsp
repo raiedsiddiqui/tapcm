@@ -82,20 +82,22 @@
 		</div>
 
 		<div class="row-fluid" id="addUserDiv" style="display:none";>
-			<form action="add_user" method="post">
-				<fieldset>
-					<legend>Add new user</legend>
-					<label>Name:</label>
-					<input type="text" name="name"/>
-					<label>Username:</label>
-					<input type="text" name="username"/>
-					<label>Email</label>
-					<input type="text" name="email"/>
-					<label>Role</label>
-					<input type="radio" name="role" value="ROLE_ADMIN">Administrator</input> <br/>
-					<input type="radio" name="role" value="ROLE_USER">Volunteer</input> <br/>
-					<input class="btn btn-primary" type="submit" value="Add" />
-				</fieldset>
+			<form id="addUser" action="add_user" method="post">
+				<div class="span6">
+					<fieldset>
+						<legend>Add new user</legend>
+						<label>Name:</label>
+						<input type="text" name="name"/>
+						<label>Username:</label>
+						<input type="text" name="username"/>
+						<label>Email</label>
+						<input type="text" name="email"/>
+						<label>Role</label>
+						<input type="radio" name="role" value="ROLE_ADMIN">Administrator</input> <br/>
+						<input type="radio" name="role" value="ROLE_USER">Volunteer</input> <br/>
+						<input class="btn btn-primary" style="margin-top:5px;" type="submit" value="Add" />
+					</fieldset>
+				</div>
 			</form>
 		</div>
 	</div>
