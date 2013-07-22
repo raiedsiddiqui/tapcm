@@ -135,7 +135,7 @@ public class PatientDao {
 	* Saves a patient in the database
 	* @param p The Patient object to save
 	*/
-    	public void createPatient(Patient p){
+    public void createPatient(Patient p){
 		try{
 			statement = con.prepareStatement("INSERT INTO survey_app.patients (firstname, lastname, volunteer, color) VALUES (?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
@@ -147,7 +147,27 @@ public class PatientDao {
 			System.out.println("Error: Could not create patient");
 			System.out.println(e.toString());
 		}
+    }
+    
+    /**
+     * Changes a patient in the database
+     * @param p The Patient object containing the new data (should have the same ID as the patient to replace)
+     */
+    public void updatePatient(Patient p){
+    	try{
+    		statement = con.prepareStatement("UPDATE survey_app.patients SET first_name=?, last_name=?, volunteer=?, gender=?, age=? WHERE patient_ID=?");
+    		statement.setString(1, p.getFirstName());
+    		statement.setString(2, p.getLastName());
+    		statement.setInt(3, p.getVolunteer());
+    		statement.setString(4, p.getGender());
+    		statement.setInt(5, p.getAge());
+    		statement.setInt(6, p.getPatientID());
+    		statement.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not update patient");
+    		System.out.println(e.toString());
     	}
+    }
 
 	/**
 	* Removes the specified patient from the database

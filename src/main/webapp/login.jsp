@@ -17,6 +17,9 @@
 					<c:if test="${not empty error}">
 					<div class="alert alert-error">Login failed</div>
 					</c:if>
+					<c:if test="${not empty usernameChanged}">
+					<div class="alert alert-info">Your username has changed. Please log in again using the new credentials.</div>
+					</c:if>
      				<div class="area">
 	      				<form class="form-horizontal" action="<c:url value="j_spring_security_check" />" method="POST">
        						<div class="heading">

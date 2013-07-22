@@ -64,14 +64,17 @@
 			<div class="row-fluid">
 				<div class="span4">
 					<h2>${vol.name}'s Profile</h2>	
-					<form id="volunteer-info">
+					<form id="volunteer-info" action="<c:url value="/update_user/${vol.userID}" />" method="POST">
 						<label>Name</label>
 						<input type="text" name="volName" value="${vol.name}" />
 						<label>Username</label>
-						<input type="text" name="volUsername" value="${vol.username}" /><br />
-						<a href="#changePassword" role="button" class="btn btn-success" data-toggle="modal">Change password</a><br />
+						<input type="text" name="volUsername" value="${vol.username}" />
+						<label>Email</label>
+						<input type="text" name="volEmail" value="${vol.email}" />
+						<br />
+						<a href="#changePassword" role="button" class="btn btn-success" data-toggle="modal">Change password</a>
+						<input type="submit" class="btn btn-primary" value="Save changes" />
 					</form>
-					<a href="#" class="btn btn-primary">Save changes</a>
 				</div>
 				
 				<div class="span8">

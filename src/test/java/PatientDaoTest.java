@@ -39,5 +39,4 @@ public class PatientDaoTest{
 			System.out.println("| " + p.getPatientID() + " | "  + p.getFirstName() + " | " + p.getLastName() + " | " + p.getColor() + " |");
 		}
 	}
-
 }

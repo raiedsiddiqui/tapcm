@@ -114,6 +114,24 @@ public class UserDao {
 			System.out.println(e.toString());
 		}
 	}
+	
+	/**
+	 * Modifies a user in the database
+	 * @param u The User object containing the new data (the user_ID should match the object to update)
+	 */
+	public void modifyUser(User u){
+		try{
+			statement = con.prepareStatement("UPDATE survey_app.users SET username=?, name=?, email=? WHERE user_ID=?");
+			statement.setString(1, u.getUsername());
+			statement.setString(2, u.getName());
+			statement.setString(3, u.getEmail());
+			statement.setInt(4, u.getUserID());
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not update user");
+			System.out.println(e.toString());
+		}
+	}
 
 	/**
 	* Removes a user from the database

@@ -118,7 +118,9 @@ public class TapestryController{
    	//Everything below this point is a RequestMapping
 
 	@RequestMapping(value="/login", method=RequestMethod.GET)
-	public String login(ModelMap model){
+	public String login(@RequestParam(value="usernameChanged", required=false) Boolean usernameChanged, ModelMap model){
+		if (usernameChanged != null)
+			model.addAttribute("usernameChanged", usernameChanged);
 		return "login";
 	}
 
@@ -322,6 +324,24 @@ public class TapestryController{
 	@RequestMapping(value="/403", method=RequestMethod.GET)
 	public String forbiddenError(){
 		return "error-forbidden";
+	}
+	
+	@RequestMapping(value="/update_user/{userID}", method=RequestMethod.POST)
+	public String updateUser(@PathVariable("userID") int id, SecurityContextHolderAwareRequestWrapper request){
+		String currentUsername = request.getUserPrincipal().getName();
+		User loggedInUser = userDao.getUserByUsername(currentUsername);
+		if (loggedInUser.getUserID() != id)
+			return "redirect:/403";
+		User u = new User();
+		u.setUserID(id);
+		u.setUsername(request.getParameter("volUsername"));
+		u.setName(request.getParameter("volName"));
+		u.setEmail(request.getParameter("volEmail"));
+		userDao.modifyUser(u);
+		if (!(currentUsername.equals(u.getUsername())))
+			return "redirect:/login?usernameChanged=true";
+		else
+			return "redirect:/profile";
 	}
 
 }
