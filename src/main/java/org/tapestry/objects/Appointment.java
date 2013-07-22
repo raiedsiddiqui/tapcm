@@ -6,8 +6,8 @@ package org.tapestry.objects;
  */
 public class Appointment{
 
-	private String volunteer;
-	private String patient;
+	private int volunteer;
+	private int patient;
 	private String time;
 	private String date;
 	private String desc;
@@ -22,14 +22,14 @@ public class Appointment{
 	/**
 	 * @return The volunteer for whom the appointment is booked
 	 */
-	public String getVolunteer(){
+	public int getVolunteer(){
 		return volunteer;
 	}
 	
 	/**
 	 * @return The patient for whom the appointment is booked
 	 */
-	public String getPatient(){
+	public int getPatient(){
 		return patient;
 	}
 	
@@ -58,14 +58,14 @@ public class Appointment{
 	/**
 	 * @param volunteer The volunteer for whom the appointment is booked
 	 */
-	public void setVolunteer(String volunteer){
+	public void setVolunteer(int volunteer){
 		this.volunteer = volunteer;
 	}
 	
 	/**
 	 * @param patient The patient for whom the appointment is booked
 	 */
-	public void setPatient(String patient){
+	public void setPatient(int patient){
 		this.patient = patient;
 	}
 	

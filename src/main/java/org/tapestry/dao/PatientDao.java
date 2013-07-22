@@ -64,10 +64,8 @@ public class PatientDao {
             		p.setLastName(result.getString("lastname"));
             		p.setGender(result.getString("gender"));
             		p.setColor(result.getString("color"));
-			//String age = result.getString("age");
-			//if (age != null);
-	            	//p.setAge(Integer.parseInt(result.getString("age")));
-            		p.setVolunteer(result.getString("volunteer"));
+	            	p.setAge(result.getInt("age"));
+            		p.setVolunteer(result.getInt("volunteer"));
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
 			System.out.println(e.toString());
@@ -86,6 +84,13 @@ public class PatientDao {
            		ArrayList<Patient> allPatients = new ArrayList<Patient>();
            		while(result.next()){
            			Patient p = createFromSearch(result);
+           			//Look up the name of the volunteer
+           			statement = con.prepareStatement("SELECT name FROM survey_app.users WHERE user_ID=?");
+           			statement.setInt(1, p.getVolunteer());
+           			ResultSet r = statement.executeQuery();
+           			r.first();
+           			String name = r.getString("name");
+           			p.setVolunteerName(name);
            			allPatients.add(p);
             	}
             	return allPatients;
@@ -98,19 +103,26 @@ public class PatientDao {
 
 	/**
 	* Returns a list of patients assigned to the specified volunteer
-	* @param volunteer The name of the volunteer (must be exact)
+	* @param volunteer The ID of the volunteer
 	* @return An ArrayList of Patient objects
 	*/
-    	public ArrayList<Patient> getPatientsForVolunteer(String volunteer){
+    	public ArrayList<Patient> getPatientsForVolunteer(int volunteer){
         	try{
+        			//Get the username for the volunteer
+        			statement = con.prepareStatement("SELECT name FROM survey_app.users WHERE user_ID=?");
+        			statement.setInt(1, volunteer);
+        			ResultSet result = statement.executeQuery();
+        			result.first();
+        			String name = result.getString("name");
             		statement = con.prepareStatement("SELECT * FROM survey_app.patients WHERE volunteer=?");
-            		statement.setString(1, volunteer);
-            		ResultSet result = statement.executeQuery();
+            		statement.setInt(1, volunteer);
+            		result = statement.executeQuery();
             		ArrayList<Patient> patients = new ArrayList<Patient>();
             		while(result.next()){
-				Patient p = createFromSearch(result);
-				patients.add(p);
-			}
+            				Patient p = createFromSearch(result);
+            				p.setVolunteerName(name);
+            				patients.add(p);
+            		}
            	 	return patients;
         	} catch (SQLException e) {
             		System.out.println("Error: Could not retrieve patients");
@@ -128,7 +140,7 @@ public class PatientDao {
 			statement = con.prepareStatement("INSERT INTO survey_app.patients (firstname, lastname, volunteer, color) VALUES (?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
 			statement.setString(2, p.getLastName());
-			statement.setString(3, p.getVolunteer());
+			statement.setInt(3, p.getVolunteer());
 			statement.setString(4, p.getColor());
 			statement.execute();
 		} catch (SQLException e){

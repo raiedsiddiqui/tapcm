@@ -66,7 +66,7 @@
 					<label>Send to:</label>
 					<select name="recipient" form="messageVolunteer">
 						<c:forEach items="${volunteers}" var="v">
-						<option value="${v.name}">${v.name}</option>
+						<option value="${v.userID}">${v.name}</option>
 						</c:forEach>
 					</select><br />
 					<label>Message:</label>

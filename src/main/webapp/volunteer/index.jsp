@@ -52,12 +52,12 @@
 				</div>	
 			</div>
 		</div>
+		<h2>Welcome, ${name}</h2>
 		<div class="row-fluid">
 			<div class="span12" style="padding:0px 15px;">
-				<h2>Welcome, ${name}</h2>
 				<p>
 					<strong>Today's Appointments:</strong>
-					<a href="#bookAppointment" role="button" class="btn btn-primary" style="margin-left:10%;" data-toggle="modal">Book appointment</a>
+					<a href="#bookAppointment" role="button" class="btn btn-primary" data-toggle="modal">Book appointment</a>
 				</p>
 				<c:choose>
 					<c:when test="${not empty appointments}">
@@ -74,6 +74,10 @@
 						<p style="margin-left:25px">No appointments for today</p>
 					</c:otherwise>
 				</c:choose>
+			</div>
+		</div>
+		<div class="row-fluid">
+			<div class="span12" style="padding:0px 15px;">
 				<p><strong>Recent Activities:</strong></p>
 				<table class="table">
 					<tr>
@@ -104,7 +108,7 @@
   				<label>With patient:</label>
 				<select name="patient" form="appt-form">
 					<c:forEach items="${patients}" var="p">
-					<option value="${p.displayName}">${p.displayName}</option>
+					<option value="${p.patientID}">${p.displayName}</option>
 					</c:forEach>
 				</select><br />
 				<label>Date:</label>

@@ -31,7 +31,7 @@ public class MessageDao {
 	private Message createFromSearch(ResultSet result){
 		Message m = new Message();
 		try{
-			m.setRecipient(result.getString("recipient"));
+			m.setRecipient(result.getInt("recipient"));
 			int r = Integer.parseInt(result.getString("msgRead"));
 			switch(r){
 				case 0: m.setRead(false); break;
@@ -49,10 +49,10 @@ public class MessageDao {
 		return m;
 	}
 	
-	public ArrayList<Message> getAllMessagesForRecipient(String recipient){
+	public ArrayList<Message> getAllMessagesForRecipient(int recipient){
 		try{
 			statement = con.prepareStatement("SELECT * FROM survey_app.messages WHERE recipient=?");
-			statement.setString(1, recipient);
+			statement.setInt(1, recipient);
 			ResultSet result = statement.executeQuery();
 			ArrayList<Message> allMessages = new ArrayList<Message>();
 			while(result.next()){
@@ -67,10 +67,10 @@ public class MessageDao {
 		}
 	}
 	
-	public int countUnreadMessagesForRecipient(String recipient){
+	public int countUnreadMessagesForRecipient(int recipient){
 		try{
 			statement = con.prepareStatement("SELECT COUNT(*) as total FROM survey_app.messages WHERE recipient=? and msgRead=0");
-			statement.setString(1, recipient);
+			statement.setInt(1, recipient);
 			ResultSet result = statement.executeQuery();
 			result.first();
 			int total = result.getInt("total");
@@ -111,7 +111,7 @@ public class MessageDao {
 	public void sendMessage(Message m){
 		try{
 			statement = con.prepareStatement("INSERT INTO survey_app.messages (recipient, sender, msg, subject) VALUES (?,?,?,?)");
-			statement.setString(1, m.getRecipient());
+			statement.setInt(1, m.getRecipient());
 			statement.setString(2, m.getSender());
 			statement.setString(3, m.getText());
 			statement.setString(4, m.getSubject());

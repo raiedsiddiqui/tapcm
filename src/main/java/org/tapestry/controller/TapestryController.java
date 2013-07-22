@@ -128,12 +128,12 @@ public class TapestryController{
 		if (request.isUserInRole("ROLE_USER")){
 			String username = request.getUserPrincipal().getName();
 			User u = userDao.getUserByUsername(username);
-			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getName());
-			ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getName());
+			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
+			ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
 			model.addAttribute("appointments", appointmentsForToday);
-			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getName());
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 			model.addAttribute("unread", unreadMessages);
 			
 			return "volunteer/index";
@@ -222,7 +222,7 @@ public class TapestryController{
 		Patient p = new Patient();
 		p.setFirstName(request.getParameter("firstname"));
 		p.setLastName(request.getParameter("lastname"));
-		p.setVolunteer(request.getParameter("volunteer"));
+		p.setVolunteer(Integer.parseInt(request.getParameter("volunteer")));
 		p.setColor(request.getParameter("backgroundColor"));
 		patientDao.createPatient(p);
 		return "redirect:/manage_patients";
@@ -241,14 +241,14 @@ public class TapestryController{
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		String loggedInUser = u.getName();
 		//Make sure that the user is actually responsible for the patient in question
-		String volunteerForPatient = patient.getVolunteer();
-		if (!(loggedInUser.equals(volunteerForPatient))){
+		int volunteerForPatient = patient.getVolunteer();
+		if (!(u.getUserID() == patient.getVolunteer())){
 			model.addAttribute("loggedIn", loggedInUser);
 			model.addAttribute("patientOwner", volunteerForPatient);
 			return "redirect:/403";
 		}
 		model.addAttribute("patient", patient);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getName());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		return "/patient";
 	}
@@ -256,11 +256,11 @@ public class TapestryController{
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
 	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		String loggedInUser = u.getName();
+		int loggedInUser = u.getUserID();
 		
 		Appointment a = new Appointment();
 		a.setVolunteer(loggedInUser);
-		a.setPatient(request.getParameter("patient"));
+		a.setPatient(Integer.parseInt(request.getParameter("patient")));
 		a.setDate(request.getParameter("appointmentDate"));
 		a.setTime(request.getParameter("appointmentTime"));
 		appointmentDao.createAppointment(a);
@@ -271,7 +271,7 @@ public class TapestryController{
 	public String viewProfile(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		model.addAttribute("vol", loggedInUser);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getName());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		return "/volunteer/profile";
 	}
@@ -279,9 +279,9 @@ public class TapestryController{
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
 	public String viewInbox(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getName());
+		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("messages", messages);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getName());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		return "/volunteer/inbox";
 	}
@@ -290,11 +290,11 @@ public class TapestryController{
 	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = messageDao.getMessageByID(id);
-		if (!(m.getRecipient().equals(loggedInUser.getName())))
+		if (!(m.getRecipient() == loggedInUser.getUserID()))
 			return "redirect:/403";
 		if (!(m.isRead()))
 			messageDao.markAsRead(id);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getName());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		model.addAttribute("message", m);
 		return "/volunteer/view_message";
@@ -305,7 +305,7 @@ public class TapestryController{
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = new Message();
 		m.setSender(loggedInUser.getName());
-		m.setRecipient(request.getParameter("recipient"));
+		m.setRecipient(Integer.parseInt(request.getParameter("recipient")));
 		m.setText(request.getParameter("msgBody"));
 		m.setSubject(request.getParameter("msgSubject"));
 		messageDao.sendMessage(m);

@@ -108,7 +108,7 @@
                 <c:forEach items="${patients}" var="p">
                 <tr>
                     <td>${p.firstName} ${p.lastName}</td>
-                    <td>${p.volunteer}</td>
+                    <td>${p.volunteerName}</td>
                     <td><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
                     <td><a href="${pageContext.request.contextPath}/remove_patient/${p.patientID}" class="btn btn-danger">Remove</a></td>
                 </tr>
@@ -127,7 +127,7 @@
 					<label>Volunteer</label>
 					<select name="volunteer" form="newPatient">
 						<c:forEach items="${volunteers}" var="v">
-						<option value="${v.name}">${v.name}</option>
+						<option value="${v.userID}">${v.name}</option>
 						</c:forEach>
 					</select><br />
 					<label>Background color</label>

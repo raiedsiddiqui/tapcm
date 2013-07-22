@@ -23,7 +23,7 @@ public class AppointmentDaoTest{
 	public void testGetAllAppointments(){
 		AppointmentDao dao = new AppointmentDao(DB, UN, PW);
 		assertNotNull("DAO is null", dao);
-		ArrayList<Appointment> appts = dao.getAllAppointmentsForVolunteer("Darryl Hui");
+		ArrayList<Appointment> appts = dao.getAllAppointmentsForVolunteer(2);
 		assertNotNull("Query returned null", appts);
 		for (Appointment a : appts){
 			assertNotNull("Volunteer is null", a.getVolunteer());
@@ -37,7 +37,7 @@ public class AppointmentDaoTest{
 	public void testGetAllForToday(){
 		AppointmentDao dao = new AppointmentDao(DB, UN, PW);
 		assertNotNull("DAO is null", dao);
-		ArrayList<Appointment> appts = dao.getAllAppointmentsForVolunteerForToday("Darryl Hui");
+		ArrayList<Appointment> appts = dao.getAllAppointmentsForVolunteerForToday(2);
 		assertNotNull("Query returned null", appts);
 		for (Appointment a : appts){
 			assertNotNull("Volunteer is null", a.getVolunteer());

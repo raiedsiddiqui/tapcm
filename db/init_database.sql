@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS patients (
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
 	age TINYINT UNSIGNED, /*Using UNSIGNED TINYINT allows ages between 0-255, which is overkill but I can't get any smaller than that*/
 	email VARCHAR(50),
-	volunteer VARCHAR(255) NOT NULL, /*Same as users.name*/
+	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
     color VARCHAR(7), /*Hexcode color string (#ffffff)*/
 	PRIMARY KEY (patient_ID)
 );
@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS activites (
 
 CREATE TABLE IF NOT EXISTS appointments (
 	appointment_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 appointments*/
-	volunteer VARCHAR(255) NOT NULL,
-	patient VARCHAR(255) NOT NULL,
+	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
+	patient SMALLINT UNSIGNED NOT NULL, /* Same as patient_ID */
 	date_time DATETIME NOT NULL, /*Contains both date and time, separated using functions in query*/
 	details TEXT,
 	PRIMARY KEY(appointment_ID)
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS required_surveys (
 
 CREATE TABLE IF NOT EXISTS messages (
 	message_ID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	recipient VARCHAR(255) NOT NULL,
+	recipient TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
 	sender VARCHAR(255) NOT NULL,
 	msg TEXT,
     sent TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

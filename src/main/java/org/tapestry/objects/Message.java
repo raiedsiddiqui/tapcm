@@ -5,7 +5,7 @@ public class Message {
 	private int msgID;
 	private String msgText;
 	private boolean msgRead;
-	private String recipient;
+	private int recipient;
 	private String sender;
 	private String subject;
 	private String date;
@@ -26,7 +26,7 @@ public class Message {
 		return msgRead;
 	}
 	
-	public String getRecipient(){
+	public int getRecipient(){
 		return recipient;
 	}
 	
@@ -59,7 +59,7 @@ public class Message {
 		this.subject = subject;
 	}
 	
-	public void setRecipient(String recipient){
+	public void setRecipient(int recipient){
 		this.recipient = recipient;
 	}
 	

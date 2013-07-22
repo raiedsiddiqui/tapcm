@@ -36,8 +36,8 @@ public class AppointmentDao {
     private Appointment createFromSearch(ResultSet result){
     	Appointment a = new Appointment();
     	try{
-    		a.setVolunteer(result.getString("volunteer"));
-    		a.setPatient(result.getString("patient"));
+    		a.setVolunteer(result.getInt("volunteer"));
+    		a.setPatient(result.getInt("patient"));
     		a.setDate(result.getString("appt_date"));
     		a.setTime(result.getString("appt_time"));
     		a.setDescription(result.getString("details"));
@@ -48,10 +48,10 @@ public class AppointmentDao {
 		return a;
     }
     	
-    public ArrayList<Appointment> getAllAppointmentsForVolunteer(String volunteer){
+    public ArrayList<Appointment> getAllAppointmentsForVolunteer(int volunteer){
     	try{
     		statement = con.prepareStatement("SELECT volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details FROM survey_app.appointments WHERE volunteer=?");
-    		statement.setString(1, volunteer);
+    		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
        		while(result.next()){
@@ -66,10 +66,10 @@ public class AppointmentDao {
     	}
     }
     
-    public ArrayList<Appointment> getAllAppointmentsForVolunteerForToday(String volunteer){
+    public ArrayList<Appointment> getAllAppointmentsForVolunteerForToday(int volunteer){
        	try{
     		statement = con.prepareStatement("SELECT volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details FROM survey_app.appointments WHERE volunteer=? AND DATE(date_time)=CURDATE()");
-    		statement.setString(1, volunteer);
+    		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
        		while(result.next()){
@@ -87,8 +87,8 @@ public class AppointmentDao {
     public void createAppointment(Appointment a){
     	try{
     		statement = con.prepareStatement("INSERT INTO survey_app.appointments (volunteer, patient, date_time) values (?,?,?)");
-    		statement.setString(1, a.getVolunteer());
-    		statement.setString(2, a.getPatient());
+    		statement.setInt(1, a.getVolunteer());
+    		statement.setInt(2, a.getPatient());
     		statement.setString(3, a.getDate() + " " + a.getTime());
     		statement.execute();
     	} catch (SQLException e){

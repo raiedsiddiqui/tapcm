@@ -7,7 +7,8 @@ public class Patient{
 	private String gender;
 	private int age;
 	private String email;
-	private String volunteer;
+	private int volunteer;
+	private String volunteerName;
 	private String color;
 
 	/**
@@ -65,11 +66,21 @@ public class Patient{
     	public String getEmail(){
         	return email;
     	}
+    	
+    /**
+     * This should really only be used for displaying info in the interface,
+     * use the volunteer (integer) version for referencing the user assigned
+     * to the patient (since names are mutable and IDs are not)
+     * @return The name of the volunteer responsible for the patient
+     */
+    	public String getVolunteerName(){
+    		return volunteerName;
+    	}
 
 	/**
 	*@return The name of the volunteer assigned to the patient
 	*/
-    	public String getVolunteer(){
+    	public int getVolunteer(){
         	return volunteer;
     	}
     
@@ -123,10 +134,14 @@ public class Patient{
         	this.email = email;
     	}
 
+    	public void setVolunteerName(String name){
+    		this.volunteerName = name;
+    	}
+    	
 	/**
 	*@param volunteer The name of the volunteer assigned to the patient
 	*/
-    	public void setVolunteer(String volunteer){
+    	public void setVolunteer(int volunteer){
         	this.volunteer = volunteer;
     	}
     	
