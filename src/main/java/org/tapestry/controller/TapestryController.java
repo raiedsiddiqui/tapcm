@@ -326,14 +326,12 @@ public class TapestryController{
 		return "error-forbidden";
 	}
 	
-	@RequestMapping(value="/update_user/{userID}", method=RequestMethod.POST)
-	public String updateUser(@PathVariable("userID") int id, SecurityContextHolderAwareRequestWrapper request){
+	@RequestMapping(value="/update_user", method=RequestMethod.POST)
+	public String updateUser(SecurityContextHolderAwareRequestWrapper request){
 		String currentUsername = request.getUserPrincipal().getName();
 		User loggedInUser = userDao.getUserByUsername(currentUsername);
-		if (loggedInUser.getUserID() != id)
-			return "redirect:/403";
 		User u = new User();
-		u.setUserID(id);
+		u.setUserID(loggedInUser.getUserID());
 		u.setUsername(request.getParameter("volUsername"));
 		u.setName(request.getParameter("volName"));
 		u.setEmail(request.getParameter("volEmail"));
@@ -343,5 +341,7 @@ public class TapestryController{
 		else
 			return "redirect:/profile";
 	}
+	
+	@RequestMapping(value="/changePassword", method=RequestMethod.POST);
 
 }
