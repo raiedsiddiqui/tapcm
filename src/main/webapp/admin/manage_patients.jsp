@@ -110,7 +110,7 @@
                     <td>${p.firstName} ${p.lastName}</td>
                     <td>${p.volunteerName}</td>
                     <td><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
-                    <td><a href="${pageContext.request.contextPath}/remove_patient/${p.patientID}" class="btn btn-danger">Remove</a></td>
+                    <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td>
                 </tr>
                 </c:forEach>
 			</table>
@@ -131,7 +131,7 @@
 						</c:forEach>
 					</select><br />
 					<label>Background color</label>
-					<input class='simple_color_live_preview' value='#ff00ff' name="backgroundColor"/>
+					<input class='simple_color_live_preview' value='#c0ffee' name="backgroundColor"/>
 					<input class="btn btn-primary" type="submit" value="Add" />
 				</fieldset>
 			</form>
