@@ -32,7 +32,9 @@
 		<intercept-url pattern="/delete_message/**" access="ROLE_USER" /><intercept-url
 			access="ROLE_USER" pattern="/update_user/**">
 </intercept-url>
-		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
+		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"></form-login><intercept-url
+			pattern="/profile" access="ROLE_USER">
+</intercept-url>
 	</http>
  
  	<beans:bean id="encoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />
