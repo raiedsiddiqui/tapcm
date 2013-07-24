@@ -79,33 +79,22 @@
 				
 				<div class="span8">
 					<h2>Pictures</h2>
+					<c:choose>
+					<c:when test="${not empty pictures}">
 					<ul class="thumbnails">
+						<c:foreach items="pictures" var="pic">
 					 	<li>
     						<a href="#">
       							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
     						</a>
   						</li>
-					 	<li>
-    						<a href="#">
-      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
-    						</a>
-  						</li>
-  					 	<li>
-    						<a href="#">
-      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
-    						</a>
-  						</li>
-  						<li>
-    						<a href="#">
-      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
-    						</a>
-  						</li>
-  						<li>
-    						<a href="#">
-      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
-    						</a>
-  						</li>
+						</c:foreach>
 					</ul>
+					</c:when>
+					<c:otherwise>
+					<p>No pictures uploaded</p>
+					</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
 		</div>
