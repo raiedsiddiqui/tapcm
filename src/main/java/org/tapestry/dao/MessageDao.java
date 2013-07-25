@@ -15,7 +15,7 @@ public class MessageDao {
 	
 	/**
 	* Constructor
-	* @param url The URL of the database, prefixed with jdbc: (probably "jdbc:mysql://localhost:3306")
+	* @param url The URL of the database, prefixed with jdbc: (probably "jdbc:mysql://localhost:3306/survey_app")
 	* @param username The username of the database user
 	* @param password The password of the database user
 	*/
@@ -32,11 +32,7 @@ public class MessageDao {
 		Message m = new Message();
 		try{
 			m.setRecipient(result.getInt("recipient"));
-			int r = Integer.parseInt(result.getString("msgRead"));
-			switch(r){
-				case 0: m.setRead(false); break;
-				case 1: m.setRead(true); break;
-			}
+			m.setRead(result.getBoolean("msgRead"));
 			m.setText(result.getString("msg"));
 			m.setSubject(result.getString("subject"));
 			m.setSender(result.getString("sender"));
@@ -51,7 +47,7 @@ public class MessageDao {
 	
 	public ArrayList<Message> getAllMessagesForRecipient(int recipient){
 		try{
-			statement = con.prepareStatement("SELECT * FROM survey_app.messages WHERE recipient=?");
+			statement = con.prepareStatement("SELECT * FROM messages WHERE recipient=?");
 			statement.setInt(1, recipient);
 			ResultSet result = statement.executeQuery();
 			ArrayList<Message> allMessages = new ArrayList<Message>();
@@ -69,7 +65,7 @@ public class MessageDao {
 	
 	public int countUnreadMessagesForRecipient(int recipient){
 		try{
-			statement = con.prepareStatement("SELECT COUNT(*) as total FROM survey_app.messages WHERE recipient=? and msgRead=0");
+			statement = con.prepareStatement("SELECT COUNT(*) as total FROM messages WHERE recipient=? and msgRead=0");
 			statement.setInt(1, recipient);
 			ResultSet result = statement.executeQuery();
 			result.first();
@@ -84,7 +80,7 @@ public class MessageDao {
 	
 	public Message getMessageByID(int id){
 		try{
-			statement = con.prepareStatement("SELECT * FROM survey_app.messages WHERE message_ID=?");
+			statement = con.prepareStatement("SELECT * FROM messages WHERE message_ID=?");
 			statement.setInt(1, id);
 			ResultSet result = statement.executeQuery();
 			result.first();
@@ -99,7 +95,7 @@ public class MessageDao {
 	
 	public void markAsRead(int id){
 		try{
-			statement = con.prepareStatement("UPDATE survey_app.messages SET msgRead=1 WHERE message_ID=?");
+			statement = con.prepareStatement("UPDATE messages SET msgRead=1 WHERE message_ID=?");
 			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e){
@@ -110,7 +106,7 @@ public class MessageDao {
 	
 	public void sendMessage(Message m){
 		try{
-			statement = con.prepareStatement("INSERT INTO survey_app.messages (recipient, sender, msg, subject) VALUES (?,?,?,?)");
+			statement = con.prepareStatement("INSERT INTO messages (recipient, sender, msg, subject) VALUES (?,?,?,?)");
 			statement.setInt(1, m.getRecipient());
 			statement.setString(2, m.getSender());
 			statement.setString(3, m.getText());
@@ -124,7 +120,7 @@ public class MessageDao {
 	
 	public void deleteMessage(int id){
 		try{
-			statement = con.prepareStatement("DELETE FROM survey_app.messages WHERE message_ID=?");
+			statement = con.prepareStatement("DELETE FROM messages WHERE message_ID=?");
 			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e){

@@ -20,7 +20,7 @@ public class UserDao {
 
 	/**
 	* Constructor
-	* @param url The url of the database, prefaced with 'jdbc:' (most likely 'jdbc:mysql://localhost:3306')
+	* @param url The url of the database, prefaced with 'jdbc:' (most likely 'jdbc:mysql://localhost:3306/survey_app')
 	* @param username The username for the database user
 	* @param password The password for the database user
 	*/
@@ -65,7 +65,7 @@ public class UserDao {
 	*/
 	public User getUserById(int id){
 		try{
-			statement = con.prepareStatement("SELECT * FROM survey_app.users WHERE user_ID=?");
+			statement = con.prepareStatement("SELECT * FROM users WHERE user_ID=?");
 			statement.setInt(1, id);
 			ResultSet result = statement.executeQuery();
 			result.first();
@@ -84,7 +84,7 @@ public class UserDao {
 	*/
 	public User getUserByUsername(String username){
 		try{
-			statement = con.prepareStatement("SELECT * FROM survey_app.users WHERE username=?");
+			statement = con.prepareStatement("SELECT * FROM users WHERE username=?");
 			statement.setString(1, username);
 			ResultSet result = statement.executeQuery();
 			result.first();
@@ -102,7 +102,7 @@ public class UserDao {
 	*/
 	public void createUser(User u){
 		try{
-			statement = con.prepareStatement("INSERT INTO survey_app.users (username, name, password, role, email, enabled) VALUES (?, ?, ?, ?, ?, 1)");
+			statement = con.prepareStatement("INSERT INTO users (username, name, password, role, email, enabled) VALUES (?, ?, ?, ?, ?, 1)");
 			statement.setString(1, u.getUsername());
 			statement.setString(2, u.getName());
 			statement.setString(3, u.getPassword());
@@ -121,7 +121,7 @@ public class UserDao {
 	 */
 	public void modifyUser(User u){
 		try{
-			statement = con.prepareStatement("UPDATE survey_app.users SET username=?, name=?, email=? WHERE user_ID=?");
+			statement = con.prepareStatement("UPDATE users SET username=?, name=?, email=? WHERE user_ID=?");
 			statement.setString(1, u.getUsername());
 			statement.setString(2, u.getName());
 			statement.setString(3, u.getEmail());
@@ -139,7 +139,7 @@ public class UserDao {
 	*/
 	public void removeUserWithId(int id){
 		try{
-			statement = con.prepareStatement("DELETE FROM survey_app.users WHERE user_ID=?");
+			statement = con.prepareStatement("DELETE FROM users WHERE user_ID=?");
 			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e){
@@ -154,7 +154,7 @@ public class UserDao {
 	*/
 	public ArrayList<User> getAllUsers(){
 		try{
-			statement = con.prepareStatement("SELECT * FROM survey_app.users");
+			statement = con.prepareStatement("SELECT * FROM users");
 			ResultSet result = statement.executeQuery();
 			ArrayList<User> allUsers = new ArrayList<User>();
 			while(result.next()){
@@ -176,7 +176,7 @@ public class UserDao {
 	*/
 	public ArrayList<User> getAllUsersWithRole(String role){
 		try{
-			statement = con.prepareStatement("SELECT * FROM survey_app.users WHERE role=?");
+			statement = con.prepareStatement("SELECT * FROM users WHERE role=?");
 			statement.setString(1, role);
 			ResultSet result = statement.executeQuery();
 			ArrayList<User> foundUsers = new ArrayList<User>();

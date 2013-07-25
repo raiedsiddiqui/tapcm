@@ -20,7 +20,7 @@ public class AppointmentDao {
 	
 	/**
 	* Constructor
-	* @param url The URL of the database, prefixed with jdbc: (probably "jdbc:mysql://localhost:3306")
+	* @param url The URL of the database, prefixed with jdbc: (probably "jdbc:mysql://localhost:3306/survey_app")
 	* @param username The username of the database user
 	* @param password The password of the database user
 	*/
@@ -50,7 +50,7 @@ public class AppointmentDao {
     	
     public ArrayList<Appointment> getAllAppointmentsForVolunteer(int volunteer){
     	try{
-    		statement = con.prepareStatement("SELECT volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details FROM survey_app.appointments WHERE volunteer=?");
+    		statement = con.prepareStatement("SELECT volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details FROM appointments WHERE volunteer=?");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -68,7 +68,7 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllAppointmentsForVolunteerForToday(int volunteer){
        	try{
-    		statement = con.prepareStatement("SELECT volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details FROM survey_app.appointments WHERE volunteer=? AND DATE(date_time)=CURDATE()");
+    		statement = con.prepareStatement("SELECT volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE()");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -86,7 +86,7 @@ public class AppointmentDao {
     
     public void createAppointment(Appointment a){
     	try{
-    		statement = con.prepareStatement("INSERT INTO survey_app.appointments (volunteer, patient, date_time) values (?,?,?)");
+    		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time) values (?,?,?)");
     		statement.setInt(1, a.getVolunteer());
     		statement.setInt(2, a.getPatient());
     		statement.setString(3, a.getDate() + " " + a.getTime());

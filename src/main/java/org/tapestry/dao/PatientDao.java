@@ -19,7 +19,7 @@ public class PatientDao {
 
 	/**
 	* Constructor
-	* @param url The URL of the database, prefixed with jdbc: (probably "jdbc:mysql://localhost:3306")
+	* @param url The URL of the database, prefixed with jdbc: (probably "jdbc:mysql://localhost:3306/survey_app")
 	* @param username The username of the database user
 	* @param password The password of the database user
 	*/
@@ -39,7 +39,7 @@ public class PatientDao {
 	*/
 	public Patient getPatientByID(int id){
 		try{
-			statement = con.prepareStatement("SELECT * FROM survey_app.patients WHERE patient_ID=?");
+			statement = con.prepareStatement("SELECT * FROM patients WHERE patient_ID=?");
 			statement.setInt(1, id);
 			ResultSet results = statement.executeQuery();
 			results.first();
@@ -79,13 +79,13 @@ public class PatientDao {
 	*/
     	public ArrayList<Patient> getAllPatients(){
         	try{
-           		statement = con.prepareStatement("SELECT * FROM survey_app.patients");
+           		statement = con.prepareStatement("SELECT * FROM patients");
            		ResultSet result = statement.executeQuery();
            		ArrayList<Patient> allPatients = new ArrayList<Patient>();
            		while(result.next()){
            			Patient p = createFromSearch(result);
            			//Look up the name of the volunteer
-           			statement = con.prepareStatement("SELECT name FROM survey_app.users WHERE user_ID=?");
+           			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
            			statement.setInt(1, p.getVolunteer());
            			ResultSet r = statement.executeQuery();
            			r.first();
@@ -109,12 +109,12 @@ public class PatientDao {
     	public ArrayList<Patient> getPatientsForVolunteer(int volunteer){
         	try{
         			//Get the username for the volunteer
-        			statement = con.prepareStatement("SELECT name FROM survey_app.users WHERE user_ID=?");
+        			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
         			statement.setInt(1, volunteer);
         			ResultSet result = statement.executeQuery();
         			result.first();
         			String name = result.getString("name");
-            		statement = con.prepareStatement("SELECT * FROM survey_app.patients WHERE volunteer=?");
+            		statement = con.prepareStatement("SELECT * FROM patients WHERE volunteer=?");
             		statement.setInt(1, volunteer);
             		result = statement.executeQuery();
             		ArrayList<Patient> patients = new ArrayList<Patient>();
@@ -137,7 +137,7 @@ public class PatientDao {
 	*/
     public void createPatient(Patient p){
 		try{
-			statement = con.prepareStatement("INSERT INTO survey_app.patients (firstname, lastname, volunteer, color) VALUES (?, ?, ?, ?)");
+			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, volunteer, color) VALUES (?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
 			statement.setString(2, p.getLastName());
 			statement.setInt(3, p.getVolunteer());
@@ -155,7 +155,7 @@ public class PatientDao {
      */
     public void updatePatient(Patient p){
     	try{
-    		statement = con.prepareStatement("UPDATE survey_app.patients SET first_name=?, last_name=?, volunteer=?, gender=?, age=? WHERE patient_ID=?");
+    		statement = con.prepareStatement("UPDATE patients SET first_name=?, last_name=?, volunteer=?, gender=?, age=? WHERE patient_ID=?");
     		statement.setString(1, p.getFirstName());
     		statement.setString(2, p.getLastName());
     		statement.setInt(3, p.getVolunteer());
@@ -175,7 +175,7 @@ public class PatientDao {
 	*/
 	public void removePatientWithId(int id){
 		try{
-			statement = con.prepareStatement("DELETE FROM survey_app.patients WHERE patient_ID=?");
+			statement = con.prepareStatement("DELETE FROM patients WHERE patient_ID=?");
 			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e){
