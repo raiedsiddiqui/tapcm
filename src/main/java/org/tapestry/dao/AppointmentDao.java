@@ -37,7 +37,15 @@ public class AppointmentDao {
     	Appointment a = new Appointment();
     	try{
     		a.setVolunteer(result.getInt("volunteer"));
-    		a.setPatient(result.getInt("patient"));
+    		int id = result.getInt("patient");
+    		a.setPatientID(id);
+    		statement = con.prepareStatement("SELECT firstname, lastname FROM patients WHERE patient_ID=?");
+    		statement.setInt(1, id);
+    		ResultSet r = statement.executeQuery();
+    		r.first();
+    		String firstName = r.getString("firstname");
+    		String lastName = r.getString("lastname");
+    		a.setPatient(firstName + " " + lastName.substring(0,1) + ".");
     		a.setDate(result.getString("appt_date"));
     		a.setTime(result.getString("appt_time"));
     		a.setDescription(result.getString("details"));
@@ -88,7 +96,7 @@ public class AppointmentDao {
     	try{
     		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time) values (?,?,?)");
     		statement.setInt(1, a.getVolunteer());
-    		statement.setInt(2, a.getPatient());
+    		statement.setInt(2, a.getPatientID());
     		statement.setString(3, a.getDate() + " " + a.getTime());
     		statement.execute();
     	} catch (SQLException e){

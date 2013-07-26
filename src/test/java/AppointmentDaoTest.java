@@ -15,7 +15,7 @@ import java.util.ArrayList;
 */
 public class AppointmentDaoTest{
 
-	private final String DB = "jdbc:mysql://localhost";
+	private final String DB = "jdbc:mysql://localhost/survey_app";
 	private final String UN = "root";
 	private final String PW = "root";
 

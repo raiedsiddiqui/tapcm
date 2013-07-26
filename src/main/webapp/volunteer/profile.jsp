@@ -64,17 +64,41 @@
 			<div class="row-fluid">
 				<div class="span4">
 					<h2>${vol.name}'s Profile</h2>	
-					<form id="volunteer-info" action="<c:url value="/update_user/${vol.userID}" />" method="POST">
-						<label>Name</label>
-						<input type="text" name="volName" value="${vol.name}" />
-						<label>Username</label>
-						<input type="text" name="volUsername" value="${vol.username}" />
-						<label>Email</label>
-						<input type="text" name="volEmail" value="${vol.email}" />
-						<br />
-						<a href="#changePassword" role="button" class="btn btn-success" data-toggle="modal">Change password</a>
-						<input type="submit" class="btn btn-primary" value="Save changes" />
+					<form id="volunteer-info" action="<c:url value="/update_user" />" method="POST">
+						<fieldset>
+							<legend>Edit details</legend>
+							<label>Name</label>
+							<input type="text" name="volName" value="${vol.name}" />
+							<label>Username</label>
+							<input type="text" name="volUsername" value="${vol.username}" />
+							<label>Email</label>
+							<input type="text" name="volEmail" value="${vol.email}" />
+							<br />
+							<input type="submit" class="btn btn-primary" value="Save changes" />
+						</fieldset>
 					</form>
+					<form id="change-password" method="post" action="<c:url value="/change_password"/>">
+						<fieldset>
+							<c:if test="${not empty errors}">
+							<c:choose>
+								<c:when test="${errors == 'confirm'}">
+								<div class="alert alert-error">Passwords do not match</div>
+								</c:when>
+								<c:when test="${errors == 'current'}">
+								<div class="alert alert-error">Password is incorrect</div>
+								</c:when>
+							</c:choose>
+							</c:if>
+							<legend>Change password</legend>
+	  						<label>Current password:</label>
+							<input type="password" name="currentPassword"/>
+							<label>New password:</label>
+							<input type="password" name="newPassword"/>
+							<label>Confirm password:</label>
+							<input type="password" name="confirmPassword"/>
+							<input type="submit" class="btn btn-primary" value="Save changes" />
+						</fieldset>
+	  				</form>
 				</div>
 				
 				<div class="span8">
@@ -82,46 +106,28 @@
 					<c:choose>
 					<c:when test="${not empty pictures}">
 					<ul class="thumbnails">
-						<c:foreach items="pictures" var="pic">
+						<c:forEach items="pictures" var="pic">
 					 	<li>
     						<a href="#">
-      							<img class="thumbnail" src="http://placehold.it/280x230" alt="">
+      							<img class="thumbnail" src="${pic}" alt="">
     						</a>
   						</li>
-						</c:foreach>
+						</c:forEach>
 					</ul>
 					</c:when>
 					<c:otherwise>
 					<p>No pictures uploaded</p>
 					</c:otherwise>
 					</c:choose>
+					<form id="uploadPic" action="<c:url value="upload_picture_to_profile" />" method="POST" enctype="multipart/form-data">
+						<label>Upload picture</label>
+  						<input form="uploadPic" type="file" name="pic" accept="image/*">
+  						<input form="uploadPic" type="submit">
+					</form>
 				</div>
 			</div>
 		</div>
-		
-		<!-- Modal -->
-		<div id="changePassword" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
-	  		<div class="modal-header">
-	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-	    		<h3 id="modalHeader">Change password</h3>
-	  		</div>
-	  		<div class="modal-body">
-	  			<form id="change-password" method="post" action="<c:url value="/change_password"/>">
-	  				<label>Current password:</label>
-					<input type="password" name="currentPassword"/>
-					<label>New password:</label>
-					<input type="password" name="newPassword"/>
-					<label>New password:</label>
-					<input type="password" name="confirmPassword"/>
-	  			</form>
-	  		</div>
-	  		<div class="modal-footer">
-	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-	    		<button type="submit" value="Book" form="change-password" class="btn btn-primary">Change</button>
-	  		</div>
-		</div>
-		
-		
+
 	</div>
 
 </body>

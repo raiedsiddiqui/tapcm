@@ -7,11 +7,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
+import org.tapestry.dao.PictureDao;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
@@ -53,6 +55,7 @@ public class TapestryController{
    	private PatientDao patientDao;
    	private AppointmentDao appointmentDao;
    	private MessageDao messageDao;
+   	private PictureDao pictureDao;
    	
    	//Mail-related settings;
    	private Properties props;
@@ -93,6 +96,14 @@ public class TapestryController{
 			System.out.println(e.toString());
 		}
 		
+		//Create the DAOs
+		userDao = new UserDao(database, dbUsername, dbPassword);
+		patientDao = new PatientDao(database, dbUsername, dbPassword);
+		appointmentDao = new AppointmentDao(database, dbUsername, dbPassword);
+		messageDao = new MessageDao(database, dbUsername, dbPassword);
+		pictureDao = new PictureDao(database, dbUsername, dbPassword);
+		
+		//Mail-related settings
 		final String username = mailUser;
 		final String password = mailPassword;
 		props = System.getProperties();
@@ -102,10 +113,6 @@ public class TapestryController{
 						return new PasswordAuthentication(username, password);
 					}
 		  		});
-		userDao = new UserDao(database, dbUsername, dbPassword);
-		patientDao = new PatientDao(database, dbUsername, dbPassword);
-		appointmentDao = new AppointmentDao(database, dbUsername, dbPassword);
-		messageDao = new MessageDao(database, dbUsername, dbPassword);
 		props.setProperty("mail.smtp.host", mailHost);
 		props.setProperty("mail.smtp.socketFactory.port", mailPort);
 		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
@@ -132,9 +139,11 @@ public class TapestryController{
 			User u = userDao.getUserByUsername(username);
 			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
 			ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
+			ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
-			model.addAttribute("appointments", appointmentsForToday);
+			model.addAttribute("appointments_today", appointmentsForToday);
+			model.addAttribute("appointments_all", allAppointments);
 			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 			model.addAttribute("unread", unreadMessages);
 			
@@ -262,7 +271,7 @@ public class TapestryController{
 		
 		Appointment a = new Appointment();
 		a.setVolunteer(loggedInUser);
-		a.setPatient(Integer.parseInt(request.getParameter("patient")));
+		a.setPatientID(Integer.parseInt(request.getParameter("patient")));
 		a.setDate(request.getParameter("appointmentDate"));
 		a.setTime(request.getParameter("appointmentTime"));
 		appointmentDao.createAppointment(a);
@@ -270,11 +279,13 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
-	public String viewProfile(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		model.addAttribute("vol", loggedInUser);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
+		if (errorsPresent != null)
+			model.addAttribute("errors", errorsPresent);
 		return "/volunteer/profile";
 	}
 	
@@ -342,6 +353,32 @@ public class TapestryController{
 			return "redirect:/profile";
 	}
 	
-	@RequestMapping(value="/changePassword", method=RequestMethod.POST);
+	@RequestMapping(value="/change_password", method=RequestMethod.POST)
+	public String changePassword(SecurityContextHolderAwareRequestWrapper request){
+		String currentUsername = request.getUserPrincipal().getName();
+		User loggedInUser = userDao.getUserByUsername(currentUsername);
+		String currentPassword = request.getParameter("currentPassword");
+		String newPassword = request.getParameter("newPassword");
+		String confirmPassword = request.getParameter("confirmPassword");
+		if (!newPassword.equals(confirmPassword)){
+			return "redirect:/profile?error=confirm";
+		}
+		if (!userDao.userHasPassword(loggedInUser.getUserID(), currentPassword)){
+			return "redirect:/profile?error=current";
+		}
+		ShaPasswordEncoder enc = new ShaPasswordEncoder();
+		String hashedPassword = enc.encodePassword(newPassword, null);
+		userDao.setPasswordForUser(loggedInUser.getUserID(), hashedPassword);
+		return "redirect:/profile";
+	}
+	
+	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
+	public String uploadPicture(SecurityContextHolderAwareRequestWrapper request){
+		//MultipartFile pic = request.getParameter("pic");
+		String pic = request.getParameter("pic");
+		System.out.println("Uploaded: " + pic);
+		//pictureDao.uploadPicture(pic, 1, true); //Change this
+		return "redirect:/profile";
+	}
 
 }

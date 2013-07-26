@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -56,24 +56,49 @@
 		<div class="row-fluid">
 			<div class="span12" style="padding:0px 15px;">
 				<p>
-					<strong>Today's Appointments:</strong>
+					<strong>Appointments:</strong>
 					<a href="#bookAppointment" role="button" class="btn btn-primary" data-toggle="modal">Book appointment</a>
 				</p>
-				<c:choose>
-					<c:when test="${not empty appointments}">
-					<table class="table">
-						<c:forEach items="${appointments}" var="a">
-						<tr>
-							<td>${a.patient}</td>
-							<td>${a.time}</td>
-						</tr>
-						</c:forEach>
-					</table>
-					</c:when>
-					<c:otherwise>
-						<p style="margin-left:25px">No appointments for today</p>
-					</c:otherwise>
-				</c:choose>
+				<ul class="nav nav-tabs" id="appointmentSelect">
+					<li class="active"><a href="#today" data-toggle="tab">Today</a></li>
+					<li><a href="#all" data-toggle="tab">All</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="today">	
+					<c:choose>
+						<c:when test="${not empty appointments_today}">
+						<table class="table">
+							<c:forEach items="${appointments_today}" var="a">
+							<tr>
+								<td>${a.patient}</td>
+								<td>${a.time}</td>
+							</tr>
+							</c:forEach>
+						</table>
+						</c:when>
+						<c:otherwise>
+							<p style="margin-left:25px">No appointments for today</p>
+						</c:otherwise>
+					</c:choose>
+					</div>					
+					<div class="tab-pane" id="all">	
+					<c:choose>
+						<c:when test="${not empty appointments_all}">
+						<table class="table">
+							<c:forEach items="${appointments_all}" var="a">
+							<tr>
+								<td>${a.patient}</td>
+								<td>${a.date} ${a.time}</td>
+							</tr>
+							</c:forEach>
+						</table>
+						</c:when>
+						<c:otherwise>
+							<p style="margin-left:25px">No appointments</p>
+						</c:otherwise>
+					</c:choose>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="row-fluid">

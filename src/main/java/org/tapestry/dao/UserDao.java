@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 /**
 * UserDAO class
@@ -189,6 +190,39 @@ public class UserDao {
 			System.out.println("Error: Could not retrieve users");
 			System.out.println(e.toString());
 			return null;
+		}
+	}
+	
+	/**
+	 * Checks if the specified user has the given password
+	 * @param id The ID of the user to check
+	 * @param pwd The password to check (plaintext)
+	 */
+	public boolean userHasPassword(int id, String pwd){
+		ShaPasswordEncoder enc = new ShaPasswordEncoder();
+		String hashedPassword = enc.encodePassword(pwd, null);
+		try{
+			statement = con.prepareStatement("SELECT password FROM users WHERE user_ID=?");
+			statement.setInt(1, id);
+			ResultSet result = statement.executeQuery();
+			result.first();
+			return hashedPassword.equals(result.getString("password"));
+		} catch (SQLException e){
+			System.out.println("Error: Could not compare passwords");
+			System.out.println(e.toString());
+			return false;
+		}
+	}
+	
+	public void setPasswordForUser(int id, String pwd){
+		try{
+			statement = con.prepareStatement("UPDATE users SET password=? WHERE user_ID=?");
+			statement.setString(1, pwd);
+			statement.setInt(2, id);
+			statement.execute();
+		} catch (SQLException e) {
+			System.out.println("Error: Could not set password");
+			System.out.println(e.toString());
 		}
 	}
 }
