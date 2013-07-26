@@ -13,11 +13,13 @@ import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
+import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.PictureDao;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
+import org.tapestry.objects.SurveyTemplate;
 import java.util.ArrayList;
 import org.yaml.snakeyaml.Yaml;
 import java.io.IOException;
@@ -56,6 +58,7 @@ public class TapestryController{
    	private AppointmentDao appointmentDao;
    	private MessageDao messageDao;
    	private PictureDao pictureDao;
+   	private SurveyTemplateDao surveyTemplateDao;
    	
    	//Mail-related settings;
    	private Properties props;
@@ -113,6 +116,7 @@ public class TapestryController{
 						return new PasswordAuthentication(username, password);
 					}
 		  		});
+		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		props.setProperty("mail.smtp.host", mailHost);
 		props.setProperty("mail.smtp.socketFactory.port", mailPort);
 		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
@@ -351,6 +355,13 @@ public class TapestryController{
 			return "redirect:/login?usernameChanged=true";
 		else
 			return "redirect:/profile";
+	}
+	
+	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
+	public String manageSurveyTemplates(ModelMap model){
+		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
+		model.addAttribute("survey_templates", surveyTemplateList);
+		return "admin/manage_survey_templates";
 	}
 	
 	@RequestMapping(value="/change_password", method=RequestMethod.POST)
