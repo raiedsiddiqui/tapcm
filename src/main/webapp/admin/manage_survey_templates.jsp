@@ -8,15 +8,21 @@
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-
+	
+	<script type="text/javascript">
+		function showAddSurvey(){
+			document.getElementById("addSurveyDiv").style.display="block";
+		}
+	</script>
+	
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
 		}
 	</style>
 </head>
-	
-<body>	
+
+<body>
   <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<div class="navbar navbar-inverse">
@@ -41,39 +47,42 @@
 			</div>
 		</div>
 		
+		
 		<div class="row-fluid">
-			<div class="span6">
-				<h2>Tapestry Admin</h2>
-				<p>Click a link in the navbar to begin</p>
-				<p>You can:</p>
-				<ul>
-					<li>Add a patient</li>
-					<li>Add a caretaker</li>
-					<li>Manage installed surveys</li>
-					<li>Send messages to volunteers</li>
-				</ul>
-			</div>
-			<div class="span6">
-				<h3>Message volunteer</h3>
-				<c:if test="${not empty success}">
-					<div class="alert alert-info" style="width:170px;">
-						<p>Message sent</p>
-					</div>
-				</c:if>
-				<form id="messageVolunteer" method="post" action="<c:url value="/send_message"/>">
-					<label>Subject:</label>
-					<input type="text" name="msgSubject" />
-					<label>Send to:</label>
-					<select name="recipient" form="messageVolunteer">
-						<c:forEach items="${volunteers}" var="v">
-						<option value="${v.userID}">${v.name}</option>
-						</c:forEach>
-					</select><br />
-					<label>Message:</label>
-					<textarea name="msgBody"></textarea><br />
-					<input type="submit" class="btn btn-primary" value="Send" />
-				</form>
-			</div>
+			<h2>Survey Templates</h2>
+			<table class="table">
+				<tr>
+					<th>Title</th>
+					<th>Type</th>
+					<th>Remove</th>
+				</tr>
+				<c:forEach items="${survey_templates}" var="st">
+				<tr>
+					<td>${st.title}</td>
+					<td>${st.type}</td>
+					<td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" class="btn btn-danger">Remove</a></td>
+				</tr>
+				</c:forEach>
+			</table>
+			<a class="btn btn-primary" onClick="showAddSurvey()">Add new</a>
+		</div>
+
+		<div class="row-fluid" id="addSurveyDiv" style="display:none";>
+			<form action="upload_survey_template" method="post" enctype="multipart/form-data">
+				<fieldset>
+					<legend>Add new survey</legend>
+					<label>Title:</label>
+					<input type="text" name="title"/>
+					<label>Type:</label>
+					<select name="type">
+						<option value="MUMPS">MUMPS</option>
+					</select>
+					<label>File:</label>
+					<input type="hidden" name="MAX_FILE_SIZE" value="2000000">
+					<input type="file" name="file"/>
+					<input class="btn btn-primary" type="submit" value="Upload" />
+				</fieldset>
+			</form>
 		</div>
 	</div>
 </body>

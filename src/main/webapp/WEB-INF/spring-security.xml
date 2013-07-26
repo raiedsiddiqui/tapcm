@@ -21,6 +21,7 @@
 		<intercept-url pattern="/resources/**" filters="none" />
 		<intercept-url pattern="/manage_patients" access="ROLE_ADMIN" />
 		<intercept-url pattern="/manage_users" access="ROLE_ADMIN" />
+		<intercept-url pattern="/manage_survey_templates" access="ROLE_ADMIN" />
 		<intercept-url pattern="/add_user" access="ROLE_ADMIN" />
 		<intercept-url pattern="/add_patient" access="ROLE_ADMIN"/>
 		<intercept-url pattern="/remove_user/*" access="ROLE_ADMIN" />
@@ -29,9 +30,10 @@
 		<intercept-url pattern="/inbox" access="ROLE_USER" />
 		<intercept-url pattern="/view_message/**" access="ROLE_USER" />
 		<intercept-url pattern="/send_message" access="ROLE_ADMIN" />
-		<intercept-url pattern="/delete_message/**" access="ROLE_USER" /><intercept-url
-			access="ROLE_USER" pattern="/update_user/**">
-</intercept-url>
+		<intercept-url pattern="/delete_message/**" access="ROLE_USER" />
+		<intercept-url pattern="/update_user/**" access="ROLE_USER" />
+		<intercept-url pattern="/upload_survey_template" access="ROLE_ADMIN" />
+		<intercept-url pattern="/delete_survey_template/**" access = "ROLE_ADMIN" />
 		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
 	</http>
  

@@ -26,8 +26,9 @@ CREATE TABLE IF NOT EXISTS patients (
 
 CREATE TABLE IF NOT EXISTS surveys (
 	survey_ID TINYINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED TINYINT allows 255 surveys*/
-	title VARCHAR(50) NOT NULL,
-	author VARCHAR(255) NOT NULL,
+	title VARCHAR(50),
+	type VARCHAR(255),
+	contents MEDIUMBLOB,
 	last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, /*Automatically updates when record changed*/
 	PRIMARY KEY (survey_ID)
 );

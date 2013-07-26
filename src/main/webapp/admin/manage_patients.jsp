@@ -89,7 +89,7 @@
 						<ul class="nav">
 							<li><a href="<c:url value="/manage_users"/>">Manage Volunteers</a></li>
 							<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
-							<li><a href="#">Manage Surveys</a></li>
+							<li><a href="<c:url value="/manage_survey_templates"/>">Manage Surveys</a></li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>
