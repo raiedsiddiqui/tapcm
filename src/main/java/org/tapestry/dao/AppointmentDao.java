@@ -42,18 +42,22 @@ public class AppointmentDao {
     		statement = con.prepareStatement("SELECT firstname, lastname FROM patients WHERE patient_ID=?");
     		statement.setInt(1, id);
     		ResultSet r = statement.executeQuery();
-    		r.first();
-    		String firstName = r.getString("firstname");
-    		String lastName = r.getString("lastname");
-    		a.setPatient(firstName + " " + lastName.substring(0,1) + ".");
+    		if (r.first()){
+    			String firstName = r.getString("firstname");
+    			String lastName = r.getString("lastname");
+    			a.setPatient(firstName + " " + lastName.substring(0,1) + ".");
+    		} else {
+    			return null; //If we book an appointment for a patient that doesn't exist, the above query will fail
+    		}
     		a.setDate(result.getString("appt_date"));
     		a.setTime(result.getString("appt_time"));
     		a.setDescription(result.getString("details"));
+    		return a;
     	} catch (SQLException e){
     		System.out.println("Error: Could not create Appointment object");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
+    		return null;
     	}
-		return a;
     }
     	
     public ArrayList<Appointment> getAllAppointmentsForVolunteer(int volunteer){
@@ -64,7 +68,8 @@ public class AppointmentDao {
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
        		while(result.next()){
        			Appointment a = createFromSearch(result);
-       			allAppointments.add(a);
+       			if (a != null)
+       				allAppointments.add(a);
         	}
        		return allAppointments;
     	} catch (SQLException e){
@@ -82,14 +87,15 @@ public class AppointmentDao {
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
        		while(result.next()){
        			Appointment a = createFromSearch(result);
-       			allAppointments.add(a);
+       			if (a != null)
+       				allAppointments.add(a);
         	}
        		return allAppointments;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve appointments");
     		System.out.println(e.toString());
     		return null;
-    	}   	
+    	}
     }
     
     public void createAppointment(Appointment a){

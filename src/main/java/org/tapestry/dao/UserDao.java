@@ -54,7 +54,7 @@ public class UserDao {
 				u.setEnabled(false);
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create User object");
-			System.out.println(e.toString());
+			System.out.println(e.getStackTrace());
 		}
 		return u;
 	}

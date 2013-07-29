@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS patients (
 	firstname VARCHAR(255) NOT NULL,
 	lastname VARCHAR(255) NOT NULL,
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
-	age TINYINT UNSIGNED, /*Using UNSIGNED TINYINT allows ages between 0-255, which is overkill but I can't get any smaller than that*/
+	birthdate VARCHAR(15),
 	email VARCHAR(50),
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
     color VARCHAR(7), /*Hexcode color string (#ffffff)*/
