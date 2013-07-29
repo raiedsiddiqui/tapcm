@@ -1,7 +1,5 @@
 package org.tapestry.objects;
 
-import java.util.Calendar;
-
 /**
 * Survey Result bean
 * Represents the results of a survey.
@@ -12,9 +10,12 @@ public class SurveyResult {
 
 	private int resultID;
 	private int surveyID;
-	private int userID;
+	private String surveyTitle;
 	private int patientID;
-	private Calendar completedDate;
+	private String patientName;
+	private String status;
+	private String startDate;
+	private String endDate;
 	private byte[] results;
 
 	public SurveyResult(){
@@ -37,10 +38,10 @@ public class SurveyResult {
 	}
 	
 	/**
-	*@return user_ID The numeric ID of the user
-	*/
-	public int getUserID(){
-		return userID;
+	 * @return status The status of the survey
+	 */
+	public String getSurveyTitle(){
+		return surveyTitle;
 	}
 	
 	/**
@@ -49,12 +50,33 @@ public class SurveyResult {
 	public int getPatientID(){
 		return patientID;
 	}
+	
+	/**
+	 * @return status The status of the survey
+	 */
+	public String getPatientName(){
+		return patientName;
+	}
+	
+	/**
+	 * @return status The status of the survey
+	 */
+	public String getStatus(){
+		return status;
+	}
 
 	/**
-	*@return complete_date The completed date of the survey
+	*@return start_date The start date of the survey
 	*/
-	public Calendar getCompletedDate(){
-		return completedDate;
+	public String getStartDate(){
+		return startDate;
+	}
+	
+	/**
+	 * @return end_date The date the survey was completed
+	 */
+	public String getEndDate(){
+		return endDate;
 	}
 	
 	/**
@@ -77,10 +99,10 @@ public class SurveyResult {
 	}
 	
 	/**
-	 * @param id The new user ID
+	 * @param status The new status
 	 */
-	public void setUserID(int id){
-		this.userID = id;
+	public void setSurveyTitle(String surveyTitle){
+		this.surveyTitle = surveyTitle;
 	}
 	
 	/**
@@ -89,12 +111,33 @@ public class SurveyResult {
 	public void setPatientID(int id){
 		this.patientID = id;
 	}
+	
+	/**
+	 * @param status The new status
+	 */
+	public void setPatientName(String patientName){
+		this.patientName = patientName;
+	}
+	
+	/**
+	 * @param status The new status
+	 */
+	public void setStatus(String status){
+		this.status = status;
+	}
 
 	/**
-	*@param completedDate The new completed date
+	* @param startDate The new start date
 	*/
-	public void setCompletedDate(Calendar completedDate){
-		this.completedDate = completedDate;
+	public void setStartDate(String startDate){
+		this.startDate = startDate;
+	}
+	
+	/**
+	 * @param endDate The new completed date
+	 */
+	public void setEndDate(String endDate){
+		this.endDate = endDate;
 	}
 	
 	/**

@@ -35,12 +35,12 @@ CREATE TABLE IF NOT EXISTS surveys (
 
 CREATE TABLE IF NOT EXISTS survey_results (
 	result_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 results*/
-	survey SMALLINT UNSIGNED NOT NULL, /*Same as survey_ID field in surveys*/
-	patient SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID in patients*/
-	volunteer SMALLINT UNSIGNED NOT NULL, /*Same as user_ID in users*/
-	started DATE NOT NULL,
-	completed DATE,
-	results TEXT,
+	survey_ID SMALLINT UNSIGNED NOT NULL, /*Same as survey_ID field in surveys*/
+	patient_ID SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID in patients*/
+	status VARCHAR(255) NOT NULL, /*The status of the survey*/
+	startDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, /*Automatically assigns the startDate when the survey is assigned*/
+	endDate TIMESTAMP, /*endDate represents the date that the survey is completed or terminated*/
+	data MEDIUMBLOB, /*The survey data*/
 	PRIMARY KEY (result_ID)
 );
 
@@ -62,13 +62,6 @@ CREATE TABLE IF NOT EXISTS appointments (
 	PRIMARY KEY(appointment_ID)
 );
 
-CREATE TABLE IF NOT EXISTS required_surveys (
-	req_survey_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED MEDIUMINT allows for 16,777,215 surveys (255 surveys * 65,535 patients = 16,711,425)*/
-	patient SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID from patients table*/
-	survey SMALLINT UNSIGNED NOT NULL,
-	PRIMARY KEY (req_survey_ID)
-);
-
 CREATE TABLE IF NOT EXISTS messages (
 	message_ID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	recipient TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
@@ -79,11 +72,4 @@ CREATE TABLE IF NOT EXISTS messages (
 	msgRead BOOLEAN NOT NULL DEFAULT 0,
 	PRIMARY KEY (message_ID)
 );
-
-CREATE TABLE IF NOT EXISTS pictures {
-    picture_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    pic VARCHAR(255), /* path to picture file */
-    owner SMALLINT, /* the ID of the user or patient the picture belongs to */
-    owner_is_user BOOLEAN /* 1 if the value of owner refers to a user, 0 if a patient */
-}
 COMMIT;
