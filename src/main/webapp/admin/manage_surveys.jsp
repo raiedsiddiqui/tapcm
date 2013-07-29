@@ -8,15 +8,21 @@
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-
+	
+	<script type="text/javascript">
+		function showAssignSurvey(){
+			document.getElementById("assignSurveyDiv").style.display="block";
+		}
+	</script>
+	
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
 		}
 	</style>
 </head>
-	
-<body>	
+
+<body>
   <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<div class="navbar navbar-inverse">
@@ -42,39 +48,51 @@
 			</div>
 		</div>
 		
+		
 		<div class="row-fluid">
-			<div class="span6">
-				<h2>Tapestry Admin</h2>
-				<p>Click a link in the navbar to begin</p>
-				<p>You can:</p>
-				<ul>
-					<li>Add a patient</li>
-					<li>Add a caretaker</li>
-					<li>Manage installed surveys</li>
-					<li>Send messages to volunteers</li>
-				</ul>
-			</div>
-			<div class="span6">
-				<h3>Message volunteer</h3>
-				<c:if test="${not empty success}">
-					<div class="alert alert-info" style="width:170px;">
-						<p>Message sent</p>
-					</div>
-				</c:if>
-				<form id="messageVolunteer" method="post" action="<c:url value="/send_message"/>">
-					<label>Subject:</label>
-					<input type="text" name="msgSubject" />
-					<label>Send to:</label>
-					<select name="recipient" form="messageVolunteer">
-						<c:forEach items="${volunteers}" var="v">
-						<option value="${v.userID}">${v.name}</option>
+			<h2>Survey Templates</h2>
+			<table class="table">
+				<tr>
+					<th>Survey</th>
+					<th>Patient</th>
+					<th>Date Assigned</th>
+					<th>Status</th>
+					<th>Date Completed</th>
+					<th>Remove</th>
+				</tr>
+				<c:forEach items="${surveys}" var="s">
+				<tr>
+					<td><a href="<c:url value="/view_survey/${s.surveyID}"/>">${s.surveyTitle}</a></td>
+					<td>${s.patientName}</td>
+					<td>${s.startDate}</td>
+					<td>${s.status}</td>
+					<td>${s.endDate}</td>
+					<td><a href="<c:url value="/delete_survey/${s.resultID}"/>" class="btn btn-danger">Remove</a></td>
+				</tr>
+				</c:forEach>
+			</table>
+			<a class="btn btn-primary" onClick="showAssignSurvey()">Assign Surveys</a>
+		</div>
+
+		<div class="row-fluid" id="assignSurveyDiv" style="display:none";>
+			<form action="assign_surveys" method="post">
+				<fieldset>
+					<legend></legend>
+					<label>Survey</label>
+					<select name="surveyID">
+						<c:forEach items="${survey_templates}" var="st">
+						<option value="${st.surveyID}">${st.title}</option>
 						</c:forEach>
 					</select><br />
-					<label>Message:</label>
-					<textarea name="msgBody"></textarea><br />
-					<input type="submit" class="btn btn-primary" value="Send" />
-				</form>
-			</div>
+					<label>Patient(s):</label>
+					<select multiple name="patients[]">
+						<c:forEach items="${patients}" var="p">
+						<option value="${p.patientID}">${p.firstName} ${p.lastName}</option>
+						</c:forEach>
+					</select><br />
+					<input class="btn btn-primary" type="submit" value="Upload" />
+				</fieldset>
+			</form>
 		</div>
 	</div>
 </body>

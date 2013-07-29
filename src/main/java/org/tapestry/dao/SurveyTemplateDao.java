@@ -52,6 +52,25 @@ public class SurveyTemplateDao
 		}
 		return st;
 	}
+	
+	/**
+	* Returns the patient with the given ID
+	* @param id The ID of the patient to find
+	* @return A Patient object representing the result
+	*/
+	public SurveyTemplate getSurveyTemplateByID(int id){
+		try{
+			statement = con.prepareStatement("SELECT * FROM surveys WHERE survey_ID=?");
+			statement.setInt(1, id);
+			ResultSet results = statement.executeQuery();
+			results.first();
+			return createFromSearch(results);
+		} catch (SQLException e){
+			System.out.println("Error: could not retrieve patient");
+			System.out.println(e.toString());
+			return null;
+		}
+	}
     
 	/**
 	 * Ordered by title ascending
@@ -61,7 +80,7 @@ public class SurveyTemplateDao
 	public ArrayList<SurveyTemplate> getAllSurveyTemplates()
 	{
 		try {
-			statement = con.prepareStatement("SELECT * FROM survey_app.surveys");
+			statement = con.prepareStatement("SELECT * FROM surveys");
 			ResultSet result = statement.executeQuery();
 			ArrayList<SurveyTemplate> allSurveyTemplates = new ArrayList<SurveyTemplate>();
 			while(result.next()){
@@ -82,7 +101,7 @@ public class SurveyTemplateDao
 	 */
 	public void uploadSurveyTemplate(SurveyTemplate st) {
 		try {
-			statement = con.prepareStatement("INSERT INTO survey_app.surveys (title, type, contents) values (?,?,?)");
+			statement = con.prepareStatement("INSERT INTO surveys (title, type, contents) values (?,?,?)");
 			statement.setString(1, st.getTitle());
 			statement.setString(2, st.getType());
 			statement.setBytes(3, st.getContents());
@@ -99,7 +118,7 @@ public class SurveyTemplateDao
 	 */
 	public void deleteSurveyTemplate(int id) {
 		try {
-			statement = con.prepareStatement("DELETE FROM survey_app.surveys WHERE survey_ID=?");
+			statement = con.prepareStatement("DELETE FROM surveys WHERE survey_ID=?");
 			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e){
