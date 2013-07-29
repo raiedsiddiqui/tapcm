@@ -64,7 +64,7 @@ public class Patient{
     	public int getAge(){
     		DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-DD");
     		DateTime bd = format.parseDateTime(this.birthdate);
-    		int age = Years.yearsBetween(DateTime.now(), bd).getYears();
+    		int age = Years.yearsBetween(bd, DateTime.now()).getYears();
     		return age;
     	}
 
