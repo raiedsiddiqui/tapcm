@@ -108,7 +108,7 @@
 				</tr>
                 <c:forEach items="${patients}" var="p">
                 <tr>
-                    <td>${p.firstName} ${p.lastName}</td>
+                    <td>${p.firstName} ${p.lastName} (${p.gender}, ${p.age})</td>
                     <td>${p.volunteerName}</td>
                     <td><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
                     <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td>
