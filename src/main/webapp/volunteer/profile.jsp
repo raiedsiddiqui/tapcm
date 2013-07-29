@@ -121,7 +121,7 @@
 					</c:choose>
 					<form id="uploadPic" action="<c:url value="upload_picture_to_profile" />" method="POST" enctype="multipart/form-data">
 						<label>Upload picture</label>
-  						<input form="uploadPic" type="file" name="pic" accept="image/*">
+  						<input form="uploadPic" type="file" name="pic" accept="image/*"><br/>
   						<input form="uploadPic" type="submit">
 					</form>
 				</div>

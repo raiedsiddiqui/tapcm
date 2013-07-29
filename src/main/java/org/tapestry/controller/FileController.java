@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.tapestry.dao.SurveyTemplateDao;
+import org.tapestry.dao.PictureDao;
 import org.tapestry.objects.SurveyTemplate;
 import org.yaml.snakeyaml.Yaml;
 
@@ -29,6 +30,7 @@ public class FileController extends MultiActionController{
 	private Yaml yaml;
 	
 	private SurveyTemplateDao surveyTemplateDao;
+	private PictureDao pictureDao;
 	
 	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
@@ -50,6 +52,7 @@ public class FileController extends MultiActionController{
 			System.out.println(e.toString());
 		}
 		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
+		pictureDao = new PictureDao(DB, UN, PW);
    	}
    	
    	@RequestMapping(value = "/upload_survey_template", method=RequestMethod.POST)
@@ -72,4 +75,13 @@ public class FileController extends MultiActionController{
    		surveyTemplateDao.deleteSurveyTemplate(id);
    		return "redirect:/manage_survey_templates";
    	}
+   	
+	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
+	public String uploadPicture(MultipartHttpServletRequest request){
+		//MultipartFile pic = request.getParameter("pic");
+		MultipartFile pic = request.getFile("pic");
+		System.out.println("Uploaded: " + pic);
+		pictureDao.uploadPicture(pic, 1, true); //Change this
+		return "redirect:/profile";
+	}
 }

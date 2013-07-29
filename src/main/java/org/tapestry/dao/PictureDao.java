@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
+import org.springframework.core.io.FileSystemResource;
 
 public class PictureDao {
 	private PreparedStatement statement;
@@ -24,9 +25,11 @@ public class PictureDao {
     }
     
     public void uploadPicture(MultipartFile pic, int owner, boolean isUser){
-    	String uploadFilename = "resources/uploads/" + pic.getOriginalFilename();
+    	String uploadFilename = "WEB-INF/" + pic.getOriginalFilename();
     	try{
-    		pic.transferTo(new File(uploadFilename));
+    		File f = new FileSystemResource(uploadFilename).getFile();
+    		f.createNewFile();
+    		pic.transferTo(f);
     		statement = con.prepareStatement("INSERT INTO pictures (pic, owner, owner_is_user) values (?,?,?)");
     		statement.setString(1, uploadFilename);
     		statement.setInt(2, owner);

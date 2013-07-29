@@ -384,14 +384,5 @@ public class TapestryController{
 		userDao.setPasswordForUser(loggedInUser.getUserID(), hashedPassword);
 		return "redirect:/profile";
 	}
-	
-	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
-	public String uploadPicture(SecurityContextHolderAwareRequestWrapper request){
-		//MultipartFile pic = request.getParameter("pic");
-		String pic = request.getParameter("pic");
-		System.out.println("Uploaded: " + pic);
-		//pictureDao.uploadPicture(pic, 1, true); //Change this
-		return "redirect:/profile";
-	}
 
 }

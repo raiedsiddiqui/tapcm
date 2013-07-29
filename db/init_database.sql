@@ -80,10 +80,12 @@ CREATE TABLE IF NOT EXISTS messages (
 	PRIMARY KEY (message_ID)
 );
 
-CREATE TABLE IF NOT EXISTS pictures {
+CREATE TABLE IF NOT EXISTS pictures (
     picture_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    pic VARCHAR(255), /* path to picture file */
+    pic LONGBLOB, /* picture data */
     owner SMALLINT, /* the ID of the user or patient the picture belongs to */
-    owner_is_user BOOLEAN /* 1 if the value of owner refers to a user, 0 if a patient */
-}
+    owner_is_user BOOLEAN, /* 1 if the value of owner refers to a user, 0 if a patient */
+    PRIMARY KEY (picture_ID)
+);
+
 COMMIT;
