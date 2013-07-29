@@ -132,6 +132,14 @@
 					</select><br />
 					<label>Background color</label>
 					<input class='simple_color_live_preview' value='#c0ffee' name="backgroundColor"/>
+					<label>Gender</label>
+					<select name="gender" form="newPatient">
+						<option value="M">Male</option>
+						<option value="F">Female</option>
+						<option value="O">Other</option>
+					</select>
+					<label>Birth Date</label>
+					<input type="date" name="birthdate" /> <br/>
 					<input class="btn btn-primary" type="submit" value="Add" />
 				</fieldset>
 			</form>

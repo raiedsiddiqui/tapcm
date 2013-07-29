@@ -239,6 +239,7 @@ public class TapestryController{
 		p.setLastName(request.getParameter("lastname"));
 		p.setVolunteer(Integer.parseInt(request.getParameter("volunteer")));
 		p.setColor(request.getParameter("backgroundColor"));
+		p.setBirthdate(request.getParameter("birthdate"));
 		patientDao.createPatient(p);
 		return "redirect:/manage_patients";
 	}
