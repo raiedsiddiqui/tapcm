@@ -105,18 +105,21 @@
 			<div class="span12" style="padding:0px 15px;">
 				<p><strong>Recent Activities:</strong></p>
 				<table class="table">
-					<tr>
-						<td>June 9, 2013</td>
-						<td>Filled out Survey 2 for Angie O.</td>
-					</tr>
-					<tr>
-						<td>June 11, 2013</td>
-						<td>Filled out general symptoms for Angie O.</td>
-					</tr>
-					<tr>
-						<td>June 11, 2013</td>
-						<td>Added new patient Tess T.</td>
-					</tr>
+				<c:choose>
+						<c:when test="${not empty appointments_all}">
+						<table class="table">
+						<c:forEach items="${activities}" var="a">
+							<tr>
+								<td>${a.date}</td>
+								<td>${a.description}</td>
+							</tr>
+							</c:forEach>
+						</table>
+						</c:when>
+						<c:otherwise>
+							<p style="margin-left:25px">No activities</p>
+						</c:otherwise>
+					</c:choose>
 				</table>
 			</div>
 		</div>

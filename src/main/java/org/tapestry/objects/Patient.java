@@ -1,11 +1,16 @@
 package org.tapestry.objects;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.Years;
+
 public class Patient{
 	private int patientID;
 	private String firstName;
 	private String lastName;
 	private String gender;
-	private int age;
+	private String birthdate;
 	private String email;
 	private int volunteer;
 	private String volunteerName;
@@ -57,9 +62,15 @@ public class Patient{
 	*@return The patient's age
 	*/
     	public int getAge(){
-        	return age;
+    		DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-DD");
+    		DateTime bd = format.parseDateTime(this.birthdate);
+    		int age = Years.yearsBetween(bd, DateTime.now()).getYears();
+    		return age;
     	}
 
+    	public String getBirthdate(){
+    		return birthdate;
+    	}
 	/**
 	*@return The patient's email address
 	*/
@@ -123,8 +134,8 @@ public class Patient{
 	/**
 	*@param age The new age of the patient
 	*/
-    	public void setAge(int age){
-        	this.age = age;
+    	public void setBirthdate(String birthdate){
+        	this.birthdate = birthdate;
     	}
 
 	/**

@@ -17,11 +17,13 @@ import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.PictureDao;
 import org.tapestry.objects.SurveyResult;
+import org.tapestry.dao.ActivityDao;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.SurveyTemplate;
+import org.tapestry.objects.Activity;
 import java.util.ArrayList;
 import org.yaml.snakeyaml.Yaml;
 import java.io.IOException;
@@ -62,6 +64,7 @@ public class TapestryController{
    	private PictureDao pictureDao;
    	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
+   	private ActivityDao activityDao;
    	
    	//Mail-related settings;
    	private Properties props;
@@ -110,6 +113,7 @@ public class TapestryController{
 		pictureDao = new PictureDao(database, dbUsername, dbPassword);
 		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		surveyResultDao = new SurveyResultDao(database, dbUsername, dbPassword);
+		activityDao = new ActivityDao(database, dbUsername, dbPassword);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -121,6 +125,7 @@ public class TapestryController{
 						return new PasswordAuthentication(username, password);
 					}
 		  		});
+		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		props.setProperty("mail.smtp.host", mailHost);
 		props.setProperty("mail.smtp.socketFactory.port", mailPort);
 		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
@@ -148,12 +153,15 @@ public class TapestryController{
 			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
 			ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
 			ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
+			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
+			//ArrayList<String> activityLog = activityDao.getAllActivitiesForVolunteer(u.getUserID());
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
 			model.addAttribute("appointments_today", appointmentsForToday);
 			model.addAttribute("appointments_all", allAppointments);
 			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 			model.addAttribute("unread", unreadMessages);
+			model.addAttribute("activities", activityLog);
 			
 			return "volunteer/index";
 		}
@@ -206,6 +214,7 @@ public class TapestryController{
 		u.setPassword(hashedPassword);
 		u.setEmail(request.getParameter("email"));
 		userDao.createUser(u);
+		activityDao.logActivity("Added user: " + u.getName(), u.getUserID());
 		try{
 			MimeMessage message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(mailAddress));
@@ -232,6 +241,7 @@ public class TapestryController{
 	@RequestMapping(value="/remove_user/{user_id}", method=RequestMethod.GET)
 	public String removeUser(@PathVariable("user_id") int id){
 		userDao.removeUserWithId(id);
+		activityDao.logActivity("Removed user: " + id, id);
 		return "redirect:/manage_users";
 	}
 
@@ -241,15 +251,21 @@ public class TapestryController{
 		Patient p = new Patient();
 		p.setFirstName(request.getParameter("firstname"));
 		p.setLastName(request.getParameter("lastname"));
-		p.setVolunteer(Integer.parseInt(request.getParameter("volunteer")));
+		int v = Integer.parseInt(request.getParameter("volunteer"));
+		p.setVolunteer(v);
 		p.setColor(request.getParameter("backgroundColor"));
+		p.setBirthdate(request.getParameter("birthdate"));
+		p.setGender(request.getParameter("gender"));
 		patientDao.createPatient(p);
+		activityDao.logActivity("Added patient: " + p.getDisplayName(), v);
 		return "redirect:/manage_patients";
 	}
 
 	@RequestMapping(value="/remove_patient/{patient_id}", method=RequestMethod.GET)
 	public String removePatient(@PathVariable("patient_id") int id){
+		Patient p = patientDao.getPatientByID(id);
 		patientDao.removePatientWithId(id);
+		activityDao.logActivity("Removed patient: " + p.getDisplayName(), p.getVolunteer(), p.getPatientID());
 		return "redirect:/manage_patients";
 	}
 
@@ -281,10 +297,13 @@ public class TapestryController{
 		
 		Appointment a = new Appointment();
 		a.setVolunteer(loggedInUser);
-		a.setPatientID(Integer.parseInt(request.getParameter("patient")));
+		int pid = Integer.parseInt(request.getParameter("patient"));
+		a.setPatientID(pid);
 		a.setDate(request.getParameter("appointmentDate"));
 		a.setTime(request.getParameter("appointmentTime"));
 		appointmentDao.createAppointment(a);
+		Patient p = patientDao.getPatientByID(pid);
+		activityDao.logActivity("Booked appointment with " + p.getDisplayName(), loggedInUser, pid);
 		return "redirect:/";
 	}
 	
@@ -296,6 +315,8 @@ public class TapestryController{
 		model.addAttribute("unread", unreadMessages);
 		if (errorsPresent != null)
 			model.addAttribute("errors", errorsPresent);
+		ArrayList<String> pics = pictureDao.getPicturesForUser(loggedInUser.getUserID());
+		model.addAttribute("pictures", pics);
 		return "/volunteer/profile";
 	}
 	
@@ -357,6 +378,7 @@ public class TapestryController{
 		u.setName(request.getParameter("volName"));
 		u.setEmail(request.getParameter("volEmail"));
 		userDao.modifyUser(u);
+		activityDao.logActivity("Updated user information", loggedInUser.getUserID());
 		if (!(currentUsername.equals(u.getUsername())))
 			return "redirect:/login?usernameChanged=true";
 		else
@@ -386,15 +408,7 @@ public class TapestryController{
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
 		String hashedPassword = enc.encodePassword(newPassword, null);
 		userDao.setPasswordForUser(loggedInUser.getUserID(), hashedPassword);
-		return "redirect:/profile";
-	}
-	
-	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
-	public String uploadPicture(SecurityContextHolderAwareRequestWrapper request){
-		//MultipartFile pic = request.getParameter("pic");
-		String pic = request.getParameter("pic");
-		System.out.println("Uploaded: " + pic);
-		//pictureDao.uploadPicture(pic, 1, true); //Change this
+		activityDao.logActivity("Changed password", loggedInUser.getUserID());
 		return "redirect:/profile";
 	}
 

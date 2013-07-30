@@ -83,6 +83,14 @@
 			<artifactId>el-impl</artifactId>
 			<version>2.2</version>
 		</dependency>
+		
+		<!-- STOP! Joda Time :P -->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.2</version>
+		</dependency>
+            
 
 		<!-- Using Spring Security because I know better than to write a custom one -->
 		<!-- Spring 3 -->

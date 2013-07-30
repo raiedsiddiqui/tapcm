@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS patients (
 	firstname VARCHAR(255) NOT NULL,
 	lastname VARCHAR(255) NOT NULL,
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
-	age TINYINT UNSIGNED, /*Using UNSIGNED TINYINT allows ages between 0-255, which is overkill but I can't get any smaller than that*/
+	birthdate VARCHAR(15),
 	email VARCHAR(50),
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
     color VARCHAR(7), /*Hexcode color string (#ffffff)*/
@@ -44,11 +44,11 @@ CREATE TABLE IF NOT EXISTS survey_results (
 	PRIMARY KEY (result_ID)
 );
 
-CREATE TABLE IF NOT EXISTS activites (
+CREATE TABLE IF NOT EXISTS activities (
 	event_ID INT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED INT allows for 4,294,967,295 events, which should be enough*/
 	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	volunteer SMALLINT UNSIGNED NOT NULL,
-	patient SMALLINT UNSIGNED NOT NULL,
+	patient SMALLINT UNSIGNED,
 	description TEXT,
 	PRIMARY KEY (event_ID)
 );
@@ -62,6 +62,13 @@ CREATE TABLE IF NOT EXISTS appointments (
 	PRIMARY KEY(appointment_ID)
 );
 
+CREATE TABLE IF NOT EXISTS required_surveys (
+	req_survey_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED MEDIUMINT allows for 16,777,215 surveys (255 surveys * 65,535 patients = 16,711,425)*/
+	patient SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID from patients table*/
+	survey SMALLINT UNSIGNED NOT NULL,
+	PRIMARY KEY (req_survey_ID)
+);
+
 CREATE TABLE IF NOT EXISTS messages (
 	message_ID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	recipient TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
@@ -71,5 +78,13 @@ CREATE TABLE IF NOT EXISTS messages (
 	subject VARCHAR(255) NOT NULL,
 	msgRead BOOLEAN NOT NULL DEFAULT 0,
 	PRIMARY KEY (message_ID)
+);
+
+CREATE TABLE IF NOT EXISTS pictures (
+    picture_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    pic VARCHAR(255), /* path to picture file */
+    owner SMALLINT, /* the ID of the user or patient the picture belongs to */
+    owner_is_user BOOLEAN, /* 1 if the value of owner refers to a user, 0 if a patient */
+    PRIMARY KEY (picture_ID)
 );
 COMMIT;

@@ -64,7 +64,7 @@ public class PatientDao {
             		p.setLastName(result.getString("lastname"));
             		p.setGender(result.getString("gender"));
             		p.setColor(result.getString("color"));
-	            	p.setAge(result.getInt("age"));
+	            	p.setBirthdate(result.getString("birthdate"));
             		p.setVolunteer(result.getInt("volunteer"));
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
@@ -137,11 +137,13 @@ public class PatientDao {
 	*/
     public void createPatient(Patient p){
 		try{
-			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, volunteer, color) VALUES (?, ?, ?, ?)");
+			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, volunteer, color, birthdate, gender) VALUES (?, ?, ?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
 			statement.setString(2, p.getLastName());
 			statement.setInt(3, p.getVolunteer());
 			statement.setString(4, p.getColor());
+			statement.setString(5, p.getBirthdate());
+			statement.setString(6, p.getGender());
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create patient");

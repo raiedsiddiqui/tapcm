@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -8,8 +8,11 @@
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
+	<link href="http://cdn.jsdelivr.net/bootstrap.lightbox/0.6/bootstrap-lightbox.css"></link>
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<script src="http://cdn.jsdelivr.net/bootstrap.lightbox/0.6/bootstrap-lightbox.js"></script>
+	
 
 	<style type="text/css">
 		html,body{
@@ -26,6 +29,17 @@
 		
 		.btn-primary{
 			margin-bottom:10px;
+		}
+		
+		.modal-backdrop{
+			z-index:0;
+		}
+		
+		.lightbox{
+			z-index:1;
+		}
+		.thumbnail{
+			width:320px;
 		}
 	</style>
 	
@@ -96,6 +110,7 @@
 							<input type="password" name="newPassword"/>
 							<label>Confirm password:</label>
 							<input type="password" name="confirmPassword"/>
+							<br />
 							<input type="submit" class="btn btn-primary" value="Save changes" />
 						</fieldset>
 	  				</form>
@@ -103,14 +118,24 @@
 				
 				<div class="span8">
 					<h2>Pictures</h2>
+					<form id="uploadPic" action="<c:url value="upload_picture_to_profile" />" method="POST" enctype="multipart/form-data">
+						<label>Upload picture</label>
+  						<input form="uploadPic" type="file" name="pic" accept="image/*"><br/>
+  						<input form="uploadPic" type="submit">
+					</form>
 					<c:choose>
 					<c:when test="${not empty pictures}">
 					<ul class="thumbnails">
-						<c:forEach items="pictures" var="pic">
+						<c:forEach items="${pictures}" var="pic">
 					 	<li>
-    						<a href="#">
-      							<img class="thumbnail" src="${pic}" alt="">
+    						<a href="#${fn:replace(pic, ".", "-")}" data-toggle="lightbox">
+      							<img class="thumbnail" src="<c:url value="/uploads/${pic}"/>"/>
     						</a>
+    						<div id="${fn:replace(pic, ".", "-")}" class="lightbox hide fade" role="dialog" aria-hidden="true" tab-index="-1">
+    							<div class="lightbox-content">
+    								<img src="<c:url value="/uploads/${pic}"/>">
+    							</div>
+    						</div>
   						</li>
 						</c:forEach>
 					</ul>
@@ -119,11 +144,6 @@
 					<p>No pictures uploaded</p>
 					</c:otherwise>
 					</c:choose>
-					<form id="uploadPic" action="<c:url value="upload_picture_to_profile" />" method="POST" enctype="multipart/form-data">
-						<label>Upload picture</label>
-  						<input form="uploadPic" type="file" name="pic" accept="image/*">
-  						<input form="uploadPic" type="submit">
-					</form>
 				</div>
 			</div>
 		</div>

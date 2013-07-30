@@ -108,7 +108,7 @@
 				</tr>
                 <c:forEach items="${patients}" var="p">
                 <tr>
-                    <td>${p.firstName} ${p.lastName}</td>
+                    <td>${p.firstName} ${p.lastName} (${p.gender}, ${p.age})</td>
                     <td>${p.volunteerName}</td>
                     <td><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
                     <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td>
@@ -133,6 +133,14 @@
 					</select><br />
 					<label>Background color</label>
 					<input class='simple_color_live_preview' value='#c0ffee' name="backgroundColor"/>
+					<label>Gender</label>
+					<select name="gender" form="newPatient">
+						<option value="M">Male</option>
+						<option value="F">Female</option>
+						<option value="O">Other</option>
+					</select>
+					<label>Birth Date</label>
+					<input type="date" name="birthdate" /> <br/>
 					<input class="btn btn-primary" type="submit" value="Add" />
 				</fieldset>
 			</form>
