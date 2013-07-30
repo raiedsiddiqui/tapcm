@@ -65,7 +65,7 @@ public class TapestryController{
    	
    	//Mail-related settings;
    	private Properties props;
-   	private String mailAddress;
+   	private String mailAddress = "";
    	private Session session;
    	
    	/**
@@ -82,7 +82,6 @@ public class TapestryController{
    		String mailPort = "";
    		String useTLS = "";
    		String useAuth = "";
-   		mailAddress = "";
 		try{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
 			yaml = new Yaml();
@@ -210,24 +209,26 @@ public class TapestryController{
 		u.setEmail(request.getParameter("email"));
 		userDao.createUser(u);
 		activityDao.logActivity("Added user: " + u.getName(), u.getUserID());
-		try{
-			MimeMessage message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(mailAddress));
-			message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(u.getEmail()));
-			message.setSubject("Welcome to Tapestry");
-			String msg = "";
-			msg += "Thank you for volunteering with Tapestry. Your accout has successfully been created.\n";
-			msg += "Your username and password are as follows:\n";
-			msg += "Username: " + u.getUsername() + "\n";
-			msg += "Password: password\n";
-			message.setText(msg);
-			System.out.println(msg);
-			System.out.println("Sending...");
-			Transport.send(message);
-			System.out.println("Email sent containing credentials to " + u.getEmail());
-		} catch (MessagingException e) {
-			System.out.println("Error: Could not send email");
-			System.out.println(e.toString());
+		if (mailAddress != null){
+			try{
+				MimeMessage message = new MimeMessage(session);
+				message.setFrom(new InternetAddress(mailAddress));
+				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(u.getEmail()));
+				message.setSubject("Welcome to Tapestry");
+				String msg = "";
+				msg += "Thank you for volunteering with Tapestry. Your accout has successfully been created.\n";
+				msg += "Your username and password are as follows:\n";
+				msg += "Username: " + u.getUsername() + "\n";
+				msg += "Password: password\n";
+				message.setText(msg);
+				System.out.println(msg);
+				System.out.println("Sending...");
+				Transport.send(message);
+				System.out.println("Email sent containing credentials to " + u.getEmail());
+			} catch (MessagingException e) {
+				System.out.println("Error: Could not send email");
+				System.out.println(e.toString());
+			}
 		}
 		//Display page again
 		return "redirect:/manage_users";
