@@ -122,9 +122,9 @@
 				<fieldset>
 					<legend>Add new patient</legend>
 					<label>First Name:</label>
-					<input type="text" name="firstname"/>
+					<input type="text" name="firstname" required/>
 					<label>Last Name:</label>
-					<input type="text" name="lastname"/>
+					<input type="text" name="lastname" required/>
 					<label>Volunteer</label>
 					<select name="volunteer" form="newPatient">
 						<c:forEach items="${volunteers}" var="v">

@@ -63,7 +63,7 @@
 				</c:if>
 				<form id="messageVolunteer" method="post" action="<c:url value="/send_message"/>">
 					<label>Subject:</label>
-					<input type="text" name="msgSubject" />
+					<input type="text" name="msgSubject" required/>
 					<label>Send to:</label>
 					<select name="recipient" form="messageVolunteer">
 						<c:forEach items="${volunteers}" var="v">

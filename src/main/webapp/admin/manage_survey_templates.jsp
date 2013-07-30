@@ -73,14 +73,14 @@
 				<fieldset>
 					<legend>Add new survey</legend>
 					<label>Title:</label>
-					<input type="text" name="title"/>
+					<input type="text" name="title" required/>
 					<label>Type:</label>
 					<select name="type">
 						<option value="MUMPS">MUMPS</option>
 					</select>
 					<label>File:</label>
 					<input type="hidden" name="MAX_FILE_SIZE" value="2000000">
-					<input type="file" name="file"/>
+					<input type="file" name="file" required/>
 					<input class="btn btn-primary" type="submit" value="Upload" />
 				</fieldset>
 			</form>

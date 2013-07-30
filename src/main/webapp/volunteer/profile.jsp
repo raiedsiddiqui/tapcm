@@ -48,6 +48,7 @@
 			document.getElementById("changePassword").style.display="block";
 		}
 	</script>
+	
 </head>
 	
 <body>
@@ -82,11 +83,11 @@
 						<fieldset>
 							<legend>Edit details</legend>
 							<label>Name</label>
-							<input type="text" name="volName" value="${vol.name}" />
+							<input type="text" name="volName" value="${vol.name}" required />
 							<label>Username</label>
-							<input type="text" name="volUsername" value="${vol.username}" />
+							<input type="text" name="volUsername" value="${vol.username}" required />
 							<label>Email</label>
-							<input type="text" name="volEmail" value="${vol.email}" />
+							<input type="email" name="volEmail" value="${vol.email}" required />
 							<br />
 							<input type="submit" class="btn btn-primary" value="Save changes" />
 						</fieldset>
@@ -105,11 +106,11 @@
 							</c:if>
 							<legend>Change password</legend>
 	  						<label>Current password:</label>
-							<input type="password" name="currentPassword"/>
+							<input type="password" name="currentPassword" required />
 							<label>New password:</label>
-							<input type="password" name="newPassword"/>
+							<input type="password" name="newPassword" required />
 							<label>Confirm password:</label>
-							<input type="password" name="confirmPassword"/>
+							<input type="password" name="confirmPassword" required />
 							<br />
 							<input type="submit" class="btn btn-primary" value="Save changes" />
 						</fieldset>
@@ -120,7 +121,7 @@
 					<h2>Pictures</h2>
 					<form id="uploadPic" action="<c:url value="upload_picture_to_profile" />" method="POST" enctype="multipart/form-data">
 						<label>Upload picture</label>
-  						<input form="uploadPic" type="file" name="pic" accept="image/*"><br/>
+  						<input form="uploadPic" type="file" name="pic" accept="image/*" required><br/>
   						<input form="uploadPic" type="submit">
 					</form>
 					<c:choose>

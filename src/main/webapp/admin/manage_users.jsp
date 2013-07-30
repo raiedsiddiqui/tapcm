@@ -88,11 +88,11 @@
 					<fieldset>
 						<legend>Add new user</legend>
 						<label>Name:</label>
-						<input type="text" name="name"/>
+						<input type="text" name="name" required/>
 						<label>Username:</label>
-						<input type="text" name="username"/>
+						<input type="text" name="username" required/>
 						<label>Email</label>
-						<input type="text" name="email"/>
+						<input type="email" name="email" required/>
 						<label>Role</label>
 						<input type="radio" name="role" value="ROLE_ADMIN">Administrator</input> <br/>
 						<input type="radio" name="role" value="ROLE_USER">Volunteer</input> <br/>
