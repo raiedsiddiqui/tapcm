@@ -72,13 +72,6 @@
 			</div>
 			<br/>
 
-			<div class="row-fluid" style="padding-bottom:15px; padding-right:15px;">
-				<div class="span12">
-					<p>General Symptoms:</p>
-					<textarea></textarea><br />
-					<button class="btn">Save</button>
-				</div>
-			</div>
 		</div>
 	</div>
 

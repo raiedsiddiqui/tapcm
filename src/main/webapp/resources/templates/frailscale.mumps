@@ -5,6 +5,10 @@
 .progressbar=true
 .geomapping=false
 
+.qu=Q0,type=void
+Edmonton Frail Scale
+.next
+
 .qu=Q1,type=select
 <canvas  id="myCanvas" width="200" height="100" style="border: 1px solid black;">
 
@@ -109,3 +113,4 @@ I would like you to sit in this chair with your back and arms resting. Then, whe
 3 = More than 20s
 4 = Patient unwilling or requires assistance
 .next
+

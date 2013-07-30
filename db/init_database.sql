@@ -44,11 +44,11 @@ CREATE TABLE IF NOT EXISTS survey_results (
 	PRIMARY KEY (result_ID)
 );
 
-CREATE TABLE IF NOT EXISTS activites (
+CREATE TABLE IF NOT EXISTS activities (
 	event_ID INT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED INT allows for 4,294,967,295 events, which should be enough*/
 	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	volunteer SMALLINT UNSIGNED NOT NULL,
-	patient SMALLINT UNSIGNED NOT NULL,
+	patient SMALLINT UNSIGNED,
 	description TEXT,
 	PRIMARY KEY (event_ID)
 );
@@ -80,10 +80,11 @@ CREATE TABLE IF NOT EXISTS messages (
 	PRIMARY KEY (message_ID)
 );
 
-CREATE TABLE IF NOT EXISTS pictures {
+CREATE TABLE IF NOT EXISTS pictures (
     picture_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
     pic VARCHAR(255), /* path to picture file */
     owner SMALLINT, /* the ID of the user or patient the picture belongs to */
-    owner_is_user BOOLEAN /* 1 if the value of owner refers to a user, 0 if a patient */
-}
+    owner_is_user BOOLEAN, /* 1 if the value of owner refers to a user, 0 if a patient */
+    PRIMARY KEY (picture_ID)
+);
 COMMIT;
