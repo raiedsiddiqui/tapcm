@@ -62,11 +62,14 @@
 				</tr>
 				<c:forEach items="${surveys}" var="s">
 				<tr>
-					<td><a href="<c:url value="/view_survey/${s.surveyID}"/>">${s.surveyTitle}</a></td>
+					<td><a href="<c:url value="/view_survey/${s.resultID}"/>">${s.surveyTitle}</a></td>
 					<td>${s.patientName}</td>
 					<td>${s.startDate}</td>
-					<td>${s.status}</td>
-					<td>${s.endDate}</td>
+					<td><c:choose>
+							<c:when test="${!s.completed}">Incomplete</c:when>
+							<c:otherwise>Complete</c:otherwise>
+						</c:choose></td>
+					<td>${s.editDate}</td>
 					<td><a href="<c:url value="/delete_survey/${s.resultID}"/>" class="btn btn-danger">Remove</a></td>
 				</tr>
 				</c:forEach>
