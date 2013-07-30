@@ -52,9 +52,4 @@
 		<location>/403</location>
 	</error-page>
 
- 	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-        <!-- one of the properties available; the maximum file size in bytes -->
-        <beans:property name="maxUploadSize" value="100000"/>
-    </beans:bean>
-
 </web-app>

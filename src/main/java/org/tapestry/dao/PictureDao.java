@@ -9,40 +9,71 @@ import java.util.ArrayList;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.ClassPathResource;
+import java.io.IOException;
+import java.util.Map;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.math.BigInteger;
+import org.yaml.snakeyaml.Yaml;
 
 public class PictureDao {
 	private PreparedStatement statement;
 	private Connection con;
+	private String uploadDir;
 	
 	public PictureDao(String database, String username, String password){
 		try{
 			con = DriverManager.getConnection(database, username, password);
-		} catch (SQLException e){
+			ClassPathResource configFile = new ClassPathResource("tapestry.yaml");
+			Yaml yaml = new Yaml();
+			Map<String, String> config = (Map<String, String>) yaml.load(configFile.getInputStream());
+			uploadDir = config.get("uploadDir");
+		} catch (SQLException se){
 			System.out.println("Error: Could not connect to database");
-			System.out.println(e.toString());
+			se.printStackTrace();
+		} catch (IOException ie) {
+			System.out.println("Error reading from config file");
+			ie.printStackTrace();
 		}
     }
+	
+	private String getExtension(String filePath) {
+	    String[] str = filePath.split("\\.");
+	    if(str.length > 1) {
+	        return str[str.length - 1];
+	    }
+	    return null; //No extension on file
+	}
     
     public void uploadPicture(MultipartFile pic, int owner, boolean isUser){
-    	String uploadFilename = "WEB-INF/" + pic.getOriginalFilename();
     	try{
-    		File f = new FileSystemResource(uploadFilename).getFile();
+    		String ext = getExtension(pic.getOriginalFilename());
+    		MessageDigest md = MessageDigest.getInstance("MD5");
+    		byte[] filenameBytes = pic.getOriginalFilename().getBytes();
+    		byte[] filenameDigest = md.digest(filenameBytes);
+    		String uploadFilename = new BigInteger(1, filenameDigest).toString(16) + "." + ext; //Maybe a bit hackish, but gets the job done;
+    		File f = new File(uploadDir + uploadFilename);
     		f.createNewFile();
     		pic.transferTo(f);
     		statement = con.prepareStatement("INSERT INTO pictures (pic, owner, owner_is_user) values (?,?,?)");
     		statement.setString(1, uploadFilename);
     		statement.setInt(2, owner);
     		statement.setBoolean(3, isUser);
+    		statement.execute();
     	} catch (SQLException se){
     		System.out.println("Error: Could not add entry to database");
-    		System.out.println(se.toString());
+    		se.printStackTrace();
     	} catch (IOException ie) {
     		System.out.println("Error: Could not write file to disk");
-    		System.out.println(ie.toString());
+    		ie.printStackTrace();
+    	} catch (NoSuchAlgorithmException ne){
+    		System.out.println("Error: Could not use MD5 algorithm to hash upload filename");
+    		ne.printStackTrace();
     	} catch (Exception e){
     		System.out.println("Error");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     	}
     }
     
@@ -59,7 +90,7 @@ public class PictureDao {
     		return pics;
     	} catch (SQLException e) {
     		System.out.println("Error: Could not retrieve pictures");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     		return null;
     	}
     }
@@ -77,7 +108,7 @@ public class PictureDao {
     		return pics;
     	} catch (SQLException e) {
     		System.out.println("Error: Could not retrieve pictures");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     		return null;
     	}
     }

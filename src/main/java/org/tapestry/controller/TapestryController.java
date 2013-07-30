@@ -292,6 +292,8 @@ public class TapestryController{
 		model.addAttribute("unread", unreadMessages);
 		if (errorsPresent != null)
 			model.addAttribute("errors", errorsPresent);
+		ArrayList<String> pics = pictureDao.getPicturesForUser(loggedInUser.getUserID());
+		model.addAttribute("pictures", pics);
 		return "/volunteer/profile";
 	}
 	

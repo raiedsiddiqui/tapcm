@@ -8,3 +8,5 @@ mailPort: "465"
 mailFrom: ""
 mailUsesTLS: "true"
 mailRequiresAuth: "true"
+
+uploadDir: "/var/uploads/"

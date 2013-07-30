@@ -32,6 +32,7 @@
 		<intercept-url pattern="/view_message/**" access="ROLE_USER" />
 		<intercept-url pattern="/send_message" access="ROLE_ADMIN" />
 		<intercept-url pattern="/delete_message/**" access="ROLE_USER" />
+		<intercept-url pattern="/profile" access="ROLE_USER" />
 		<intercept-url pattern="/update_user/**" access="ROLE_USER" />
 		<intercept-url pattern="/upload_survey_template" access="ROLE_ADMIN" />
 		<intercept-url pattern="/delete_survey_template/**" access = "ROLE_ADMIN" />
