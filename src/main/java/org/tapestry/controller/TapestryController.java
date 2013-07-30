@@ -14,7 +14,9 @@ import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.SurveyTemplateDao;
+import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.PictureDao;
+import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
@@ -59,6 +61,7 @@ public class TapestryController{
    	private MessageDao messageDao;
    	private PictureDao pictureDao;
    	private SurveyTemplateDao surveyTemplateDao;
+   	private SurveyResultDao surveyResultDao;
    	
    	//Mail-related settings;
    	private Properties props;
@@ -105,6 +108,8 @@ public class TapestryController{
 		appointmentDao = new AppointmentDao(database, dbUsername, dbPassword);
 		messageDao = new MessageDao(database, dbUsername, dbPassword);
 		pictureDao = new PictureDao(database, dbUsername, dbPassword);
+		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
+		surveyResultDao = new SurveyResultDao(database, dbUsername, dbPassword);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -116,7 +121,6 @@ public class TapestryController{
 						return new PasswordAuthentication(username, password);
 					}
 		  		});
-		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		props.setProperty("mail.smtp.host", mailHost);
 		props.setProperty("mail.smtp.socketFactory.port", mailPort);
 		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
@@ -265,6 +269,8 @@ public class TapestryController{
 		model.addAttribute("patient", patient);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 		model.addAttribute("unread", unreadMessages);
+		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getSurveysByPatientID(id);
+		model.addAttribute("surveys", surveyResultList);
 		return "/patient";
 	}
 	

@@ -65,10 +65,9 @@
 				</div>
 			</div>
 			<div class="row-fluid">
-				<a class="btn span3 btn-large btn-primary" href="#">EQ5D</a>
-				<a class="btn span3 btn-large btn-info" href="#">Survey 1</a>
-				<a class="btn span3 btn-large btn-warning" href="#">Survey 2</a>
-				<a class="btn span3 btn-large btn-success" href="#">Survey 3</a>
+				<c:forEach items="${surveys}" var="s">
+					<a class="btn span3 btn-large btn-primary" href="/start_survey/${s.resultID}">${s.surveyTitle}</a>
+				</c:forEach>
 			</div>
 			<br/>
 

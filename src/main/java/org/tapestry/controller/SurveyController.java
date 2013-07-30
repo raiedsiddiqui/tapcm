@@ -77,7 +77,6 @@ public class SurveyController{
             sr.setSurveyID(Integer.parseInt(request.getParameter("surveyID")));
             sr.setPatientID(Integer.parseInt(patients[i]));
             sr.setResults(st.getContents());
-            sr.setStatus("Incomplete");
             surveyResultDao.assignSurvey(sr);
 		}
 		return "redirect:/manage_surveys";
@@ -87,5 +86,10 @@ public class SurveyController{
    	public String deleteSurvey(@PathVariable("resultID") int id){
    		surveyResultDao.deleteSurvey(id);
    		return "redirect:/manage_surveys";
+   	}
+   	
+   	@RequestMapping(value="/do_survey/{resultID}", method=RequestMethod.GET)
+   	public String doSurvey(@PathVariable("resultID") int id){
+   		return "redirect:/";
    	}
 }

@@ -34,9 +34,9 @@ public class SurveyResultDao
     	}
     }
     
-    public ArrayList<SurveyResult> getAllPatientsSurveys(int patientId){
+    public ArrayList<SurveyResult> getSurveysByPatientID(int patientId){
     	try {
-			statement = con.prepareStatement("SELECT * FROM survey_results WHERE patient_id=?");
+			statement = con.prepareStatement("SELECT * FROM survey_results WHERE patient_ID=?");
 			statement.setInt(1, patientId);
 			ResultSet result = statement.executeQuery();
 			ArrayList<SurveyResult> allSurveyResults = new ArrayList<SurveyResult>();
@@ -65,23 +65,6 @@ public class SurveyResultDao
 			ArrayList<SurveyResult> allSurveyResults = new ArrayList<SurveyResult>();
 			while(result.next()){
 				SurveyResult sr = createFromSearch(result);
-				
-				//Look up the name of the survey
-       			statement = con.prepareStatement("SELECT title FROM surveys WHERE survey_ID=?");
-       			statement.setInt(1, sr.getSurveyID());
-       			ResultSet r = statement.executeQuery();
-       			r.first();
-       			String title = r.getString("title");
-       			sr.setSurveyTitle(title);
-       			
-				//Look up the name of the patient
-       			statement = con.prepareStatement("SELECT firstname, lastname FROM patients WHERE patient_ID=?");
-       			statement.setInt(1, sr.getPatientID());
-       			r = statement.executeQuery();
-       			r.first();
-       			String name = r.getString("firstname") + " " + r.getString("lastname");
-       			sr.setPatientName(name);
-       			
 				allSurveyResults.add(sr);
 			}
 			return allSurveyResults;
@@ -101,12 +84,27 @@ public class SurveyResultDao
 		SurveyResult sr = new SurveyResult();
 		try{
             sr.setResultID(result.getInt("result_ID"));
-            sr.setSurveyID(result.getInt("survey_ID"));
-            sr.setPatientID(result.getInt("patient_ID"));
-            sr.setResults(result.getBytes("data"));
+            int surveyID = result.getInt("survey_ID");
+            sr.setSurveyID(surveyID);
+            //Look up the name of the survey
+   			statement = con.prepareStatement("SELECT title FROM surveys WHERE survey_ID=?");
+   			statement.setInt(1, surveyID);
+   			ResultSet r = statement.executeQuery();
+   			r.first();
+   			sr.setSurveyTitle(r.getString("title"));
+   			
+   			int patientID = result.getInt("patient_ID");
+   			sr.setPatientID(patientID);
+			//Look up the name of the patient
+   			statement = con.prepareStatement("SELECT firstname, lastname FROM patients WHERE patient_ID=?");
+   			statement.setInt(1, patientID);
+   			r = statement.executeQuery();
+   			r.first();
+   			sr.setPatientName(r.getString("firstname") + " " + r.getString("lastname"));
+   			sr.setCompleted(result.getBoolean("completed"));
             sr.setStartDate(result.getString("startDate"));
-            sr.setStatus(result.getString("status"));
-            sr.setEndDate(result.getString("endDate"));
+            sr.setEditDate(result.getString("editDate"));
+            sr.setResults(result.getBytes("data"));
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
 			System.out.println(e.toString());
@@ -120,11 +118,10 @@ public class SurveyResultDao
 	 */
 	public void assignSurvey(SurveyResult sr) {
 		try {
-			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data, status) values (?,?,?,?)");
+			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data) values (?,?,?)");
 			statement.setInt(1, sr.getPatientID());
 			statement.setInt(2, sr.getSurveyID());
 			statement.setBytes(3, sr.getResults());
-			statement.setString(4, sr.getStatus());
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not assign survey # " + sr.getSurveyID() + " to patient # " + sr.getPatientID());

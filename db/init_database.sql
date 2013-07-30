@@ -37,9 +37,9 @@ CREATE TABLE IF NOT EXISTS survey_results (
 	result_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 results*/
 	survey_ID SMALLINT UNSIGNED NOT NULL, /*Same as survey_ID field in surveys*/
 	patient_ID SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID in patients*/
-	status VARCHAR(255) NOT NULL, /*The status of the survey*/
+	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the survey (0=incomplete)*/
 	startDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, /*Automatically assigns the startDate when the survey is assigned*/
-	endDate TIMESTAMP, /*endDate represents the date that the survey is completed or terminated*/
+	editDate TIMESTAMP, /*editDate represents the last edit date*/
 	data MEDIUMBLOB, /*The survey data*/
 	PRIMARY KEY (result_ID)
 );

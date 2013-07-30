@@ -13,9 +13,9 @@ public class SurveyResult {
 	private String surveyTitle;
 	private int patientID;
 	private String patientName;
-	private String status;
+	private boolean completed;
 	private String startDate;
-	private String endDate;
+	private String editDate;
 	private byte[] results;
 
 	public SurveyResult(){
@@ -61,8 +61,8 @@ public class SurveyResult {
 	/**
 	 * @return status The status of the survey
 	 */
-	public String getStatus(){
-		return status;
+	public boolean getCompleted(){
+		return completed;
 	}
 
 	/**
@@ -73,10 +73,10 @@ public class SurveyResult {
 	}
 	
 	/**
-	 * @return end_date The date the survey was completed
+	 * @return edit_date The date the survey was completed
 	 */
-	public String getEndDate(){
-		return endDate;
+	public String getEditDate(){
+		return editDate;
 	}
 	
 	/**
@@ -122,8 +122,8 @@ public class SurveyResult {
 	/**
 	 * @param status The new status
 	 */
-	public void setStatus(String status){
-		this.status = status;
+	public void setCompleted(boolean completed){
+		this.completed = completed;
 	}
 
 	/**
@@ -136,8 +136,8 @@ public class SurveyResult {
 	/**
 	 * @param endDate The new completed date
 	 */
-	public void setEndDate(String endDate){
-		this.endDate = endDate;
+	public void setEditDate(String editDate){
+		this.editDate = editDate;
 	}
 	
 	/**
