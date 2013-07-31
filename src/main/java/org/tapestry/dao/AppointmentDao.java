@@ -29,7 +29,7 @@ public class AppointmentDao {
     		con = DriverManager.getConnection(url, username, password);
     	} catch (SQLException e){
     		System.out.println("Error: Could not connect to database");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     	}
     }
     
@@ -74,7 +74,7 @@ public class AppointmentDao {
        		return allAppointments;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve appointments");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     		return null;
     	}
     }
@@ -93,7 +93,7 @@ public class AppointmentDao {
        		return allAppointments;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve appointments");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     		return null;
     	}
     }
@@ -107,7 +107,7 @@ public class AppointmentDao {
     		statement.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not save appointment");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     	}
     }
 }

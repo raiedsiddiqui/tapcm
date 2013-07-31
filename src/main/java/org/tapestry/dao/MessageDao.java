@@ -24,7 +24,7 @@ public class MessageDao {
 			con = DriverManager.getConnection(url, username, password);
 		} catch (SQLException e){
 			System.out.println("Error: Could not connect to database");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 	}
 	
@@ -40,7 +40,7 @@ public class MessageDao {
 			m.setDate(result.getString("sent"));
 		} catch (SQLException e){
 			System.out.println("Error: Could not create Message object");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 		return m;
 	}
@@ -58,7 +58,7 @@ public class MessageDao {
 			return allMessages;
 		} catch (SQLException e){
 			System.out.println("Error: Could not retrieve messages");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -73,7 +73,7 @@ public class MessageDao {
 			return total;
 		} catch (SQLException e){
 			System.out.println("Error: Could not count messages");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return 0;
 		}
 	}
@@ -88,7 +88,7 @@ public class MessageDao {
 			return m;
 		} catch (SQLException e){
 			System.out.println("Error: Could not retrieve message");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -100,7 +100,7 @@ public class MessageDao {
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not mark message as read");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 	}
 	
@@ -114,7 +114,7 @@ public class MessageDao {
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not send message");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 	}
 	
@@ -125,7 +125,7 @@ public class MessageDao {
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not delete message");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 	}
 	

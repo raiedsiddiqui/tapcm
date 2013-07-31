@@ -28,7 +28,7 @@ public class PatientDao {
 			con = DriverManager.getConnection(url, username, password);
 		} catch (SQLException e){
 			System.out.println("Error: Could not connect to database");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
     	}
 
@@ -46,7 +46,7 @@ public class PatientDao {
 			return createFromSearch(results);
 		} catch (SQLException e){
 			System.out.println("Error: could not retrieve patient");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -68,7 +68,7 @@ public class PatientDao {
             		p.setVolunteer(result.getInt("volunteer"));
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 		return p;
 	}
@@ -96,7 +96,7 @@ public class PatientDao {
             	return allPatients;
         	} catch (SQLException e){
            		System.out.println("Error: Could not retrieve patients");
-           		System.out.println(e.toString());
+           		e.printStackTrace();
            		return null;
         	}
     	}
@@ -126,7 +126,7 @@ public class PatientDao {
            	 	return patients;
         	} catch (SQLException e) {
             		System.out.println("Error: Could not retrieve patients");
-            		System.out.println(e.toString());
+            		e.printStackTrace();
 			return null;
         	}
     	}
@@ -147,7 +147,7 @@ public class PatientDao {
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create patient");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
     }
     
@@ -167,7 +167,7 @@ public class PatientDao {
     		statement.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not update patient");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     	}
     }
 
@@ -182,7 +182,7 @@ public class PatientDao {
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not remove patient");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 	}
 

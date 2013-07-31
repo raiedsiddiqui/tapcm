@@ -30,7 +30,7 @@ public class UserDao {
 			con = DriverManager.getConnection(url, username, password);
 		} catch (SQLException e){
 			System.out.println("Error: Could not connect to database");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 	}
 
@@ -54,7 +54,7 @@ public class UserDao {
 				u.setEnabled(false);
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create User object");
-			System.out.println(e.getStackTrace());
+			e.printStackTrace();
 		}
 		return u;
 	}
@@ -73,7 +73,7 @@ public class UserDao {
 			return createFromSearch(result);
 		} catch (SQLException e){
 			System.out.println("Error: Could not retrieve user");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -92,7 +92,7 @@ public class UserDao {
 			return createFromSearch(result);
 		} catch (SQLException e){
 			System.out.println("Error: Could not retrieve user");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -112,8 +112,8 @@ public class UserDao {
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create user");
-			System.out.println(e.toString());
-		}
+			e.printStackTrace();
+			}
 	}
 	
 	/**
@@ -130,8 +130,8 @@ public class UserDao {
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not update user");
-			System.out.println(e.toString());
-		}
+			e.printStackTrace();
+			}
 	}
 
 	/**
@@ -145,8 +145,8 @@ public class UserDao {
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not remove user");
-			System.out.println(e.toString());
-		}
+			e.printStackTrace();
+			}
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class UserDao {
 			return allUsers;
 		} catch (SQLException e){
 			System.out.println("Error: Could not retrieve users");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -188,7 +188,7 @@ public class UserDao {
 			return foundUsers;
 		} catch (SQLException e){
 			System.out.println("Error: Could not retrieve users");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -209,7 +209,7 @@ public class UserDao {
 			return hashedPassword.equals(result.getString("password"));
 		} catch (SQLException e){
 			System.out.println("Error: Could not compare passwords");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return false;
 		}
 	}
@@ -222,7 +222,7 @@ public class UserDao {
 			statement.execute();
 		} catch (SQLException e) {
 			System.out.println("Error: Could not set password");
-			System.out.println(e.toString());
-		}
+			e.printStackTrace();
+			}
 	}
 }

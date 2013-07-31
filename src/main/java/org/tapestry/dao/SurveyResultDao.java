@@ -30,7 +30,7 @@ public class SurveyResultDao
     		con = DriverManager.getConnection(url, username, password);
     	} catch (SQLException e){
     		System.out.println("Error: Could not connect to database");
-    		System.out.println(e.toString());
+    		e.printStackTrace();
     	}
     }
     
@@ -47,7 +47,7 @@ public class SurveyResultDao
 			return allSurveyResults;
 		} catch (SQLException e) {
 			System.out.println("Error: could not retrieve survey templates");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
     }
@@ -70,7 +70,7 @@ public class SurveyResultDao
 			return allSurveyResults;
 		} catch (SQLException e) {
 			System.out.println("Error: could not retrieve survey templates");
-			System.out.println(e.toString());
+			e.printStackTrace();
 			return null;
 		}
 	}
@@ -107,7 +107,7 @@ public class SurveyResultDao
             sr.setResults(result.getBytes("data"));
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 		return sr;
 	}
@@ -125,7 +125,7 @@ public class SurveyResultDao
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not assign survey # " + sr.getSurveyID() + " to patient # " + sr.getPatientID());
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 	}
 	
@@ -140,7 +140,7 @@ public class SurveyResultDao
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not delete survey");
-			System.out.println(e.toString());
+			e.printStackTrace();
 		}
 	}
 }
