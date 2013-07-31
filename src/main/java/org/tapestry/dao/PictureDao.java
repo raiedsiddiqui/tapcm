@@ -17,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.math.BigInteger;
 import org.yaml.snakeyaml.Yaml;
+import org.tapestry.objects.Picture;
 
 public class PictureDao {
 	private PreparedStatement statement;
@@ -39,14 +40,14 @@ public class PictureDao {
 		}
     }
 	
-	private String getExtension(String filePath) {
-	    String[] str = filePath.split("\\.");
+	private String getExtension(String path) {
+	    String[] str = path.split("\\.");
 	    if(str.length > 1) {
 	        return str[str.length - 1];
 	    }
 	    return null; //No extension on file
 	}
-    
+	
     public void uploadPicture(MultipartFile pic, int owner, boolean isUser){
     	try{
     		String ext = getExtension(pic.getOriginalFilename());
@@ -77,14 +78,16 @@ public class PictureDao {
     	}
     }
     
-    public ArrayList<String> getPicturesForUser(int userID){
+    public ArrayList<Picture> getPicturesForUser(int userID){
     	try{
-    		statement = con.prepareStatement("SELECT pic FROM pictures WHERE owner=? and owner_is_user=1");
+    		statement = con.prepareStatement("SELECT * FROM pictures WHERE owner=? and owner_is_user=1");
     		statement.setInt(1, userID);
     		ResultSet result = statement.executeQuery();
-    		ArrayList<String> pics = new ArrayList<String>();
+    		ArrayList<Picture> pics = new ArrayList<Picture>();
     		while(result.next()){
-    			String p = result.getString("pic");
+    			Picture p = new Picture();
+    			p.setPictureID(result.getInt("picture_ID"));
+    			p.setPath(result.getString("pic"));
     			pics.add(p);
     		}
     		return pics;
@@ -95,14 +98,16 @@ public class PictureDao {
     	}
     }
     
-    public ArrayList<String> getPicturesForPatient(int patientID){
+    public ArrayList<Picture> getPicturesForPatient(int patientID){
     	try{
     		statement = con.prepareStatement("SELECT pic FROM pictures WHERE owner=? and owner_is_user=0");
     		statement.setInt(1, patientID);
     		ResultSet result = statement.executeQuery();
-    		ArrayList<String> pics = new ArrayList<String>();
+    		ArrayList<Picture> pics = new ArrayList<Picture>();
     		while(result.next()){
-    			String p = result.getString("pic");
+    			Picture p = new Picture();
+    			p.setPictureID(result.getInt("picture_ID"));
+    			p.setPath(result.getString("pic"));
     			pics.add(p);
     		}
     		return pics;
@@ -110,6 +115,17 @@ public class PictureDao {
     		System.out.println("Error: Could not retrieve pictures");
     		e.printStackTrace();
     		return null;
+    	}
+    }
+    
+    public void removePicture(int pictureID){
+    	try{
+    		statement = con.prepareStatement("DELETE FROM pictures WHERE picture_ID=?");
+    		statement.setInt(1, pictureID);
+    		statement.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not remove picture");
+    		e.printStackTrace();
     	}
     }
 

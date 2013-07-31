@@ -129,12 +129,13 @@
 					<ul class="thumbnails">
 						<c:forEach items="${pictures}" var="pic">
 					 	<li>
-    						<a href="#${fn:replace(pic, ".", "-")}" data-toggle="lightbox">
-      							<img class="thumbnail" src="<c:url value="/uploads/${pic}"/>"/>
+    						<a href="#${fn:replace(pic.path, ".", "-")}" data-toggle="lightbox">
+      							<img class="thumbnail" src="<c:url value="/uploads/${pic.path}"/>"/>
     						</a>
-    						<div id="${fn:replace(pic, ".", "-")}" class="lightbox hide fade" role="dialog" aria-hidden="true" tab-index="-1">
+    						<a href="<c:url value="/remove_picture/${pic.pictureID}"/>" class="btn btn-danger" style="width:92%;">Remove</a>
+    						<div id="${fn:replace(pic.path, ".", "-")}" class="lightbox hide fade" role="dialog" aria-hidden="true" tab-index="-1">
     							<div class="lightbox-content">
-    								<img src="<c:url value="/uploads/${pic}"/>">
+    								<img src="<c:url value="/uploads/${pic.path}"/>">
     							</div>
     						</div>
   						</li>

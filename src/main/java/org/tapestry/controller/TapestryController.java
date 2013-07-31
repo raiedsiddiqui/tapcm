@@ -24,6 +24,7 @@ import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.Activity;
+import org.tapestry.objects.Picture;
 import java.util.ArrayList;
 import org.yaml.snakeyaml.Yaml;
 import java.io.IOException;
@@ -316,7 +317,7 @@ public class TapestryController{
 		model.addAttribute("unread", unreadMessages);
 		if (errorsPresent != null)
 			model.addAttribute("errors", errorsPresent);
-		ArrayList<String> pics = pictureDao.getPicturesForUser(loggedInUser.getUserID());
+		ArrayList<Picture> pics = pictureDao.getPicturesForUser(loggedInUser.getUserID());
 		model.addAttribute("pictures", pics);
 		return "/volunteer/profile";
 	}
@@ -410,6 +411,12 @@ public class TapestryController{
 		String hashedPassword = enc.encodePassword(newPassword, null);
 		userDao.setPasswordForUser(loggedInUser.getUserID(), hashedPassword);
 		activityDao.logActivity("Changed password", loggedInUser.getUserID());
+		return "redirect:/profile";
+	}
+	
+	@RequestMapping(value="/remove_picture/{id}", method=RequestMethod.GET)
+	public String removePicture(@PathVariable("id") int pictureID){
+		pictureDao.removePicture(pictureID);
 		return "redirect:/profile";
 	}
 
