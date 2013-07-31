@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS patients (
 	email VARCHAR(50),
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
     color VARCHAR(7), /*Hexcode color string (#ffffff)*/
+    warnings TEXT,
+    picture VARCHAR(255),
 	PRIMARY KEY (patient_ID)
 );
 

@@ -15,6 +15,7 @@ public class Patient{
 	private int volunteer;
 	private String volunteerName;
 	private String color;
+	private String warnings;
 
 	/**
 	* Empty constructor
@@ -101,6 +102,10 @@ public class Patient{
     	public String getColor(){
     		return color;
     	}
+    	
+    	public String getWarnings(){
+    		return warnings;
+    	}
 
 	//Mutators
 	/**
@@ -161,5 +166,9 @@ public class Patient{
      */
     	public void setColor(String color){
     		this.color = color;
+    	}
+    	
+    	public void setWarnings(String warnings){
+    		this.warnings = warnings;
     	}
 }

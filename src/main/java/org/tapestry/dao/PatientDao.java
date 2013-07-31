@@ -66,6 +66,7 @@ public class PatientDao {
             		p.setColor(result.getString("color"));
 	            	p.setBirthdate(result.getString("birthdate"));
             		p.setVolunteer(result.getInt("volunteer"));
+            		p.setWarnings(result.getString("warnings"));
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
 			e.printStackTrace();

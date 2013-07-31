@@ -60,8 +60,9 @@
 				<div class="span3"><h2>${patient.displayName}</h2></div>
 				<div class="span3 btn-group">
 					<a href="#modalInfo" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
+					<c:if test="${not empty patient.warnings}">
 					<a href="#modalWarn" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-exclamation-sign icon-white"></i></a>
-					<a href="#modalCamera" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-camera icon-white"></i></a>
+					</c:if>
 				</div>
 			</div>
 			<div class="row-fluid">
@@ -99,7 +100,7 @@
    			<h3 id="warnLabel" style="color:#000000;">Patient Warnings: ${patient.displayName}</h3>
   		</div>
   		<div class="modal-body">
-  			<p class="text-warning"></p>
+  			<p class="text-warning">${patient.warnings}</p>
   		</div>
   		<div class="modal-footer">
    			<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
