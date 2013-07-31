@@ -154,7 +154,7 @@ public class TapestryController{
 			ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
 			ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
-			//ArrayList<String> activityLog = activityDao.getAllActivitiesForVolunteer(u.getUserID());
+			//ArrayList<Activity> activityLog = activityDao.getAllActivitiesForVolunteer(u.getUserID());
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
 			model.addAttribute("appointments_today", appointmentsForToday);

@@ -106,7 +106,7 @@
 				<p><strong>Recent Activities:</strong></p>
 				<table class="table">
 				<c:choose>
-						<c:when test="${not empty appointments_all}">
+						<c:when test="${not empty activities}">
 						<table class="table">
 						<c:forEach items="${activities}" var="a">
 							<tr>
