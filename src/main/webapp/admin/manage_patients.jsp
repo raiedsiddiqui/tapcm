@@ -11,12 +11,6 @@
 	
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/jquery.simple-color.js"></script>
 	
-	<script type="text/javascript">
-		function showAddPatient(){
-			document.getElementById("addPatientDiv").style.display="block";
-		}
-	</script>
-	
 	<script  type="text/javascript">
 		$(document).ready(function(){
   			$('.simple_color').simpleColor();
@@ -111,14 +105,22 @@
                     <td>${p.firstName} ${p.lastName} (${p.gender}, ${p.age})</td>
                     <td>${p.volunteerName}</td>
                     <td><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
-                    <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td>
+                    <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a> <a href="#"><i class="icon-exclamation-sign"></i></a></td>
                 </tr>
                 </c:forEach>
 			</table>
-			<a class="btn btn-primary" onClick="showAddPatient()">Add new</a>
+			<a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add new</a>
 		</div>
-		<div class="row-fluid" id="addPatientDiv" style="display:none";>
-			<form id="newPatient" method="post" action="<c:url value="/add_patient"/>">
+	</div>
+	
+	<!-- Modal -->
+	<div id="addPatient" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+  		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    		<h3 id="modalHeader">Add Warning</h3>
+  		</div>
+  		<div class="modal-body">
+  			<form id="newPatient" method="post" action="<c:url value="/add_patient"/>">
 				<fieldset>
 					<legend>Add new patient</legend>
 					<label>First Name:</label>
@@ -141,10 +143,13 @@
 					</select>
 					<label>Birth Date</label>
 					<input type="date" name="birthdate" /> <br/>
-					<input class="btn btn-primary" type="submit" value="Add" />
 				</fieldset>
 			</form>
-		</div>
+  		</div>
+  		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			<input class="btn btn-primary" form="newPatient" type="submit" value="Add" />
+  		</div>
 	</div>
 </body>
 </html>

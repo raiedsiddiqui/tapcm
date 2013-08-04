@@ -79,11 +79,22 @@
 				</tr>
 				</c:forEach>
 			</table>
-			<a class="btn btn-primary" onClick="showAddUser()">Add new</a>
+			<a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add new</a>
 		</div>
 
 		<div class="row-fluid" id="addUserDiv" style="display:none";>
-			<form id="addUser" action="add_user" method="post">
+			
+		</div>
+	</div>
+	
+	<!-- Modal -->
+	<div id="addPatient" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+  		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    		<h3 id="modalHeader">Add Warning</h3>
+  		</div>
+  		<div class="modal-body">
+  			<form id="addUser" action="add_user" method="post">
 				<div class="span6">
 					<fieldset>
 						<legend>Add new user</legend>
@@ -100,7 +111,11 @@
 					</fieldset>
 				</div>
 			</form>
-		</div>
+  		</div>
+  		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			<input class="btn btn-primary" form="addUser" type="submit" value="Add" />
+  		</div>
 	</div>
 </body>
 </html>
