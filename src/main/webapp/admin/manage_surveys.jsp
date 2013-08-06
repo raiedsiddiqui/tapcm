@@ -62,7 +62,7 @@
 				</tr>
 				<c:forEach items="${surveys}" var="s">
 				<tr>
-					<td><a href="<c:url value="/view_survey/${s.resultID}"/>">${s.surveyTitle}</a></td>
+					<td><a href="<c:url value="/show_survey/${s.resultID}"/>">${s.surveyTitle}</a></td>
 					<td>${s.patientName}</td>
 					<td>${s.startDate}</td>
 					<td><c:choose>

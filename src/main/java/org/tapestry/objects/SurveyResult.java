@@ -1,5 +1,17 @@
 package org.tapestry.objects;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.oscarehr.util.XmlUtils;
+import org.survey_component.data.QuestionAnswerPair;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 /**
 * Survey Result bean
 * Represents the results of a survey.
@@ -17,9 +29,50 @@ public class SurveyResult {
 	private String startDate;
 	private String editDate;
 	private byte[] results;
+	private ArrayList<QuestionAnswerPair> questionAnswerPairs;
 
 	public SurveyResult(){
 		//Default constructor
+	}
+	
+	public SurveyResult processMumpsResults(SurveyResult surveyResult) throws IOException, SAXException, ParserConfigurationException
+	{
+		ArrayList<QuestionAnswerPair> questionAnswerPairs = new ArrayList<QuestionAnswerPair>();
+		
+		Document doc = XmlUtils.toDocument(surveyResult.getResults());
+		Node rootNode = doc.getFirstChild();
+
+		Node resultsNode = XmlUtils.getChildNode(rootNode, "Results");
+		NodeList qaNodes = resultsNode.getChildNodes();
+		for (int i = 0; i < qaNodes.getLength(); i++)
+		{
+			Node qaNode = qaNodes.item(i);
+
+			// everything should be an IndivoSurveyQuestion
+			if (!"IndivoSurveyQuestion".equals(qaNode.getNodeName())) continue;
+
+			QuestionAnswerPair qaPair = new QuestionAnswerPair();
+			qaPair.questionId = XmlUtils.getChildNodeTextContents(qaNode, "QuestionId");
+			qaPair.questionText = XmlUtils.getChildNodeTextContents(qaNode, "QuestionText");
+
+			Node answerNode = XmlUtils.getChildNode(qaNode, "QuestionAnswer");
+			if (answerNode != null)
+			{
+				NodeList answerValueNodes = answerNode.getChildNodes();
+				for (int j = 0; j < answerValueNodes.getLength(); j++)
+				{
+					Node answerValueNode = answerValueNodes.item(j);
+
+					// everything should be an AnswerValue
+					if (!"AnswerValue".equals(answerValueNode.getNodeName())) continue;
+
+					qaPair.answers.add(answerValueNode.getTextContent());
+				}
+			}
+			questionAnswerPairs.add(qaPair);
+		}
+		surveyResult.setQuestionAnswerPairs(questionAnswerPairs);
+		return surveyResult;
 	}
 
 	//Accessor methods
@@ -85,6 +138,13 @@ public class SurveyResult {
 	public byte[] getResults(){
 		return results;
 	}
+	
+	/**
+	 * @param results The results of the survey
+	 */
+	public ArrayList<QuestionAnswerPair> getQuestionAnswerPairs(){
+		return questionAnswerPairs;
+	}
 
 	//Mutator methods
 	public void setResultID(int id){
@@ -145,5 +205,12 @@ public class SurveyResult {
 	 */
 	public void setResults(byte[] results){
 		this.results = results;
+	}
+	
+	/**
+	 * @param questionAnswerPair The new Question Answer Pair Array
+	 */
+	public void setQuestionAnswerPairs(ArrayList<QuestionAnswerPair> questionAnswerPairs){
+		this.questionAnswerPairs = questionAnswerPairs;
 	}
 }
