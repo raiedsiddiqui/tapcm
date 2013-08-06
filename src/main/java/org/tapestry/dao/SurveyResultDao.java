@@ -46,7 +46,7 @@ public class SurveyResultDao
 			}
 			return allSurveyResults;
 		} catch (SQLException e) {
-			System.out.println("Error: could not retrieve survey templates");
+			System.out.println("Error: could not retrieve survey results for patient ID #" + patientId);
 			e.printStackTrace();
 			return null;
 		}
@@ -57,9 +57,10 @@ public class SurveyResultDao
     		statement = con.prepareStatement("SELECT * FROM survey_results WHERE result_ID=?");
     		statement.setInt(1, id);
     		ResultSet result = statement.executeQuery();
+    		result.first();
     		return createFromSearch(result);
     	} catch (SQLException e){
-    		System.out.println("Error: Could not retrieve survey result");
+    		System.out.println("Error: Could not retrieve survey result for result ID #" + id);
     		e.printStackTrace();
     		return null;
     	}
@@ -82,7 +83,7 @@ public class SurveyResultDao
 			}
 			return allSurveyResults;
 		} catch (SQLException e) {
-			System.out.println("Error: could not retrieve survey templates");
+			System.out.println("Error: could not retrieve all survey results");
 			e.printStackTrace();
 			return null;
 		}
@@ -119,7 +120,7 @@ public class SurveyResultDao
             sr.setEditDate(result.getString("editDate"));
             sr.setResults(result.getBytes("data"));
 		} catch (SQLException e) {
-			System.out.println("Error: Failed to create Patient object");
+			System.out.println("Error: Failed to create Survey Result object");
 			e.printStackTrace();
 		}
 		return sr;
