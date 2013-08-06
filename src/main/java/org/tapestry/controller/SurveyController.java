@@ -138,10 +138,10 @@ public class SurveyController{
 			System.out.println("Something bad happened");
 		}
    		if (request.isUserInRole("ROLE_USER") && redirectAction.getViewName() == "failed"){
-   			redirectAction.setViewName("/patient/" + request.getParameter("patientID")); //This probably won't work
+   			redirectAction.setViewName("redirect:/"); //This probably won't work
    			return redirectAction;
    		} else if (request.isUserInRole("ROLE_ADMIN") && redirectAction.getViewName() == "failed") {
-   			redirectAction.setViewName("/manage_surveys");
+   			redirectAction.setViewName("redirect:/manage_surveys");
    			return redirectAction;
    		} else {
    			if (redirectAction.getModelMap().containsKey("survey_completed")){
