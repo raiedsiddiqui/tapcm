@@ -6,7 +6,7 @@
 	<groupId>org.tapestry</groupId>
 	<artifactId>tapestry</artifactId>
 	<packaging>war</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>13.08.06</version>
 	<name>Tapestry</name>
 	<url></url>
 
