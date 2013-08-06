@@ -26,6 +26,7 @@ public class PictureDao {
 	
 	public PictureDao(String database, String username, String password){
 		try{
+			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
 			con = DriverManager.getConnection(database, username, password);
 			ClassPathResource configFile = new ClassPathResource("tapestry.yaml");
 			Yaml yaml = new Yaml();
