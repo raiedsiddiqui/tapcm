@@ -1,4 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,6 +10,7 @@
 	<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<script src="http://cdn.jsdelivr.net/bootstrap.lightbox/0.6/bootstrap-lightbox.js"></script>
 
 	<style type="text/css">
 		html,body{
@@ -30,50 +33,18 @@
 			width:90%;
 			margin-right:10px;
 		}
+		.modal-backdrop{
+			z-index:0;
+		}
 		
-		.imageSelector, .imageSelector input[type=file], .imageSelector img{
-    		width:200px;
-    		height:200px;
+		.lightbox{
+			z-index:1;
 		}
-
-		.imageSelector input[type=file]{
-    		position:relative;
-    		opacity:0;
-    		z-index:10;
-		}
-		.imageSelector img{
-    		z-index:0;
-    		position:absolute;
-    		left:0;
-    		top:0;
-		}
-		.imageSelector:hover img{
-    		left:-2;
-    		top:-2;
-    		box-shadow: 4px 4px 5px #888888;
+		.thumbnail{
+			width:320px;
 		}
 		
 	</style>
-	
-	<script type="text/javascript">
-	  	function submit(){
-	
-	    	var xmlhttp;
-	    	if(window.XMLHttpRequest){
-	      		xmlhttp = new XMLHttpRequest();
-	    	} else {
-	      		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-	    	}
-	    	xmlhttp.onreadystatechange=function(){
-	      		if (xmlhttp.readyState==4 && xmlhttp.status==200){
-	       			alert("Received response");
-	      		}
-	    	}
-	    	xmlhttp.open("POST", "<c:url value="/set_picture_for_patient/${patient.patientID}" />", true);
-			xmlhttp.setRequestHeader("Content-type", "multipart/form-data");
-	    	xmlhttp.send("pic="+document.getElementById("profilePic").value);
-	  	}
-	</script>
 	
 </head>
 	
@@ -114,9 +85,37 @@
 					<a class="btn span3 btn-large btn-primary" href="/start_survey/${s.resultID}">${s.surveyTitle}</a>
 				</c:forEach>
 			</div>
-			<br/>
-
 		</div>
+		<div class="span8">
+					<h2>Pictures</h2>
+					<form id="uploadPic" action="<c:url value="/upload_picture_for_patient/${patient.patientID}" />" method="POST" enctype="multipart/form-data">
+						<label>Upload picture</label>
+  						<input form="uploadPic" type="file" name="pic" accept="image/*" required><br/>
+  						<input form="uploadPic" type="submit">
+					</form>
+					<c:choose>
+					<c:when test="${not empty pictures}">
+					<ul class="thumbnails">
+						<c:forEach items="${pictures}" var="pic">
+					 	<li>
+    						<a href="#${fn:replace(pic.path, ".", "-")}" data-toggle="lightbox">
+      							<img class="thumbnail" src="<c:url value="/uploads/${pic.path}"/>"/>
+    						</a>
+    						<a href="<c:url value="/remove_picture/${pic.pictureID}"/>" class="btn btn-danger" style="width:92%;">Remove</a>
+    						<div id="${fn:replace(pic.path, ".", "-")}" class="lightbox hide fade" role="dialog" aria-hidden="true" tab-index="-1">
+    							<div class="lightbox-content">
+    								<img src="<c:url value="/uploads/${pic.path}"/>">
+    							</div>
+    						</div>
+  						</li>
+						</c:forEach>
+					</ul>
+					</c:when>
+					<c:otherwise>
+					<p>No pictures uploaded</p>
+					</c:otherwise>
+					</c:choose>
+				</div>
 	</div>
 
 	<!-- Modal dialogs -->
@@ -127,11 +126,6 @@
   		</div>
   		<div class="modal-body">
   			<div class="row">
-  				<div class="imageSelector span3">
-					<input id="profilePic" type="file" accept="image/*" onchange="submit()"/>
-					<img src="http://placehold.it/200x200"/>
-				</div>
-				<div class="span2"> 			
    				<p class="text-info">Gender: ${patient.gender}</p>
    				<p class="text-info">Age: ${patient.age}</p>
    			</div>
@@ -152,19 +146,6 @@
   		<div class="modal-footer">
    			<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
   		</div>
-	</div>
-	<div id="modalCamera" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="cameraLabel" aria-hidden="true">
-		<div class="modal-header">
-   			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-			<h3 id="cameraLabel" style="color:#000000;">Take Picture</h3>
-		</div>
-		<div class="modal-body">
-			<input type="file" accept="image/*" capture="camera">
-		</div>
-		<div class="modal-footer">
-			<button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-			<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Save</button>
-		</div>
 	</div>
 </body>
 </html>

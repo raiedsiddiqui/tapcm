@@ -72,8 +72,8 @@
 						<c:if test="${u.role eq 'ROLE_USER'}">Volunteer</c:if>
 					</td>
 					<td>
-						<c:if test="${u.enabled eq 'true'}">Enabled</c:if>
-						<c:if test="${u.enabled eq 'false'}">Disabled</c:if>
+						<c:if test="${u.enabled eq 'true'}"><a href="<c:url value="/disable_user/${u.userID}"/>" class="btn btn-danger">Click to disable</a></c:if>
+						<c:if test="${u.enabled eq 'false'}"><a href="<c:url value="/enable_user/${u.userID}"/>" class="btn">Click to enable</a></c:if>
 					</td>
 					<td><a href="<c:url value="/remove_user/${u.userID}"/>" class="btn btn-danger">Remove</a></td>
 				</tr>
@@ -94,21 +94,21 @@
     		<h3 id="modalHeader">Add User</h3>
   		</div>
   		<div class="modal-body">
-  			<form id="addUser" action="add_user" method="post">
+  			<form id="newUser" action="<c:url value="/add_user"/>" method="post">
 						<label>Name:</label>
 						<input type="text" name="name" required/>
 						<label>Username:</label>
 						<input type="text" name="username" required/>
 						<label>Email</label>
 						<input type="email" name="email" required/>
-						<label>Role</label>ze
+						<label>Role</label>
 						<input type="radio" name="role" value="ROLE_ADMIN">Administrator</input> <br/>
 						<input type="radio" name="role" value="ROLE_USER">Volunteer</input> <br/>
 			</form>
   		</div>
   		<div class="modal-footer">
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			<input class="btn btn-primary" form="addUser" type="submit" value="Add" />
+			<input class="btn btn-primary" form="newUser" type="submit" value="Add" />
   		</div>
 	</div>
 </body>

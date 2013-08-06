@@ -20,8 +20,11 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.PictureDao;
+import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
+import org.tapestry.dao.ActivityDao;
 import org.tapestry.objects.User;
+import org.tapestry.objects.Patient;
 import org.tapestry.objects.SurveyTemplate;
 import org.yaml.snakeyaml.Yaml;
 
@@ -35,6 +38,8 @@ public class FileController extends MultiActionController{
 	private SurveyTemplateDao surveyTemplateDao;
 	private PictureDao pictureDao;
 	private UserDao userDao;
+	private PatientDao patientDao;
+	private ActivityDao activityDao;
 	
 	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
@@ -58,6 +63,8 @@ public class FileController extends MultiActionController{
 		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
 		pictureDao = new PictureDao(DB, UN, PW);
 		userDao = new UserDao(DB, UN, PW);
+		activityDao = new ActivityDao(DB, UN, PW);
+		patientDao = new PatientDao(DB, UN, PW);
    	}
    	
    	@RequestMapping(value = "/upload_survey_template", method=RequestMethod.POST)
@@ -88,14 +95,19 @@ public class FileController extends MultiActionController{
 		MultipartFile pic = request.getFile("pic");
 		System.out.println("Uploaded: " + pic);
 		pictureDao.uploadPicture(pic, loggedInUser.getUserID(), true);
+		activityDao.logActivity("Uploaded picture for profile", loggedInUser.getUserID());
 		return "redirect:/profile";
 	}
-	
-	@RequestMapping(value="/set_picture_for_patient/{id}", method=RequestMethod.POST)
-	//public @ResponseBody String updateProfilePicture(@PathVariable("id") int id, MultipartHttpServletRequest request){
-	public @ResponseBody String updateProfilePicture(@PathVariable("id") int id, SecurityContextHolderAwareRequestWrapper request){
-		//MultipartFile pic = request.getFile("pic");
-		System.out.println("Set picture for patient: " + request.getParameter("pic"));
-		return "";
+
+	@RequestMapping(value="/upload_picture_for_patient/{patientID}", method=RequestMethod.POST)
+	public String uploadPicture(@PathVariable("patientID") int id, MultipartHttpServletRequest request){
+		String currentUsername = request.getUserPrincipal().getName();
+		User loggedInUser = userDao.getUserByUsername(currentUsername);
+		MultipartFile pic = request.getFile("pic");
+		System.out.println("Uploaded: " + pic);
+		Patient p = patientDao.getPatientByID(id);
+		pictureDao.uploadPicture(pic, id, false);
+		activityDao.logActivity("Uploaded picture for " + p.getDisplayName(), loggedInUser.getUserID());
+		return "redirect:/patient/" + id;
 	}
 }

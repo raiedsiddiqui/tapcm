@@ -242,8 +242,24 @@ public class TapestryController{
 
 	@RequestMapping(value="/remove_user/{user_id}", method=RequestMethod.GET)
 	public String removeUser(@PathVariable("user_id") int id){
-		userDao.removeUserWithId(id);
+		userDao.removeUserWithID(id);
 		activityDao.logActivity("Removed user: " + id, id);
+		return "redirect:/manage_users";
+	}
+	
+	@RequestMapping(value="/disable_user/{user_id}", method=RequestMethod.GET)
+	public String disableUser(@PathVariable("user_id") int id){
+		User u = userDao.getUserByID(id);
+		userDao.disableUserWithID(id);
+		activityDao.logActivity("Disabled user: " + u.getName(), id);
+		return "redirect:/manage_users";
+	}
+
+	@RequestMapping(value="/enable_user/{user_id}", method=RequestMethod.GET)
+	public String enableUser(@PathVariable("user_id") int id){
+		User u = userDao.getUserByID(id);
+		userDao.enableUserWithID(id);
+		activityDao.logActivity("Enabled user: " + u.getName(), id);
 		return "redirect:/manage_users";
 	}
 
@@ -290,6 +306,9 @@ public class TapestryController{
 		model.addAttribute("unread", unreadMessages);
 		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getSurveysByPatientID(id);
 		model.addAttribute("surveys", surveyResultList);
+		
+		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
+		model.addAttribute("pictures", pics);
 		return "/patient";
 	}
 	

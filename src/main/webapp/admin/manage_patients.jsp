@@ -97,17 +97,17 @@
 				<tr>
 					<th>Name</th>
 					<th>Volunteer</th>
-					<th>Color</th>
+					<th style="display:none">Color</th>
 					<th></th>
 				</tr>
                 <c:forEach items="${patients}" var="p">
                 <tr>
                     <td>${p.firstName} ${p.lastName} (${p.gender}, ${p.age})</td>
                     <td>${p.volunteerName}</td>
-                    <td><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
+                    <td style="display:none;"><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
                     <td>
-                    	<a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a>
                     	<a href="<c:url value="/edit_patient/${p.patientID}"/>" class="btn btn-info">Edit</a>
+                    	<a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a>
                     </td>
                 </tr>
                 </c:forEach>
@@ -135,7 +135,7 @@
 						</c:forEach>
 					</select><br />
 					<label>Background color</label>
-					<input class='simple_color_live_preview' value='#c0ffee' name="backgroundColor"/>
+					<input class='simple_color_live_preview' value='#c0ffee' hidden name="backgroundColor"/> <!-- Making hidden until minds are changed -->
 					<label>Gender</label>
 					<select name="gender" form="newPatient">
 						<option value="M">Male</option>

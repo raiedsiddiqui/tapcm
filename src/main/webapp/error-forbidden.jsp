@@ -1,3 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +11,7 @@
 </head>
 	
 <body>
-	<img src="<c:url value="/resources/images/logo.png"/>"/>
+	<img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="container">
 		<h1>Access Denied</h1>
 		<h2>You don't have permission to view this page<h2>

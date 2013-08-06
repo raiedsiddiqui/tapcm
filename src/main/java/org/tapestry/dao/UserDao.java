@@ -64,7 +64,7 @@ public class UserDao {
 	* @param id The ID of the user to search for
 	* @return A User object representing the person
 	*/
-	public User getUserById(int id){
+	public User getUserByID(int id){
 		try{
 			statement = con.prepareStatement("SELECT * FROM users WHERE user_ID=?");
 			statement.setInt(1, id);
@@ -138,7 +138,7 @@ public class UserDao {
 	* Removes a user from the database
 	* @param id The ID of the user to remove
 	*/
-	public void removeUserWithId(int id){
+	public void removeUserWithID(int id){
 		try{
 			statement = con.prepareStatement("DELETE FROM users WHERE user_ID=?");
 			statement.setInt(1, id);
@@ -147,6 +147,38 @@ public class UserDao {
 			System.out.println("Error: Could not remove user");
 			e.printStackTrace();
 			}
+	}
+	
+	/**
+	 * Disables a user
+	 * Useful for closing access to an account without losing data associated with it
+	 * @param id The ID of the user to disable
+	 */
+	public void disableUserWithID(int id){
+		try{
+			statement = con.prepareStatement("UPDATE users SET enabled=0 WHERE user_ID=?");
+			statement.setInt(1, id);
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not disable user");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Enables a user
+	 * Logically follows from above
+	 * @param id The ID of the user to disable
+	 */
+	public void enableUserWithID(int id){
+		try{
+			statement = con.prepareStatement("UPDATE users SET enabled=1 WHERE user_ID=?");
+			statement.setInt(1, id);
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not enable user");
+			e.printStackTrace();
+		}
 	}
 
 	/**

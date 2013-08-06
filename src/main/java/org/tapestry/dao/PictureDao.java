@@ -100,7 +100,7 @@ public class PictureDao {
     
     public ArrayList<Picture> getPicturesForPatient(int patientID){
     	try{
-    		statement = con.prepareStatement("SELECT pic FROM pictures WHERE owner=? and owner_is_user=0");
+    		statement = con.prepareStatement("SELECT * FROM pictures WHERE owner=? and owner_is_user=0");
     		statement.setInt(1, patientID);
     		ResultSet result = statement.executeQuery();
     		ArrayList<Picture> pics = new ArrayList<Picture>();
