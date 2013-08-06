@@ -258,6 +258,7 @@ public class TapestryController{
 		p.setColor(request.getParameter("backgroundColor"));
 		p.setBirthdate(request.getParameter("birthdate"));
 		p.setGender(request.getParameter("gender"));
+		p.setWarnings(request.getParameter("warnings"));
 		patientDao.createPatient(p);
 		activityDao.logActivity("Added patient: " + p.getDisplayName(), v);
 		return "redirect:/manage_patients";
@@ -419,5 +420,31 @@ public class TapestryController{
 		pictureDao.removePicture(pictureID);
 		return "redirect:/profile";
 	}
-
+	
+	@RequestMapping(value="/edit_patient/{id}", method=RequestMethod.GET)
+	public String editPatientForm(@PathVariable("id") int patientID, ModelMap model){
+		Patient p = patientDao.getPatientByID(patientID);
+		model.addAttribute("patient", p);
+		ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+		model.addAttribute("volunteers", volunteers);
+		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
+	}
+	
+	@RequestMapping(value="/submit_edit_patient/{id}", method=RequestMethod.POST)
+	public String modifyPatient(@PathVariable("id") int patientID, SecurityContextHolderAwareRequestWrapper request){
+		Patient p = new Patient();
+		p.setPatientID(patientID);
+		p.setFirstName(request.getParameter("firstname"));
+		p.setLastName(request.getParameter("lastname"));
+		int v = Integer.parseInt(request.getParameter("volunteer"));
+		p.setVolunteer(v);
+		p.setColor(request.getParameter("backgroundColor"));
+		p.setBirthdate(request.getParameter("birthdate"));
+		p.setGender(request.getParameter("gender"));
+		p.setWarnings(request.getParameter("warnings"));
+		patientDao.updatePatient(p);
+		activityDao.logActivity("Modified patient: " + p.getDisplayName(), v);
+		return "redirect:/manage_patients";
+	}
+	
 }

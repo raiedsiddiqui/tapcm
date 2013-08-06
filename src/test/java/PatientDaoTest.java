@@ -25,7 +25,7 @@ public class PatientDaoTest{
 		assertNotNull("DAO is null", dao);
 		Patient p = dao.getPatientByID(1);
 		assertNotNull("Patient is null", p);
-		System.out.println("Patient with ID 1 is: " + p.getFirstName() + " " + p.getLastName());
+		System.out.println("Patient with ID 2 is: " + p.getFirstName() + " " + p.getLastName());
 	}
 
 	@Test

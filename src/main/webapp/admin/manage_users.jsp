@@ -79,7 +79,7 @@
 				</tr>
 				</c:forEach>
 			</table>
-			<a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add new</a>
+			<a href="#addUser" class="btn btn-primary" data-toggle="modal">Add new</a>
 		</div>
 
 		<div class="row-fluid" id="addUserDiv" style="display:none";>
@@ -88,28 +88,22 @@
 	</div>
 	
 	<!-- Modal -->
-	<div id="addPatient" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+	<div id="addUser" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
   		<div class="modal-header">
     		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    		<h3 id="modalHeader">Add Warning</h3>
+    		<h3 id="modalHeader">Add User</h3>
   		</div>
   		<div class="modal-body">
   			<form id="addUser" action="add_user" method="post">
-				<div class="span6">
-					<fieldset>
-						<legend>Add new user</legend>
 						<label>Name:</label>
 						<input type="text" name="name" required/>
 						<label>Username:</label>
 						<input type="text" name="username" required/>
 						<label>Email</label>
 						<input type="email" name="email" required/>
-						<label>Role</label>
+						<label>Role</label>ze
 						<input type="radio" name="role" value="ROLE_ADMIN">Administrator</input> <br/>
 						<input type="radio" name="role" value="ROLE_USER">Volunteer</input> <br/>
-						<input class="btn btn-primary" style="margin-top:5px;" type="submit" value="Add" />
-					</fieldset>
-				</div>
 			</form>
   		</div>
   		<div class="modal-footer">

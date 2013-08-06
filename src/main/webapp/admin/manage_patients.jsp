@@ -105,7 +105,10 @@
                     <td>${p.firstName} ${p.lastName} (${p.gender}, ${p.age})</td>
                     <td>${p.volunteerName}</td>
                     <td><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
-                    <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a> <a href="#"><i class="icon-exclamation-sign"></i></a></td>
+                    <td>
+                    	<a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a>
+                    	<a href="<c:url value="/edit_patient/${p.patientID}"/>" class="btn btn-info">Edit</a>
+                    </td>
                 </tr>
                 </c:forEach>
 			</table>
@@ -117,12 +120,10 @@
 	<div id="addPatient" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
   		<div class="modal-header">
     		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    		<h3 id="modalHeader">Add Warning</h3>
+    		<h3 id="modalHeader">Add Patient</h3>
   		</div>
   		<div class="modal-body">
   			<form id="newPatient" method="post" action="<c:url value="/add_patient"/>">
-				<fieldset>
-					<legend>Add new patient</legend>
 					<label>First Name:</label>
 					<input type="text" name="firstname" required/>
 					<label>Last Name:</label>
@@ -143,7 +144,8 @@
 					</select>
 					<label>Birth Date</label>
 					<input type="date" name="birthdate" /> <br/>
-				</fieldset>
+					<label>Warnings</label>
+					<textarea name="warnings"></textarea>
 			</form>
   		</div>
   		<div class="modal-footer">

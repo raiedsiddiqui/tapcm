@@ -4,6 +4,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.Years;
+import org.joda.time.LocalDate;
+import org.joda.time.Period;
 
 public class Patient{
 	private int patientID;
@@ -65,7 +67,7 @@ public class Patient{
     	public int getAge(){
     		DateTimeFormatter format = DateTimeFormat.forPattern("yyyy-MM-DD");
     		DateTime bd = format.parseDateTime(this.birthdate);
-    		int age = Years.yearsBetween(bd, DateTime.now()).getYears();
+    		int age = new Period(new LocalDate(bd), new LocalDate()).getYears();
     		return age;
     	}
 

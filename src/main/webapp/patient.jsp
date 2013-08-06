@@ -30,7 +30,51 @@
 			width:90%;
 			margin-right:10px;
 		}
+		
+		.imageSelector, .imageSelector input[type=file], .imageSelector img{
+    		width:200px;
+    		height:200px;
+		}
+
+		.imageSelector input[type=file]{
+    		position:relative;
+    		opacity:0;
+    		z-index:10;
+		}
+		.imageSelector img{
+    		z-index:0;
+    		position:absolute;
+    		left:0;
+    		top:0;
+		}
+		.imageSelector:hover img{
+    		left:-2;
+    		top:-2;
+    		box-shadow: 4px 4px 5px #888888;
+		}
+		
 	</style>
+	
+	<script type="text/javascript">
+	  	function submit(){
+	
+	    	var xmlhttp;
+	    	if(window.XMLHttpRequest){
+	      		xmlhttp = new XMLHttpRequest();
+	    	} else {
+	      		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+	    	}
+	    	xmlhttp.onreadystatechange=function(){
+	      		if (xmlhttp.readyState==4 && xmlhttp.status==200){
+	       			alert("Received response");
+	      		}
+	    	}
+	    	xmlhttp.open("POST", "<c:url value="/set_picture_for_patient/${patient.patientID}" />", true);
+			xmlhttp.setRequestHeader("Content-type", "multipart/form-data");
+	    	xmlhttp.send("pic="+document.getElementById("profilePic").value);
+	  	}
+	</script>
+	
 </head>
 	
 <body>
@@ -83,7 +127,10 @@
   		</div>
   		<div class="modal-body">
   			<div class="row">
-  				<div class="span3"><img src="http://placehold.it/200x200"></img></div>
+  				<div class="imageSelector span3">
+					<input id="profilePic" type="file" accept="image/*" onchange="submit()"/>
+					<img src="http://placehold.it/200x200"/>
+				</div>
 				<div class="span2"> 			
    				<p class="text-info">Gender: ${patient.gender}</p>
    				<p class="text-info">Age: ${patient.age}</p>

@@ -67,6 +67,13 @@ public class PatientDao {
 	            	p.setBirthdate(result.getString("birthdate"));
             		p.setVolunteer(result.getInt("volunteer"));
             		p.setWarnings(result.getString("warnings"));
+            		//Set volunteer name
+            		statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+           			statement.setInt(1, p.getVolunteer());
+           			ResultSet r = statement.executeQuery();
+           			r.first();
+           			String name = r.getString("name");
+           			p.setVolunteerName(name);
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
 			e.printStackTrace();
@@ -85,13 +92,6 @@ public class PatientDao {
            		ArrayList<Patient> allPatients = new ArrayList<Patient>();
            		while(result.next()){
            			Patient p = createFromSearch(result);
-           			//Look up the name of the volunteer
-           			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-           			statement.setInt(1, p.getVolunteer());
-           			ResultSet r = statement.executeQuery();
-           			r.first();
-           			String name = r.getString("name");
-           			p.setVolunteerName(name);
            			allPatients.add(p);
             	}
             	return allPatients;
@@ -109,19 +109,12 @@ public class PatientDao {
 	*/
     	public ArrayList<Patient> getPatientsForVolunteer(int volunteer){
         	try{
-        			//Get the username for the volunteer
-        			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-        			statement.setInt(1, volunteer);
-        			ResultSet result = statement.executeQuery();
-        			result.first();
-        			String name = result.getString("name");
             		statement = con.prepareStatement("SELECT * FROM patients WHERE volunteer=?");
             		statement.setInt(1, volunteer);
-            		result = statement.executeQuery();
+            		ResultSet result = statement.executeQuery();
             		ArrayList<Patient> patients = new ArrayList<Patient>();
             		while(result.next()){
             				Patient p = createFromSearch(result);
-            				p.setVolunteerName(name);
             				patients.add(p);
             		}
            	 	return patients;
@@ -138,13 +131,14 @@ public class PatientDao {
 	*/
     public void createPatient(Patient p){
 		try{
-			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, volunteer, color, birthdate, gender) VALUES (?, ?, ?, ?, ?, ?)");
+			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, volunteer, color, birthdate, gender, warnings) VALUES (?, ?, ?, ?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
 			statement.setString(2, p.getLastName());
 			statement.setInt(3, p.getVolunteer());
 			statement.setString(4, p.getColor());
 			statement.setString(5, p.getBirthdate());
 			statement.setString(6, p.getGender());
+			statement.setString(7, p.getWarnings());
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create patient");
@@ -158,13 +152,14 @@ public class PatientDao {
      */
     public void updatePatient(Patient p){
     	try{
-    		statement = con.prepareStatement("UPDATE patients SET first_name=?, last_name=?, volunteer=?, gender=?, age=? WHERE patient_ID=?");
+    		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, volunteer=?, gender=?, birthdate=?, warnings=? WHERE patient_ID=?");
     		statement.setString(1, p.getFirstName());
     		statement.setString(2, p.getLastName());
     		statement.setInt(3, p.getVolunteer());
     		statement.setString(4, p.getGender());
-    		statement.setInt(5, p.getAge());
-    		statement.setInt(6, p.getPatientID());
+    		statement.setString(5, p.getBirthdate());
+    		statement.setString(6, p.getWarnings());
+    		statement.setInt(7, p.getPatientID());
     		statement.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not update patient");

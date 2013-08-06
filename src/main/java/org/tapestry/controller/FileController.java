@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -86,7 +87,15 @@ public class FileController extends MultiActionController{
 		User loggedInUser = userDao.getUserByUsername(currentUsername);
 		MultipartFile pic = request.getFile("pic");
 		System.out.println("Uploaded: " + pic);
-		pictureDao.uploadPicture(pic, loggedInUser.getUserID(), true); //Change this
+		pictureDao.uploadPicture(pic, loggedInUser.getUserID(), true);
 		return "redirect:/profile";
+	}
+	
+	@RequestMapping(value="/set_picture_for_patient/{id}", method=RequestMethod.POST)
+	//public @ResponseBody String updateProfilePicture(@PathVariable("id") int id, MultipartHttpServletRequest request){
+	public @ResponseBody String updateProfilePicture(@PathVariable("id") int id, SecurityContextHolderAwareRequestWrapper request){
+		//MultipartFile pic = request.getFile("pic");
+		System.out.println("Set picture for patient: " + request.getParameter("pic"));
+		return "";
 	}
 }
