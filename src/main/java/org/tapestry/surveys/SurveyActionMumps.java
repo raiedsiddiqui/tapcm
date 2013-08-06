@@ -47,7 +47,7 @@ public class SurveyActionMumps {
 
 		phrSurveyResult.setDocumentId(Integer.toString(surveyResult.getResultID()));
 		phrSurveyResult.setSurveyId(Integer.toString(surveyResult.getSurveyID()));
-		phrSurveyResult.setComplete(surveyResult.getCompleted());
+		phrSurveyResult.setComplete(surveyResult.isCompleted());
 
 		//        //load answers
 		//        for (IndivoSurveyQuestionType iQuestion: iQuestions) {        

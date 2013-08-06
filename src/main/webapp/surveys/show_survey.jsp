@@ -29,15 +29,6 @@
      				</a>
      					
      				<a class="brand" href="<c:url value="/"/>">Home</a>
-     				<div class="nav-collapse collapse">
-						<ul class="nav">
-							<li><a href="<c:url value="/manage_users"/>">Manage Volunteers</a></li>
-							<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
-							<li><a href="<c:url value="/manage_survey_templates"/>">Manage Survey Templates</a></li>
-							<li><a href="<c:url value="/manage_surveys"/>">Manage Surveys</a></li>
-							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
-						</ul>
-					</div>
 				</div>
 			</div>
 		</div>
@@ -52,26 +43,31 @@
 <%@page import="java.math.*"%>
 
 <%
-String questionId = request.getParameter("questionid");
+String questionId = request.getAttribute("questionid").toString();
 //find the survey
-String documentId = request.getParameter("resultid");
+String documentId = request.getAttribute("resultid").toString();
 
 SurveyMap surveys = DoSurveyAction.getSurveyMap(request);
-PHRSurvey survey = surveys.get(documentId);	
+//PHRSurvey survey = surveys.get(documentId);	
+PHRSurvey survey = (PHRSurvey) request.getAttribute("survey");
 
 //get question
 SurveyQuestion question = survey.getQuestionById(questionId);
 
-String message = request.getParameter("message");
-if (message == null) message = "";
+String message;
+Object messageObject = request.getAttribute("message");
+if (messageObject == null) 
+	message = "";
+else 
+	message = messageObject.toString();
 %>
 
 <div>
     <div style="float: left;">
-        <h2 class="surveyTitle"><%=survey.getTitle()%></h2>
+        <h2 class="surveyTitle">${survey.title}</h2>
         
         <!-- Look at the div with class="questionWidth" at the bottom to adjust question min-width) -->
-        <form action="/show_survey/" + documentId name="surveyQuestion" id="surveyQuestion">
+        <form action="/tapestry/show_survey/<%=documentId%>" name="surveyQuestion" id="surveyQuestion">
             <input type="hidden" name="questionid" value="<%=question.getId()%>">
             <input type="hidden" name="direction" value="forward">
             <input type="hidden" name="documentid" value="<%=documentId%>">
@@ -136,7 +132,7 @@ questionText = questionText.replaceAll("--%" + ">", "");
                     <input type="hidden" name="answer" value="-">
                 <%}%>
                 <br/>
-                <input type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='survey_action.jsp?documentid=<%=documentId%>'">
+                <input type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='/tapestry/manage_surveys'">
                 <input type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();"> 
                 <input type="submit" value="Next">
 

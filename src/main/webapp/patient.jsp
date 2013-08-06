@@ -82,7 +82,7 @@
 			</div>
 			<div class="row-fluid">
 				<c:forEach items="${surveys}" var="s">
-					<a class="btn span3 btn-large btn-primary" href="/start_survey/${s.resultID}">${s.surveyTitle}</a>
+					<a <c:if test="${s.completed}">disabled</c:if> class="btn span3 btn-large btn-primary" href="<c:url value="/show_survey/${s.resultID}"/>">${s.surveyTitle}</a>
 				</c:forEach>
 			</div>
 		</div>
@@ -125,10 +125,8 @@
    		<h3 id="infoLabel" style="color:#000000;">Patient Information: ${patient.displayName}</h3>
   		</div>
   		<div class="modal-body">
-  			<div class="row">
-   				<p class="text-info">Gender: ${patient.gender}</p>
-   				<p class="text-info">Age: ${patient.age}</p>
-   			</div>
+   			<p class="text-info">Gender: ${patient.gender}</p>
+   			<p class="text-info">Age: ${patient.age}</p>
    		</div>
   		</div>
   		<div class="modal-footer">

@@ -40,7 +40,7 @@
        						<div class="control-group">
 	        					<div class="controls">
 									<input type="submit" value="Login" style="margin-bottom:10px;"></input>
-									<p>Tapestry v0.8</p>
+									<p>Tapestry 13.08.06</p>
         						</div>
        						</div>
       					</form>

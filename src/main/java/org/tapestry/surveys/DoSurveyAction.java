@@ -44,6 +44,7 @@ import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.surveys.SurveyFactory;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyException;
@@ -65,15 +66,19 @@ public class DoSurveyAction
 	/** 
 	 * @return the next url to go to, excluding contextPath
 	 */
-	public static String execute(HttpServletRequest request, ModelMap m, String documentId, ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates) throws Exception
+	public static ModelAndView execute(HttpServletRequest request, String documentId, ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates) throws Exception
 	{
+		ModelAndView m = new ModelAndView();
 		final String questionId = request.getParameter("questionid");
 		String direction = request.getParameter("direction");
+		if (direction == null)
+			direction = "forward";
 
 		if (documentId == null)
 		{
 			logger.error("no selected survey? documentId=" + documentId);
-			return("failed");
+			m.setViewName("failed");
+			return m;
 		}
 
 		SurveyMap userSurveys = getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
@@ -86,7 +91,8 @@ public class DoSurveyAction
 		if (currentSurvey == null)
 		{
 			logger.error("Cannot find requested survey. documentId=" + documentId);
-			return("failed");
+			m.setViewName("failed");
+			return m;
 		}
 
 		//if requested survey is completed
@@ -96,7 +102,7 @@ public class DoSurveyAction
 		}
 
 		SurveyFactory surveyFactory = new SurveyFactory();
-		PHRSurvey templateSurvey = surveyFactory.getSurveyTemplateById(Integer.getInteger(currentSurvey.getSurveyId()));
+		PHRSurvey templateSurvey = surveyFactory.getSurveyTemplateById(Integer.parseInt(currentSurvey.getSurveyId()));
 		boolean saved = false;
 
 		//if starting/continuing survey, clear session
@@ -112,7 +118,8 @@ public class DoSurveyAction
 				if (!moreQuestions)
 				{
 					logger.error("Survey has no questions?");
-					return("failed");
+					m.setViewName("failed");
+					return m;
 				}
 			}
 
@@ -125,11 +132,12 @@ public class DoSurveyAction
 				lastQuestionId = currentSurvey.getQuestions().get(currentSurvey.getQuestions().size() - 1).getId();
 			}
 
-			m.addAttribute("survey", currentSurvey);
-			m.addAttribute("templateSurvey", templateSurvey);
-			m.addAttribute("questionid", lastQuestionId);
-			m.addAttribute("resultid", documentId);
-			return("/surveys/show_survey/" + documentId);
+			m.addObject("survey", currentSurvey);
+			m.addObject("templateSurvey", templateSurvey);
+			m.addObject("questionid", lastQuestionId);
+			m.addObject("resultid", documentId);
+			m.setViewName("/surveys/show_survey");
+			return m;
 		}
 
 		String errMsg = null;
@@ -192,9 +200,15 @@ public class DoSurveyAction
 					//finished survey
 					if (!moreQuestions)
 					{
-						if (!currentSurvey.isComplete())	SurveyAction.updateSurveyResult(currentSurvey);
-
-						return("failed");
+						if (!currentSurvey.isComplete()){
+							SurveyAction.updateSurveyResult(currentSurvey);
+							m.setViewName("redirect:/");
+							m.addObject("survey_completed", true);
+							return m;
+						} else {
+							m.setViewName("redirect:/");
+							return m;
+						}
 					}
 					int questionIndex = currentSurvey.getQuestionIndexbyId(questionId);
 					nextQuestionId = currentSurvey.getQuestions().get(questionIndex + 1).getId();
@@ -206,12 +220,14 @@ public class DoSurveyAction
 					//if answer fails validation
 				}
 				else {
-					m.addAttribute("survey", currentSurvey);
-					m.addAttribute("templateSurvey", templateSurvey);
-					m.addAttribute("questionid", questionId);
-					m.addAttribute("resultid", documentId);
-					m.addAttribute("message", URLEncoder.encode(question.getRestriction().getInstruction(), "UTF-8"));
-					return("/surveys/show_survey/" + documentId);
+					m.addObject("survey", currentSurvey);
+					m.addObject("templateSurvey", templateSurvey);
+					m.addObject("questionid", questionId);
+					m.addObject("resultid", documentId);
+					m.addObject("message", URLEncoder.encode(question.getRestriction().getInstruction(), "UTF-8"));
+
+					m.setViewName("/surveys/show_survey");
+					return m;
 				}
 
 				//if answer not specified, and hit forward
@@ -224,12 +240,14 @@ public class DoSurveyAction
 			if (questionIndex > 0) nextQuestionId = currentSurvey.getQuestions().get(questionIndex - 1).getId();
 		}
 
-		m.addAttribute("survey", currentSurvey);
-		m.addAttribute("templateSurvey", templateSurvey);
-		m.addAttribute("questionid", nextQuestionId);
-		m.addAttribute("resultid", documentId);
-		if (errMsg != null) m.addAttribute("message", URLEncoder.encode(errMsg, "UTF-8"));	
-		return "/surveys/show_survey" + documentId;
+		m.addObject("survey", currentSurvey);
+		m.addObject("templateSurvey", templateSurvey);
+		m.addObject("questionid", nextQuestionId);
+		m.addObject("resultid", documentId);
+		if (errMsg != null) m.addObject("message", URLEncoder.encode(errMsg, "UTF-8"));	
+
+		m.setViewName("/surveys/show_survey");
+		return m;
 	}
 
 	private static boolean addNextQuestion(String currentQuestionId, PHRSurvey currentSurvey, PHRSurvey templateSurvey) throws SurveyException

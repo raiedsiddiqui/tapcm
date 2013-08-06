@@ -151,4 +151,19 @@ public class SurveyResultDao
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Mark a survey as completed
+	 * @param id
+	 */
+	public void markAsComplete(int id){
+		try{
+			statement = con.prepareStatement("UPDATE survey_results SET completed=1 WHERE result_ID=?");
+			statement.setInt(1, id);
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not mark survey as completed");
+			e.printStackTrace();
+		}
+	}
 }

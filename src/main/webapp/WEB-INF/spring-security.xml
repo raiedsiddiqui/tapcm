@@ -40,7 +40,7 @@
 		<intercept-url pattern="/assign_surveys" access="ROLE_ADMIN" />
 		<intercept-url pattern="/delete_survey/**" access="ROLE_ADMIN" />
 		<intercept-url pattern="/edit_patient/**" access="ROLE_ADMIN" />
-		<intercept-url pattern="/show_survey/**" access="ROLE_ADMIN" />
+		<intercept-url pattern="/show_survey/**" access="ROLE_ADMIN, ROLE_USER" />
 		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
 	</http>
  

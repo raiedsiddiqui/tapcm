@@ -9,6 +9,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -115,22 +116,31 @@ public class SurveyController{
 	}
    	
    	@RequestMapping(value="/show_survey/{resultID}", method=RequestMethod.GET)
-   	public String openSurvey(@PathVariable("resultID") int id, ModelMap model, HttpServletRequest request) {
-   		String redirectAction = null;
+   	public ModelAndView openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {
+   		ModelAndView redirectAction = null;
    		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
 		try {
-			redirectAction = DoSurveyAction.execute(request, model, Integer.toString(id), surveyResults, surveyTemplates);
+			redirectAction = DoSurveyAction.execute(request, Integer.toString(id), surveyResults, surveyTemplates);
 		} catch (Exception e) {
 			System.out.println("Error: " + e);
+			e.printStackTrace();
 		}
 		
-   		if (request.isUserInRole("ROLE_USER") && redirectAction == "failed"){
-   			return "patient/" + request.getParameter("patientID");
-   		} else if (request.isUserInRole("ROLE_ADMIN") && redirectAction == "failed") {
-   			return "manage_surveys";
+		if (redirectAction == null){ //Assuming we've completed the survey
+			System.out.println("Something bad happened");
+		}
+   		if (request.isUserInRole("ROLE_USER") && redirectAction.getViewName() == "failed"){
+   			redirectAction.setViewName("/patient/" + request.getParameter("patientID"));
+   			return redirectAction;
+   		} else if (request.isUserInRole("ROLE_ADMIN") && redirectAction.getViewName() == "failed") {
+   			redirectAction.setViewName("/manage_surveys");
+   			return redirectAction;
    		} else {
-   			return "/surveys/show_survey";
+   			if (redirectAction.getModelMap().containsKey("survey_completed")){
+   				surveyResultDao.markAsComplete(id);
+   			}
+   			return redirectAction;
    		}
    	}
    	

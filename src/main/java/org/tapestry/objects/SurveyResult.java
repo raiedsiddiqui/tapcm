@@ -114,7 +114,7 @@ public class SurveyResult {
 	/**
 	 * @return status The status of the survey
 	 */
-	public boolean getCompleted(){
+	public boolean isCompleted(){
 		return completed;
 	}
 
