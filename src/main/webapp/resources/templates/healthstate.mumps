@@ -1,6 +1,7 @@
+
 .title=Your Health State
 .instances=65000
-.menubar=hidden
+.menuhidden=false
 .progressbar=true
 .geomapping=false
 
@@ -49,7 +50,7 @@ Anxiety/Depression
 3 = I am extremely anxious or depressed
 .next
 
-.qu=HS6,type=int
+.qu=HS6,type=number
 Health State
 In your opinion, how good or bad is your health today on a scale of 1 to 100 (with 100 being the best imaginable)?
 .an

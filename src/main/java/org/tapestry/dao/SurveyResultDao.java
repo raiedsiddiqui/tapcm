@@ -52,6 +52,19 @@ public class SurveyResultDao
 		}
     }
     
+    public SurveyResult getSurveyResultByID(int id){
+    	try{
+    		statement = con.prepareStatement("SELECT * FROM survey_results WHERE result_ID=?");
+    		statement.setInt(1, id);
+    		ResultSet result = statement.executeQuery();
+    		return createFromSearch(result);
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve survey result");
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
+    
 	/**
 	 * Ordered by title ascending
 	 * @param itemsToReturn 

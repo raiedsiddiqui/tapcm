@@ -10,15 +10,7 @@ Edmonton Frail Scale
 .next
 
 .qu=Q1,type=select
-<canvas  id="myCanvas" width="200" height="100" style="border: 1px solid black;">
-
-<script>
-var canvas=document.getElementById("myCanvas");
-var context=canvas.getContext("2d");
-context.beginPath();
-context.arc(95,50,40,0,2*Math.PI);
-context.stroke();
-</script>
+(Hand the patient a paper with a drawn circle)
 
 Please imagine that this pre-drawn circle is a clock. I would like you to place the numbers in the correct positions to indicate a time of 'ten after eleven'.
 

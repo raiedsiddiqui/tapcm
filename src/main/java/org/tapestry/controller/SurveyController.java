@@ -26,7 +26,10 @@ import org.survey_component.data.SurveyQuestion;
 import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.SurveyResultDao;
+import org.tapestry.dao.ActivityDao;
+import org.tapestry.dao.UserDao;
 import org.tapestry.objects.Patient;
+import org.tapestry.objects.User;
 import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.surveys.DoSurveyAction;
@@ -43,6 +46,8 @@ public class SurveyController{
 	private SurveyResultDao surveyResultDao;
 	private SurveyTemplateDao surveyTemplateDao;
 	private PatientDao patientDao;
+	private ActivityDao activityDao;
+	private UserDao userDao;
 	
 	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
@@ -66,6 +71,8 @@ public class SurveyController{
 		surveyResultDao = new SurveyResultDao(DB, UN, PW);
 		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
 		patientDao = new PatientDao(DB, UN, PW);
+		activityDao = new ActivityDao(DB, UN, PW);
+		userDao = new UserDao(DB, UN, PW);
    	}
    	
    	@RequestMapping(value="/manage_surveys", method=RequestMethod.GET)
@@ -131,7 +138,7 @@ public class SurveyController{
 			System.out.println("Something bad happened");
 		}
    		if (request.isUserInRole("ROLE_USER") && redirectAction.getViewName() == "failed"){
-   			redirectAction.setViewName("/patient/" + request.getParameter("patientID"));
+   			redirectAction.setViewName("/patient/" + request.getParameter("patientID")); //This probably won't work
    			return redirectAction;
    		} else if (request.isUserInRole("ROLE_ADMIN") && redirectAction.getViewName() == "failed") {
    			redirectAction.setViewName("/manage_surveys");
@@ -139,6 +146,9 @@ public class SurveyController{
    		} else {
    			if (redirectAction.getModelMap().containsKey("survey_completed")){
    				surveyResultDao.markAsComplete(id);
+   				User currentUser = userDao.getUserByUsername(request.getRemoteUser());
+   				SurveyResult s = surveyResultDao.getSurveyResultByID(id);
+   				activityDao.logActivity("Completed survey " + s.getSurveyTitle(), currentUser.getUserID());
    			}
    			return redirectAction;
    		}
