@@ -25,7 +25,6 @@ public class PatientDao {
 	*/
     	public PatientDao(String url, String username, String password){
 		try{
-			Class.forName("com.mysql.jdbc.Driver").newInstance(); 
 			con = DriverManager.getConnection(url, username, password);
 		} catch (SQLException e){
 			System.out.println("Error: Could not connect to database");
