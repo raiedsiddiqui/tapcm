@@ -9,7 +9,6 @@ import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -68,7 +67,7 @@ public class FileController extends MultiActionController{
    	}
    	
    	@RequestMapping(value = "/upload_survey_template", method=RequestMethod.POST)
-	public String addSurveyTemplate(HttpServletRequest request, HttpServletResponse response) throws Exception{
+	public String addSurveyTemplate(HttpServletRequest request) throws Exception{
    		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
    		MultipartFile multipartFile = multipartRequest.getFile("file");
    		

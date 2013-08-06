@@ -18,7 +18,12 @@
 		<repository>
 			<id>survey-component</id>
 			<name>Survey Component</name>
-			<url>https://github.com/adamgignac/mvn-repo/raw/master/</url>
+			<url>https://github.com/adamgignac/mvn-repo/raw/master</url>
+		</repository>
+		
+		<repository>
+			<id>oscar_repo</id>
+			<url>http://oscarmcmaster.sourceforge.net/m2</url>
 		</repository>
 		
   		<repository>
@@ -27,7 +32,7 @@
     		<url>http://oss.sonatype.org/content/groups/public/</url>
   		</repository>
 	</repositories>
- 
+	
 	<dependencies>
   		<dependency>
     		<groupId>org.yaml</groupId>
@@ -190,7 +195,26 @@
 		<dependency>
 			<groupId>survey-component</groupId>
 			<artifactId>survey-component</artifactId>
-			<version>0.0</version>
+			<version>0.3</version>
+		</dependency>
+		
+		<!-- Utils -->
+		<dependency>
+			<groupId>org.oscarehr</groupId>
+			<artifactId>util</artifactId>
+			<version>2013.03.06</version>
+		</dependency>
+		
+		<!-- indivo stuff -->
+		<dependency>
+			<groupId>org.indivo</groupId>
+			<artifactId>indivo-core</artifactId>
+			<version>3.2-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.indivo</groupId>
+			<artifactId>indivo-survey-model</artifactId>
+			<version>3.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 	

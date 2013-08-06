@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS patients (
 	birthdate VARCHAR(15),
 	email VARCHAR(50),
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
-    color VARCHAR(7), /*Hexcode color string (#ffffff)*/
-    warnings TEXT,
-    picture VARCHAR(255),
+	color VARCHAR(7), /*Hexcode color string (#ffffff)*/
+	warnings TEXT,
+	picture VARCHAR(255),
 	PRIMARY KEY (patient_ID)
 );
 
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS survey_results (
 	survey_ID SMALLINT UNSIGNED NOT NULL, /*Same as survey_ID field in surveys*/
 	patient_ID SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID in patients*/
 	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the survey (0=incomplete)*/
-	startDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, /*Automatically assigns the startDate when the survey is assigned*/
+	startDate TIMESTAMP, /*Automatically assigns the startDate when the survey is assigned*/
 	editDate TIMESTAMP, /*editDate represents the last edit date*/
 	data MEDIUMBLOB, /*The survey data*/
 	PRIMARY KEY (result_ID)

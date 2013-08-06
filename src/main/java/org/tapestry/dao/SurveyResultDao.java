@@ -116,17 +116,25 @@ public class SurveyResultDao
 	 * Uploads a survey template to the database
 	 * @param st
 	 */
-	public void assignSurvey(SurveyResult sr) {
+	public String assignSurvey(SurveyResult sr) {
+		String resultId = null;
 		try {
-			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data) values (?,?,?)");
+			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data, editDate) values (?,?,?, now())");
 			statement.setInt(1, sr.getPatientID());
 			statement.setInt(2, sr.getSurveyID());
 			statement.setBytes(3, sr.getResults());
 			statement.execute();
+			
+			 //Look up the id of the new survey result
+   			statement = con.prepareStatement("SELECT MAX(result_ID) AS result_ID FROM survey_results");
+   			ResultSet r = statement.executeQuery();
+   			r.first();
+   			resultId = r.getString("result_ID");
 		} catch (SQLException e){
 			System.out.println("Error: Could not assign survey # " + sr.getSurveyID() + " to patient # " + sr.getPatientID());
 			e.printStackTrace();
 		}
+		return resultId;
 	}
 	
 	/**
