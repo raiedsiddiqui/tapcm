@@ -110,7 +110,7 @@ public class SurveyResultDao
 	/**
 	* Creates a Survey Template object from a database query
 	* @param result The ResultSet from the database query
-	* @return The Patient object
+	* @return The SurveyResult object
 	*/
 	private SurveyResult createFromSearch(ResultSet result){
 		SurveyResult sr = new SurveyResult();
@@ -195,6 +195,23 @@ public class SurveyResultDao
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not mark survey as completed");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Upload survey results
+	 * @param id The ID of the survey result
+	 * @param data The survey results
+	 */
+	public void updateSurveyResults(int id, byte[] data){
+		try{
+			statement = con.prepareStatement("UPDATE survey_results SET data=? WHERE result_ID=?");
+			statement.setBytes(1, data);
+			statement.setInt(2, id);
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not save survey results");
 			e.printStackTrace();
 		}
 	}

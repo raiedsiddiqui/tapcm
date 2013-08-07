@@ -133,7 +133,7 @@
                     		<input type="hidden" name="answer" value="-">
                 		<%}%>
                 	<br/>
-                	<input type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='/tapestry/manage_surveys'">
+                	<input type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>'">
                 	<input type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();"> 
                 	<input type="submit" value="Next">
 

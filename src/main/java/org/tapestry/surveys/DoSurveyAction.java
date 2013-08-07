@@ -194,11 +194,10 @@ public class DoSurveyAction
 					{
 						if (!currentSurvey.isComplete()){
 							SurveyAction.updateSurveyResult(currentSurvey);
-							m.setViewName("redirect:/");
 							m.addObject("survey_completed", true);
 							return m;
 						} else {
-							m.setViewName("redirect:/");
+							m.setViewName("redirect:/manage_surveys");
 							return m;
 						}
 					}
