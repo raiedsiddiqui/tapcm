@@ -127,8 +127,15 @@ public class SurveyController{
    		ModelAndView redirectAction = null;
    		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
+		SurveyTemplate surveyTemplate = surveyTemplateDao.getSurveyTemplateByID(surveyResult.getSurveyID());
+		SurveyMap userSurveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+		PHRSurvey currentSurvey = userSurveys.getSurvey(Integer.toString(id));
+		
 		try {
-			redirectAction = DoSurveyAction.execute(request, Integer.toString(id), surveyResults, surveyTemplates);
+			SurveyFactory surveyFactory = new SurveyFactory();
+			PHRSurvey templateSurvey = surveyFactory.getSurveyTemplate(surveyTemplate);
+			redirectAction = DoSurveyAction.execute(request, Integer.toString(id), currentSurvey, templateSurvey);
 		} catch (Exception e) {
 			System.out.println("Error: " + e);
 			e.printStackTrace();

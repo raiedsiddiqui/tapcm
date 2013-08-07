@@ -126,7 +126,6 @@
   		</div>
   		<div class="modal-body">
    			<p class="text-info">Gender: ${patient.gender}</p>
-   			<p class="text-info">Age: ${patient.age}</p>
    		</div>
   		</div>
   		<div class="modal-footer">
