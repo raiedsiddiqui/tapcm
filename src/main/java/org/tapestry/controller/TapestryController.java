@@ -303,7 +303,7 @@ public class TapestryController{
 		model.addAttribute("patient", patient);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 		model.addAttribute("unread", unreadMessages);
-		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getSurveysByPatientID(id);
+		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getIncompleteSurveysByPatientID(id);
 		model.addAttribute("surveys", surveyResultList);
 		
 		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);

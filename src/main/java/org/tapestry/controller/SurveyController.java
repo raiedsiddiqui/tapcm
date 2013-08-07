@@ -145,7 +145,7 @@ public class SurveyController{
 			System.out.println("Something bad happened");
 		}
    		if (request.isUserInRole("ROLE_USER") && redirectAction.getViewName() == "failed"){
-   			redirectAction.setViewName("redirect:/"); //This probably won't work
+   			redirectAction.setViewName("redirect:/volunteer/index");
    			return redirectAction;
    		} else if (request.isUserInRole("ROLE_ADMIN") && redirectAction.getViewName() == "failed") {
    			redirectAction.setViewName("redirect:/manage_surveys");

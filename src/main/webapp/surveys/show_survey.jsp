@@ -62,8 +62,6 @@
 		<div class="row-fluid">
 			<div>
     			<div style="float: left;">
-        			<h2 class="surveyTitle">${survey.title}</h2>
-        
         			<!-- Look at the div with class="questionWidth" at the bottom to adjust question min-width) -->
         			<form action="/tapestry/show_survey/<%=documentId%>" name="surveyQuestion" id="surveyQuestion">
             			<input type="hidden" name="questionid" value="<%=question.getId()%>">

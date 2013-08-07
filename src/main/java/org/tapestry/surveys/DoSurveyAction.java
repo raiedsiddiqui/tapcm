@@ -32,7 +32,6 @@
 
 package org.tapestry.surveys;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -217,7 +216,7 @@ public class DoSurveyAction
 					m.addObject("templateSurvey", templateSurvey);
 					m.addObject("questionid", questionId);
 					m.addObject("resultid", documentId);
-					m.addObject("message", URLEncoder.encode(question.getRestriction().getInstruction(), "UTF-8"));
+					m.addObject("message", question.getRestriction().getInstruction());
 
 					m.setViewName("/surveys/show_survey");
 					return m;
@@ -237,7 +236,7 @@ public class DoSurveyAction
 		m.addObject("templateSurvey", templateSurvey);
 		m.addObject("questionid", nextQuestionId);
 		m.addObject("resultid", documentId);
-		if (errMsg != null) m.addObject("message", URLEncoder.encode(errMsg, "UTF-8"));	
+		if (errMsg != null) m.addObject("message", errMsg);	
 
 		m.setViewName("/surveys/show_survey");
 		return m;

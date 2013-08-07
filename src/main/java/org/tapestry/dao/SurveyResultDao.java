@@ -52,6 +52,24 @@ public class SurveyResultDao
 		}
     }
     
+    public ArrayList<SurveyResult> getIncompleteSurveysByPatientID(int patientId){
+    	try {
+			statement = con.prepareStatement("SELECT * FROM survey_results WHERE patient_ID=? AND completed=0");
+			statement.setInt(1, patientId);
+			ResultSet result = statement.executeQuery();
+			ArrayList<SurveyResult> allSurveyResults = new ArrayList<SurveyResult>();
+			while(result.next()){
+				SurveyResult sr = createFromSearch(result);
+				allSurveyResults.add(sr);
+			}
+			return allSurveyResults;
+		} catch (SQLException e) {
+			System.out.println("Error: could not retrieve survey results for patient ID #" + patientId);
+			e.printStackTrace();
+			return null;
+		}
+    }
+    
     public SurveyResult getSurveyResultByID(int id){
     	try{
     		statement = con.prepareStatement("SELECT * FROM survey_results WHERE result_ID=?");
