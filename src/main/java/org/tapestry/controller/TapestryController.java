@@ -370,10 +370,32 @@ public class TapestryController{
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = new Message();
 		m.setSender(loggedInUser.getName());
-		m.setRecipient(Integer.parseInt(request.getParameter("recipient")));
+		int recipientID = Integer.parseInt(request.getParameter("recipient"));
+		m.setRecipient(recipientID);
 		m.setText(request.getParameter("msgBody"));
 		m.setSubject(request.getParameter("msgSubject"));
 		messageDao.sendMessage(m);
+		
+		User recipient = userDao.getUserByID(recipientID);
+		
+		if (mailAddress != null){
+			try{
+				MimeMessage message = new MimeMessage(session);
+				message.setFrom(new InternetAddress(mailAddress));
+				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
+				message.setSubject("Tapestry: New message notification");
+				String msg = "You have received a message. To review it, log into Tapestry and open your inbox.";
+				message.setText(msg);
+				System.out.println(msg);
+				System.out.println("Sending...");
+				Transport.send(message);
+				System.out.println("Email sent containing credentials to " + recipient.getEmail());
+			} catch (MessagingException e) {
+				System.out.println("Error: Could not send email");
+				System.out.println(e.toString());
+			}
+		}
+		
 		return "redirect:/?success=true";
 	}
 	
