@@ -157,7 +157,7 @@ public class TapestryController{
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
 			model.addAttribute("appointments_today", appointmentsForToday);
-			model.addAttribute("appointments_all", allAppointments);
+			model.addAttribute("appointments_all", allAppointments);;
 			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 			model.addAttribute("unread", unreadMessages);
 			model.addAttribute("activities", activityLog);
@@ -188,6 +188,8 @@ public class TapestryController{
 	public String manageUsers(ModelMap model){
 		ArrayList<User> userList = userDao.getAllUsers();
 		model.addAttribute("users", userList);
+		model.addAttribute("active", userDao.countActiveUsers());
+		model.addAttribute("total", userDao.countAllUsers());
 		return "admin/manage_users";
 	}
 	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)

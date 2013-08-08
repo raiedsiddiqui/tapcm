@@ -49,7 +49,7 @@
 			</div>
 		</div>
 		<div class="row-fluid">
-			<h2>Users</h2>
+			<h2>Users <small>${total} users, ${active} enabled</small></h2>
 			<table class="table">
 				<tr>
 					<th>Name</th>
