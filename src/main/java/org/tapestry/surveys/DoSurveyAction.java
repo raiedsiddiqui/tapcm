@@ -194,10 +194,24 @@ public class DoSurveyAction
 					{
 						if (!currentSurvey.isComplete()){
 							SurveyAction.updateSurveyResult(currentSurvey);
+							
 							m.addObject("survey_completed", true);
+							m.addObject("survey", currentSurvey);
+							m.addObject("templateSurvey", templateSurvey);
+							m.addObject("questionid", questionId);
+							m.addObject("resultid", documentId);
+							m.addObject("message", "Survey End - Please Save and Exit");
+							
+							m.setViewName("/surveys/show_survey");
 							return m;
 						} else {
-							m.setViewName("redirect:/manage_surveys");
+							m.addObject("survey", currentSurvey);
+							m.addObject("templateSurvey", templateSurvey);
+							m.addObject("questionid", questionId);
+							m.addObject("resultid", documentId);
+							m.addObject("message", "End of Survey");
+
+							m.setViewName("/surveys/show_survey");
 							return m;
 						}
 					}

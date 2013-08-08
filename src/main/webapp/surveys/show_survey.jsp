@@ -20,6 +20,14 @@
 			
 	//get question
 	SurveyQuestion question = survey.getQuestionById(questionId);
+	
+	boolean completed;
+	Object completedObject = request.getAttribute("survey_completed");
+	if (completedObject == null)
+		completed = false;
+	else
+		completed = true;
+	
 			
 	String message;
 	Object messageObject = request.getAttribute("message");
@@ -133,7 +141,7 @@
                     		<input type="hidden" name="answer" value="-">
                 		<%}%>
                 	<br/>
-                	<input type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>'">
+                	<input type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>?survey_completed=<%=completed%>'">
                 	<input type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();"> 
                 	<input type="submit" value="Next">
 
