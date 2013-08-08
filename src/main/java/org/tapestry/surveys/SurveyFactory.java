@@ -15,7 +15,7 @@ public class SurveyFactory {
 	{
 		//check if it's loaded, if not, try to load
 		ensureLoaded(surveyTemplate);
-		return loadedSurveys.get(Integer.toString(surveyTemplate.getSurveyID())); //write-protecting to the template survey
+		return loadedSurveys.get(Integer.toString(surveyTemplate.getSurveyID())).cloneSurvey(); //write-protecting to the template survey
 	}
 	
 	//optimized
