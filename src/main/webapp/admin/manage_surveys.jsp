@@ -50,14 +50,14 @@
 		
 		
 		<div class="row-fluid">
-			<h2>Survey Templates</h2>
+			<h2>Surveys</h2>
 			<table class="table">
 				<tr>
 					<th>Survey</th>
 					<th>Patient</th>
 					<th>Date Assigned</th>
 					<th>Status</th>
-					<th>Date Completed</th>
+					<th>Last Edit Date</th>
 					<th>Remove</th>
 				</tr>
 				<c:forEach items="${surveys}" var="s">

@@ -151,7 +151,7 @@ public class SurveyResultDao
 	public String assignSurvey(SurveyResult sr) {
 		String resultId = null;
 		try {
-			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data, editDate) values (?,?,?, now())");
+			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data, startDate) values (?,?,?, now())");
 			statement.setInt(1, sr.getPatientID());
 			statement.setInt(2, sr.getSurveyID());
 			statement.setBytes(3, sr.getResults());
