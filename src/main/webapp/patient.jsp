@@ -79,13 +79,14 @@
 					</c:if>
 				</div>
 			</div>
+			
+			<c:set var="count" value="1" scope="page" />
+			<c:forEach items="${surveys}" var="s">
 			<div class="row-fluid">
-				<c:set var="count" value="1" scope="page" />
-				<c:forEach items="${surveys}" var="s">
-					<a class="btn span3 btn-large btn-primary" href="<c:url value="/show_survey/${s.resultID}"/>">Survey #${count}</a></td>
-					<c:set var="count" value="${count + 1}" scope="page"/>
-				</c:forEach>
+				<a class="btn span12 btn-large btn-primary" href="<c:url value="/show_survey/${s.resultID}"/>">Survey #${count}</a></td>
+				<c:set var="count" value="${count + 1}" scope="page"/>
 			</div>
+			</c:forEach>
 		</div>
 		<div class="span8">
 					<h2>Pictures</h2>
