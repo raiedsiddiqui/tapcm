@@ -206,7 +206,7 @@ public class SurveyResultDao
 	 */
 	public void updateSurveyResults(int id, byte[] data){
 		try{
-			statement = con.prepareStatement("UPDATE survey_results SET data=? WHERE result_ID=?");
+			statement = con.prepareStatement("UPDATE survey_results SET data=?, endDate=now() WHERE result_ID=?");
 			statement.setBytes(1, data);
 			statement.setInt(2, id);
 			statement.execute();
