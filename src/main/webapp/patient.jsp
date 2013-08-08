@@ -72,9 +72,8 @@
 		</div>
 		<div style="padding: 0px 15px;">
 			<div class="row-fluid">
-				<div class="span3"><h2>${patient.displayName}</h2></div>
+				<div class="span3"><h2>${patient.displayName} (${patient.gender})</h2></div>
 				<div class="span3 btn-group">
-					<a href="#modalInfo" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 					<c:if test="${not empty patient.warnings}">
 					<a href="#modalWarn" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-exclamation-sign icon-white"></i></a>
 					</c:if>
@@ -120,20 +119,6 @@
 				</div>
 	</div>
 
-	<!-- Modal dialogs -->
-	<div id="modalInfo" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="infoLabel" aria-hidden="true">
-		<div class="modal-header">
-   		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-   		<h3 id="infoLabel" style="color:#000000;">Patient Information: ${patient.displayName}</h3>
-  		</div>
-  		<div class="modal-body">
-   			<p class="text-info">Gender: ${patient.gender}</p>
-   		</div>
-  		</div>
-  		<div class="modal-footer">
-   		<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
-  		</div>
-	</div>
 	<div id="modalWarn" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="warnLabel" aria-hidden="true">
 		<div class="modal-header">
    			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
