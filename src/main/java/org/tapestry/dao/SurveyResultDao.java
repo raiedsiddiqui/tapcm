@@ -46,7 +46,25 @@ public class SurveyResultDao
 			}
 			return allSurveyResults;
 		} catch (SQLException e) {
-			System.out.println("Error: could not retrieve survey templates");
+			System.out.println("Error: could not retrieve survey results for patient ID #" + patientId);
+			e.printStackTrace();
+			return null;
+		}
+    }
+    
+    public ArrayList<SurveyResult> getIncompleteSurveysByPatientID(int patientId){
+    	try {
+			statement = con.prepareStatement("SELECT * FROM survey_results WHERE patient_ID=? AND completed=0");
+			statement.setInt(1, patientId);
+			ResultSet result = statement.executeQuery();
+			ArrayList<SurveyResult> allSurveyResults = new ArrayList<SurveyResult>();
+			while(result.next()){
+				SurveyResult sr = createFromSearch(result);
+				allSurveyResults.add(sr);
+			}
+			return allSurveyResults;
+		} catch (SQLException e) {
+			System.out.println("Error: could not retrieve survey results for patient ID #" + patientId);
 			e.printStackTrace();
 			return null;
 		}
@@ -57,9 +75,10 @@ public class SurveyResultDao
     		statement = con.prepareStatement("SELECT * FROM survey_results WHERE result_ID=?");
     		statement.setInt(1, id);
     		ResultSet result = statement.executeQuery();
+    		result.first();
     		return createFromSearch(result);
     	} catch (SQLException e){
-    		System.out.println("Error: Could not retrieve survey result");
+    		System.out.println("Error: Could not retrieve survey result for result ID #" + id);
     		e.printStackTrace();
     		return null;
     	}
@@ -82,7 +101,7 @@ public class SurveyResultDao
 			}
 			return allSurveyResults;
 		} catch (SQLException e) {
-			System.out.println("Error: could not retrieve survey templates");
+			System.out.println("Error: could not retrieve all survey results");
 			e.printStackTrace();
 			return null;
 		}
@@ -91,7 +110,7 @@ public class SurveyResultDao
 	/**
 	* Creates a Survey Template object from a database query
 	* @param result The ResultSet from the database query
-	* @return The Patient object
+	* @return The SurveyResult object
 	*/
 	private SurveyResult createFromSearch(ResultSet result){
 		SurveyResult sr = new SurveyResult();
@@ -119,7 +138,7 @@ public class SurveyResultDao
             sr.setEditDate(result.getString("editDate"));
             sr.setResults(result.getBytes("data"));
 		} catch (SQLException e) {
-			System.out.println("Error: Failed to create Patient object");
+			System.out.println("Error: Failed to create Survey Result object");
 			e.printStackTrace();
 		}
 		return sr;
@@ -176,6 +195,23 @@ public class SurveyResultDao
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not mark survey as completed");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Upload survey results
+	 * @param id The ID of the survey result
+	 * @param data The survey results
+	 */
+	public void updateSurveyResults(int id, byte[] data){
+		try{
+			statement = con.prepareStatement("UPDATE survey_results SET data=? WHERE result_ID=?");
+			statement.setBytes(1, data);
+			statement.setInt(2, id);
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not save survey results");
 			e.printStackTrace();
 		}
 	}

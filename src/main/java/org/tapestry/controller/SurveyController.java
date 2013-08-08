@@ -127,8 +127,14 @@ public class SurveyController{
    		ModelAndView redirectAction = null;
    		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
+		SurveyTemplate surveyTemplate = surveyTemplateDao.getSurveyTemplateByID(surveyResult.getSurveyID());
+		SurveyMap userSurveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+		PHRSurvey currentSurvey = userSurveys.getSurvey(Integer.toString(id));
 		try {
-			redirectAction = DoSurveyAction.execute(request, Integer.toString(id), surveyResults, surveyTemplates);
+			SurveyFactory surveyFactory = new SurveyFactory();
+			PHRSurvey templateSurvey = surveyFactory.getSurveyTemplate(surveyTemplate);
+			redirectAction = DoSurveyAction.execute(request, Integer.toString(id), currentSurvey, templateSurvey);
 		} catch (Exception e) {
 			System.out.println("Error: " + e);
 			e.printStackTrace();
@@ -138,22 +144,57 @@ public class SurveyController{
 			System.out.println("Something bad happened");
 		}
    		if (request.isUserInRole("ROLE_USER") && redirectAction.getViewName() == "failed"){
-   			redirectAction.setViewName("redirect:/"); //This probably won't work
+   			redirectAction.setViewName("redirect:/");
    			return redirectAction;
    		} else if (request.isUserInRole("ROLE_ADMIN") && redirectAction.getViewName() == "failed") {
    			redirectAction.setViewName("redirect:/manage_surveys");
    			return redirectAction;
    		} else {
    			if (redirectAction.getModelMap().containsKey("survey_completed")){
+   				byte[] data = null;
+   				try {
+					data = SurveyAction.updateSurveyResult(currentSurvey);
+				} catch (Exception e) {
+					System.out.println("Failed to convert PHRSurvey into a byte array");
+					e.printStackTrace();
+				}
+   				surveyResultDao.updateSurveyResults(id, data);
    				surveyResultDao.markAsComplete(id);
    				User currentUser = userDao.getUserByUsername(request.getRemoteUser());
    				SurveyResult s = surveyResultDao.getSurveyResultByID(id);
    				activityDao.logActivity("Completed survey " + s.getSurveyTitle(), currentUser.getUserID());
+   				if (request.isUserInRole("ROLE_ADMIN")){
+   		   			redirectAction.setViewName("redirect:/manage_surveys");
+   		   		} else {
+   		   			redirectAction.setViewName("redirect:/");
+   		   		}
    			}
    			return redirectAction;
    		}
    	}
-   	
+   	  
+   	@RequestMapping(value="/save_survey/{resultID}", method=RequestMethod.GET)
+   	public String saveAndExit(@PathVariable("resultID") int id, HttpServletRequest request) throws Exception
+	{
+   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+		
+		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+		PHRSurvey currentSurvey = surveys.getSurvey(Integer.toString(id));
+
+		if (!currentSurvey.isComplete())
+		{
+			byte[] data = SurveyAction.updateSurveyResult(currentSurvey);
+			surveyResultDao.updateSurveyResults(id, data);
+		}
+		
+		if (request.isUserInRole("ROLE_ADMIN")){
+   			return "redirect:/manage_surveys";
+   		} else {
+   			return "redirect:/";
+   		}
+	}
+  
    	@RequestMapping(value="/delete_survey/{resultID}", method=RequestMethod.GET)
    	public String deleteSurvey(@PathVariable("resultID") int id, HttpServletRequest request){
    		surveyResultDao.deleteSurvey(id);

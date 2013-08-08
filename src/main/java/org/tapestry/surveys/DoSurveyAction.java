@@ -32,7 +32,6 @@
 
 package org.tapestry.surveys;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,8 +41,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
-import org.tapestry.surveys.SurveyFactory;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
@@ -66,7 +63,7 @@ public class DoSurveyAction
 	/** 
 	 * @return the next url to go to, excluding contextPath
 	 */
-	public static ModelAndView execute(HttpServletRequest request, String documentId, ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates) throws Exception
+	public static ModelAndView execute(HttpServletRequest request, String documentId, PHRSurvey currentSurvey, PHRSurvey templateSurvey) throws Exception
 	{
 		ModelAndView m = new ModelAndView();
 		final String questionId = request.getParameter("questionid");
@@ -80,9 +77,6 @@ public class DoSurveyAction
 			m.setViewName("failed");
 			return m;
 		}
-
-		SurveyMap userSurveys = getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
-		PHRSurvey currentSurvey = userSurveys.getSurvey(documentId);
 
 		String[] answerStrs = request.getParameterValues("answer");
 
@@ -101,8 +95,6 @@ public class DoSurveyAction
 			logger.error("trying to complete already completed survey?");
 		}
 
-		SurveyFactory surveyFactory = new SurveyFactory();
-		PHRSurvey templateSurvey = surveyFactory.getSurveyTemplateById(Integer.parseInt(currentSurvey.getSurveyId()));
 		boolean saved = false;
 
 		//if starting/continuing survey, clear session
@@ -202,11 +194,10 @@ public class DoSurveyAction
 					{
 						if (!currentSurvey.isComplete()){
 							SurveyAction.updateSurveyResult(currentSurvey);
-							m.setViewName("redirect:/");
 							m.addObject("survey_completed", true);
 							return m;
 						} else {
-							m.setViewName("redirect:/");
+							m.setViewName("redirect:/manage_surveys");
 							return m;
 						}
 					}
@@ -224,7 +215,7 @@ public class DoSurveyAction
 					m.addObject("templateSurvey", templateSurvey);
 					m.addObject("questionid", questionId);
 					m.addObject("resultid", documentId);
-					m.addObject("message", URLEncoder.encode(question.getRestriction().getInstruction(), "UTF-8"));
+					m.addObject("message", question.getRestriction().getInstruction());
 
 					m.setViewName("/surveys/show_survey");
 					return m;
@@ -244,7 +235,7 @@ public class DoSurveyAction
 		m.addObject("templateSurvey", templateSurvey);
 		m.addObject("questionid", nextQuestionId);
 		m.addObject("resultid", documentId);
-		if (errMsg != null) m.addObject("message", URLEncoder.encode(errMsg, "UTF-8"));	
+		if (errMsg != null) m.addObject("message", errMsg);	
 
 		m.setViewName("/surveys/show_survey");
 		return m;

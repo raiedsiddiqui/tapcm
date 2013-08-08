@@ -81,8 +81,10 @@
 				</div>
 			</div>
 			<div class="row-fluid">
+				<c:set var="count" value="1" scope="page" />
 				<c:forEach items="${surveys}" var="s">
-					<a <c:if test="${s.completed}">disabled</c:if> class="btn span3 btn-large btn-primary" href="<c:url value="/show_survey/${s.resultID}"/>">${s.surveyTitle}</a>
+					<a class="btn span3 btn-large btn-primary" href="<c:url value="/show_survey/${s.resultID}"/>">Survey #${count}</a></td>
+					<c:set var="count" value="${count + 1}" scope="page"/>
 				</c:forEach>
 			</div>
 		</div>
@@ -126,7 +128,6 @@
   		</div>
   		<div class="modal-body">
    			<p class="text-info">Gender: ${patient.gender}</p>
-   			<p class="text-info">Age: ${patient.age}</p>
    		</div>
   		</div>
   		<div class="modal-footer">

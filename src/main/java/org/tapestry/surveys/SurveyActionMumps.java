@@ -49,46 +49,24 @@ public class SurveyActionMumps {
 		phrSurveyResult.setSurveyId(Integer.toString(surveyResult.getSurveyID()));
 		phrSurveyResult.setComplete(surveyResult.isCompleted());
 
-		//        //load answers
-		//        for (IndivoSurveyQuestionType iQuestion: iQuestions) {        
+		//load answers  
 		PHRSurvey phrSurveyTemplate = surveyFactory.getSurveyTemplate(st);
 		for (QuestionAnswerPair qaPair : surveyResult.getQuestionAnswerPairs())
 		{
-
-			//            if (iQuestion.getQuestionId().equals(this.INDIVO_SURVEY_ID)) continue;
-			//            if (iQuestion.getQuestionId().equals(this.INDIVO_SURVEY_HASH)) continue;
 			if (SurveyServiceIndivo.INDIVO_SURVEY_ID.equals(qaPair.questionId)) continue;
 			if (SurveyServiceIndivo.INDIVO_SURVEY_HASH.equals(qaPair.questionId)) continue;
 
-			//            //assuming that survey ID question is loaded by now
-			//            if (mSurvey.getSurveyId() == null) {
-			//                _log.warn("ID IS NULL, SKIPPING SURVEY TITLED '" + mSurvey.getTitle() +"'");
-			//                return null;
-			//            }
-			//            
-			//            SurveyQuestion templateQuestion = surveyFactory.getSurveyTemplate(mSurvey.getSurveyId()).getQuestionById(iQuestion.getQuestionId());
-			//            if (templateQuestion == null) {
-			//                _log.warn("Cannot find question: " + iQuestion.getQuestionId() + " for survey: " + mSurvey.getSurveyId());
-			//                return null;
-			//            }
+			//assuming that survey ID question is loaded by now
 			SurveyQuestion templateQuestion = phrSurveyTemplate.getQuestionById(qaPair.questionId);
 
-			//            SurveyQuestion mQuestion = templateQuestion;
 			SurveyQuestion mQuestion = templateQuestion;
 
-			//            List<IndivoSurveyAnswerType> iAnswers = iQuestion.getQuestionAnswer();
-			//            for (IndivoSurveyAnswerType iAnswer: iAnswers) {
-			//                SurveyAnswer mAnswer = new SurveyAnswerString(iAnswer.getAnswerValue());
-			//                mQuestion.getAnswers().add(mAnswer);
-			//            }
 			for (String answer : qaPair.answers)
 			{
 				SurveyAnswer mAnswer = new SurveyAnswerString(answer);
 				mQuestion.getAnswers().add(mAnswer);
 			}
-
-			//            mSurvey.getQuestions().add(mQuestion);
-			//        }
+			
 			phrSurveyResult.getQuestions().add(mQuestion);
 		}
 

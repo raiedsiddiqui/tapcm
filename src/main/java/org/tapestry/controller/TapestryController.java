@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
@@ -304,7 +303,7 @@ public class TapestryController{
 		model.addAttribute("patient", patient);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 		model.addAttribute("unread", unreadMessages);
-		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getSurveysByPatientID(id);
+		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getIncompleteSurveysByPatientID(id);
 		model.addAttribute("surveys", surveyResultList);
 		
 		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);

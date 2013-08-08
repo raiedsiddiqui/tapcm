@@ -18,11 +18,6 @@ public class SurveyFactory {
 		return loadedSurveys.get(Integer.toString(surveyTemplate.getSurveyID())); //write-protecting to the template survey
 	}
 	
-	public PHRSurvey getSurveyTemplateById(int templateId) throws SurveyException
-	{
-		return loadedSurveys.get(Integer.toString(templateId));
-	}
-	
 	//optimized
 	public PHRSurvey getSurveyTemplateNoQuestions(SurveyTemplate surveyTemplate) throws SurveyException
 	{

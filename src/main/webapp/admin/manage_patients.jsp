@@ -102,7 +102,7 @@
 				</tr>
                 <c:forEach items="${patients}" var="p">
                 <tr>
-                    <td>${p.firstName} ${p.lastName} (${p.gender}, ${p.age})</td>
+                    <td>${p.firstName} ${p.lastName} (${p.gender})</td>
                     <td>${p.volunteerName}</td>
                     <td style="display:none;"><div style="height:28px; width:28px; border-radius:5px; border:1px solid; background-color:${p.color};"></div></td>
                     <td>
