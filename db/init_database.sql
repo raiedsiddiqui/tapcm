@@ -64,13 +64,6 @@ CREATE TABLE IF NOT EXISTS appointments (
 	PRIMARY KEY(appointment_ID)
 );
 
-CREATE TABLE IF NOT EXISTS required_surveys (
-	req_survey_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED MEDIUMINT allows for 16,777,215 surveys (255 surveys * 65,535 patients = 16,711,425)*/
-	patient SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID from patients table*/
-	survey SMALLINT UNSIGNED NOT NULL,
-	PRIMARY KEY (req_survey_ID)
-);
-
 CREATE TABLE IF NOT EXISTS messages (
 	message_ID BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	recipient TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
