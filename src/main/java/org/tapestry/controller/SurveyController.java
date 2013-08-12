@@ -121,9 +121,20 @@ public class SurveyController{
 		}
 		return "redirect:/manage_surveys";
 	}
+	
+	@RequestMapping(value="open_survey/{resultID}", method=RequestMethod.GET)
+	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {
+		String username = request.getUserPrincipal().getName();
+		User u = userDao.getUserByUsername(username);
+		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
+		Patient p = patientDao.getPatientByID(surveyResult.getPatientID());
+		
+		activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getDisplayName(), u.getUserID());
+		return "redirect:/show_survey/" + id;
+	}
    	
    	@RequestMapping(value="/show_survey/{resultID}", method=RequestMethod.GET)
-   	public ModelAndView openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {
+   	public ModelAndView showSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {
    		ModelAndView redirectAction = null;
    		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
@@ -160,26 +171,31 @@ public class SurveyController{
 		
 		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
 		PHRSurvey currentSurvey = surveys.getSurvey(Integer.toString(id));
-
+		
+		//For activity logging purposes
+		User currentUser = userDao.getUserByUsername(request.getRemoteUser());
+		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
+		Patient currentPatient = patientDao.getPatientByID(surveyResult.getPatientID());
+		
 		if (isComplete) {
 			byte[] data = null;
 				try {
 				data = SurveyAction.updateSurveyResult(currentSurvey);
+				currentSurvey.setComplete(true);
 			} catch (Exception e) {
 				System.out.println("Failed to convert PHRSurvey into a byte array");
 				e.printStackTrace();
 			}
 			surveyResultDao.updateSurveyResults(id, data);
 			surveyResultDao.markAsComplete(id);
-			User currentUser = userDao.getUserByUsername(request.getRemoteUser());
-			SurveyResult s = surveyResultDao.getSurveyResultByID(id);
-			activityDao.logActivity("Completed survey " + s.getSurveyTitle(), currentUser.getUserID());
+			activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID());
 		}
 		
 		if (!currentSurvey.isComplete())
 		{
 			byte[] data = SurveyAction.updateSurveyResult(currentSurvey);
 			surveyResultDao.updateSurveyResults(id, data);
+			activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID());
 		}
 		
 		if (request.isUserInRole("ROLE_ADMIN")){

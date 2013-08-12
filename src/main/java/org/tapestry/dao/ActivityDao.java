@@ -59,12 +59,12 @@ public class ActivityDao {
     
     public ArrayList<Activity> getAllActivities(){
     	try{
-    		statement = con.prepareStatement("SELECT DATE(event_timestamp) as event_date, description, volunteer FROM activities ORDER BY event_timestamp DESC");
+    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer FROM activities ORDER BY event_timestamp DESC");
     		ResultSet result = statement.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
     			Activity a = new Activity();
-    			a.setDate(result.getString("event_date"));
+    			a.setDate(result.getString("event_timestamp"));
     			a.setDescription(result.getString("description"));
     			
     			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
@@ -88,13 +88,13 @@ public class ActivityDao {
     
     public ArrayList<Activity> getAllActivitiesForVolunteer(int user){
     	try{
-    		statement = con.prepareStatement("SELECT DATE(event_timestamp) as event_date, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");
+    		statement = con.prepareStatement("SELECT event_timestamp, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");
     		statement.setInt(1, user);
     		ResultSet result = statement.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
     			Activity a = new Activity();
-    			a.setDate(result.getString("event_date"));
+    			a.setDate(result.getString("event_timestamp"));
     			a.setDescription(result.getString("description"));
     			log.add(a);
     		}
@@ -108,14 +108,14 @@ public class ActivityDao {
     
     public ArrayList<Activity> getLastNActivitiesForVolunteer(int user, int n){
     	try{
-    		statement = con.prepareStatement("SELECT DATE(event_timestamp) as event_date, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");
+    		statement = con.prepareStatement("SELECT event_timestamp, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");
     		statement.setInt(1, user);
     		ResultSet result = statement.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		int count = 0;
     		while (result.next() && count < n){
     			Activity a = new Activity();
-    			a.setDate(result.getString("event_date"));
+    			a.setDate(result.getString("event_timestamp"));
     			a.setDescription(result.getString("description"));
     			log.add(a);
     			count++;
