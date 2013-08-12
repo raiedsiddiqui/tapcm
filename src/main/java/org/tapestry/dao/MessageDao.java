@@ -129,4 +129,22 @@ public class MessageDao {
 		}
 	}
 	
+	public ArrayList<Message> getAnnouncementsForUser(int userID){
+		try{
+			statement = con.prepareStatement("SELECT * FROM messages WHERE recipient=? AND msgRead=0 AND subject LIKE 'ANNOUNCEMENT:%'");
+			statement.setInt(1, userID);
+			ResultSet result = statement.executeQuery();
+			ArrayList<Message> announcements = new ArrayList<Message>();
+			while(result.next()){
+				Message m = createFromSearch(result);
+				announcements.add(m);
+			}
+			return announcements;
+		} catch (SQLException e){
+			System.out.println("Error: Could not retrieve announcements");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 }

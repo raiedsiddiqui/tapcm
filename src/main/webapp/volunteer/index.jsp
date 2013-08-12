@@ -23,7 +23,11 @@
 			-o-border-radius:5px;
 			-ms-border-radius:5px;
 		}
+		.span12{
+			padding:0px 15px;
+		}
 	</style>
+	
 </head>
 	
 <body>	
@@ -53,8 +57,30 @@
 			</div>
 		</div>
 		<h2>Welcome, ${name}</h2>
+		<c:if test="${not empty announcements}">
 		<div class="row-fluid">
-			<div class="span12" style="padding:0px 15px;">
+			<div class="span12">
+				<p><strong>Announcements</strong></p>
+				<div class="accordion" id="announcementsAccordion">
+					<c:forEach items="${announcements}" var="a">
+					<div class="accordion-group">
+						<div class="accordion-heading">
+							<a class="accordion-toggle" data-toggle="collapse" data-parent="announcementsAccordion" href="#msg${a.messageID}">${fn:substringAfter(a.subject, "ANNOUNCEMENT: ")}</a>
+						</div>
+						<div id="msg${a.messageID}" class="accordion-body collapse">
+							<div class="accordion-inner">
+								<p>${a.text}</p>
+								<a class="btn btn-danger" href="<c:url value="/dismiss/${a.messageID}"/>">Dismiss</a>
+							</div>
+						</div>
+					</div>
+					</c:forEach>
+				</div>
+			</div>
+		</div>
+		</c:if>
+		<div class="row-fluid">
+			<div class="span12">
 				<p>
 					<strong>Appointments:</strong>
 					<a href="#bookAppointment" role="button" class="btn btn-primary" data-toggle="modal">Book appointment</a>
@@ -102,7 +128,7 @@
 			</div>
 		</div>
 		<div class="row-fluid">
-			<div class="span12" style="padding:0px 15px;">
+			<div class="span12">
 				<p><strong>Recent Activities:</strong></p>
 				<table class="table">
 				<c:choose>

@@ -33,6 +33,32 @@ public class UserDao {
 			e.printStackTrace();
 		}
 	}
+	
+	public int countActiveUsers(){
+		try{
+			statement = con.prepareStatement("SELECT COUNT(*) as c FROM users WHERE enabled=1");
+			ResultSet result = statement.executeQuery();
+			result.first();
+			return result.getInt("c");
+		} catch (SQLException e){
+			System.out.println("Error: Could not count active users");
+			e.printStackTrace();
+			return 0;
+		}
+	}
+	
+	public int countAllUsers(){
+		try{
+			statement = con.prepareStatement("SELECT COUNT(*) as c FROM users");
+			ResultSet result = statement.executeQuery();
+			result.first();
+			return result.getInt("c");
+		} catch (SQLException e){
+			System.out.println("Error: Could not count active users");
+			e.printStackTrace();
+			return 0;
+		}
+	}
 
 	/**
 	* Creates a User object from the result of executing an SQL query
