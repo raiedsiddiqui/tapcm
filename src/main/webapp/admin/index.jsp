@@ -65,7 +65,8 @@
 					<label>Subject:</label>
 					<input type="text" name="msgSubject" required/>
 					<label>Send to:</label>
-					<select name="recipient" form="messageVolunteer">
+					<input type="checkbox" style="margin-bottom:10px;" value="true" name="isAnnouncement" onclick="document.getElementById('rec').disabled = !document.getElementById('rec').disabled;">Global announcement</input><br/>
+					<select id="rec" name="recipient" form="messageVolunteer">
 						<c:forEach items="${volunteers}" var="v">
 						<option value="${v.userID}">${v.name}</option>
 						</c:forEach>

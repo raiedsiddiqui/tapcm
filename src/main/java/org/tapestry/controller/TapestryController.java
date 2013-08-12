@@ -153,6 +153,7 @@ public class TapestryController{
 			ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
 			ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
+			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(u.getUserID());
 			//ArrayList<Activity> activityLog = activityDao.getAllActivitiesForVolunteer(u.getUserID());
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
@@ -161,6 +162,7 @@ public class TapestryController{
 			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 			model.addAttribute("unread", unreadMessages);
 			model.addAttribute("activities", activityLog);
+			model.addAttribute("announcements", announcements);
 			
 			return "volunteer/index";
 		}
@@ -366,38 +368,79 @@ public class TapestryController{
 		model.addAttribute("message", m);
 		return "/volunteer/view_message";
 	}
+	
+	@RequestMapping(value="/dismiss/{announcement}", method=RequestMethod.GET)
+	public String dismissAnnouncement(@PathVariable("announcement") int id, SecurityContextHolderAwareRequestWrapper request){
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		Message m = messageDao.getMessageByID(id);
+		if (!(m.getRecipient() == loggedInUser.getUserID()))
+			return "redirect:/403";
+		messageDao.markAsRead(id);
+		return "redirect:/";
+	}
 
 	@RequestMapping(value="/send_message", method=RequestMethod.POST)
 	public String sendMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = new Message();
 		m.setSender(loggedInUser.getName());
-		int recipientID = Integer.parseInt(request.getParameter("recipient"));
-		m.setRecipient(recipientID);
 		m.setText(request.getParameter("msgBody"));
-		m.setSubject(request.getParameter("msgSubject"));
-		messageDao.sendMessage(m);
-		
-		User recipient = userDao.getUserByID(recipientID);
-		
-		if (mailAddress != null){
-			try{
-				MimeMessage message = new MimeMessage(session);
-				message.setFrom(new InternetAddress(mailAddress));
-				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
-				message.setSubject("Tapestry: New message notification");
-				String msg = "You have received a message. To review it, log into Tapestry and open your inbox.";
-				message.setText(msg);
-				System.out.println(msg);
-				System.out.println("Sending...");
-				Transport.send(message);
-				System.out.println("Email sent containing credentials to " + recipient.getEmail());
-			} catch (MessagingException e) {
-				System.out.println("Error: Could not send email");
-				System.out.println(e.toString());
+		if (request.getParameter("isAnnouncement").equals("true")){ //Sound to all volunteers
+			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+			for (User u: volunteers){
+				m.setSubject("ANNOUNCEMENT: " + request.getParameter("msgSubject"));
+				m.setRecipient(u.getUserID());
+				
+				User recipient = userDao.getUserByID(u.getUserID());
+				
+				if (mailAddress != null){
+					try{
+						MimeMessage message = new MimeMessage(session);
+						message.setFrom(new InternetAddress(mailAddress));
+						message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
+						message.setSubject("Tapestry: New message notification");
+						String msg = "You have received an announcement. To view it, log in to Tapestry.";
+						message.setText(msg);
+						System.out.println(msg);
+						System.out.println("Sending...");
+						Transport.send(message);
+						System.out.println("Email sent notifying " + recipient.getEmail());
+					} catch (MessagingException e) {
+						System.out.println("Error: Could not send email");
+						System.out.println(e.toString());
+					}
+				}
+				messageDao.sendMessage(m);
 			}
 		}
-		
+		else{ //Send to one person
+			int recipientID = Integer.parseInt(request.getParameter("recipient"));
+			m.setRecipient(recipientID);
+			m.setSubject(request.getParameter("msgSubject"));
+			messageDao.sendMessage(m);
+
+			
+			User recipient = userDao.getUserByID(recipientID);
+			
+			if (mailAddress != null){
+				try{
+					MimeMessage message = new MimeMessage(session);
+					message.setFrom(new InternetAddress(mailAddress));
+					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
+					message.setSubject("Tapestry: New message notification");
+					String msg = "You have received a message. To review it, log into Tapestry and open your inbox.";
+					message.setText(msg);
+					System.out.println(msg);
+					System.out.println("Sending...");
+					Transport.send(message);
+					System.out.println("Email sent notifying " + recipient.getEmail());
+				} catch (MessagingException e) {
+					System.out.println("Error: Could not send email");
+					System.out.println(e.toString());
+				}
+			}
+		}
+
 		return "redirect:/?success=true";
 	}
 	
