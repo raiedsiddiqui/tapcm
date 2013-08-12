@@ -42,6 +42,7 @@
 							<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
 							<li><a href="<c:url value="/manage_survey_templates"/>">Manage Surveys Templates</a></li>
 							<li><a href="<c:url value="/manage_surveys"/>">Manage Surveys</a></li>
+							<li><a href="<c:url value="/user_logs"/>">User Logs</a><li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>

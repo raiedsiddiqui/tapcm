@@ -106,6 +106,30 @@ public class SurveyResultDao
 			return null;
 		}
 	}
+	
+	/**
+	 * Retrieves all survey results by survey Id
+	 * @param itemsToReturn 
+	 * @param id survey ID
+	 */
+	public ArrayList<SurveyResult> getAllSurveyResultsBySurveyId(int id)
+	{
+		try {
+			statement = con.prepareStatement("SELECT * FROM survey_results WHERE survey_ID=?");
+			statement.setInt(1, id);
+			ResultSet result = statement.executeQuery();
+			ArrayList<SurveyResult> allSurveyResults = new ArrayList<SurveyResult>();
+			while(result.next()){
+				SurveyResult sr = createFromSearch(result);
+				allSurveyResults.add(sr);
+			}
+			return allSurveyResults;
+		} catch (SQLException e) {
+			System.out.println("Error: could not retrieve all survey results by survey Id #" + id);
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/**
 	* Creates a Survey Template object from a database query
@@ -151,7 +175,7 @@ public class SurveyResultDao
 	public String assignSurvey(SurveyResult sr) {
 		String resultId = null;
 		try {
-			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data, editDate) values (?,?,?, now())");
+			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data, startDate) values (?,?,?, now())");
 			statement.setInt(1, sr.getPatientID());
 			statement.setInt(2, sr.getSurveyID());
 			statement.setBytes(3, sr.getResults());
@@ -206,7 +230,7 @@ public class SurveyResultDao
 	 */
 	public void updateSurveyResults(int id, byte[] data){
 		try{
-			statement = con.prepareStatement("UPDATE survey_results SET data=?, endDate=now() WHERE result_ID=?");
+			statement = con.prepareStatement("UPDATE survey_results SET data=?, editDate=now() WHERE result_ID=?");
 			statement.setBytes(1, data);
 			statement.setInt(2, id);
 			statement.execute();

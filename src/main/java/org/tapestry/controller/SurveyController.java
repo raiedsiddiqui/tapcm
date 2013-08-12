@@ -145,43 +145,37 @@ public class SurveyController{
 		}
    		if (request.isUserInRole("ROLE_USER") && redirectAction.getViewName() == "failed"){
    			redirectAction.setViewName("redirect:/");
-   			return redirectAction;
    		} else if (request.isUserInRole("ROLE_ADMIN") && redirectAction.getViewName() == "failed") {
    			redirectAction.setViewName("redirect:/manage_surveys");
-   			return redirectAction;
-   		} else {
-   			if (redirectAction.getModelMap().containsKey("survey_completed")){
-   				byte[] data = null;
-   				try {
-					data = SurveyAction.updateSurveyResult(currentSurvey);
-				} catch (Exception e) {
-					System.out.println("Failed to convert PHRSurvey into a byte array");
-					e.printStackTrace();
-				}
-   				surveyResultDao.updateSurveyResults(id, data);
-   				surveyResultDao.markAsComplete(id);
-   				User currentUser = userDao.getUserByUsername(request.getRemoteUser());
-   				SurveyResult s = surveyResultDao.getSurveyResultByID(id);
-   				activityDao.logActivity("Completed survey " + s.getSurveyTitle(), currentUser.getUserID());
-   				if (request.isUserInRole("ROLE_ADMIN")){
-   		   			redirectAction.setViewName("redirect:/manage_surveys");
-   		   		} else {
-   		   			redirectAction.setViewName("redirect:/");
-   		   		}
-   			}
-   			return redirectAction;
    		}
+   		return redirectAction;
    	}
    	  
    	@RequestMapping(value="/save_survey/{resultID}", method=RequestMethod.GET)
    	public String saveAndExit(@PathVariable("resultID") int id, HttpServletRequest request) throws Exception
 	{
+   		boolean isComplete = Boolean.parseBoolean(request.getParameter("survey_completed"));
    		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
 		
 		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
 		PHRSurvey currentSurvey = surveys.getSurvey(Integer.toString(id));
 
+		if (isComplete) {
+			byte[] data = null;
+				try {
+				data = SurveyAction.updateSurveyResult(currentSurvey);
+			} catch (Exception e) {
+				System.out.println("Failed to convert PHRSurvey into a byte array");
+				e.printStackTrace();
+			}
+			surveyResultDao.updateSurveyResults(id, data);
+			surveyResultDao.markAsComplete(id);
+			User currentUser = userDao.getUserByUsername(request.getRemoteUser());
+			SurveyResult s = surveyResultDao.getSurveyResultByID(id);
+			activityDao.logActivity("Completed survey " + s.getSurveyTitle(), currentUser.getUserID());
+		}
+		
 		if (!currentSurvey.isComplete())
 		{
 			byte[] data = SurveyAction.updateSurveyResult(currentSurvey);

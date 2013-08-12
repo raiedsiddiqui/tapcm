@@ -40,8 +40,8 @@ CREATE TABLE IF NOT EXISTS survey_results (
 	survey_ID SMALLINT UNSIGNED NOT NULL, /*Same as survey_ID field in surveys*/
 	patient_ID SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID in patients*/
 	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the survey (0=incomplete)*/
-	startDate TIMESTAMP, /*Automatically assigns the startDate when the survey is assigned*/
-	editDate TIMESTAMP, /*editDate represents the last edit date*/
+	startDate DATETIME NOT NULL, /*Automatically assigns the startDate when the survey is assigned*/
+	editDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, /*editDate represents the last edit date*/
 	data MEDIUMBLOB, /*The survey data*/
 	PRIMARY KEY (result_ID)
 );
@@ -62,13 +62,6 @@ CREATE TABLE IF NOT EXISTS appointments (
 	date_time DATETIME NOT NULL, /*Contains both date and time, separated using functions in query*/
 	details TEXT,
 	PRIMARY KEY(appointment_ID)
-);
-
-CREATE TABLE IF NOT EXISTS required_surveys (
-	req_survey_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED MEDIUMINT allows for 16,777,215 surveys (255 surveys * 65,535 patients = 16,711,425)*/
-	patient SMALLINT UNSIGNED NOT NULL, /*Same as patient_ID from patients table*/
-	survey SMALLINT UNSIGNED NOT NULL,
-	PRIMARY KEY (req_survey_ID)
 );
 
 CREATE TABLE IF NOT EXISTS messages (

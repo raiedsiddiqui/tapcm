@@ -225,10 +225,11 @@ public class TapestryController{
 				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(u.getEmail()));
 				message.setSubject("Welcome to Tapestry");
 				String msg = "";
-				msg += "Thank you for volunteering with Tapestry. Your accout has successfully been created.\n";
+				msg += "Thank you for volunteering with Tapestry. Your account has been successfully created.\n";
 				msg += "Your username and password are as follows:\n";
 				msg += "Username: " + u.getUsername() + "\n";
-				msg += "Password: password\n";
+				msg += "Password: password\n\n";
+				msg += "We recommend that you change your password as soon as possible due to security reasons";
 				message.setText(msg);
 				System.out.println(msg);
 				System.out.println("Sending...");
@@ -474,9 +475,11 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
-	public String manageSurveyTemplates(ModelMap model){
+	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, ModelMap model){
 		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
 		model.addAttribute("survey_templates", surveyTemplateList);
+		if (deleteFailed != null)
+			model.addAttribute("failed", deleteFailed);
 		return "admin/manage_survey_templates";
 	}
 	
@@ -532,4 +535,10 @@ public class TapestryController{
 		return "redirect:/manage_patients";
 	}
 	
+	@RequestMapping(value="/user_logs", method=RequestMethod.GET)
+	public String viewUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap m){
+		ArrayList<Activity> activityLog = activityDao.getAllActivities();
+		m.addAttribute("activities", activityLog);
+		return "admin/user_logs";
+	}
 }

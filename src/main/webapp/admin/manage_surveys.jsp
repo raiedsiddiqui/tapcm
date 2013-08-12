@@ -41,6 +41,7 @@
 							<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
 							<li><a href="<c:url value="/manage_survey_templates"/>">Manage Survey Templates</a></li>
 							<li><a href="<c:url value="/manage_surveys"/>">Manage Surveys</a></li>
+							<li><a href="<c:url value="/user_logs"/>">User Logs</a><li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>
@@ -50,14 +51,14 @@
 		
 		
 		<div class="row-fluid">
-			<h2>Survey Templates</h2>
+			<h2>Surveys</h2>
 			<table class="table">
 				<tr>
 					<th>Survey</th>
 					<th>Patient</th>
 					<th>Date Assigned</th>
 					<th>Status</th>
-					<th>Date Completed</th>
+					<th>Last Edit Date</th>
 					<th>Remove</th>
 				</tr>
 				<c:forEach items="${surveys}" var="s">
