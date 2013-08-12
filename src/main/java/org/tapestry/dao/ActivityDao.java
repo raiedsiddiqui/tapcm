@@ -57,6 +57,35 @@ public class ActivityDao {
     	}
     }
     
+    public ArrayList<Activity> getAllActivities(){
+    	try{
+    		statement = con.prepareStatement("SELECT DATE(event_timestamp) as event_date, description, volunteer FROM activities ORDER BY event_timestamp DESC");
+    		ResultSet result = statement.executeQuery();
+    		ArrayList<Activity> log = new ArrayList<Activity>();
+    		while (result.next()){
+    			Activity a = new Activity();
+    			a.setDate(result.getString("event_date"));
+    			a.setDescription(result.getString("description"));
+    			
+    			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+    			statement.setInt(1, result.getInt("volunteer"));
+    			ResultSet r = statement.executeQuery();
+    			if(r.isBeforeFirst()) {
+    				r.first();
+	    			a.setVolunteer(r.getString("name"));
+    			} else {
+    				a.setVolunteer("");
+    			}
+    			log.add(a);
+    		}
+    		return log;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve activities log");
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
+    
     public ArrayList<Activity> getAllActivitiesForVolunteer(int user){
     	try{
     		statement = con.prepareStatement("SELECT DATE(event_timestamp) as event_date, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");

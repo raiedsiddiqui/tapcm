@@ -106,6 +106,30 @@ public class SurveyResultDao
 			return null;
 		}
 	}
+	
+	/**
+	 * Retrieves all survey results by survey Id
+	 * @param itemsToReturn 
+	 * @param id survey ID
+	 */
+	public ArrayList<SurveyResult> getAllSurveyResultsBySurveyId(int id)
+	{
+		try {
+			statement = con.prepareStatement("SELECT * FROM survey_results WHERE survey_ID=?");
+			statement.setInt(1, id);
+			ResultSet result = statement.executeQuery();
+			ArrayList<SurveyResult> allSurveyResults = new ArrayList<SurveyResult>();
+			while(result.next()){
+				SurveyResult sr = createFromSearch(result);
+				allSurveyResults.add(sr);
+			}
+			return allSurveyResults;
+		} catch (SQLException e) {
+			System.out.println("Error: could not retrieve all survey results by survey Id #" + id);
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/**
 	* Creates a Survey Template object from a database query

@@ -1,10 +1,12 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -12,14 +14,17 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
+import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.PictureDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.ActivityDao;
+import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.SurveyTemplate;
@@ -33,6 +38,7 @@ public class FileController extends MultiActionController{
 	private Yaml yaml;
 	
 	private SurveyTemplateDao surveyTemplateDao;
+	private SurveyResultDao surveyResultDao;
 	private PictureDao pictureDao;
 	private UserDao userDao;
 	private PatientDao patientDao;
@@ -58,6 +64,7 @@ public class FileController extends MultiActionController{
 			System.out.println(e.toString());
 		}
 		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
+		surveyResultDao = new SurveyResultDao(DB, UN, PW);
 		pictureDao = new PictureDao(DB, UN, PW);
 		userDao = new UserDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
@@ -80,9 +87,14 @@ public class FileController extends MultiActionController{
 	}
    	
    	@RequestMapping(value="/delete_survey_template/{surveyID}", method=RequestMethod.GET)
-   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id){
-   		surveyTemplateDao.deleteSurveyTemplate(id);
-   		return "redirect:/manage_survey_templates";
+   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model){
+   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResultsBySurveyId(id);
+   		if(surveyResults.isEmpty()) {
+   			surveyTemplateDao.deleteSurveyTemplate(id);
+   			return "redirect:/manage_survey_templates";
+   		} else {
+   			return "redirect:/manage_survey_templates?failed=true";
+   		}
    	}
    	
 	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)

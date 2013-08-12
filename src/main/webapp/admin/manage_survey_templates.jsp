@@ -41,6 +41,7 @@
 							<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
 							<li><a href="<c:url value="/manage_survey_templates"/>">Manage Survey Templates</a></li>
 							<li><a href="<c:url value="/manage_surveys"/>">Manage Surveys</a></li>
+							<li><a href="<c:url value="/user_logs"/>">User Logs</a><li>
 							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
 						</ul>
 					</div>
@@ -51,6 +52,9 @@
 		
 		<div class="row-fluid">
 			<h2>Survey Templates</h2>
+			<c:if test="${not empty failed}">
+				<div class="alert alert-error">Failed to delete survey template: survey results still exist that use the survey template</div>
+			</c:if>
 			<table class="table">
 				<tr>
 					<th>Title</th>

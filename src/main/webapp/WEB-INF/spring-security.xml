@@ -24,6 +24,7 @@
 		<intercept-url pattern="/manage_users" access="ROLE_ADMIN" />
 		<intercept-url pattern="/manage_survey_templates" access="ROLE_ADMIN" />
 		<intercept-url pattern="/manage_surveys" access="ROLE_ADMIN" />
+		<intercept-url pattern="/user_logs" access="ROLE_ADMIN" />
 		<intercept-url pattern="/add_user" access="ROLE_ADMIN" />
 		<intercept-url pattern="/add_patient" access="ROLE_ADMIN"/>
 		<intercept-url pattern="/remove_user/*" access="ROLE_ADMIN" />
