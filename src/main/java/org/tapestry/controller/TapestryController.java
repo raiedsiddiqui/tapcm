@@ -142,8 +142,18 @@ public class TapestryController{
 			model.addAttribute("usernameChanged", usernameChanged);
 		return "login";
 	}
+	
+	@RequestMapping(value="/loginsuccess", method=RequestMethod.GET)
+	public String loginSuccess(SecurityContextHolderAwareRequestWrapper request){
+		String username = request.getUserPrincipal().getName();
+		User u = userDao.getUserByUsername(username);
+		if (request.isUserInRole("ROLE_USER")){
+			activityDao.logActivity(u.getName() + " logged in", u.getUserID());
+		}
+		return "redirect:/";
+	}
 
-	@RequestMapping(value={"/", "/loginsuccess"}, method=RequestMethod.GET)
+	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
 	public String welcome(@RequestParam(value="success", required=false) Boolean messageSent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
@@ -186,6 +196,14 @@ public class TapestryController{
 		return "login";
 	}
 
+	@RequestMapping(value="/logout", method=RequestMethod.GET)
+	public String logout(SecurityContextHolderAwareRequestWrapper request){
+		String username = request.getUserPrincipal().getName();
+		User currentUser = userDao.getUserByUsername(username);
+		activityDao.logActivity(currentUser.getName() + " logged out", currentUser.getUserID());
+		return "redirect:/j_spring_security_logout";
+	}
+	
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
 	public String manageUsers(ModelMap model){
 		ArrayList<User> userList = userDao.getAllUsers();
@@ -217,7 +235,6 @@ public class TapestryController{
 		u.setPassword(hashedPassword);
 		u.setEmail(request.getParameter("email"));
 		userDao.createUser(u);
-		activityDao.logActivity("Added user: " + u.getName(), u.getUserID());
 		if (mailAddress != null){
 			try{
 				MimeMessage message = new MimeMessage(session);
@@ -247,23 +264,18 @@ public class TapestryController{
 	@RequestMapping(value="/remove_user/{user_id}", method=RequestMethod.GET)
 	public String removeUser(@PathVariable("user_id") int id){
 		userDao.removeUserWithID(id);
-		activityDao.logActivity("Removed user: " + id, id);
 		return "redirect:/manage_users";
 	}
 	
 	@RequestMapping(value="/disable_user/{user_id}", method=RequestMethod.GET)
 	public String disableUser(@PathVariable("user_id") int id){
-		User u = userDao.getUserByID(id);
 		userDao.disableUserWithID(id);
-		activityDao.logActivity("Disabled user: " + u.getName(), id);
 		return "redirect:/manage_users";
 	}
 
 	@RequestMapping(value="/enable_user/{user_id}", method=RequestMethod.GET)
 	public String enableUser(@PathVariable("user_id") int id){
-		User u = userDao.getUserByID(id);
 		userDao.enableUserWithID(id);
-		activityDao.logActivity("Enabled user: " + u.getName(), id);
 		return "redirect:/manage_users";
 	}
 
@@ -280,7 +292,6 @@ public class TapestryController{
 		p.setGender(request.getParameter("gender"));
 		p.setWarnings(request.getParameter("warnings"));
 		patientDao.createPatient(p);
-		activityDao.logActivity("Added patient: " + p.getDisplayName(), v);
 		return "redirect:/manage_patients";
 	}
 
@@ -310,9 +321,9 @@ public class TapestryController{
 		model.addAttribute("unread", unreadMessages);
 		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getIncompleteSurveysByPatientID(id);
 		model.addAttribute("surveys", surveyResultList);
-		
 		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
 		model.addAttribute("pictures", pics);
+		activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
 		return "/patient";
 	}
 	
@@ -467,7 +478,6 @@ public class TapestryController{
 		u.setName(request.getParameter("volName"));
 		u.setEmail(request.getParameter("volEmail"));
 		userDao.modifyUser(u);
-		activityDao.logActivity("Updated user information", loggedInUser.getUserID());
 		if (!(currentUsername.equals(u.getUsername())))
 			return "redirect:/login?usernameChanged=true";
 		else

@@ -64,7 +64,7 @@
 						<ul class="nav">
 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
 							<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
-							<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
+							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 						</ul>
 					</div>
 				</div>	
@@ -83,7 +83,7 @@
 			<c:set var="count" value="1" scope="page" />
 			<c:forEach items="${surveys}" var="s">
 			<div class="row-fluid">
-				<a class="btn span12 btn-large btn-primary" href="<c:url value="/show_survey/${s.resultID}"/>">Survey #${count}</a></td>
+				<a class="btn span12 btn-large btn-primary" href="<c:url value="/open_survey/${s.resultID}"/>">Survey #${count}</a></td>
 				<c:set var="count" value="${count + 1}" scope="page"/>
 			</div>
 			</c:forEach>
