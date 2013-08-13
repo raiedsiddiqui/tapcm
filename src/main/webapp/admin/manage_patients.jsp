@@ -143,8 +143,6 @@
 						<option value="F">Female</option>
 						<option value="O">Other</option>
 					</select>
-					<label>Birth Date</label>
-					<input type="date" name="birthdate" /> <br/>
 					<label>Warnings</label>
 					<textarea name="warnings"></textarea>
 			</form>
