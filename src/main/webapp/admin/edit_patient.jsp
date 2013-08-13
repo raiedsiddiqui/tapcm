@@ -83,15 +83,12 @@
 					<option value="${v.userID}" <c:if test="${v.name eq patient.volunteerName}">selected</c:if>>${v.name}</option>
 					</c:forEach>
 				</select><br />
-				<label>Background color</label>
-				<input class='simple_color_live_preview' value='${patient.color}' name="backgroundColor"/>
 				<label>Gender</label>
 				<select name="gender" form="editPatient">
 					<option value="M" <c:if test="${patient.gender eq 'M'}">selected</c:if>>Male</option>	
 					<option value="F" <c:if test="${patient.gender eq 'F'}">selected</c:if>>Female</option>
 					<option value="O" <c:if test="${patient.gender eq 'O'}">selected</c:if>>Other</option>
 				</select>
-				<label>Birth Date</label>
 				<label>Warnings</label>
 				<textarea name="warnings">${patient.warnings}</textarea><br/>
 				<input type="submit" value="Save changes" class="btn btn-primary"/>
