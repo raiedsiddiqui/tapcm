@@ -69,7 +69,7 @@
 <body>	
   <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
-		<%@include file="navbar.jsp %>
+		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
 			<h2>Edit Patient</h2>
 		  	<form id="editPatient" method="post" action="<c:url value="/submit_edit_patient/${patient.patientID}"/>">
