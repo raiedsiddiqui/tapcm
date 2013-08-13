@@ -92,7 +92,6 @@
 					<option value="O" <c:if test="${patient.gender eq 'O'}">selected</c:if>>Other</option>
 				</select>
 				<label>Birth Date</label>
-				<input type="date" name="birthdate" value="${patient.birthdate}"/> <br/>
 				<label>Warnings</label>
 				<textarea name="warnings">${patient.warnings}</textarea><br/>
 				<input type="submit" value="Save changes" class="btn btn-primary"/>
