@@ -69,7 +69,13 @@ public class SurveyTemplateDao
 			System.out.println("Error: could not retrieve patient");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
     
 	/**
@@ -92,7 +98,13 @@ public class SurveyTemplateDao
 			System.out.println("Error: could not retrieve survey templates");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	/**
@@ -109,7 +121,13 @@ public class SurveyTemplateDao
 		} catch (SQLException e){
 			System.out.println("Error: Could not upload survey template");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	/**
@@ -124,6 +142,12 @@ public class SurveyTemplateDao
 		} catch (SQLException e){
 			System.out.println("Error: Could not delete survey template");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 }

@@ -48,7 +48,13 @@ public class PatientDao {
 			System.out.println("Error: could not retrieve patient");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 
 	/**
@@ -99,6 +105,12 @@ public class PatientDao {
            		System.out.println("Error: Could not retrieve patients");
            		e.printStackTrace();
            		return null;
+        	} finally {
+        		try{
+        			statement.close();
+        		} catch (Exception e) {
+        			//Ignore
+        		}
         	}
     	}
 
@@ -122,6 +134,12 @@ public class PatientDao {
             		System.out.println("Error: Could not retrieve patients");
             		e.printStackTrace();
 			return null;
+        	} finally {
+        		try{
+        			statement.close();
+        		} catch (Exception e) {
+        			//Ignore
+        		}
         	}
     	}
 
@@ -143,7 +161,13 @@ public class PatientDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not create patient");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
     }
     
     /**
@@ -164,6 +188,12 @@ public class PatientDao {
     	} catch (SQLException e){
     		System.out.println("Error: Could not update patient");
     		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
 
@@ -179,7 +209,13 @@ public class PatientDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not remove patient");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 
 }

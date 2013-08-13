@@ -44,7 +44,13 @@ public class UserDao {
 			System.out.println("Error: Could not count active users");
 			e.printStackTrace();
 			return 0;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public int countAllUsers(){
@@ -57,7 +63,13 @@ public class UserDao {
 			System.out.println("Error: Could not count active users");
 			e.printStackTrace();
 			return 0;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 
 	/**
@@ -101,7 +113,13 @@ public class UserDao {
 			System.out.println("Error: Could not retrieve user");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 
 	/**
@@ -120,7 +138,13 @@ public class UserDao {
 			System.out.println("Error: Could not retrieve user");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 
 	/**
@@ -139,7 +163,13 @@ public class UserDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not create user");
 			e.printStackTrace();
-			}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	/**
@@ -157,7 +187,13 @@ public class UserDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not update user");
 			e.printStackTrace();
-			}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 
 	/**
@@ -172,7 +208,13 @@ public class UserDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not remove user");
 			e.printStackTrace();
-			}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	/**
@@ -204,7 +246,13 @@ public class UserDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not enable user");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 
 	/**
@@ -225,7 +273,13 @@ public class UserDao {
 			System.out.println("Error: Could not retrieve users");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public ArrayList<User> getUsersByPartialName(String partialName){
@@ -265,7 +319,13 @@ public class UserDao {
 			System.out.println("Error: Could not retrieve users");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	/**
@@ -286,7 +346,13 @@ public class UserDao {
 			System.out.println("Error: Could not compare passwords");
 			e.printStackTrace();
 			return false;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public void setPasswordForUser(int id, String pwd){
@@ -298,6 +364,12 @@ public class UserDao {
 		} catch (SQLException e) {
 			System.out.println("Error: Could not set password");
 			e.printStackTrace();
-			}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 }

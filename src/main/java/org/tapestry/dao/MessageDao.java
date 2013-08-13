@@ -60,7 +60,13 @@ public class MessageDao {
 			System.out.println("Error: Could not retrieve messages");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public int countUnreadMessagesForRecipient(int recipient){
@@ -75,7 +81,13 @@ public class MessageDao {
 			System.out.println("Error: Could not count messages");
 			e.printStackTrace();
 			return 0;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public Message getMessageByID(int id){
@@ -90,7 +102,13 @@ public class MessageDao {
 			System.out.println("Error: Could not retrieve message");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public void markAsRead(int id){
@@ -101,7 +119,13 @@ public class MessageDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not mark message as read");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public void sendMessage(Message m){
@@ -115,7 +139,13 @@ public class MessageDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not send message");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public void deleteMessage(int id){
@@ -126,7 +156,13 @@ public class MessageDao {
 		} catch (SQLException e){
 			System.out.println("Error: Could not delete message");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	public ArrayList<Message> getAnnouncementsForUser(int userID){
@@ -144,7 +180,13 @@ public class MessageDao {
 			System.out.println("Error: Could not retrieve announcements");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 }

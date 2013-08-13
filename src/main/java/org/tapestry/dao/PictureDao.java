@@ -75,6 +75,12 @@ public class PictureDao {
     	} catch (Exception e){
     		System.out.println("Error");
     		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -95,6 +101,12 @@ public class PictureDao {
     		System.out.println("Error: Could not retrieve pictures");
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -115,6 +127,12 @@ public class PictureDao {
     		System.out.println("Error: Could not retrieve pictures");
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -126,6 +144,12 @@ public class PictureDao {
     	} catch (SQLException e){
     		System.out.println("Error: Could not remove picture");
     		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
 
