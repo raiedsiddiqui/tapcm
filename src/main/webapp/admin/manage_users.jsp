@@ -82,7 +82,7 @@
 						<input type="email" name="email" required/>
 						<label>Role</label>
 						<input type="radio" name="role" value="ROLE_ADMIN">Administrator</input> <br/>
-						<input type="radio" name="role" value="ROLE_USER">Volunteer</input> <br/>
+						<input type="radio" name="role" value="ROLE_USER" checked>Volunteer</input> <br/>
 			</form>
   		</div>
   		<div class="modal-footer">
