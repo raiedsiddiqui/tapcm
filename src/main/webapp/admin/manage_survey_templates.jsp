@@ -62,7 +62,7 @@
 					</select>
 					<label>File:</label>
 					<input type="hidden" name="MAX_FILE_SIZE" value="2000000">
-					<input type="file" name="file" required/>
+					<input type="file" accept="text/*" name="file" required/>
 					<input class="btn btn-primary" type="submit" value="Upload" />
 				</fieldset>
 			</form>
