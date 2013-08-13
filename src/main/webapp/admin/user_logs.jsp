@@ -47,6 +47,13 @@
 					</tr>
 				</c:forEach>
 			</table>
+			<div class="pagination text-center">
+				<ul>
+					<c:forEach begin="1" end="${numPages}" var="i">
+					<li><a href="<c:url value="/user_logs/${i}"/>">${i}</a></li>
+					</c:forEach>
+				</ul>
+			</div>
 		</div>
 	</div>
 </body>
