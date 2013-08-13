@@ -1,6 +1,7 @@
 url: "jdbc:mysql://localhost/survey_app"
 username: "root"
 password: "root"
+
 mailHost: "smtp.gmail.com"
 mailUser: ""
 mailPassword: ""
