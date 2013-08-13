@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+
+import sys
+import os
+import subprocess
+import optparse
+import glob
+
+##### EDIT THESE VALUES IF NECESSARY
+WEBAPP_DIR = "/var/lib/tomcat7/webapps/"
+
+##### DO NOT EDIT THESE VALUES
+DEPENDENCIES = ["maven2", "tomcat7", "openjdk-7-jdk", "mysql-server"]
+
+##### CALLBACK FUNCTIONS
+def _check_dependency(package):
+    """Checks if a given package is installed. If yes, returns 0."""
+    r = subprocess.call(['dpkg', '-s', package], stdout=open(os.devnull, 'w'), stderr=subprocess.STDOUT)
+    return r
+
+def check_dependencies(option, opt, value, parser):
+    """Checks to see if all the dependencies listed above are met. If any are missing, prompt to install them."""
+    print("Checking dependencies...")
+    missing = []
+    for p in DEPENDENCIES:
+        if _check_dependency(p) == 0:
+            print("%s installed" % (p,))
+        else:
+            print("%s not installed" % (p,))
+            missing.append(p)
+    if any(missing):
+        #Promt to install dependencies
+        cmd = ["sudo", "apt-get", "install"]
+        cmd.extend(missing)
+        subprocess.call(cmd)
+    else:
+        print "All dependencies are installed"
+        
+
+def update(option, opt, value, parser):
+    """Pulls the latest code from Git"""
+    print("Grabbing new code...")
+    subprocess.call(["git", "pull"])
+
+def build(option, opt, value, parser):
+    """Uses Maven to build the WAR file"""
+    print("Building package...")
+    subprocess.call(["mvn", "clean", "package", "-Dmaven.test.skip=true"])
+
+def deploy(option, opt, value, parser):
+    """Copies the WAR file to the specified directory"""
+    print("Deploying WAR file...")
+    os.chdir("target")
+    f = glob.glob("*.war")[0]
+    subprocess.call(["sudo", "cp", f, WEBAPP_DIR + "tapestry.war"])
+
+def initial_install(option, opt, value, parser):
+    """Convenience function, runs all of the above plus some helpful prompts"""
+    update(option, opt, value, parser)
+    os.system("gedit src/main/webapp/WEB-INF/classes/tapestry.yaml")
+    build(option, opt, value, parser)
+    deploy(option, opt, value, parser)
+
+parser = optparse.OptionParser()
+parser.add_option("-u", "--update", action="callback", callback=update, help="get the newest code from Github (runs git pull)")
+parser.add_option("-b", "--build", action="callback", callback=build, help="build the .war file (runs mvn clean package -Dmaven.test.skip=true)")
+parser.add_option("-d", "--deploy", action="callback", callback=deploy, help="copies the .war file to the Tomcat directory (currently %s)" % (WEBAPP_DIR,))
+parser.add_option("-c", "--check", action="callback", callback=check_dependencies, help="checks to see if the necessary dependencies are installed and installs them if necessary")
+parser.add_option("--install", action="callback", callback=initial_install, help="Calls all of the above, also prompts to edit config file")
+
+(options, args) = parser.parse_args()
