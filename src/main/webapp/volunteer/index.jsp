@@ -10,6 +10,7 @@
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/0.0.11/js/bootstrap-datetimepicker.min.js"></script>
 
 	<style type="text/css">
 		html,body{
@@ -26,8 +27,24 @@
 		.span12{
 			padding:0px 15px;
 		}
+		.bootstrap-datetimepicker-widget{
+			z-index:9999;
+		}
 	</style>
 	
+	<script type="text/javascript">
+		$(function(){
+			$('#datepicker').datetimepicker({
+				pickTime: false
+			});
+		});
+		
+		$(function(){
+			$('#timepicker').datetimepicker({
+				pickDate: false
+			});
+		});
+	</script>
 </head>
 	
 <body>	
@@ -165,10 +182,20 @@
 					<option value="${p.patientID}">${p.displayName}</option>
 					</c:forEach>
 				</select><br />
-				<label>Date:</label>
-				<input type="date" name="appointmentDate"/>
+				<label>Date:</label>		
+				<div id="datepicker" class="input-append">
+					<input data-format="yyyy-mm-dd" type="text" name="appointmentDate" readonly>
+				    <span class="add-on">
+				    	<i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+				    </span>
+				</div>
 				<label>Time:</label>
-				<input type="time" name="appointmentTime"/>
+				<div id="timepicker" class="input-append">
+					<input data-format="hh:mm:ss" type="text" name="appointmentTime" readonly>
+				    <span class="add-on">
+				    	<i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+				    </span>
+				</div>
   			</form>
   		</div>
   		<div class="modal-footer">

@@ -92,8 +92,8 @@
 					<h2>Pictures</h2>
 					<form id="uploadPic" action="<c:url value="/upload_picture_for_patient/${patient.patientID}" />" method="POST" enctype="multipart/form-data">
 						<label>Upload picture</label>
-  						<input form="uploadPic" type="file" name="pic" accept="image/*" required><br/>
-  						<input form="uploadPic" type="submit">
+  						<input form="uploadPic" type="file" name="pic" accept="image/*" required /><br/>
+  						<input form="uploadPic" type="submit" value="Upload" />
 					</form>
 					<c:choose>
 					<c:when test="${not empty pictures}">
