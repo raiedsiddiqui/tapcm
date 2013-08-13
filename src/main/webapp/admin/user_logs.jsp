@@ -45,6 +45,16 @@
 		</div>
 		<div class="row-fluid">
 			<h2>Activity Log</h2>
+			<div class="row-fluid">
+				<form action="user_logs" method="post">
+					<fieldset>
+						<legend>Search Logs</legend>
+						<label>Name:</label>
+						<input type="text" name="name" /><br />
+						<input class="btn btn-primary" type="submit" value="Search" />
+					</fieldset>
+				</form>
+			</div>
 			<table class="table">
 				<tr>
 					<th>Volunteer Name</th>
