@@ -130,6 +130,43 @@ public class ActivityDao {
     	}
     }
     
+    public ArrayList<Activity> getAllActivitiesForVolunteers(ArrayList<Integer> users){
+    	try{
+    		String sqlStatement = "SELECT event_timestamp, description, volunteer FROM activities WHERE ";
+    		for(Integer id : users){
+    			sqlStatement += "volunteer=" + id + " OR ";
+    		}
+    		if (sqlStatement.endsWith("OR ")) {
+    			  sqlStatement = sqlStatement.substring(0, sqlStatement.length() - 3);
+    		}
+    		sqlStatement += "ORDER BY event_timestamp DESC";
+    		statement = con.prepareStatement(sqlStatement);
+    		ResultSet result = statement.executeQuery();
+    		ArrayList<Activity> log = new ArrayList<Activity>();
+    		while (result.next()){
+    			Activity a = new Activity();
+    			a.setDate(result.getString("event_timestamp"));
+    			a.setDescription(result.getString("description"));
+    			
+    			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+    			statement.setInt(1, result.getInt("volunteer"));
+    			ResultSet r = statement.executeQuery();
+    			if(r.isBeforeFirst()) {
+    				r.first();
+	    			a.setVolunteer(r.getString("name"));
+    			} else {
+    				a.setVolunteer("");
+    			}
+    			log.add(a);
+    		}
+    		return log;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve activities log");
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
+    
     public ArrayList<Activity> getLastNActivitiesForVolunteer(int user, int n){
     	try{
     		statement = con.prepareStatement("SELECT event_timestamp, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");

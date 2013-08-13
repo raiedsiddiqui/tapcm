@@ -59,7 +59,7 @@
 		<div class="row-fluid" id="assignSurveyDiv" style="display:none";>
 			<form action="assign_surveys" method="post">
 				<fieldset>
-					<legend></legend>
+					<legend>Assign Surveys</legend>
 					<label>Survey</label>
 					<select name="surveyID">
 						<c:forEach items="${survey_templates}" var="st">

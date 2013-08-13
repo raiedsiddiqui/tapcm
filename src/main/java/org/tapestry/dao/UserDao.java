@@ -281,6 +281,23 @@ public class UserDao {
     		}
     	}
 	}
+	
+	public ArrayList<User> getUsersByPartialName(String partialName){
+		try{
+			statement = con.prepareStatement("SELECT * FROM users WHERE UPPER(name) LIKE UPPER('%" + partialName + "%')");
+			ResultSet result = statement.executeQuery();
+			ArrayList<User> allUsers = new ArrayList<User>();
+			while(result.next()){
+				User u = createFromSearch(result);
+				allUsers.add(u);
+			}
+			return allUsers;
+		} catch (SQLException e){
+			System.out.println("Error: Could not retrieve users by partial name " + partialName);
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/**
 	* Lists all the users in the database with the specified role

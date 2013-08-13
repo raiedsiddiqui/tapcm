@@ -551,4 +551,22 @@ public class TapestryController{
 		m.addAttribute("activities", activityLog);
 		return "admin/user_logs";
 	}
+	
+	@RequestMapping(value="/user_logs", method=RequestMethod.POST)
+	public String viewFilteredUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap m){
+		ArrayList<Activity> activityLog = new ArrayList<Activity>();
+		String name = request.getParameter("name");
+		if(name != null) {
+			ArrayList<User> u = userDao.getUsersByPartialName(name);
+			ArrayList<Integer> userIds = new ArrayList<Integer>();
+			for(User user : u) {
+				userIds.add(user.getUserID());
+			}
+			activityLog = activityDao.getAllActivitiesForVolunteers(userIds);
+		} else {
+			activityLog = activityDao.getAllActivities();
+		}
+		m.addAttribute("activities", activityLog);
+		return "admin/user_logs";
+	}
 }
