@@ -49,7 +49,13 @@ public class SurveyResultDao
 			System.out.println("Error: could not retrieve survey results for patient ID #" + patientId);
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
     }
     
     public ArrayList<SurveyResult> getIncompleteSurveysByPatientID(int patientId){
@@ -67,7 +73,13 @@ public class SurveyResultDao
 			System.out.println("Error: could not retrieve survey results for patient ID #" + patientId);
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
     }
     
     public SurveyResult getSurveyResultByID(int id){
@@ -81,6 +93,12 @@ public class SurveyResultDao
     		System.out.println("Error: Could not retrieve survey result for result ID #" + id);
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -104,7 +122,13 @@ public class SurveyResultDao
 			System.out.println("Error: could not retrieve all survey results");
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	/**
@@ -128,7 +152,13 @@ public class SurveyResultDao
 			System.out.println("Error: could not retrieve all survey results by survey Id #" + id);
 			e.printStackTrace();
 			return null;
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 
 	/**
@@ -189,7 +219,13 @@ public class SurveyResultDao
 		} catch (SQLException e){
 			System.out.println("Error: Could not assign survey # " + sr.getSurveyID() + " to patient # " + sr.getPatientID());
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 		return resultId;
 	}
 	
@@ -205,7 +241,13 @@ public class SurveyResultDao
 		} catch (SQLException e){
 			System.out.println("Error: Could not delete survey");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	/**
@@ -220,7 +262,13 @@ public class SurveyResultDao
 		} catch (SQLException e){
 			System.out.println("Error: Could not mark survey as completed");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 	
 	/**
@@ -237,6 +285,12 @@ public class SurveyResultDao
 		} catch (SQLException e){
 			System.out.println("Error: Could not save survey results");
 			e.printStackTrace();
-		}
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
 	}
 }

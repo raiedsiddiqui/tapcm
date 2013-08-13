@@ -397,7 +397,7 @@ public class TapestryController{
 		Message m = new Message();
 		m.setSender(loggedInUser.getName());
 		m.setText(request.getParameter("msgBody"));
-		if (request.getParameter("isAnnouncement").equals("true")){ //Sound to all volunteers
+		if (request.getParameter("isAnnouncement") != null && request.getParameter("isAnnouncement").equals("true")){ //Sound to all volunteers
 			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
 			for (User u: volunteers){
 				m.setSubject("ANNOUNCEMENT: " + request.getParameter("msgSubject"));

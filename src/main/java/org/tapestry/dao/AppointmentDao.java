@@ -76,6 +76,12 @@ public class AppointmentDao {
     		System.out.println("Error: Could not retrieve appointments");
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -95,6 +101,12 @@ public class AppointmentDao {
     		System.out.println("Error: Could not retrieve appointments");
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -108,6 +120,12 @@ public class AppointmentDao {
     	} catch (SQLException e){
     		System.out.println("Error: Could not save appointment");
     		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
 }

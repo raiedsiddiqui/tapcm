@@ -41,6 +41,12 @@ public class ActivityDao {
     	} catch (SQLException e){
     		System.out.println("Error: Could not record event");
     		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -54,6 +60,12 @@ public class ActivityDao {
     	} catch (SQLException e){
     		System.out.println("Error: Could not record event");
     		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -83,6 +95,12 @@ public class ActivityDao {
     		System.out.println("Error: Could not retrieve activities log");
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -103,6 +121,12 @@ public class ActivityDao {
     		System.out.println("Error: Could not retrieve activities log");
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
@@ -125,6 +149,12 @@ public class ActivityDao {
     		System.out.println("Error: Could not retrieve activities log");
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
     	}
     }
     
