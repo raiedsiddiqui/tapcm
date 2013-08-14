@@ -95,7 +95,7 @@ public class TapestryController{
 			mailHost = config.get("mailHost");
 			mailUser = config.get("mailUser");
 			mailPassword = config.get("mailPassword");
-			mailAddress = config.get("mailAddress");
+			mailAddress = config.get("mailFrom");
 			mailPort = config.get("mailPort");
 			useTLS = config.get("mailUsesTLS");
 			useAuth = config.get("mailRequiresAuth");
@@ -341,6 +341,31 @@ public class TapestryController{
 		appointmentDao.createAppointment(a);
 		Patient p = patientDao.getPatientByID(pid);
 		activityDao.logActivity("Booked appointment with " + p.getDisplayName(), loggedInUser, pid);
+		
+		//Email all the administrators with a notification
+		if (mailAddress != null){
+			try{
+				MimeMessage message = new MimeMessage(session);
+				message.setFrom(new InternetAddress(mailAddress));
+				for (User admin : userDao.getAllUsersWithRole("ROLE_ADMIN")){
+					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(admin.getEmail()));
+				}
+				message.setSubject("Tapestry: New appointment booked");
+				String msg = u.getName() + " has booked an appointment with " + p.getFirstName() + " " + p.getLastName();
+				msg += " for " + a.getTime() + " on " + a.getDate() + ".\n";
+				msg += "This appointment is awaiting confirmation.";
+				message.setText(msg);
+				System.out.println(msg);
+				System.out.println("Sending...");
+				Transport.send(message);
+				System.out.println("Email sent to administrators");
+			} catch (MessagingException e) {
+				System.out.println("Error: Could not send email");
+				System.out.println(e.toString());
+			}
+		} else {
+			System.out.println("Email address not set");
+		}
 		return "redirect:/";
 	}
 	
