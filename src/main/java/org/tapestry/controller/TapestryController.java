@@ -159,7 +159,6 @@ public class TapestryController{
 			ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
 			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(u.getUserID());
-			//ArrayList<Activity> activityLog = activityDao.getAllActivitiesForVolunteer(u.getUserID());
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
 			model.addAttribute("appointments_today", appointmentsForToday);
@@ -510,7 +509,6 @@ public class TapestryController{
 		p.setGender(request.getParameter("gender"));
 		p.setWarnings(request.getParameter("warnings"));
 		patientDao.updatePatient(p);
-		activityDao.logActivity("Modified patient: " + p.getDisplayName(), v);
 		return "redirect:/manage_patients";
 	}
 	
