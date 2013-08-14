@@ -211,8 +211,8 @@ public class TapestryController{
 	public String managePatients(ModelMap model){
 		ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
 		model.addAttribute("volunteers", volunteers);
-	        ArrayList<Patient> patientList = patientDao.getAllPatients();
-                model.addAttribute("patients", patientList);
+	    ArrayList<Patient> patientList = patientDao.getAllPatients();
+        model.addAttribute("patients", patientList);
 		return "admin/manage_patients";
 	}
 
@@ -282,8 +282,6 @@ public class TapestryController{
 		p.setLastName(request.getParameter("lastname"));
 		int v = Integer.parseInt(request.getParameter("volunteer"));
 		p.setVolunteer(v);
-		p.setColor(request.getParameter("backgroundColor"));
-		p.setBirthdate(request.getParameter("birthdate"));
 		p.setGender(request.getParameter("gender"));
 		p.setWarnings(request.getParameter("warnings"));
 		patientDao.createPatient(p);
@@ -292,9 +290,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/remove_patient/{patient_id}", method=RequestMethod.GET)
 	public String removePatient(@PathVariable("patient_id") int id){
-		Patient p = patientDao.getPatientByID(id);
 		patientDao.removePatientWithId(id);
-		activityDao.logActivity("Removed patient: " + p.getDisplayName(), p.getVolunteer(), p.getPatientID());
 		return "redirect:/manage_patients";
 	}
 
@@ -505,8 +501,6 @@ public class TapestryController{
 		p.setLastName(request.getParameter("lastname"));
 		int v = Integer.parseInt(request.getParameter("volunteer"));
 		p.setVolunteer(v);
-		p.setColor(request.getParameter("backgroundColor"));
-		p.setBirthdate(request.getParameter("birthdate"));
 		p.setGender(request.getParameter("gender"));
 		p.setWarnings(request.getParameter("warnings"));
 		patientDao.updatePatient(p);

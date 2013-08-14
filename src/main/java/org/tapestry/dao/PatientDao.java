@@ -69,8 +69,6 @@ public class PatientDao {
             		p.setFirstName(result.getString("firstname"));
             		p.setLastName(result.getString("lastname"));
             		p.setGender(result.getString("gender"));
-            		p.setColor(result.getString("color"));
-	            	p.setBirthdate(result.getString("birthdate"));
             		p.setVolunteer(result.getInt("volunteer"));
             		p.setWarnings(result.getString("warnings"));
             		//Set volunteer name
@@ -149,14 +147,12 @@ public class PatientDao {
 	*/
     public void createPatient(Patient p){
 		try{
-			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, volunteer, color, birthdate, gender, warnings) VALUES (?, ?, ?, ?, ?, ?, ?)");
+			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, volunteer, gender, warnings) VALUES (?, ?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
 			statement.setString(2, p.getLastName());
 			statement.setInt(3, p.getVolunteer());
-			statement.setString(4, p.getColor());
-			statement.setString(5, p.getBirthdate());
-			statement.setString(6, p.getGender());
-			statement.setString(7, p.getWarnings());
+			statement.setString(4, p.getGender());
+			statement.setString(5, p.getWarnings());
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create patient");
@@ -176,14 +172,13 @@ public class PatientDao {
      */
     public void updatePatient(Patient p){
     	try{
-    		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, volunteer=?, gender=?, birthdate=?, warnings=? WHERE patient_ID=?");
+    		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, volunteer=?, gender=?, warnings=? WHERE patient_ID=?");
     		statement.setString(1, p.getFirstName());
     		statement.setString(2, p.getLastName());
     		statement.setInt(3, p.getVolunteer());
     		statement.setString(4, p.getGender());
-    		statement.setString(5, p.getBirthdate());
-    		statement.setString(6, p.getWarnings());
-    		statement.setInt(7, p.getPatientID());
+    		statement.setString(5, p.getWarnings());
+    		statement.setInt(6, p.getPatientID());
     		statement.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not update patient");
