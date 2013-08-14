@@ -12,7 +12,6 @@ import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
-import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.PictureDao;
 import org.tapestry.objects.SurveyResult;
@@ -21,7 +20,6 @@ import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
-import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Picture;
 import java.util.ArrayList;
@@ -62,7 +60,6 @@ public class TapestryController{
    	private AppointmentDao appointmentDao;
    	private MessageDao messageDao;
    	private PictureDao pictureDao;
-   	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
    	private ActivityDao activityDao;
    	
@@ -110,7 +107,6 @@ public class TapestryController{
 		appointmentDao = new AppointmentDao(database, dbUsername, dbPassword);
 		messageDao = new MessageDao(database, dbUsername, dbPassword);
 		pictureDao = new PictureDao(database, dbUsername, dbPassword);
-		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		surveyResultDao = new SurveyResultDao(database, dbUsername, dbPassword);
 		activityDao = new ActivityDao(database, dbUsername, dbPassword);
 		
@@ -124,7 +120,6 @@ public class TapestryController{
 						return new PasswordAuthentication(username, password);
 					}
 		  		});
-		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		props.setProperty("mail.smtp.host", mailHost);
 		props.setProperty("mail.smtp.socketFactory.port", mailPort);
 		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
@@ -164,7 +159,6 @@ public class TapestryController{
 			ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
 			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(u.getUserID());
-			//ArrayList<Activity> activityLog = activityDao.getAllActivitiesForVolunteer(u.getUserID());
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
 			model.addAttribute("appointments_today", appointmentsForToday);
@@ -515,7 +509,6 @@ public class TapestryController{
 		p.setGender(request.getParameter("gender"));
 		p.setWarnings(request.getParameter("warnings"));
 		patientDao.updatePatient(p);
-		activityDao.logActivity("Modified patient: " + p.getDisplayName(), v);
 		return "redirect:/manage_patients";
 	}
 	
