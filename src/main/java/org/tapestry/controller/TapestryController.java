@@ -236,15 +236,9 @@ public class TapestryController{
 		String hashedPassword = enc.encodePassword("password", null); //Default
 		
 		u.setPassword(hashedPassword);
-<<<<<<< HEAD
-		u.setEmail(request.getParameter("email"));
+		u.setEmail(request.getParameter("email").trim());
 		boolean success = userDao.createUser(u);
 		if (mailAddress != null && success){
-=======
-		u.setEmail(request.getParameter("email").trim());
-		userDao.createUser(u);
-		if (mailAddress != null){
->>>>>>> 9b814d5573045e7597f658e55f6a43f6f5c87f8d
 			try{
 				MimeMessage message = new MimeMessage(session);
 				message.setFrom(new InternetAddress(mailAddress));
