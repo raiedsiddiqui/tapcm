@@ -6,7 +6,7 @@ package org.tapestry.objects;
 * @author Adam Gignac
 * @version 1.0
 */
-public class User implements java.io.Serializable {
+public class User {
 
 	private int userID;
 	private String name;
