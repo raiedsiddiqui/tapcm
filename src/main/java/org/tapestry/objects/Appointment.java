@@ -5,13 +5,15 @@ package org.tapestry.objects;
  * Represents an appointment between the volunteer and a patient
  */
 public class Appointment{
-
-	private int volunteer;
+	private int appointmentID;
+	private int volunteerID;
+	private String volunteer;
 	private int patientID;
 	private String patient;
 	private String time;
 	private String date;
 	private String desc;
+	private boolean approved;
 	
 	/**
 	 * Empty constructor
@@ -20,10 +22,25 @@ public class Appointment{
 	}
 	
 	//Accessors
+	
+	/**
+	 * @return the appointment ID
+	 */
+	public int getAppointmentID(){
+		return appointmentID;
+	}
+	
 	/**
 	 * @return The volunteer for whom the appointment is booked
 	 */
-	public int getVolunteer(){
+	public int getVolunteerID(){
+		return volunteerID;
+	}
+	
+	/**
+	 * @return The volunteers name for the appointment booking
+	 */
+	public String getVolunteer(){
 		return volunteer;
 	}
 	
@@ -59,12 +76,34 @@ public class Appointment{
 		return desc;
 	}
 	
-	//Mutators
 	/**
-	 * @param volunteer The volunteer for whom the appointment is booked
+	 * @return The approval status of the appointment
 	 */
-	public void setVolunteer(int volunteer){
+	public boolean isApproved(){
+		return approved;
+	}
+	
+	//Mutators
+	
+	/**
+	 * @param appointmentID the id of the appointment
+	 */
+	public void setAppointmentID(int appointmentID){
+		this.appointmentID = appointmentID;
+	}
+	
+	/**
+	 * @param volunteer The volunteer's name for the appointment booking
+	 */
+	public void setVolunteer(String volunteer){
 		this.volunteer = volunteer;
+	}
+	
+	/**
+	 * @param volunteerID the volunteer's ID for the appointment booking
+	 */
+	public void setVolunteerID(int volunteerID){
+		this.volunteerID = volunteerID;
 	}
 	
 	/**
@@ -97,5 +136,12 @@ public class Appointment{
 	 */
 	public void setDescription(String desc){
 		this.desc = desc;
+	}
+	
+	/**
+	 * @param approved The approval status of the appointment
+	 */
+	public void setApproved(boolean approved){
+		this.approved = approved;
 	}
 }

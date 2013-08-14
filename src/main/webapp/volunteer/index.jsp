@@ -10,6 +10,7 @@
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.0.2/js/bootstrap-datepicker.min.js"></script>
 	<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/0.0.11/js/bootstrap-datetimepicker.min.js"></script>
 
 	<style type="text/css">
@@ -33,12 +34,6 @@
 	</style>
 	
 	<script type="text/javascript">
-		$(function(){
-			$('#datepicker').datetimepicker({
-				pickTime: false
-			});
-		});
-		
 		$(function(){
 			$('#timepicker').datetimepicker({
 				pickDate: false
@@ -111,10 +106,21 @@
 					<c:choose>
 						<c:when test="${not empty appointments_today}">
 						<table class="table">
+							<tr>
+								<th>Patient</th>
+								<th>Time</th>
+								<th>Approval Status</th>
+								<th>Delete</th>
+							</tr>
 							<c:forEach items="${appointments_today}" var="a">
 							<tr>
 								<td>${a.patient}</td>
 								<td>${a.time}</td>
+								<td><c:choose>
+									<c:when test="${!a.approved}">Not Approved</c:when>
+									<c:otherwise>Approved</c:otherwise>
+									</c:choose></td>
+								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
 							</tr>
 							</c:forEach>
 						</table>
@@ -128,10 +134,21 @@
 					<c:choose>
 						<c:when test="${not empty appointments_all}">
 						<table class="table">
+							<tr>
+								<th>Patient</th>
+								<th>Time</th>
+								<th>Approval Status</th>
+								<th>Delete</th>
+							</tr>
 							<c:forEach items="${appointments_all}" var="a">
 							<tr>
 								<td>${a.patient}</td>
 								<td>${a.date} ${a.time}</td>
+								<td><c:choose>
+									<c:when test="${!a.approved}">Not Approved</c:when>
+									<c:otherwise>Approved</c:otherwise>
+									</c:choose></td>
+								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
 							</tr>
 							</c:forEach>
 						</table>
@@ -183,11 +200,11 @@
 					</c:forEach>
 				</select><br />
 				<label>Date:</label>		
-				<div id="datepicker" class="input-append">
-					<input data-format="yyyy-mm-dd" type="text" name="appointmentDate" readonly>
-				    <span class="add-on">
-				    	<i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
-				    </span>
+				<div class="input-append date" id="dp1" data-date-format="yyyy-mm-dd">
+					<input type="text" name="appointmentDate" readonly>
+					<span class="add-on">
+						<i class="icon-calendar" onclick="$('#dp1').datepicker('show');"></i>
+					</span>
 				</div>
 				<label>Time:</label>
 				<div id="timepicker" class="input-append">

@@ -12,6 +12,7 @@
 				<ul class="nav">
 					<li><a href="<c:url value="/manage_users"/>">Manage Volunteers</a></li>
 					<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
+					<li><a href="<c:url value="/manage_appointments"/>">Manage Appointments</a></li>
 					<li><a href="<c:url value="/manage_survey_templates"/>">Manage Survey Templates</a></li>
 					<li><a href="<c:url value="/manage_surveys"/>">Manage Surveys</a></li>
 					<li><a href="<c:url value="/user_logs/1"/>">User Logs</a><li>

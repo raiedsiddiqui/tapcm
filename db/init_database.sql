@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS appointments (
 	patient SMALLINT UNSIGNED NOT NULL, /* Same as patient_ID */
 	date_time DATETIME NOT NULL, /*Contains both date and time, separated using functions in query*/
 	details TEXT,
+	approved BOOLEAN NOT NULL DEFAULT 0, /*Approval status of appointment*/
 	PRIMARY KEY(appointment_ID)
 );
 
