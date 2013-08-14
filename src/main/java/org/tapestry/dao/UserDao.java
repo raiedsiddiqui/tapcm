@@ -151,15 +151,24 @@ public class UserDao {
 	* Stores a user in the database
 	* @param u The User object to store
 	*/
-	public void createUser(User u){
+	public boolean createUser(User u){
+		boolean success = false;
 		try{
-			statement = con.prepareStatement("INSERT INTO users (username, name, password, role, email, enabled) VALUES (?, ?, ?, ?, ?, 1)");
+			statement = con.prepareStatement("SELECT * FROM users WHERE UPPER(username) LIKE UPPER(?)");
 			statement.setString(1, u.getUsername());
-			statement.setString(2, u.getName());
-			statement.setString(3, u.getPassword());
-			statement.setString(4, u.getRole());
-			statement.setString(5, u.getEmail());
-			statement.execute();
+			ResultSet rs = statement.executeQuery();
+			
+			//If the username doesn't exist, create the user
+			if(!rs.isBeforeFirst()) {
+				statement = con.prepareStatement("INSERT INTO users (username, name, password, role, email, enabled) VALUES (?, ?, ?, ?, ?, 1)");
+				statement.setString(1, u.getUsername());
+				statement.setString(2, u.getName());
+				statement.setString(3, u.getPassword());
+				statement.setString(4, u.getRole());
+				statement.setString(5, u.getEmail());
+				statement.execute();
+				success = true;
+			}
 		} catch (SQLException e){
 			System.out.println("Error: Could not create user");
 			e.printStackTrace();
@@ -170,6 +179,7 @@ public class UserDao {
     			//Ignore
     		}
     	}
+		return success;
 	}
 	
 	/**

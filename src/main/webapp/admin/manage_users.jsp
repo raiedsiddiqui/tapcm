@@ -29,6 +29,9 @@
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
 			<h2>Users <small>${total} users, ${active} enabled</small></h2>
+			<c:if test="${not empty failed}">
+				<div class="alert alert-error">Failed to create user: Username already exists</div>
+			</c:if>
 			<table class="table">
 				<tr>
 					<th>Name</th>

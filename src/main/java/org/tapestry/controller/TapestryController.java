@@ -200,11 +200,14 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
-	public String manageUsers(ModelMap model){
+	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model){
 		ArrayList<User> userList = userDao.getAllUsers();
 		model.addAttribute("users", userList);
 		model.addAttribute("active", userDao.countActiveUsers());
 		model.addAttribute("total", userDao.countAllUsers());
+		if(failed != null) {
+			model.addAttribute("failed", true);
+		}
 		return "admin/manage_users";
 	}
 	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
@@ -229,8 +232,8 @@ public class TapestryController{
 		
 		u.setPassword(hashedPassword);
 		u.setEmail(request.getParameter("email"));
-		userDao.createUser(u);
-		if (mailAddress != null){
+		boolean success = userDao.createUser(u);
+		if (mailAddress != null && success){
 			try{
 				MimeMessage message = new MimeMessage(session);
 				message.setFrom(new InternetAddress(mailAddress));
@@ -251,6 +254,10 @@ public class TapestryController{
 				System.out.println("Error: Could not send email");
 				System.out.println(e.toString());
 			}
+		}
+		
+		if(!success) {
+			return "redirect:/manage_users?failed=true";
 		}
 		//Display page again
 		return "redirect:/manage_users";
@@ -404,7 +411,6 @@ public class TapestryController{
 			m.setRecipient(recipientID);
 			m.setSubject(request.getParameter("msgSubject"));
 			messageDao.sendMessage(m);
-
 			
 			User recipient = userDao.getUserByID(recipientID);
 			
