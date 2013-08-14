@@ -3,10 +3,10 @@ username: "root"
 password: "root"
 
 mailHost: "smtp.gmail.com"
-mailUser: ""
-mailPassword: ""
+mailUser: "tapestry.notifications@gmail.com"
+mailPassword: "6E5lywnUgd"
 mailPort: "465"
-mailFrom: ""
+mailFrom: "tapestry.notifications@gmail.com"
 mailUsesTLS: "true"
 mailRequiresAuth: "true"
 
