@@ -225,15 +225,15 @@ public class TapestryController{
 	public String addUser(SecurityContextHolderAwareRequestWrapper request){
 		//Add a new user
 		User u = new User();
-		u.setName(request.getParameter("name"));
-		u.setUsername(request.getParameter("username"));
+		u.setName(request.getParameter("name").trim());
+		u.setUsername(request.getParameter("username").trim());
 		u.setRole(request.getParameter("role"));
 		
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
 		String hashedPassword = enc.encodePassword("password", null); //Default
 		
 		u.setPassword(hashedPassword);
-		u.setEmail(request.getParameter("email"));
+		u.setEmail(request.getParameter("email").trim());
 		userDao.createUser(u);
 		if (mailAddress != null){
 			try{
@@ -283,8 +283,8 @@ public class TapestryController{
 	public String addPatient(SecurityContextHolderAwareRequestWrapper request){
 		//Add a new patient
 		Patient p = new Patient();
-		p.setFirstName(request.getParameter("firstname"));
-		p.setLastName(request.getParameter("lastname"));
+		p.setFirstName(request.getParameter("firstname").trim());
+		p.setLastName(request.getParameter("lastname").trim());
 		int v = Integer.parseInt(request.getParameter("volunteer"));
 		p.setVolunteer(v);
 		p.setGender(request.getParameter("gender"));
@@ -329,7 +329,7 @@ public class TapestryController{
 		int loggedInUser = u.getUserID();
 		
 		Appointment a = new Appointment();
-		a.setVolunteer(loggedInUser);
+		a.setVolunteerID(loggedInUser);
 		int pid = Integer.parseInt(request.getParameter("patient"));
 		a.setPatientID(pid);
 		a.setDate(request.getParameter("appointmentDate"));
