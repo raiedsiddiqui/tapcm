@@ -19,6 +19,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyMap;
@@ -74,6 +75,15 @@ public class SurveyController{
 		activityDao = new ActivityDao(DB, UN, PW);
 		userDao = new UserDao(DB, UN, PW);
    	}
+   	
+	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
+	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, ModelMap model){
+		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
+		model.addAttribute("survey_templates", surveyTemplateList);
+		if (deleteFailed != null)
+			model.addAttribute("failed", deleteFailed);
+		return "admin/manage_survey_templates";
+	}
    	
    	@RequestMapping(value="/manage_surveys", method=RequestMethod.GET)
 	public String manageSurveys(ModelMap model, HttpServletRequest request){

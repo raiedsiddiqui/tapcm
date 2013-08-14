@@ -36,7 +36,8 @@ public class AppointmentDao {
     private Appointment createFromSearch(ResultSet result){
     	Appointment a = new Appointment();
     	try{
-    		a.setVolunteer(result.getInt("volunteer"));
+    		a.setAppointmentID(result.getInt("appointment_ID"));
+    		a.setVolunteerID(result.getInt("volunteer"));
     		int id = result.getInt("patient");
     		a.setPatientID(id);
     		statement = con.prepareStatement("SELECT firstname, lastname FROM patients WHERE patient_ID=?");
@@ -52,6 +53,7 @@ public class AppointmentDao {
     		a.setDate(result.getString("appt_date"));
     		a.setTime(result.getString("appt_time"));
     		a.setDescription(result.getString("details"));
+    		a.setApproved(result.getBoolean("approved"));
     		return a;
     	} catch (SQLException e){
     		System.out.println("Error: Could not create Appointment object");
@@ -59,10 +61,39 @@ public class AppointmentDao {
     		return null;
     	}
     }
+    
+    public ArrayList<Appointment> getAllAppointments(){
+    	try{
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, approved FROM appointments ORDER BY date_time DESC");
+    		ResultSet result = statement.executeQuery();
+       		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
+       		while(result.next()){
+       			Appointment a = createFromSearch(result);
+       			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+       			statement.setInt(1, result.getInt("patient"));
+       			ResultSet rs = statement.executeQuery();
+       			rs.first();
+       			a.setVolunteer(rs.getString("name"));
+       			if (a != null)
+       				allAppointments.add(a);
+        	}
+       		return allAppointments;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve all appointments");
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
     	
     public ArrayList<Appointment> getAllAppointmentsForVolunteer(int volunteer){
     	try{
-    		statement = con.prepareStatement("SELECT volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details FROM appointments WHERE volunteer=?");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, approved FROM appointments WHERE volunteer=? ORDER BY date_time DESC");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -73,7 +104,7 @@ public class AppointmentDao {
         	}
        		return allAppointments;
     	} catch (SQLException e){
-    		System.out.println("Error: Could not retrieve appointments");
+    		System.out.println("Error: Could not retrieve all appointments for user #" + volunteer);
     		e.printStackTrace();
     		return null;
     	} finally {
@@ -87,7 +118,7 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllAppointmentsForVolunteerForToday(int volunteer){
        	try{
-    		statement = con.prepareStatement("SELECT volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE()");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, approved FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE() ORDER BY date_time DESC");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -98,7 +129,7 @@ public class AppointmentDao {
         	}
        		return allAppointments;
     	} catch (SQLException e){
-    		System.out.println("Error: Could not retrieve appointments");
+    		System.out.println("Error: Could not retrieve all appointments for today for user #" + volunteer);
     		e.printStackTrace();
     		return null;
     	} finally {
@@ -113,12 +144,63 @@ public class AppointmentDao {
     public void createAppointment(Appointment a){
     	try{
     		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time) values (?,?,?)");
-    		statement.setInt(1, a.getVolunteer());
+    		statement.setInt(1, a.getVolunteerID());
     		statement.setInt(2, a.getPatientID());
     		statement.setString(3, a.getDate() + " " + a.getTime());
     		statement.execute();
     	} catch (SQLException e){
-    		System.out.println("Error: Could not save appointment");
+    		System.out.println("Error: Could not create appointment");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void approveAppointment(int id){
+    	try{
+    		statement = con.prepareStatement("UPDATE appointments SET approved=1 WHERE appointment_ID=?");
+    		statement.setInt(1, id);
+    		statement.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not approve appointment");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void unapproveAppointment(int id){
+    	try{
+    		statement = con.prepareStatement("UPDATE appointments SET approved=0 WHERE appointment_ID=?");
+    		statement.setInt(1, id);
+    		statement.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not unapprove appointment");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void deleteAppointment(int id){
+    	try{
+    		statement = con.prepareStatement("DELETE FROM appointments WHERE appointment_ID=?");
+    		statement.setInt(1, id);
+    		statement.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not delete appointment");
     		e.printStackTrace();
     	} finally {
     		try{

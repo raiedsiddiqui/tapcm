@@ -12,7 +12,6 @@ import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
-import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.PictureDao;
 import org.tapestry.objects.SurveyResult;
@@ -21,7 +20,6 @@ import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
-import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Picture;
 import java.util.ArrayList;
@@ -62,7 +60,6 @@ public class TapestryController{
    	private AppointmentDao appointmentDao;
    	private MessageDao messageDao;
    	private PictureDao pictureDao;
-   	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
    	private ActivityDao activityDao;
    	
@@ -110,7 +107,6 @@ public class TapestryController{
 		appointmentDao = new AppointmentDao(database, dbUsername, dbPassword);
 		messageDao = new MessageDao(database, dbUsername, dbPassword);
 		pictureDao = new PictureDao(database, dbUsername, dbPassword);
-		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		surveyResultDao = new SurveyResultDao(database, dbUsername, dbPassword);
 		activityDao = new ActivityDao(database, dbUsername, dbPassword);
 		
@@ -124,7 +120,6 @@ public class TapestryController{
 						return new PasswordAuthentication(username, password);
 					}
 		  		});
-		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		props.setProperty("mail.smtp.host", mailHost);
 		props.setProperty("mail.smtp.socketFactory.port", mailPort);
 		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
@@ -327,23 +322,6 @@ public class TapestryController{
 		return "/patient";
 	}
 	
-	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
-	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		int loggedInUser = u.getUserID();
-		
-		Appointment a = new Appointment();
-		a.setVolunteer(loggedInUser);
-		int pid = Integer.parseInt(request.getParameter("patient"));
-		a.setPatientID(pid);
-		a.setDate(request.getParameter("appointmentDate"));
-		a.setTime(request.getParameter("appointmentTime"));
-		appointmentDao.createAppointment(a);
-		Patient p = patientDao.getPatientByID(pid);
-		activityDao.logActivity("Booked appointment with " + p.getDisplayName(), loggedInUser, pid);
-		return "redirect:/";
-	}
-	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
 	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -482,15 +460,6 @@ public class TapestryController{
 			return "redirect:/login?usernameChanged=true";
 		else
 			return "redirect:/profile";
-	}
-	
-	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
-	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, ModelMap model){
-		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
-		model.addAttribute("survey_templates", surveyTemplateList);
-		if (deleteFailed != null)
-			model.addAttribute("failed", deleteFailed);
-		return "admin/manage_survey_templates";
 	}
 	
 	@RequestMapping(value="/change_password", method=RequestMethod.POST)
