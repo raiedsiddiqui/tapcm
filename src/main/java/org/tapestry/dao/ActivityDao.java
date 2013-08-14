@@ -69,6 +69,25 @@ public class ActivityDao {
     	}
     }
     
+    public int countEntries(){
+    	try{
+    		statement = con.prepareStatement("SELECT COUNT(event_ID) AS c FROM activities");
+    		ResultSet result = statement.executeQuery();
+    		result.first();
+    		return result.getInt("c");
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not count entries");
+    		e.printStackTrace();
+    		return 0;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e){
+    			//Ignore;
+    		}
+    	}
+    }
+    
     public ArrayList<Activity> getAllActivities(){
     	try{
     		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer FROM activities ORDER BY event_timestamp DESC");
@@ -164,6 +183,47 @@ public class ActivityDao {
     		System.out.println("Error: Could not retrieve activities log");
     		e.printStackTrace();
     		return null;
+    	}
+    }
+    
+    /**
+     * Returns a list of n items starting at start
+     * @param start The position in the log to start at
+     * @param n The number of items to return
+     */
+    public ArrayList<Activity> getPage(int start, int n){
+    	try{
+    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer FROM activities ORDER BY event_timestamp DESC LIMIT ?,?");
+    		statement.setInt(1, start);
+    		statement.setInt(2, n);
+    		ResultSet result = statement.executeQuery();
+    		ArrayList<Activity> page = new ArrayList<Activity>();
+    		while (result.next()){
+    			Activity a = new Activity();
+    			a.setDate(result.getString("event_timestamp"));
+    			a.setDescription(result.getString("description"));
+    			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+    			statement.setInt(1, result.getInt("volunteer"));
+    			ResultSet r = statement.executeQuery();
+    			if(r.isBeforeFirst()) {
+    				r.first();
+	    			a.setVolunteer(r.getString("name"));
+    			} else {
+    				a.setVolunteer("");
+    			}
+    			page.add(a);
+    		}
+    		return page;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not create page");
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e){
+    			//Ignore
+    		}
     	}
     }
     
