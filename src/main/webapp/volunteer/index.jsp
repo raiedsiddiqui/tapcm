@@ -34,11 +34,20 @@
 	</style>
 	
 	<script type="text/javascript">
+		var nowTemp = new Date();
+		var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+		
 		$(function(){
 			$('#timepicker').datetimepicker({
 				pickDate: false
 			});
+			$('#dp1').datepicker({
+				onRender: function(date) {
+    				return date.valueOf() < now.valueOf() ? 'disabled' : '';
+  				}
+  			}
 		});
+		
 	</script>
 </head>
 	

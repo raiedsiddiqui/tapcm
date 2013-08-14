@@ -330,48 +330,6 @@ public class TapestryController{
 		return "/patient";
 	}
 	
-	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
-	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		int loggedInUser = u.getUserID();
-		
-		Appointment a = new Appointment();
-		a.setVolunteerID(loggedInUser);
-		int pid = Integer.parseInt(request.getParameter("patient"));
-		a.setPatientID(pid);
-		a.setDate(request.getParameter("appointmentDate"));
-		a.setTime(request.getParameter("appointmentTime"));
-		appointmentDao.createAppointment(a);
-		Patient p = patientDao.getPatientByID(pid);
-		activityDao.logActivity("Booked appointment with " + p.getDisplayName(), loggedInUser, pid);
-		
-		//Email all the administrators with a notification
-		if (mailAddress != null){
-			try{
-				MimeMessage message = new MimeMessage(session);
-				message.setFrom(new InternetAddress(mailAddress));
-				for (User admin : userDao.getAllUsersWithRole("ROLE_ADMIN")){
-					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(admin.getEmail()));
-				}
-				message.setSubject("Tapestry: New appointment booked");
-				String msg = u.getName() + " has booked an appointment with " + p.getFirstName() + " " + p.getLastName();
-				msg += " for " + a.getTime() + " on " + a.getDate() + ".\n";
-				msg += "This appointment is awaiting confirmation.";
-				message.setText(msg);
-				System.out.println(msg);
-				System.out.println("Sending...");
-				Transport.send(message);
-				System.out.println("Email sent to administrators");
-			} catch (MessagingException e) {
-				System.out.println("Error: Could not send email");
-				System.out.println(e.toString());
-			}
-		} else {
-			System.out.println("Email address not set");
-		}
-		return "redirect:/";
-	}
-	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
 	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -509,15 +467,6 @@ public class TapestryController{
 			return "redirect:/login?usernameChanged=true";
 		else
 			return "redirect:/profile";
-	}
-	
-	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
-	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, ModelMap model){
-		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
-		model.addAttribute("survey_templates", surveyTemplateList);
-		if (deleteFailed != null)
-			model.addAttribute("failed", deleteFailed);
-		return "admin/manage_survey_templates";
 	}
 	
 	@RequestMapping(value="/change_password", method=RequestMethod.POST)

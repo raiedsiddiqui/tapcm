@@ -21,6 +21,13 @@ import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
 import org.yaml.snakeyaml.Yaml;
+import java.util.Properties;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Transport;
+import javax.mail.Session;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 @Controller
 public class AppointmentController{
@@ -34,6 +41,11 @@ public class AppointmentController{
 	private ActivityDao activityDao;
 	private AppointmentDao appointmentDao;
 	
+   	//Mail-related settings;
+   	private Properties props;
+   	private String mailAddress = "";
+   	private Session session;
+	
 	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
    	 */
@@ -42,6 +54,12 @@ public class AppointmentController{
    		String DB = "";
    		String UN = "";
    		String PW = "";
+   		String mailHost = "";
+   		String mailUser = "";
+   		String mailPassword = "";
+   		String mailPort = "";
+   		String useTLS = "";
+   		String useAuth = "";
 		try{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
 			yaml = new Yaml();
@@ -49,6 +67,13 @@ public class AppointmentController{
 			DB = config.get("url");
 			UN = config.get("username");
 			PW = config.get("password");
+			mailHost = config.get("mailHost");
+			mailUser = config.get("mailUser");
+			mailPassword = config.get("mailPassword");
+			mailAddress = config.get("mailFrom");
+			mailPort = config.get("mailPort");
+			useTLS = config.get("mailUsesTLS");
+			useAuth = config.get("mailRequiresAuth");
 		} catch (IOException e) {
 			System.out.println("Error reading from config file");
 			System.out.println(e.toString());
@@ -57,6 +82,24 @@ public class AppointmentController{
 		patientDao = new PatientDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
+		
+		//Mail-related settings
+		final String username = mailUser;
+		final String password = mailPassword;
+		props = System.getProperties();
+		session = Session.getDefaultInstance(props, 
+				 new javax.mail.Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(username, password);
+					}
+		  		});
+		props.setProperty("mail.smtp.host", mailHost);
+		props.setProperty("mail.smtp.socketFactory.port", mailPort);
+		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		props.setProperty("mail.smtp.auth", useAuth);
+		props.setProperty("mail.smtp.starttls.enable", useTLS);
+		props.setProperty("mail.user", mailUser);
+		props.setProperty("mail.password", mailPassword);
    	}
    	
    	@RequestMapping(value="/manage_appointments", method=RequestMethod.GET)
@@ -79,7 +122,32 @@ public class AppointmentController{
 		a.setTime(request.getParameter("appointmentTime"));
 		appointmentDao.createAppointment(a);
 		Patient p = patientDao.getPatientByID(pid);
-		activityDao.logActivity("Booked appointment with " + p.getDisplayName(), loggedInUser, pid);
+		
+		//Email all the administrators with a notification
+		if (mailAddress != null){
+			try{
+				MimeMessage message = new MimeMessage(session);
+				message.setFrom(new InternetAddress(mailAddress));
+				for (User admin : userDao.getAllUsersWithRole("ROLE_ADMIN")){
+					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(admin.getEmail()));
+				}
+				message.setSubject("Tapestry: New appointment booked");
+				String msg = u.getName() + " has booked an appointment with " + p.getFirstName() + " " + p.getLastName();
+				msg += " for " + a.getTime() + " on " + a.getDate() + ".\n";
+				msg += "This appointment is awaiting confirmation.";
+				message.setText(msg);
+				System.out.println(msg);
+				System.out.println("Sending...");
+				Transport.send(message);
+				System.out.println("Email sent to administrators");
+			} catch (MessagingException e) {
+				System.out.println("Error: Could not send email");
+				System.out.println(e.toString());
+			}
+		} else {
+			System.out.println("Email address not set");
+		}
+		
 		return "redirect:/";
 	}
 	

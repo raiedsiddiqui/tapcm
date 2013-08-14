@@ -9,12 +9,21 @@
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
+	
 
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
 		}
 	</style>
+	
+	<script type="text/javascript">
+		function printTable(){
+			$('.table').printThis();
+		}
+	</script>
 </head>
 	
 <body>	
@@ -22,7 +31,7 @@
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
-			<h2>Activity Log</h2>
+			<h2>Activity Log <button class="btn btn-primary pull-right" onclick="printTable()" style="margin-right:25px;">Print</button></h2>
 			<div class="row-fluid">
 				<form action="user_logs" method="post">
 					<fieldset>
