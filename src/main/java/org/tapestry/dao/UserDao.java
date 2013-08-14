@@ -53,6 +53,25 @@ public class UserDao {
     	}
 	}
 	
+	public int countAdministrators(){
+		try{
+			statement = con.prepareStatement("SELECT COUNT(*) as c FROM users WHERE role=ROLE_ADMIN");
+			ResultSet result = statement.executeQuery();
+			result.first();
+			return result.getInt("c");
+		} catch (SQLException e){
+			System.out.println("Error: Could not count administrators");
+			e.printStackTrace();
+			return 0;
+		} finally {
+			try {
+				statement.close();
+			} catch (Exception e) {
+				//Ignore
+			}
+		}
+	}
+	
 	public int countAllUsers(){
 		try{
 			statement = con.prepareStatement("SELECT COUNT(*) as c FROM users");

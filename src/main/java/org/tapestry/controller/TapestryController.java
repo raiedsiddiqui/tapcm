@@ -12,6 +12,7 @@ import org.tapestry.dao.UserDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
+import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.PictureDao;
 import org.tapestry.objects.SurveyResult;
@@ -20,6 +21,7 @@ import org.tapestry.objects.User;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
+import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Picture;
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public class TapestryController{
    	private AppointmentDao appointmentDao;
    	private MessageDao messageDao;
    	private PictureDao pictureDao;
+   	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
    	private ActivityDao activityDao;
    	
@@ -92,7 +95,7 @@ public class TapestryController{
 			mailHost = config.get("mailHost");
 			mailUser = config.get("mailUser");
 			mailPassword = config.get("mailPassword");
-			mailAddress = config.get("mailAddress");
+			mailAddress = config.get("mailFrom");
 			mailPort = config.get("mailPort");
 			useTLS = config.get("mailUsesTLS");
 			useAuth = config.get("mailRequiresAuth");
@@ -107,6 +110,7 @@ public class TapestryController{
 		appointmentDao = new AppointmentDao(database, dbUsername, dbPassword);
 		messageDao = new MessageDao(database, dbUsername, dbPassword);
 		pictureDao = new PictureDao(database, dbUsername, dbPassword);
+		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		surveyResultDao = new SurveyResultDao(database, dbUsername, dbPassword);
 		activityDao = new ActivityDao(database, dbUsername, dbPassword);
 		
@@ -120,6 +124,7 @@ public class TapestryController{
 						return new PasswordAuthentication(username, password);
 					}
 		  		});
+		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		props.setProperty("mail.smtp.host", mailHost);
 		props.setProperty("mail.smtp.socketFactory.port", mailPort);
 		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
@@ -223,17 +228,23 @@ public class TapestryController{
 	public String addUser(SecurityContextHolderAwareRequestWrapper request){
 		//Add a new user
 		User u = new User();
-		u.setName(request.getParameter("name"));
-		u.setUsername(request.getParameter("username"));
+		u.setName(request.getParameter("name").trim());
+		u.setUsername(request.getParameter("username").trim());
 		u.setRole(request.getParameter("role"));
 		
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
 		String hashedPassword = enc.encodePassword("password", null); //Default
 		
 		u.setPassword(hashedPassword);
+<<<<<<< HEAD
 		u.setEmail(request.getParameter("email"));
 		boolean success = userDao.createUser(u);
 		if (mailAddress != null && success){
+=======
+		u.setEmail(request.getParameter("email").trim());
+		userDao.createUser(u);
+		if (mailAddress != null){
+>>>>>>> 9b814d5573045e7597f658e55f6a43f6f5c87f8d
 			try{
 				MimeMessage message = new MimeMessage(session);
 				message.setFrom(new InternetAddress(mailAddress));
@@ -285,8 +296,8 @@ public class TapestryController{
 	public String addPatient(SecurityContextHolderAwareRequestWrapper request){
 		//Add a new patient
 		Patient p = new Patient();
-		p.setFirstName(request.getParameter("firstname"));
-		p.setLastName(request.getParameter("lastname"));
+		p.setFirstName(request.getParameter("firstname").trim());
+		p.setLastName(request.getParameter("lastname").trim());
 		int v = Integer.parseInt(request.getParameter("volunteer"));
 		p.setVolunteer(v);
 		p.setGender(request.getParameter("gender"));
@@ -323,6 +334,48 @@ public class TapestryController{
 		model.addAttribute("pictures", pics);
 		activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
 		return "/patient";
+	}
+	
+	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
+	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		int loggedInUser = u.getUserID();
+		
+		Appointment a = new Appointment();
+		a.setVolunteerID(loggedInUser);
+		int pid = Integer.parseInt(request.getParameter("patient"));
+		a.setPatientID(pid);
+		a.setDate(request.getParameter("appointmentDate"));
+		a.setTime(request.getParameter("appointmentTime"));
+		appointmentDao.createAppointment(a);
+		Patient p = patientDao.getPatientByID(pid);
+		activityDao.logActivity("Booked appointment with " + p.getDisplayName(), loggedInUser, pid);
+		
+		//Email all the administrators with a notification
+		if (mailAddress != null){
+			try{
+				MimeMessage message = new MimeMessage(session);
+				message.setFrom(new InternetAddress(mailAddress));
+				for (User admin : userDao.getAllUsersWithRole("ROLE_ADMIN")){
+					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(admin.getEmail()));
+				}
+				message.setSubject("Tapestry: New appointment booked");
+				String msg = u.getName() + " has booked an appointment with " + p.getFirstName() + " " + p.getLastName();
+				msg += " for " + a.getTime() + " on " + a.getDate() + ".\n";
+				msg += "This appointment is awaiting confirmation.";
+				message.setText(msg);
+				System.out.println(msg);
+				System.out.println("Sending...");
+				Transport.send(message);
+				System.out.println("Email sent to administrators");
+			} catch (MessagingException e) {
+				System.out.println("Error: Could not send email");
+				System.out.println(e.toString());
+			}
+		} else {
+			System.out.println("Email address not set");
+		}
+		return "redirect:/";
 	}
 	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
@@ -462,6 +515,15 @@ public class TapestryController{
 			return "redirect:/login?usernameChanged=true";
 		else
 			return "redirect:/profile";
+	}
+	
+	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
+	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, ModelMap model){
+		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
+		model.addAttribute("survey_templates", surveyTemplateList);
+		if (deleteFailed != null)
+			model.addAttribute("failed", deleteFailed);
+		return "admin/manage_survey_templates";
 	}
 	
 	@RequestMapping(value="/change_password", method=RequestMethod.POST)
