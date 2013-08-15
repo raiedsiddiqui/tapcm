@@ -37,7 +37,7 @@
 					<fieldset>
 						<legend>Search Logs</legend>
 						<label>Name:</label>
-						<input type="text" name="name" /><br />
+						<input type="text" name="name" />
 						<input class="btn btn-primary" type="submit" value="Search" />
 					</fieldset>
 				</form>
