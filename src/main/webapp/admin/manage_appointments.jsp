@@ -41,7 +41,7 @@
 							<c:when test="${!a.approved}"><a href="<c:url value="/approve_appointment/${a.appointmentID}"/>" class="btn btn-primary">Approve</a></c:when>
 							<c:otherwise><a href="<c:url value="/unapprove_appointment/${a.appointmentID}"/>" class="btn btn-danger">Unapprove</a></c:otherwise>
 						</c:choose></td>
-					<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Remove</a></td>
+					<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
 				</tr>
 				</c:forEach>
 			</table>

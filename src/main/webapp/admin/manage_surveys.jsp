@@ -72,7 +72,7 @@
 						<option value="${p.patientID}">${p.firstName} ${p.lastName}</option>
 						</c:forEach>
 					</select><br />
-					<input class="btn btn-primary" type="submit" value="Upload" />
+					<input class="btn btn-primary" type="submit" value="Assign" />
 				</fieldset>
 			</form>
 		</div>

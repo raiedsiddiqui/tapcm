@@ -37,8 +37,7 @@
 					<th>Name</th>
 					<th>Username</th>
 					<th>Role</th>
-					<th>Status</th>
-					<th></th>
+					<th>Enable/Disable</th>
 				</tr>
 				<c:forEach items="${users}" var="u">
 				<c:if test="${u.role eq 'ROLE_ADMIN'}">
@@ -57,7 +56,8 @@
 						<c:if test="${u.enabled eq 'true'}"><a href="<c:url value="/disable_user/${u.userID}"/>" class="btn btn-danger">Click to disable</a></c:if>
 						<c:if test="${u.enabled eq 'false'}"><a href="<c:url value="/enable_user/${u.userID}"/>" class="btn">Click to enable</a></c:if>
 					</td>
-					<td><a href="<c:url value="/remove_user/${u.userID}"/>" class="btn btn-danger">Remove</a></td>
+					<!-- Disabling remove user as we should not be removing data from the database -->
+					<!-- <td><a href="<c:url value="/remove_user/${u.userID}"/>" class="btn btn-danger">Remove</a></td> -->
 				</tr>
 				</c:forEach>
 			</table>

@@ -77,14 +77,15 @@
 					<th>Name</th>
 					<th>Volunteer</th>
 					<th>Edit</th>
-					<th>Remove</th>
+					<!-- <th>Remove</th> -->
 				</tr>
                 <c:forEach items="${patients}" var="p">
                 <tr>
                     <td>${p.firstName} ${p.lastName} (${p.gender})</td>
                     <td>${p.volunteerName}</td>
                     <td><a href="<c:url value="/edit_patient/${p.patientID}"/>" class="btn btn-info">Edit</a></td>
-                    <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td>
+                    <!-- Disabling the ability to delete patients as data relating to a patient should not be deleted -->
+                    <!-- <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td> -->
                 </tr>
                 </c:forEach>
 			</table>
