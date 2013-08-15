@@ -104,6 +104,9 @@
 								</c:when>
 							</c:choose>
 							</c:if>
+							<c:if test="${not empty success}">
+								<div class="alert alert-info">Password successfully changed</div>
+							</c:if>
 							<legend>Change password</legend>
 	  						<label>Current password:</label>
 							<input type="password" name="currentPassword" required />

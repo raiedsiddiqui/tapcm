@@ -325,13 +325,15 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
-	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, @RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		model.addAttribute("vol", loggedInUser);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		if (errorsPresent != null)
 			model.addAttribute("errors", errorsPresent);
+		if(success != null)
+			model.addAttribute("success", true);
 		ArrayList<Picture> pics = pictureDao.getPicturesForUser(loggedInUser.getUserID());
 		model.addAttribute("pictures", pics);
 		return "/volunteer/profile";
@@ -480,7 +482,7 @@ public class TapestryController{
 		String hashedPassword = enc.encodePassword(newPassword, null);
 		userDao.setPasswordForUser(loggedInUser.getUserID(), hashedPassword);
 		activityDao.logActivity("Changed password", loggedInUser.getUserID());
-		return "redirect:/profile";
+		return "redirect:/profile?success=true";
 	}
 	
 	@RequestMapping(value="/remove_picture/{id}", method=RequestMethod.GET)
