@@ -33,25 +33,15 @@
 	</style>
 	
 	<script type="text/javascript">
-		var nowTemp = new Date();
-		var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
-		
-		$(function(){
-			$('#dp').datetimepicker({ 
-				pickTime: false,
-				minDate: 0
-			});
-		});
-
 		$(function(){
 			$('#tp').datetimepicker({
-				pickDate: false
+				pickDate: false,
+				pickSeconds: false
 			});
-			$('#dp1').datepicker({
-				onRender: function(date) {
-    				return date.valueOf() < now.valueOf() ? 'disabled' : '';
-  				}
-  			}
+			$('#dp').datetimepicker({
+				pickTime: false,
+				startDate: new Date()
+  			});
 		});
 		
 	</script>
@@ -223,7 +213,7 @@
 				</div>
 				<label>Time:</label>
 				<div id="tp" class="input-append">
-					<input data-format="hh:mm:ss" type="text" name="appointmentTime" readonly>
+					<input data-format="hh:mm:00" type="text" name="appointmentTime" readonly>
 				    <span class="add-on">
 				    	<i class="icon-time"></i>
 				    </span>
