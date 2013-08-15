@@ -10,7 +10,8 @@ Documentation can be found at src/site/markdown/
 Installation
 ------------
 
-- Change directory to the root of the git repository.
+- Run `git clone https://github.com/adamgignac/tapestry.git"
+- Run `cd tapestry`.
 - Open the 'tapp-admin' file and make sure that WEBAPP_DIR points to your Tomcat web app folder.
 - Run db/init_database.sql and db/insert_users.sql to create the database tables and add a default administrator (username and password 'admin').
 - Run `./tapp-admin --install`
