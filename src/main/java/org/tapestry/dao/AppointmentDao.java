@@ -70,7 +70,7 @@ public class AppointmentDao {
        		while(result.next()){
        			Appointment a = createFromSearch(result);
        			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-       			statement.setInt(1, result.getInt("patient"));
+       			statement.setInt(1, result.getInt("volunteer"));
        			ResultSet rs = statement.executeQuery();
        			rs.first();
        			a.setVolunteer(rs.getString("name"));
