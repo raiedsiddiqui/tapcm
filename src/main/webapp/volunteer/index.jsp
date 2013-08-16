@@ -121,10 +121,7 @@
 							<tr>
 								<td>${a.patient}</td>
 								<td>${a.time}</td>
-								<td><c:choose>
-									<c:when test="${!a.approved}">Not Approved</c:when>
-									<c:otherwise>Approved</c:otherwise>
-									</c:choose></td>
+								<td>${a.status}</td>
 								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
 							</tr>
 							</c:forEach>
@@ -149,10 +146,7 @@
 							<tr>
 								<td>${a.patient}</td>
 								<td>${a.date} ${a.time}</td>
-								<td><c:choose>
-									<c:when test="${!a.approved}">Not Approved</c:when>
-									<c:otherwise>Approved</c:otherwise>
-									</c:choose></td>
+								<td>${a.status}</td>
 								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
 							</tr>
 							</c:forEach>

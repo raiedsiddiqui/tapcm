@@ -29,7 +29,9 @@
 					<th>Volunteer</th>
 					<th>Patient</th>
 					<th>Time</th>
-					<th>Approve/Unapprove</th>
+					<th>Status</th>
+					<th>Approve</th>
+					<th>Decline</th>
 					<th>Delete</th>
 				</tr>
 				<c:forEach items="${appointments}" var="a">
@@ -37,10 +39,9 @@
 					<td>${a.volunteer}</td>
 					<td>${a.patient}</td>
 					<td>${a.date} ${a.time}</td>
-					<td><c:choose>
-							<c:when test="${!a.approved}"><a href="<c:url value="/approve_appointment/${a.appointmentID}"/>" class="btn btn-primary">Approve</a></c:when>
-							<c:otherwise><a href="<c:url value="/unapprove_appointment/${a.appointmentID}"/>" class="btn btn-danger">Unapprove</a></c:otherwise>
-						</c:choose></td>
+					<td>${a.status}</td>
+					<td><a href="<c:url value="/approve_appointment/${a.appointmentID}"/>" class="btn btn-primary">Approve</a></td>
+					<td><a href="<c:url value="/decline_appointment/${a.appointmentID}"/>" class="btn btn-danger">Decline</a></td>
 					<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
 				</tr>
 				</c:forEach>

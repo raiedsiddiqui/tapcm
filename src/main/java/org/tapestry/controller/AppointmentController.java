@@ -13,7 +13,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
@@ -38,7 +37,6 @@ public class AppointmentController{
 	
 	private UserDao userDao;
 	private PatientDao patientDao;
-	private ActivityDao activityDao;
 	private AppointmentDao appointmentDao;
 	
    	//Mail-related settings;
@@ -80,7 +78,6 @@ public class AppointmentController{
 		}
 		userDao = new UserDao(DB, UN, PW);
 		patientDao = new PatientDao(DB, UN, PW);
-		activityDao = new ActivityDao(DB, UN, PW);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
 		
 		//Mail-related settings
@@ -167,9 +164,9 @@ public class AppointmentController{
 		return "redirect:/manage_appointments";
 	}
 	
-	@RequestMapping(value="/unapprove_appointment/{appointmentID}", method=RequestMethod.GET)
+	@RequestMapping(value="/decline_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String unapproveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
-		appointmentDao.unapproveAppointment(id);
+		appointmentDao.declineAppointment(id);
 		return "redirect:/manage_appointments";
 	}
 }

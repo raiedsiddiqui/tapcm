@@ -53,7 +53,7 @@ public class AppointmentDao {
     		a.setDate(result.getString("appt_date"));
     		a.setTime(result.getString("appt_time"));
     		a.setDescription(result.getString("details"));
-    		a.setApproved(result.getBoolean("approved"));
+    		a.setStatus(result.getString("status"));
     		return a;
     	} catch (SQLException e){
     		System.out.println("Error: Could not create Appointment object");
@@ -64,7 +64,7 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllAppointments(){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, approved FROM appointments ORDER BY date_time DESC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, status FROM appointments ORDER BY date_time DESC");
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
        		while(result.next()){
@@ -93,7 +93,7 @@ public class AppointmentDao {
     	
     public ArrayList<Appointment> getAllAppointmentsForVolunteer(int volunteer){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, approved FROM appointments WHERE volunteer=? ORDER BY date_time DESC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, status FROM appointments WHERE volunteer=? ORDER BY date_time DESC");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -118,7 +118,7 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllAppointmentsForVolunteerForToday(int volunteer){
        	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, approved FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE() ORDER BY date_time DESC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, status FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE() ORDER BY date_time DESC");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -143,10 +143,11 @@ public class AppointmentDao {
     
     public void createAppointment(Appointment a){
     	try{
-    		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time) values (?,?,?)");
+    		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time, status) values (?,?,?,?)");
     		statement.setInt(1, a.getVolunteerID());
     		statement.setInt(2, a.getPatientID());
     		statement.setString(3, a.getDate() + " " + a.getTime());
+    		statement.setString(4, "Awaiting Approval");
     		statement.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not create appointment");
@@ -162,7 +163,7 @@ public class AppointmentDao {
     
     public void approveAppointment(int id){
     	try{
-    		statement = con.prepareStatement("UPDATE appointments SET approved=1 WHERE appointment_ID=?");
+    		statement = con.prepareStatement("UPDATE appointments SET status='Approved' WHERE appointment_ID=?");
     		statement.setInt(1, id);
     		statement.execute();
     	} catch (SQLException e){
@@ -177,9 +178,9 @@ public class AppointmentDao {
     	}
     }
     
-    public void unapproveAppointment(int id){
+    public void declineAppointment(int id){
     	try{
-    		statement = con.prepareStatement("UPDATE appointments SET approved=0 WHERE appointment_ID=?");
+    		statement = con.prepareStatement("UPDATE appointments SET status='Declined' WHERE appointment_ID=?");
     		statement.setInt(1, id);
     		statement.execute();
     	} catch (SQLException e){

@@ -13,7 +13,7 @@ public class Appointment{
 	private String time;
 	private String date;
 	private String desc;
-	private boolean approved;
+	private String status;
 	
 	/**
 	 * Empty constructor
@@ -79,8 +79,8 @@ public class Appointment{
 	/**
 	 * @return The approval status of the appointment
 	 */
-	public boolean isApproved(){
-		return approved;
+	public String getStatus(){
+		return status;
 	}
 	
 	//Mutators
@@ -141,7 +141,7 @@ public class Appointment{
 	/**
 	 * @param approved The approval status of the appointment
 	 */
-	public void setApproved(boolean approved){
-		this.approved = approved;
+	public void setStatus(String status){
+		this.status = status;
 	}
 }
