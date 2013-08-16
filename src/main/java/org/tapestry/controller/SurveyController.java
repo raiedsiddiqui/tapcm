@@ -86,7 +86,7 @@ public class SurveyController{
 	}
    	
    	@RequestMapping(value="/manage_surveys", method=RequestMethod.GET)
-	public String manageSurveys(ModelMap model, HttpServletRequest request){
+	public String manageSurveys(@RequestParam(value="failed", required=false) String failed, ModelMap model, HttpServletRequest request){
    		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getAllSurveyResults();
 		model.addAttribute("surveys", surveyResultList);
 		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
@@ -94,16 +94,22 @@ public class SurveyController{
 		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResultList, surveyTemplateList);
 	    ArrayList<Patient> patientList = patientDao.getAllPatients();
         model.addAttribute("patients", patientList);
+        if(failed != null) {
+        	model.addAttribute("failed", true);
+        }
 		return "admin/manage_surveys";
 	}
    	
 	@RequestMapping(value="/assign_surveys", method=RequestMethod.POST)
 	public String assignSurveys(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
-   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+		String[] patients = request.getParameterValues("patients[]");
+		if(patients == null) {
+			return "redirect:/manage_surveys?failed=true";
+		}
+		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
    		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
    		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
    		int surveyId = Integer.parseInt(request.getParameter("surveyID"));
-		String[] patients = request.getParameterValues("patients[]");
 		SurveyTemplate st = surveyTemplateDao.getSurveyTemplateByID(surveyId);
 		List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(surveyId));
 		

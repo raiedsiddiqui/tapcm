@@ -30,6 +30,9 @@
 		
 		<div class="row-fluid">
 			<h2>Surveys</h2>
+			<c:if test="${not empty failed}">
+				<div class="alert alert-error">Failed to assign survey: You must select at least one patient</div>
+			</c:if>
 			<table class="table">
 				<tr>
 					<th>Survey</th>
