@@ -358,6 +358,35 @@ public class UserDao {
 	}
 	
 	/**
+	* Lists all the active users in the database with the specified role
+	* @param role The role to search for ("ROLE_USER" or "ROLE_ADMIN")
+	* @return An ArrayList of User objects, or null if the request fails
+	*/
+	public ArrayList<User> getAllActiveUsersWithRole(String role){
+		try{
+			statement = con.prepareStatement("SELECT * FROM users WHERE role=? AND enabled=1");
+			statement.setString(1, role);
+			ResultSet result = statement.executeQuery();
+			ArrayList<User> foundUsers = new ArrayList<User>();
+			while(result.next()){
+				User u = createFromSearch(result);
+				foundUsers.add(u);
+			}
+			return foundUsers;
+		} catch (SQLException e){
+			System.out.println("Error: Could not retrieve users");
+			e.printStackTrace();
+			return null;
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+	}
+	
+	/**
 	 * Checks if the specified user has the given password
 	 * @param id The ID of the user to check
 	 * @param pwd The password to check (plaintext)

@@ -211,7 +211,7 @@ public class TapestryController{
 	}
 	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
 	public String managePatients(ModelMap model){
-		ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+		ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
 		model.addAttribute("volunteers", volunteers);
 	    ArrayList<Patient> patientList = patientDao.getAllPatients();
         model.addAttribute("patients", patientList);
@@ -495,7 +495,7 @@ public class TapestryController{
 	public String editPatientForm(@PathVariable("id") int patientID, ModelMap model){
 		Patient p = patientDao.getPatientByID(patientID);
 		model.addAttribute("patient", p);
-		ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+		ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
 		model.addAttribute("volunteers", volunteers);
 		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
 	}
