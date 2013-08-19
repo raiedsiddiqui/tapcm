@@ -89,7 +89,7 @@
 					<option value="F" <c:if test="${patient.gender eq 'F'}">selected</c:if>>Female</option>
 					<option value="O" <c:if test="${patient.gender eq 'O'}">selected</c:if>>Other</option>
 				</select>
-				<label>Warnings</label>
+				<label>Notes</label>
 				<textarea name="warnings">${patient.warnings}</textarea><br/>
 				<input type="submit" value="Save changes" class="btn btn-primary"/>
 			</form>

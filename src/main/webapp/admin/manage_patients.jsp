@@ -117,7 +117,7 @@
 						<option value="F">Female</option>
 						<option value="O">Other</option>
 					</select>
-					<label>Warnings</label>
+					<label>Notes</label>
 					<textarea name="warnings"></textarea>
 			</form>
   		</div>

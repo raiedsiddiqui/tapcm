@@ -123,7 +123,7 @@
 	<div id="modalWarn" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="warnLabel" aria-hidden="true">
 		<div class="modal-header">
    			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-   			<h3 id="warnLabel" style="color:#000000;">Patient Warnings: ${patient.displayName}</h3>
+   			<h3 id="warnLabel" style="color:#000000;">Patient Notes: ${patient.displayName}</h3>
   		</div>
   		<div class="modal-body">
   			<p class="text-warning">${patient.warnings}</p>
