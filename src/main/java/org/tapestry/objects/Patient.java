@@ -4,11 +4,12 @@ public class Patient{
 	private int patientID;
 	private String firstName;
 	private String lastName;
+	private String preferredName;
 	private String gender;
 	private String email;
 	private int volunteer;
 	private String volunteerName;
-	private String warnings;
+	private String notes;
 
 	/**
 	* Empty constructor
@@ -36,6 +37,13 @@ public class Patient{
 	*/
     public String getLastName(){
         return lastName;
+    }
+    
+    /**
+     * @return The patient's display name
+     */
+    public String getPreferredName(){
+    	return preferredName;
     }
 
 	/**
@@ -77,10 +85,10 @@ public class Patient{
     }
     
     /**
-     * @return The warnings for the patient
+     * @return The notes for the patient
      */
-    public String getWarnings(){
-    	return warnings;
+    public String getNotes(){
+    	return notes;
     }
 
 	//Mutators
@@ -103,6 +111,13 @@ public class Patient{
 	*/
     public void setLastName(String lastName){
         this.lastName = lastName;
+    }
+    
+    /**
+     * @param preferredName The new preferred name of the patient
+     */
+    public void setPreferredName(String preferredName){
+    	this.preferredName = preferredName;
     }
 
 	/**
@@ -134,9 +149,9 @@ public class Patient{
     }
     
     /**	
-     * @param warnings The warnings for the patient
+     * @param warnings The notes for the patient
      */
-    public void setWarnings(String warnings){
-    	this.warnings = warnings;
+    public void setNotes(String notes){
+    	this.notes = notes;
     }
 }

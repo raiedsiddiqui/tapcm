@@ -8,60 +8,10 @@
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/jquery.simple-color.js"></script>
-	
-	<script  type="text/javascript">
-		$(document).ready(function(){
-  			$('.simple_color').simpleColor();
-
-  			$('.simple_color_color_code').simpleColor({ displayColorCode: true });
-
-  			$('.simple_color_custom_cell_size').simpleColor({ cellWidth: 30, cellHeight: 10 });
-
-  			$('.simple_color_live_preview').simpleColor({ livePreview: true });
-
-			$('.simple_color_callback').simpleColor({
-    			onSelect: function( hex ) {
-      			alert("You selected #" + hex);
-    			}
-  			});
-
-  			$('.simple_color_mouse_enter').simpleColor({
-    			onCellEnter: function( hex ) {
-      			console.log("You just entered #" + hex);
-    			}
-  			});
-
-  			$('.simple_color_kitchen_sink').simpleColor({
-    			cellWidth: 20,
-    			cellHeight: 20,
-    			border: '1px solid #660033',
-    			buttonClass: 'button',
-    			displayColorCode: true,
-    			livePreview: true,
-    			onSelect: function( hex ) {
-      			alert("You selected #" + hex);
-    			},
-    			onCellEnter: function( hex ) {
-      				console.log("You just entered #" + hex);
-    			},
-    			onClose: function() {
-      				alert("color selector closed");
-    			}
-  			});
-
-		});
-	</script>
 
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
-		}
-		.simpleColorDisplay{
-			height:50px;
-			border-radius:4px;
-			margin-bottom:10px;
 		}
 	</style>
 </head>
@@ -75,6 +25,7 @@
 			<table class="table">
 				<tr>
 					<th>Name</th>
+					<th>Preferred Name</th>
 					<th>Volunteer</th>
 					<th>Edit</th>
 					<!-- <th>Remove</th> -->
@@ -82,6 +33,7 @@
                 <c:forEach items="${patients}" var="p">
                 <tr>
                     <td>${p.firstName} ${p.lastName} (${p.gender})</td>
+                    <td>${p.preferredName}</td>
                     <td>${p.volunteerName}</td>
                     <td><a href="<c:url value="/edit_patient/${p.patientID}"/>" class="btn btn-info">Edit</a></td>
                     <!-- Disabling the ability to delete patients as data relating to a patient should not be deleted -->
@@ -105,6 +57,8 @@
 					<input type="text" name="firstname" required/>
 					<label>Last Name:</label>
 					<input type="text" name="lastname" required/>
+					<label>Preferred Name:</label>
+					<input type="text" name="preferredname"/>
 					<label>Volunteer</label>
 					<select name="volunteer" form="newPatient">
 						<c:forEach items="${volunteers}" var="v">
@@ -117,8 +71,8 @@
 						<option value="F">Female</option>
 						<option value="O">Other</option>
 					</select>
-					<label>Warnings</label>
-					<textarea name="warnings"></textarea>
+					<label>Notes</label>
+					<textarea name="notes"></textarea>
 			</form>
   		</div>
   		<div class="modal-footer">

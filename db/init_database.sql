@@ -16,13 +16,11 @@ CREATE TABLE IF NOT EXISTS patients (
 	patient_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*zzUsing UNSIGNED SMALLINT allows for 65,535 patients*/
 	firstname VARCHAR(255) NOT NULL,
 	lastname VARCHAR(255) NOT NULL,
+	preferredname VARCHAR(255),
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
-	birthdate VARCHAR(15),
 	email VARCHAR(50),
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
-	color VARCHAR(7), /*Hexcode color string (#ffffff)*/
-	warnings TEXT,
-	picture VARCHAR(255),
+	notes TEXT,
 	PRIMARY KEY (patient_ID)
 );
 

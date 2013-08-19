@@ -63,7 +63,14 @@
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<c:forEach items="${patients}" var="p">
-							<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.displayName}</a></li>
+								<c:choose>
+									<c:when test="${not empty p.preferredName}">
+										<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.preferredName}</a></li>
+									</c:when>
+									<c:otherwise>
+										<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.displayName}</a></li>
+									</c:otherwise>
+								</c:choose>
 							</c:forEach>
 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
 							<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>

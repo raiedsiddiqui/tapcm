@@ -68,9 +68,10 @@ public class PatientDao {
             		p.setPatientID(result.getInt("patient_ID"));
             		p.setFirstName(result.getString("firstname"));
             		p.setLastName(result.getString("lastname"));
+            		p.setPreferredName(result.getString("preferredname"));
             		p.setGender(result.getString("gender"));
             		p.setVolunteer(result.getInt("volunteer"));
-            		p.setWarnings(result.getString("warnings"));
+            		p.setNotes(result.getString("notes"));
             		//Set volunteer name
             		statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
            			statement.setInt(1, p.getVolunteer());
@@ -147,12 +148,13 @@ public class PatientDao {
 	*/
     public void createPatient(Patient p){
 		try{
-			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, volunteer, gender, warnings) VALUES (?, ?, ?, ?, ?)");
+			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer, gender, notes) VALUES (?, ?, ?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
 			statement.setString(2, p.getLastName());
-			statement.setInt(3, p.getVolunteer());
-			statement.setString(4, p.getGender());
-			statement.setString(5, p.getWarnings());
+			statement.setString(3, p.getPreferredName());
+			statement.setInt(4, p.getVolunteer());
+			statement.setString(5, p.getGender());
+			statement.setString(6, p.getNotes());
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create patient");
@@ -172,13 +174,14 @@ public class PatientDao {
      */
     public void updatePatient(Patient p){
     	try{
-    		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, volunteer=?, gender=?, warnings=? WHERE patient_ID=?");
+    		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, preferredname=?, volunteer=?, gender=?, notes=? WHERE patient_ID=?");
     		statement.setString(1, p.getFirstName());
     		statement.setString(2, p.getLastName());
-    		statement.setInt(3, p.getVolunteer());
-    		statement.setString(4, p.getGender());
-    		statement.setString(5, p.getWarnings());
-    		statement.setInt(6, p.getPatientID());
+    		statement.setString(3, p.getPreferredName());
+    		statement.setInt(4, p.getVolunteer());
+    		statement.setString(5, p.getGender());
+    		statement.setString(6, p.getNotes());
+    		statement.setInt(7, p.getPatientID());
     		statement.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not update patient");
