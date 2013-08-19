@@ -47,6 +47,12 @@
 		.row-fluid{
 			margin:10px;
 		}
+		
+		input[type="radio"], input[type="checkbox"]{
+			height:50px;
+			width:50px;
+		}
+		
 	</style>
 </head>
 
