@@ -72,10 +72,19 @@
 		</div>
 		<div style="padding: 0px 15px;">
 			<div class="row-fluid">
-				<div class="span3"><h2>${patient.displayName} (${patient.gender})</h2></div>
+				<div class="span3">
+					<c:choose>
+						<c:when test="${not empty patient.preferredName}">
+							<h2>${patient.preferredName} (${patient.gender})</h2>
+						</c:when>
+						<c:otherwise>
+							<h2>${patient.displayName} (${patient.gender})</h2>
+						</c:otherwise>
+					</c:choose>
+				</div>
 				<div class="span3 btn-group">
-					<c:if test="${not empty patient.warnings}">
-					<a href="#modalWarn" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-exclamation-sign icon-white"></i></a>
+					<c:if test="${not empty patient.notes}">
+						<a href="#modalNotes" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-exclamation-sign icon-white"></i></a>
 					</c:if>
 				</div>
 			</div>
@@ -88,45 +97,56 @@
 			</div>
 			</c:forEach>
 		</div>
+		<!--
 		<div class="span8">
-					<h2>Pictures</h2>
-					<form id="uploadPic" action="<c:url value="/upload_picture_for_patient/${patient.patientID}" />" method="POST" enctype="multipart/form-data">
-						<label>Upload picture</label>
-  						<input form="uploadPic" type="file" name="pic" accept="image/*" required /><br/>
-  						<input form="uploadPic" type="submit" value="Upload" />
-					</form>
-					<c:choose>
-					<c:when test="${not empty pictures}">
+			<h2>Pictures</h2>
+			<form id="uploadPic" action="<c:url value="/upload_picture_for_patient/${patient.patientID}" />" method="POST" enctype="multipart/form-data">
+				<label>Upload picture</label>
+  				<input form="uploadPic" type="file" name="pic" accept="image/*" required /><br/>
+  				<input form="uploadPic" type="submit" value="Upload" />
+			</form>
+			<c:choose>
+				<c:when test="${not empty pictures}">
 					<ul class="thumbnails">
 						<c:forEach items="${pictures}" var="pic">
-					 	<li>
-    						<a href="#${fn:replace(pic.path, ".", "-")}" data-toggle="lightbox">
-      							<img class="thumbnail" src="<c:url value="/uploads/${pic.path}"/>"/>
-    						</a>
-    						<a href="<c:url value="/remove_picture/${pic.pictureID}"/>" class="btn btn-danger" style="width:92%;">Remove</a>
-    						<div id="${fn:replace(pic.path, ".", "-")}" class="lightbox hide fade" role="dialog" aria-hidden="true" tab-index="-1">
-    							<div class="lightbox-content">
-    								<img src="<c:url value="/uploads/${pic.path}"/>">
-    							</div>
-    						</div>
-  						</li>
+							<li>
+	    						<a href="#${fn:replace(pic.path, ".", "-")}" data-toggle="lightbox">
+	      							<img class="thumbnail" src="<c:url value="/uploads/${pic.path}"/>"/>
+	    						</a>
+	    						<a href="<c:url value="/remove_picture/${pic.pictureID}"/>" class="btn btn-danger" style="width:92%;">Remove</a>
+	    						<div id="${fn:replace(pic.path, ".", "-")}" class="lightbox hide fade" role="dialog" aria-hidden="true" tab-index="-1">
+	    							<div class="lightbox-content">
+	    								<img src="<c:url value="/uploads/${pic.path}"/>">
+	    							</div>
+	    						</div>
+	  						</li>
 						</c:forEach>
 					</ul>
-					</c:when>
-					<c:otherwise>
+				</c:when>
+				<c:otherwise>
 					<p>No pictures uploaded</p>
-					</c:otherwise>
-					</c:choose>
-				</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
+		-->
 	</div>
 
-	<div id="modalWarn" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="warnLabel" aria-hidden="true">
+	<div id="modalNotes" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="warnLabel" aria-hidden="true">
 		<div class="modal-header">
    			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-   			<h3 id="warnLabel" style="color:#000000;">Patient Notes: ${patient.displayName}</h3>
+   			<h3 id="warnLabel" style="color:#000000;">
+   				<c:choose>
+					<c:when test="${not empty patient.preferredName}">
+						${patient.preferredName}
+					</c:when>
+					<c:otherwise>
+						${patient.displayName}
+					</c:otherwise>
+				</c:choose>
+   			</h3>
   		</div>
   		<div class="modal-body">
-  			<p class="text-warning">${patient.warnings}</p>
+  			<p class="text-warning">${patient.notes}</p>
   		</div>
   		<div class="modal-footer">
    			<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>

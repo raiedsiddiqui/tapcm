@@ -286,10 +286,11 @@ public class TapestryController{
 		Patient p = new Patient();
 		p.setFirstName(request.getParameter("firstname").trim());
 		p.setLastName(request.getParameter("lastname").trim());
+		p.setPreferredName(request.getParameter("preferredname").trim());
 		int v = Integer.parseInt(request.getParameter("volunteer"));
 		p.setVolunteer(v);
 		p.setGender(request.getParameter("gender"));
-		p.setWarnings(request.getParameter("warnings"));
+		p.setNotes(request.getParameter("notes"));
 		patientDao.createPatient(p);
 		return "redirect:/manage_patients";
 	}
@@ -320,7 +321,11 @@ public class TapestryController{
 		model.addAttribute("surveys", surveyResultList);
 		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
 		model.addAttribute("pictures", pics);
-		activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
+		if(patient.getPreferredName() != null){
+			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getPreferredName(), u.getUserID(), patient.getPatientID());
+		} else {
+			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
+		}
 		return "/patient";
 	}
 	
@@ -506,10 +511,11 @@ public class TapestryController{
 		p.setPatientID(patientID);
 		p.setFirstName(request.getParameter("firstname"));
 		p.setLastName(request.getParameter("lastname"));
+		p.setPreferredName(request.getParameter("preferredname"));
 		int v = Integer.parseInt(request.getParameter("volunteer"));
 		p.setVolunteer(v);
 		p.setGender(request.getParameter("gender"));
-		p.setWarnings(request.getParameter("warnings"));
+		p.setNotes(request.getParameter("notes"));
 		patientDao.updatePatient(p);
 		return "redirect:/manage_patients";
 	}

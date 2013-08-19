@@ -8,60 +8,10 @@
 	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	
-	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/jquery.simple-color.js"></script>
-	
-	<script  type="text/javascript">
-		$(document).ready(function(){
-  			$('.simple_color').simpleColor();
-
-  			$('.simple_color_color_code').simpleColor({ displayColorCode: true });
-
-  			$('.simple_color_custom_cell_size').simpleColor({ cellWidth: 30, cellHeight: 10 });
-
-  			$('.simple_color_live_preview').simpleColor({ livePreview: true });
-
-			$('.simple_color_callback').simpleColor({
-    			onSelect: function( hex ) {
-      			alert("You selected #" + hex);
-    			}
-  			});
-
-  			$('.simple_color_mouse_enter').simpleColor({
-    			onCellEnter: function( hex ) {
-      			console.log("You just entered #" + hex);
-    			}
-  			});
-
-  			$('.simple_color_kitchen_sink').simpleColor({
-    			cellWidth: 20,
-    			cellHeight: 20,
-    			border: '1px solid #660033',
-    			buttonClass: 'button',
-    			displayColorCode: true,
-    			livePreview: true,
-    			onSelect: function( hex ) {
-      			alert("You selected #" + hex);
-    			},
-    			onCellEnter: function( hex ) {
-      				console.log("You just entered #" + hex);
-    			},
-    			onClose: function() {
-      				alert("color selector closed");
-    			}
-  			});
-
-		});
-	</script>
 
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
-		}
-		.simpleColorDisplay{
-			height:50px;
-			border-radius:4px;
-			margin-bottom:10px;
 		}
 	</style>
 </head>
@@ -77,6 +27,8 @@
 				<input type="text" name="firstname" value="${patient.firstName}" required/>
 				<label>Last Name:</label>
 				<input type="text" name="lastname" value="${patient.lastName}" required/>
+				<label>Preferred Name:</label>
+				<input type="text" name="preferredname" value="${patient.preferredName}"/>
 				<label>Volunteer</label>
 				<select name="volunteer" form="editPatient">
 					<c:forEach items="${volunteers}" var="v">
@@ -90,7 +42,7 @@
 					<option value="O" <c:if test="${patient.gender eq 'O'}">selected</c:if>>Other</option>
 				</select>
 				<label>Notes</label>
-				<textarea name="warnings">${patient.warnings}</textarea><br/>
+				<textarea name="notes">${patient.notes}</textarea><br/>
 				<input type="submit" value="Save changes" class="btn btn-primary"/>
 			</form>
 		</div>
