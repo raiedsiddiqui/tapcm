@@ -35,6 +35,7 @@ import javax.mail.Transport;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Collections;
 
 
 /**
@@ -318,6 +319,7 @@ public class TapestryController{
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getIncompleteSurveysByPatientID(id);
+		Collections.sort(surveyResultList);
 		model.addAttribute("surveys", surveyResultList);
 		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
 		model.addAttribute("pictures", pics);

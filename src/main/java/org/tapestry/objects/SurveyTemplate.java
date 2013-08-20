@@ -11,6 +11,7 @@ public class SurveyTemplate {
 	private int surveyID;
 	private String title;
 	private String type;
+	private int priority;
 	private byte[] contents;
 
 	public SurveyTemplate(){
@@ -61,6 +62,13 @@ public class SurveyTemplate {
 	public byte[] getContents(){
 		return contents;
 	}
+	
+	/**
+	 * @return the survey priority
+	 */
+	public int getPriority(){
+		return priority;
+	}
 
 	//Mutator methods
 	public void setSurveyID(int id){
@@ -86,5 +94,12 @@ public class SurveyTemplate {
 	 */
 	public void setContents(byte[] contents){
 		this.contents = contents;
+	}
+	
+	/**
+	 * @param priority The new priority for the survey
+	 */
+	public void setPriority(int priority){
+		this.priority = priority;
 	}
 }

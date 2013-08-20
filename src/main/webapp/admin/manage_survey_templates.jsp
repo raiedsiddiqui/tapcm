@@ -9,12 +9,6 @@
 	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
 	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 	
-	<script type="text/javascript">
-		function showAddSurvey(){
-			document.getElementById("addSurveyDiv").style.display="block";
-		}
-	</script>
-	
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
@@ -37,21 +31,29 @@
 				<tr>
 					<th>Title</th>
 					<th>Type</th>
+					<th>Priority</th>
 					<th>Remove</th>
 				</tr>
 				<c:forEach items="${survey_templates}" var="st">
 				<tr>
 					<td>${st.title}</td>
 					<td>${st.type}</td>
+					<td>${st.priority}</td>
 					<td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" class="btn btn-danger">Remove</a></td>
 				</tr>
 				</c:forEach>
 			</table>
-			<a class="btn btn-primary" onClick="showAddSurvey()">Add new</a>
+			<a href="#addSurvey" data-toggle="modal" class="btn btn-primary"">Add new</a>
 		</div>
-
-		<div class="row-fluid" id="addSurveyDiv" style="display:none";>
-			<form action="upload_survey_template" method="post" enctype="multipart/form-data">
+	
+	<!-- Modal -->
+	<div id="addSurvey" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+  		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    		<h3 id="modalHeader">Add Survey</h3>
+  		</div>
+  		<div class="modal-body">
+  			<form id="uploadSurveyForm" action="upload_survey_template" method="post" enctype="multipart/form-data">
 				<fieldset>
 					<legend>Add new survey</legend>
 					<label>Title:</label>
@@ -60,13 +62,22 @@
 					<select name="type">
 						<option value="MUMPS">MUMPS</option>
 					</select>
+					<label>Priority: (Higher numbers will be above lower numbers on the patient page)</label>
+					<select name="priority">
+						<c:forEach begin="0" end="9" varStatus="loop">
+						<option value="${loop.index}">${loop.index}</option>
+						</c:forEach>
+					</select>
 					<label>File:</label>
 					<input type="hidden" name="MAX_FILE_SIZE" value="2000000">
 					<input type="file" accept="text/*" name="file" required/>
-					<input class="btn btn-primary" type="submit" value="Upload" />
 				</fieldset>
 			</form>
-		</div>
+  		</div>
+  		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			<input class="btn btn-primary" form="uploadSurveyForm" type="submit" value="Upload" />
+  		</div>
 	</div>
 </body>
 </html>

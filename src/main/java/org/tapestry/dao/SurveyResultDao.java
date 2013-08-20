@@ -61,11 +61,17 @@ public class SurveyResultDao
     public ArrayList<SurveyResult> getIncompleteSurveysByPatientID(int patientId){
     	try {
 			statement = con.prepareStatement("SELECT * FROM survey_results WHERE patient_ID=? AND completed=0");
+			PreparedStatement priorityLookup = con.prepareStatement("SELECT priority FROM surveys WHERE survey_ID=?");
 			statement.setInt(1, patientId);
 			ResultSet result = statement.executeQuery();
+			ResultSet r;
 			ArrayList<SurveyResult> allSurveyResults = new ArrayList<SurveyResult>();
 			while(result.next()){
 				SurveyResult sr = createFromSearch(result);
+				priorityLookup.setInt(1, sr.getSurveyID());
+				r = priorityLookup.executeQuery();
+				r.first();
+				sr.setPriority(r.getInt("priority"));
 				allSurveyResults.add(sr);
 			}
 			return allSurveyResults;
@@ -191,6 +197,8 @@ public class SurveyResultDao
             sr.setStartDate(result.getString("startDate"));
             sr.setEditDate(result.getString("editDate"));
             sr.setResults(result.getBytes("data"));
+            
+            sr.setPriority(result.getInt("priority"));
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Survey Result object");
 			e.printStackTrace();

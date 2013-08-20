@@ -11,6 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import java.lang.ClassCastException;
 
 /**
 * Survey Result bean
@@ -18,7 +19,7 @@ import org.xml.sax.SAXException;
 * @author Darryl Hui
 * @version 1.0
 */
-public class SurveyResult {
+public class SurveyResult implements Comparable<SurveyResult> {
 
 	private int resultID;
 	private int surveyID;
@@ -29,6 +30,7 @@ public class SurveyResult {
 	private String startDate;
 	private String editDate;
 	private byte[] results;
+	private int priority;
 	private ArrayList<QuestionAnswerPair> questionAnswerPairs;
 
 	public SurveyResult(){
@@ -145,6 +147,10 @@ public class SurveyResult {
 	public ArrayList<QuestionAnswerPair> getQuestionAnswerPairs(){
 		return questionAnswerPairs;
 	}
+	
+	public int getPriority(){
+		return priority;
+	}
 
 	//Mutator methods
 	public void setResultID(int id){
@@ -212,5 +218,18 @@ public class SurveyResult {
 	 */
 	public void setQuestionAnswerPairs(ArrayList<QuestionAnswerPair> questionAnswerPairs){
 		this.questionAnswerPairs = questionAnswerPairs;
+	}
+	
+	public void setPriority(int priority){
+		this.priority = priority;
+	}
+	
+	/**
+	 * Compares the object with another one by priority
+	 * @o The object to be compared with
+	 */
+	@Override
+	public int compareTo(SurveyResult o) throws ClassCastException {
+		return o.getPriority() - this.priority;
 	}
 }
