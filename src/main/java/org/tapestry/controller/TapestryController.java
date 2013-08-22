@@ -415,28 +415,32 @@ public class TapestryController{
 			}
 		}
 		else{ //Send to one person
-			int recipientID = Integer.parseInt(request.getParameter("recipient"));
-			m.setRecipient(recipientID);
-			m.setSubject(request.getParameter("msgSubject"));
-			messageDao.sendMessage(m);
 			
-			User recipient = userDao.getUserByID(recipientID);
-			
-			if (mailAddress != null){
-				try{
-					MimeMessage message = new MimeMessage(session);
-					message.setFrom(new InternetAddress(mailAddress));
-					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
-					message.setSubject("Tapestry: New message notification");
-					String msg = "You have received a message. To review it, log into Tapestry and open your inbox.";
-					message.setText(msg);
-					System.out.println(msg);
-					System.out.println("Sending...");
-					Transport.send(message);
-					System.out.println("Email sent notifying " + recipient.getEmail());
-				} catch (MessagingException e) {
-					System.out.println("Error: Could not send email");
-					System.out.println(e.toString());
+			String[] recipients = request.getParameterValues("recipient");
+			for (String recipientIDAsString: recipients){ //Annoyingly, the request comes as strings
+				int recipientID = Integer.parseInt(recipientIDAsString);
+				m.setRecipient(recipientID);
+				m.setSubject(request.getParameter("msgSubject"));
+				messageDao.sendMessage(m);
+				
+				User recipient = userDao.getUserByID(recipientID);
+				
+				if (mailAddress != null){
+					try{
+						MimeMessage message = new MimeMessage(session);
+						message.setFrom(new InternetAddress(mailAddress));
+						message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
+						message.setSubject("Tapestry: New message notification");
+						String msg = "You have received a message. To review it, log into Tapestry and open your inbox.";
+						message.setText(msg);
+						System.out.println(msg);
+						System.out.println("Sending...");
+						Transport.send(message);
+						System.out.println("Email sent notifying " + recipient.getEmail());
+					} catch (MessagingException e) {
+						System.out.println("Error: Could not send email");
+						System.out.println(e.toString());
+					}
 				}
 			}
 		}

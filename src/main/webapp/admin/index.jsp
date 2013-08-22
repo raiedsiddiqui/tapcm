@@ -45,7 +45,7 @@
 					<input type="text" name="msgSubject" required/>
 					<label>Send to:</label>
 					<input type="checkbox" style="margin-bottom:10px;" value="true" name="isAnnouncement" onclick="document.getElementById('rec').disabled = !document.getElementById('rec').disabled;">Broadcast message</input><br/>
-					<select id="rec" name="recipient" form="messageVolunteer">
+					<select multiple id="rec" name="recipient" form="messageVolunteer">
 						<c:forEach items="${volunteers}" var="v">
 						<option value="${v.userID}">${v.name}</option>
 						</c:forEach>
