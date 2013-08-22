@@ -31,6 +31,7 @@ public class SurveyResult implements Comparable<SurveyResult> {
 	private String editDate;
 	private byte[] results;
 	private int priority;
+	private String description;
 	private ArrayList<QuestionAnswerPair> questionAnswerPairs;
 
 	public SurveyResult(){
@@ -151,6 +152,10 @@ public class SurveyResult implements Comparable<SurveyResult> {
 	public int getPriority(){
 		return priority;
 	}
+	
+	public String getDescription(){
+		return description;
+	}
 
 	//Mutator methods
 	public void setResultID(int id){
@@ -222,6 +227,10 @@ public class SurveyResult implements Comparable<SurveyResult> {
 	
 	public void setPriority(int priority){
 		this.priority = priority;
+	}
+	
+	public void setDescription(String description){
+		this.description = description;
 	}
 	
 	/**

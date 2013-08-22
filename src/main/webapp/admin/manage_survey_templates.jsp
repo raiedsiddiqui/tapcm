@@ -30,6 +30,7 @@
 			<table class="table">
 				<tr>
 					<th>Title</th>
+					<th>Description</th>
 					<th>Type</th>
 					<th>Priority</th>
 					<th>Remove</th>
@@ -37,6 +38,7 @@
 				<c:forEach items="${survey_templates}" var="st">
 				<tr>
 					<td>${st.title}</td>
+					<td>${st.description}</td>
 					<td>${st.type}</td>
 					<td>${st.priority}</td>
 					<td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" class="btn btn-danger">Remove</a></td>
@@ -58,6 +60,8 @@
 					<legend>Add new survey</legend>
 					<label>Title:</label>
 					<input type="text" name="title" required/>
+					<label>Description:</label>
+					<input type="text" name="desc"/>
 					<label>Type:</label>
 					<select name="type">
 						<option value="MUMPS">MUMPS</option>

@@ -28,13 +28,13 @@
 				<p>You can:</p>
 				<ul>
 					<li>Add a patient</li>
-					<li>Add a caretaker</li>
+					<li>Add a volunteer or administrator</li>
 					<li>Manage installed surveys</li>
 					<li>Send messages to volunteers</li>
 				</ul>
 			</div>
 			<div class="span6">
-				<h3>Message volunteer</h3>
+				<h3>Message Volunteer</h3>
 				<c:if test="${not empty success}">
 					<div class="alert alert-info" style="width:170px;">
 						<p>Message sent</p>
@@ -44,7 +44,7 @@
 					<label>Subject:</label>
 					<input type="text" name="msgSubject" required/>
 					<label>Send to:</label>
-					<input type="checkbox" style="margin-bottom:10px;" value="true" name="isAnnouncement" onclick="document.getElementById('rec').disabled = !document.getElementById('rec').disabled;">Global announcement</input><br/>
+					<input type="checkbox" style="margin-bottom:10px;" value="true" name="isAnnouncement" onclick="document.getElementById('rec').disabled = !document.getElementById('rec').disabled;">Broadcast message</input><br/>
 					<select id="rec" name="recipient" form="messageVolunteer">
 						<c:forEach items="${volunteers}" var="v">
 						<option value="${v.userID}">${v.name}</option>

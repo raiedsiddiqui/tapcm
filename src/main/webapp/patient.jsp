@@ -89,11 +89,12 @@
 				</div>
 			</div>
 			
-			<c:set var="count" value="1" scope="page" />
 			<c:forEach items="${surveys}" var="s">
 			<div class="row-fluid">
-				<a class="btn span12 btn-large btn-primary" href="<c:url value="/open_survey/${s.resultID}"/>">Survey #${count}</a></td>
-				<c:set var="count" value="${count + 1}" scope="page"/>
+				<a href="<c:url value="/open_survey/${s.resultID}"/>" class="span12 btn btn-primary" style="height:50px; margin-bottom:10px;">
+					<b>${s.surveyTitle}</b><br/>
+					${s.description}
+				</a>
 			</div>
 			</c:forEach>
 		</div>

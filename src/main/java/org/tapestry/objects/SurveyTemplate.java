@@ -13,6 +13,7 @@ public class SurveyTemplate {
 	private String type;
 	private int priority;
 	private byte[] contents;
+	private String description;
 
 	public SurveyTemplate(){
 		//Default constructor
@@ -69,6 +70,13 @@ public class SurveyTemplate {
 	public int getPriority(){
 		return priority;
 	}
+	
+	/**
+	 * @return the survey description
+	 */
+	public String getDescription(){
+		return description;
+	}
 
 	//Mutator methods
 	public void setSurveyID(int id){
@@ -101,5 +109,12 @@ public class SurveyTemplate {
 	 */
 	public void setPriority(int priority){
 		this.priority = priority;
+	}
+	
+	/**
+	 * @param desc The new description for the survey
+	 */
+	public void setDescription(String desc){
+		this.description = desc;
 	}
 }

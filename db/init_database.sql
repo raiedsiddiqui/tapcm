@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS surveys (
 	contents MEDIUMBLOB,
 	last_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, /*Automatically updates when record changed*/
     priority TINYINT(1), /*Between 0-9*/
+    description TEXT,
 	PRIMARY KEY (survey_ID)
 );
 

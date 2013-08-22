@@ -79,6 +79,7 @@ public class FileController extends MultiActionController{
 		SurveyTemplate st = new SurveyTemplate();
 		st.setTitle(request.getParameter("title"));
 		st.setType(request.getParameter("type"));
+		st.setDescription(request.getParameter("desc"));
 		int p = Integer.parseInt(request.getParameter("priority"));
 		st.setPriority(p);
 		st.setContents(multipartFile.getBytes());

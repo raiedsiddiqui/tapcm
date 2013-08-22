@@ -47,6 +47,7 @@ public class SurveyTemplateDao
             st.setType(result.getString("type"));
             st.setContents(result.getBytes("contents"));
             st.setPriority(result.getInt("priority"));
+            st.setDescription(result.getString("description"));
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
 			e.printStackTrace();
@@ -114,11 +115,12 @@ public class SurveyTemplateDao
 	 */
 	public void uploadSurveyTemplate(SurveyTemplate st) {
 		try {
-			statement = con.prepareStatement("INSERT INTO surveys (title, type, contents, priority) values (?,?,?,?)");
+			statement = con.prepareStatement("INSERT INTO surveys (title, type, contents, priority, description) values (?,?,?,?,?)");
 			statement.setString(1, st.getTitle());
 			statement.setString(2, st.getType());
 			statement.setBytes(3, st.getContents());
 			statement.setInt(4, st.getPriority());
+			statement.setString(5, st.getDescription());
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not upload survey template");

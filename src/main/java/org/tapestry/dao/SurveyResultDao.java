@@ -179,11 +179,12 @@ public class SurveyResultDao
             int surveyID = result.getInt("survey_ID");
             sr.setSurveyID(surveyID);
             //Look up the name of the survey
-   			statement = con.prepareStatement("SELECT title FROM surveys WHERE survey_ID=?");
+   			statement = con.prepareStatement("SELECT title, description FROM surveys WHERE survey_ID=?");
    			statement.setInt(1, surveyID);
    			ResultSet r = statement.executeQuery();
    			r.first();
    			sr.setSurveyTitle(r.getString("title"));
+   			sr.setDescription(r.getString("description"));
    			
    			int patientID = result.getInt("patient_ID");
    			sr.setPatientID(patientID);
