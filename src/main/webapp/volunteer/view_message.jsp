@@ -47,9 +47,10 @@
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 						</ul>
 					</div>
-				</div>	
+				</div>
 			</div>
 		</div>
+		
 		<div class="row-fluid">
 			<div class="span12" style="padding:0px 15px;">
 				<ul class="breadcrumb">
@@ -59,11 +60,20 @@
 				<div class="well">
 					<p>From: ${message.sender}</p>
 					<p>${message.text}</p>
+					<a href="<c:url value="/delete_message/${message.messageID}"/>" class="btn btn-danger">Delete</a>
+					<button onclick="document.getElementById('replyForm').style.display='block'" class="btn btn-primary">Reply</button>
 				</div>
 			</div>
 		</div>
 	</div>
 
+	<div id="replyForm" style="display:none;" class="span12">
+		<form id="reply" action="<c:url value="/reply_to/${message.messageID}"/>" method="POST">
+			<label>Message:</label>
+			<textarea name="msgBody"></textarea><br/>
+			<input type="submit" class="btn btn-primary" value="Send"/>
+		</form>
+	</div>
 
 </body>
 </html>

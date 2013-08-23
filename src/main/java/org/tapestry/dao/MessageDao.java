@@ -35,7 +35,13 @@ public class MessageDao {
 			m.setRead(result.getBoolean("msgRead"));
 			m.setText(result.getString("msg"));
 			m.setSubject(result.getString("subject"));
-			m.setSender(result.getString("sender"));
+			int senderID = result.getInt("sender");
+			m.setSenderID(senderID);
+			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+			statement.setInt(1, senderID);
+			ResultSet r = statement.executeQuery();
+			r.first();
+			m.setSender(r.getString("name"));
 			m.setMessageID(result.getInt("message_ID"));
 			m.setDate(result.getString("sent"));
 		} catch (SQLException e){
@@ -132,7 +138,7 @@ public class MessageDao {
 		try{
 			statement = con.prepareStatement("INSERT INTO messages (recipient, sender, msg, subject) VALUES (?,?,?,?)");
 			statement.setInt(1, m.getRecipient());
-			statement.setString(2, m.getSender());
+			statement.setInt(2, m.getSenderID());
 			statement.setString(3, m.getText());
 			statement.setString(4, m.getSubject());
 			statement.execute();

@@ -353,7 +353,10 @@ public class TapestryController{
 		model.addAttribute("messages", messages);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
-		return "/volunteer/inbox";
+		if (request.isUserInRole("ROLE_USER"))
+			return "/volunteer/inbox";
+		else
+			return "/admin/inbox";
 	}
 	
 	@RequestMapping(value="/view_message/{msgID}", method=RequestMethod.GET)
@@ -367,7 +370,10 @@ public class TapestryController{
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		model.addAttribute("message", m);
-		return "/volunteer/view_message";
+		if (request.isUserInRole("ROLE_USER"))
+			return "/volunteer/view_message";
+		else
+			return "/admin/view_message";
 	}
 	
 	@RequestMapping(value="/dismiss/{announcement}", method=RequestMethod.GET)
@@ -385,6 +391,7 @@ public class TapestryController{
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = new Message();
 		m.setSender(loggedInUser.getName());
+		m.setSenderID(loggedInUser.getUserID());
 		m.setText(request.getParameter("msgBody"));
 		if (request.getParameter("isAnnouncement") != null && request.getParameter("isAnnouncement").equals("true")){ //Sound to all volunteers
 			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
@@ -451,6 +458,39 @@ public class TapestryController{
 	@RequestMapping(value="/delete_message/{msgID}", method=RequestMethod.GET)
 	public String deleteMessage(@PathVariable("msgID") int id, ModelMap model){
 		messageDao.deleteMessage(id);
+		return "redirect:/inbox";
+	}
+	
+	@RequestMapping(value="/reply_to/{msgID}", method=RequestMethod.POST)
+	public String replyToMessage(@PathVariable("msgID") int id, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+		Message oldMsg = messageDao.getMessageByID(id);
+		Message newMsg = new Message();
+		//Reverse sender and recipient
+		User recipient = userDao.getUserByID(oldMsg.getSenderID());
+		int newRecipient = userDao.getUserByID(oldMsg.getRecipient()).getUserID();
+		newMsg.setSenderID(newRecipient);
+		newMsg.setRecipient(oldMsg.getSenderID());
+		newMsg.setText(request.getParameter("msgBody"));
+		newMsg.setSubject("RE: " + oldMsg.getSubject());
+		messageDao.sendMessage(newMsg);
+		
+		if (mailAddress != null){
+			try{
+				MimeMessage message = new MimeMessage(session);
+				message.setFrom(new InternetAddress(mailAddress));
+				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
+				message.setSubject("Tapestry: New message notification");
+				String msg = "You have received a message. To review it, log into Tapestry and open your inbox.";
+				message.setText(msg);
+				System.out.println(msg);
+				System.out.println("Sending...");
+				Transport.send(message);
+				System.out.println("Email sent notifying " + recipient.getEmail());
+			} catch (MessagingException e) {
+				System.out.println("Error: Could not send email");
+				System.out.println(e.toString());
+			}
+		}
 		return "redirect:/inbox";
 	}
 

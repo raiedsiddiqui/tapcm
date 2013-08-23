@@ -6,6 +6,7 @@ public class Message {
 	private String msgText;
 	private boolean msgRead;
 	private int recipient;
+	private int senderID;
 	private String sender;
 	private String subject;
 	private String date;
@@ -32,6 +33,10 @@ public class Message {
 	
 	public String getSender(){
 		return sender;
+	}
+	
+	public int getSenderID(){
+		return senderID;
 	}
 	
 	public String getSubject(){
@@ -65,6 +70,10 @@ public class Message {
 	
 	public void setSender(String sender){
 		this.sender = sender;
+	}
+	
+	public void setSenderID(int senderID){
+		this.senderID = senderID;
 	}
 	
 	public void setDate(String date){
