@@ -217,7 +217,7 @@ public class SurveyController{
 		if (request.isUserInRole("ROLE_ADMIN")){
    			return "redirect:/manage_surveys";
    		} else {
-   			return "redirect:/";
+   			return "redirect:/patient/" + currentPatient.getPatientID();
    		}
 	}
   
