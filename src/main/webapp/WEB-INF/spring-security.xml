@@ -19,7 +19,7 @@
 		<intercept-url pattern="/caretaker/*" access="ROLE_USER" />
 		<intercept-url pattern="/login" filters="none" />
 		<intercept-url pattern="/loginfailed" filters="none" />
-		<intercept-url pattern="/logout" access="ROLE_USER" />
+		<intercept-url pattern="/logout" access="ROLE_USER, ROLE_ADMIN" />
 		<intercept-url pattern="/resources/**" filters="none" />
 		<intercept-url pattern="/manage_appointments" access="ROLE_ADMIN" />
 		<intercept-url pattern="/manage_patients" access="ROLE_ADMIN" />
@@ -50,6 +50,7 @@
 		<intercept-url pattern="/open_survey/**" access="ROLE_USER" />
 		<intercept-url pattern="/show_survey/**" access="ROLE_ADMIN, ROLE_USER" />
 		<intercept-url pattern="/save_survey/**" access="ROLE_ADMIN, ROLE_USER" />
+		<intercept-url pattern="/user_logs/**" access="ROLE_ADMIN" />
 		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
 	</http>
  

@@ -195,8 +195,8 @@ public class TapestryController{
 	public String logout(SecurityContextHolderAwareRequestWrapper request){
 		String username = request.getUserPrincipal().getName();
 		User currentUser = userDao.getUserByUsername(username);
-		activityDao.logActivity(currentUser.getName() + " logged out", currentUser.getUserID());
-		return "redirect:/j_spring_security_logout";
+		//activityDao.logActivity(currentUser.getName() + " logged out", currentUser.getUserID());
+		return "confirm-logout";
 	}
 	
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)

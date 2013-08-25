@@ -16,7 +16,7 @@
 					<li <c:if test="${pageContext.request.requestURI.contains('manage_surveys')}">class="active"</c:if>><a href="<c:url value="/manage_surveys"/>">Manage Surveys</a></li>
 					<li <c:if test="${pageContext.request.requestURI.contains('inbox')}">class="active"</c:if>><a href="<c:url value="/inbox"/>">Inbox</a></li>
 					<li <c:if test="${pageContext.request.requestURI.contains('user_logs')}">class="active"</c:if>><a href="<c:url value="/user_logs/1"/>">User Logs</a><li>
-					<li><a href="<c:url value="/j_spring_security_logout"/>">Log Out</a></li>
+					<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 				</ul>
 			</div>
 		</div>	
