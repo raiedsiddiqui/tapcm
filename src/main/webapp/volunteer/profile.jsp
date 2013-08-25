@@ -66,7 +66,7 @@
      					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
+							<li class="active"><a href="<c:url value="/profile"/>">My Profile</a></li>
 							<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 						</ul>
