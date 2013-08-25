@@ -47,10 +47,19 @@
 		.row-fluid{
 			margin:10px;
 		}
+
+		#surveyQuestion{
+			font-size:18px;
+		}
 		
 		input[type="radio"], input[type="checkbox"]{
 			height:50px;
 			width:50px;
+		}
+		
+		input[type="button"], input[type="submit"]{
+			height:40px;
+			font-size:18px;
 		}
 		
 	</style>
@@ -84,7 +93,7 @@
             			
             			Question: 
             			
-            			<div style="padding: 3px;border-top: 1px solid #cdcdcd;border-bottom: 1px solid #cdcdcd;font-size: 13px;font-family: Verdana, Arial, Helvetica, sans-serif;">
+            			<div style="padding: 3px;border-top: 1px solid #cdcdcd;border-bottom: 1px solid #cdcdcd;font-family: Verdana, Arial, Helvetica, sans-serif;">
            				<%
            					String questionText = question.getQuestionTextRenderKeys(survey);
             				//put enterspaces into the text, except if the <script tag is unclosed (allows javascript)
@@ -105,7 +114,7 @@
             			<%=questionText%>
             		</div>
             		<br/>
-            		<div style="padding: 3px;background-color: #e1ebef;font-size: 13px;font-family: Verdana, Arial, Helvetica, sans-serif;">
+            		<div style="padding: 3px;background-color: #e1ebef;font-family: Verdana, Arial, Helvetica, sans-serif;">
                 		<div class="notificationMessage"><%=message%></div>
                 		Answer: 
                 
