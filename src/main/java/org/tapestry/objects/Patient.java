@@ -40,7 +40,7 @@ public class Patient{
     }
     
     /**
-     * @return The patient's display name
+     * @return The patient's preferred name, defaulting to "First L."
      */
     public String getPreferredName(){
     	return preferredName;

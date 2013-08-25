@@ -323,7 +323,7 @@ public class TapestryController{
 		model.addAttribute("surveys", surveyResultList);
 		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
 		model.addAttribute("pictures", pics);
-		if(patient.getPreferredName() != null){
+		if(patient.getPreferredName() != null && patient.getPreferredName() != ""){
 			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getPreferredName(), u.getUserID(), patient.getPatientID());
 		} else {
 			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
