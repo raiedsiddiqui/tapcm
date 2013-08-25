@@ -131,7 +131,7 @@
 							</tr>
 							<c:forEach items="${appointments_today}" var="a">
 							<tr>
-								<td>${a.patient}</td>
+								<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
 								<td>${a.time}</td>
 								<td>${a.status}</td>
 								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
