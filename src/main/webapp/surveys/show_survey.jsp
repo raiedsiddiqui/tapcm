@@ -115,7 +115,7 @@
             		</div>
             		<br/>
             		<div style="padding: 3px;background-color: #e1ebef;font-family: Verdana, Arial, Helvetica, sans-serif;">
-                		<div class="notificationMessage"><%=message%></div>
+                		<div class="alert alert-warning notificationMessage"><%=message%></div>
                 		Answer: 
                 
                 		<%
