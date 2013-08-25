@@ -84,7 +84,7 @@
 				</div>
 				<div class="span3 btn-group">
 					<c:if test="${not empty patient.notes}">
-						<a href="#modalNotes" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-exclamation-sign icon-white"></i></a>
+						<a href="#modalNotes" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 					</c:if>
 				</div>
 			</div>
