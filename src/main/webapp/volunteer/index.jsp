@@ -7,10 +7,15 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
-	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
-	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/0.0.11/js/bootstrap-datetimepicker.min.js"></script>
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
+		  		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+
+	<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
 
 	<style type="text/css">
 		html,body{
@@ -134,7 +139,7 @@
 								<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
 								<td>${a.time}</td>
 								<td>${a.status}</td>
-								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
+								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this appointment?')">Delete</a></td>
 							</tr>
 							</c:forEach>
 						</table>

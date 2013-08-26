@@ -7,11 +7,12 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
-	<link href="http://cdn.jsdelivr.net/bootstrap.lightbox/0.6/bootstrap-lightbox.css"></link>
-	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
-	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	<script src="http://cdn.jsdelivr.net/bootstrap.lightbox/0.6/bootstrap-lightbox.js"></script>
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+	<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
+	<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 	
 
 	<style type="text/css">
