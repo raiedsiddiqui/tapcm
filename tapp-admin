@@ -56,6 +56,7 @@ def deploy(option, opt, value, parser):
 
 def initial_install(option, opt, value, parser):
     """Convenience function, runs all of the above plus some helpful prompts"""
+    check_dependencies(option, opt, value, parser)
     update(option, opt, value, parser)
     os.system("gedit src/main/webapp/WEB-INF/classes/tapestry.yaml")
     build(option, opt, value, parser)
@@ -68,4 +69,10 @@ parser.add_option("-d", "--deploy", action="callback", callback=deploy, help="co
 parser.add_option("-c", "--check", action="callback", callback=check_dependencies, help="checks to see if the necessary dependencies are installed and installs them if necessary")
 parser.add_option("--install", action="callback", callback=initial_install, help="Calls all of the above, also prompts to edit config file")
 
+print(" ________    ___      _____   _____ ")
+print("|__    __|  /   \    |     | |     |")
+print("   |  |    /  _  \   |   __| |   __|")
+print("   |  |   /  / \  \  |  |    |  |   ")
+print("   |__|  /__/   \__\ |__|    |__|   ")
+print("====================================")
 (options, args) = parser.parse_args()
