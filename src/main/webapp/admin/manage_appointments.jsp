@@ -14,17 +14,36 @@
 		.row-fluid{
 			margin:10px;
 		}
+		.bootstrap-datetimepicker-widget{
+			z-index:9999;
+		}
 	</style>
+	
+	<script type="text/javascript">
+		$(function(){
+			$('#tp').datetimepicker({
+				pickDate: false,
+				pickSeconds: false
+			});
+			$('#dp').datetimepicker({
+				pickTime: false,
+				startDate: new Date()
+  			});
+		});
+		
+	</script>
 </head>
 
 <body>
   <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<%@include file="navbar.jsp" %>
-		
-		
+
 		<div class="row-fluid">
 			<h2>Appointments</h2>
+			<c:if test="${not empty success}">
+				<div class="alert alert-info">Appointment has been successfully booked</div>
+			</c:if>
 			<table class="table">
 				<tr>
 					<th>Volunteer</th>
@@ -47,7 +66,44 @@
 				</tr>
 				</c:forEach>
 			</table>
+			<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book new appointment</a>
 		</div>
+	</div>
+	
+	<!-- Modal -->
+	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+  		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    		<h3 id="modalHeader">Book Appointment</h3>
+  		</div>
+  		<div class="modal-body">
+  			<form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
+  				<label>With patient:</label>
+				<select name="patient" form="appt-form">
+					<c:forEach items="${patients}" var="p">
+					<option value="${p.patientID}">${p.displayName}</option>
+					</c:forEach>
+				</select><br />
+				<label>Date:</label>		
+				<div id="dp" class="input-append">
+					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate" readonly>
+					<span class="add-on">
+						<i class="icon-calendar"></i>
+					</span>
+				</div>
+				<label>Time:</label>
+				<div id="tp" class="input-append">
+					<input data-format="hh:mm:00" type="text" name="appointmentTime" readonly>
+				    <span class="add-on">
+				    	<i class="icon-time"></i>
+				    </span>
+				</div>
+  			</form>
+  		</div>
+  		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    		<button type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
+  		</div>
 	</div>
 </body>
 </html>
