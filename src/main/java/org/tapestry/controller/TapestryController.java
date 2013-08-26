@@ -303,7 +303,7 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/patient/{patient_id}", method=RequestMethod.GET)
-	public String viewPatient(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false) String completedSurvey, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -328,6 +328,8 @@ public class TapestryController{
 		} else {
 			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
 		}
+		if (completedSurvey != null)
+			model.addAttribute("completed", completedSurvey);
 		return "/patient";
 	}
 	

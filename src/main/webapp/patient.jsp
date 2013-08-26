@@ -88,7 +88,9 @@
 					</c:if>
 				</div>
 			</div>
-			
+			<c:if test="${not empty completed}">
+				<p class="alert alert-success">Completed survey: ${completed}</p>
+			</c:if>
 			<c:forEach items="${surveys}" var="s">
 			<div class="row-fluid">
 				<a href="<c:url value="/open_survey/${s.resultID}"/>" class="span12 btn btn-primary" style="height:50px; margin-bottom:10px;">
