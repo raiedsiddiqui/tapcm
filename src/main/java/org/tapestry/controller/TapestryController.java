@@ -151,7 +151,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
-	public String welcome(@RequestParam(value="success", required=false) Boolean messageSent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String welcome(@RequestParam(value="success", required=false) Boolean messageSent, @RequestParam(value="booked", required=false) Boolean booked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
 			String username = request.getUserPrincipal().getName();
 			User u = userDao.getUserByUsername(username);
@@ -168,7 +168,8 @@ public class TapestryController{
 			model.addAttribute("unread", unreadMessages);
 			model.addAttribute("activities", activityLog);
 			model.addAttribute("announcements", announcements);
-			
+			if (booked != null)
+				model.addAttribute("booked", booked);
 			return "volunteer/index";
 		}
 		else if (request.isUserInRole("ROLE_ADMIN")){
@@ -195,7 +196,7 @@ public class TapestryController{
 	public String logout(SecurityContextHolderAwareRequestWrapper request){
 		String username = request.getUserPrincipal().getName();
 		User currentUser = userDao.getUserByUsername(username);
-		//activityDao.logActivity(currentUser.getName() + " logged out", currentUser.getUserID());
+		activityDao.logActivity(currentUser.getName() + " logged out", currentUser.getUserID());
 		return "confirm-logout";
 	}
 	

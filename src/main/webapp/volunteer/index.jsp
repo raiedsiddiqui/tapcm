@@ -108,6 +108,9 @@
 			</div>
 		</div>
 		</c:if>
+		<c:if test="${not empty booked}">
+			<div class="alert alert-info">The appointment was successfully booked</div>
+		</c:if>
 		<div class="row-fluid">
 			<div class="span12">
 				<p>

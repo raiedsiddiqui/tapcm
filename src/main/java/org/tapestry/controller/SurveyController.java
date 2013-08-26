@@ -145,7 +145,11 @@ public class SurveyController{
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		Patient p = patientDao.getPatientByID(surveyResult.getPatientID());
 		
-		activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getDisplayName(), u.getUserID());
+		if(p.getPreferredName() != null && p.getPreferredName() != "") {
+			activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getPreferredName(), u.getUserID());
+		} else {
+			activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getDisplayName(), u.getUserID());
+		}
 		return "redirect:/show_survey/" + id;
 	}
    	
@@ -204,14 +208,22 @@ public class SurveyController{
 			}
 			surveyResultDao.updateSurveyResults(id, data);
 			surveyResultDao.markAsComplete(id);
-			activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID());
+			if(currentPatient.getPreferredName() != null && currentPatient.getPreferredName() != "") {
+				activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getPreferredName(), currentUser.getUserID(), currentPatient.getPatientID());
+			} else {
+				activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID());
+			}
 		}
 		
 		if (!currentSurvey.isComplete())
 		{
 			byte[] data = SurveyAction.updateSurveyResult(currentSurvey);
 			surveyResultDao.updateSurveyResults(id, data);
-			activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID());
+			if(currentPatient.getPreferredName() != null && currentPatient.getPreferredName() != "") {
+				activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getPreferredName(), currentUser.getUserID(), currentPatient.getPatientID());
+			} else {
+				activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID());
+			}
 		}
 		
 		if (request.isUserInRole("ROLE_ADMIN")){

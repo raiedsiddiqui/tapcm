@@ -13,6 +13,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
@@ -100,52 +101,58 @@ public class AppointmentController{
    	}
    	
    	@RequestMapping(value="/manage_appointments", method=RequestMethod.GET)
-   	public String manageAppointments(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+   	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
    		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();
+   		ArrayList<Patient> allPatients = patientDao.getAllPatients();
    		model.addAttribute("appointments", allAppointments);
+   		model.addAttribute("patients", allPatients);
+   		if(appointmentBooked != null)
+   			model.addAttribute("success", appointmentBooked);
    		return "admin/manage_appointments";
    	}
    	
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
 	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		int loggedInUser = u.getUserID();
+		int patientId = Integer.parseInt(request.getParameter("patient"));
+		Patient p = patientDao.getPatientByID(patientId);
 		
 		Appointment a = new Appointment();
-		a.setVolunteerID(loggedInUser);
-		int pid = Integer.parseInt(request.getParameter("patient"));
-		a.setPatientID(pid);
+		a.setVolunteerID(p.getVolunteer());
+		a.setPatientID(p.getPatientID());
 		a.setDate(request.getParameter("appointmentDate"));
 		a.setTime(request.getParameter("appointmentTime"));
 		appointmentDao.createAppointment(a);
-		Patient p = patientDao.getPatientByID(pid);
 		
-		//Email all the administrators with a notification
-		if (mailAddress != null){
-			try{
-				MimeMessage message = new MimeMessage(session);
-				message.setFrom(new InternetAddress(mailAddress));
-				for (User admin : userDao.getAllUsersWithRole("ROLE_ADMIN")){
-					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(admin.getEmail()));
+		if(request.isUserInRole("ROLE_USER")) {
+			//Email all the administrators with a notification
+			if (mailAddress != null){
+				try{
+					MimeMessage message = new MimeMessage(session);
+					message.setFrom(new InternetAddress(mailAddress));
+					for (User admin : userDao.getAllUsersWithRole("ROLE_ADMIN")){
+						message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(admin.getEmail()));
+					}
+					message.setSubject("Tapestry: New appointment booked");
+					String msg = p.getVolunteerName() + " has booked an appointment with " + p.getFirstName() + " " + p.getLastName();
+					msg += " for " + a.getTime() + " on " + a.getDate() + ".\n";
+					msg += "This appointment is awaiting confirmation.";
+					message.setText(msg);
+					System.out.println(msg);
+					System.out.println("Sending...");
+					Transport.send(message);
+					System.out.println("Email sent to administrators");
+				} catch (MessagingException e) {
+					System.out.println("Error: Could not send email");
+					System.out.println(e.toString());
 				}
-				message.setSubject("Tapestry: New appointment booked");
-				String msg = u.getName() + " has booked an appointment with " + p.getFirstName() + " " + p.getLastName();
-				msg += " for " + a.getTime() + " on " + a.getDate() + ".\n";
-				msg += "This appointment is awaiting confirmation.";
-				message.setText(msg);
-				System.out.println(msg);
-				System.out.println("Sending...");
-				Transport.send(message);
-				System.out.println("Email sent to administrators");
-			} catch (MessagingException e) {
-				System.out.println("Error: Could not send email");
-				System.out.println(e.toString());
+			} else {
+				System.out.println("Email address not set");
 			}
+			
+			return "redirect:/?booked=true";
 		} else {
-			System.out.println("Email address not set");
+			return "redirect:/manage_appointments?success=true";
 		}
-		
-		return "redirect:/";
 	}
 	
 	@RequestMapping(value="/delete_appointment/{appointmentID}", method=RequestMethod.GET)
