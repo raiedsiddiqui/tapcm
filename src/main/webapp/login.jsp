@@ -41,7 +41,7 @@
        						<div class="control-group">
 	        					<div class="controls">
 									<input type="submit" value="Login" style="margin-bottom:10px;"></input>
-									<p>Tapestry 13.08.16</p>
+									<p>Tapestry 13.08.26</p>
         						</div>
        						</div>
       					</form>
