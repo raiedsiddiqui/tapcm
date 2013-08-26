@@ -14,8 +14,7 @@
 		  		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-
-	<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
 
 	<style type="text/css">
 		html,body{
@@ -43,12 +42,20 @@
 				pickDate: false,
 				pickSeconds: false
 			});
+			
 			$('#dp').datetimepicker({
 				pickTime: false,
 				startDate: new Date()
   			});
+  			
+ 			$('#bookAppt').click(function(){
+		        var btn = $(this)
+		        btn.button('loading')
+		        setTimeout(function () {
+		            btn.button('reset')
+		        }, 3000)
+		    });
 		});
-		
 	</script>
 </head>
 	
@@ -236,7 +243,7 @@
   		</div>
   		<div class="modal-footer">
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    		<button type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
+    		<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
   		</div>
 	</div>
 </body>

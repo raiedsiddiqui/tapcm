@@ -6,9 +6,13 @@
 	<title>Tapestry Admin</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
+				
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
 	
 	<style type="text/css">
 		.row-fluid{
@@ -29,6 +33,14 @@
 				pickTime: false,
 				startDate: new Date()
   			});
+  			
+  			$('#bookAppt').click(function(){
+		        var btn = $(this)
+		        btn.button('loading')
+		        setTimeout(function () {
+		            btn.button('reset')
+		        }, 3000)
+		    });
 		});
 		
 	</script>
@@ -102,7 +114,7 @@
   		</div>
   		<div class="modal-footer">
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    		<button type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
+    		<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
   		</div>
 	</div>
 </body>
