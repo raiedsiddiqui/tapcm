@@ -39,18 +39,28 @@
 <head>
 	<title>Tapestry Admin</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
-	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
-	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 	
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
 		}
+
+		#surveyQuestion{
+			font-size:18px;
+		}
 		
 		input[type="radio"], input[type="checkbox"]{
 			height:50px;
 			width:50px;
+		}
+		
+		input[type="button"], input[type="submit"]{
+			height:40px;
+			font-size:18px;
 		}
 		
 	</style>
@@ -84,7 +94,7 @@
             			
             			Question: 
             			
-            			<div style="padding: 3px;border-top: 1px solid #cdcdcd;border-bottom: 1px solid #cdcdcd;font-size: 13px;font-family: Verdana, Arial, Helvetica, sans-serif;">
+            			<div style="padding: 3px;border-top: 1px solid #cdcdcd;border-bottom: 1px solid #cdcdcd;font-family: Verdana, Arial, Helvetica, sans-serif;">
            				<%
            					String questionText = question.getQuestionTextRenderKeys(survey);
             				//put enterspaces into the text, except if the <script tag is unclosed (allows javascript)
@@ -105,8 +115,8 @@
             			<%=questionText%>
             		</div>
             		<br/>
-            		<div style="padding: 3px;background-color: #e1ebef;font-size: 13px;font-family: Verdana, Arial, Helvetica, sans-serif;">
-                		<div class="notificationMessage"><%=message%></div>
+            		<div style="padding: 3px;background-color: #e1ebef;font-family: Verdana, Arial, Helvetica, sans-serif;">
+                		<div class="alert alert-warning notificationMessage"><%=message%></div>
                 		Answer: 
                 
                 		<%

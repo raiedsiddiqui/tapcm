@@ -151,7 +151,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
-	public String welcome(@RequestParam(value="success", required=false) Boolean messageSent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String welcome(@RequestParam(value="success", required=false) Boolean messageSent, @RequestParam(value="booked", required=false) Boolean booked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
 			String username = request.getUserPrincipal().getName();
 			User u = userDao.getUserByUsername(username);
@@ -168,7 +168,8 @@ public class TapestryController{
 			model.addAttribute("unread", unreadMessages);
 			model.addAttribute("activities", activityLog);
 			model.addAttribute("announcements", announcements);
-			
+			if (booked != null)
+				model.addAttribute("booked", booked);
 			return "volunteer/index";
 		}
 		else if (request.isUserInRole("ROLE_ADMIN")){
@@ -196,7 +197,7 @@ public class TapestryController{
 		String username = request.getUserPrincipal().getName();
 		User currentUser = userDao.getUserByUsername(username);
 		activityDao.logActivity(currentUser.getName() + " logged out", currentUser.getUserID());
-		return "redirect:/j_spring_security_logout";
+		return "confirm-logout";
 	}
 	
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
@@ -303,7 +304,7 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/patient/{patient_id}", method=RequestMethod.GET)
-	public String viewPatient(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false) String completedSurvey, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -323,11 +324,13 @@ public class TapestryController{
 		model.addAttribute("surveys", surveyResultList);
 		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
 		model.addAttribute("pictures", pics);
-		if(patient.getPreferredName() != null){
+		if(patient.getPreferredName() != null && patient.getPreferredName() != ""){
 			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getPreferredName(), u.getUserID(), patient.getPatientID());
 		} else {
 			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
 		}
+		if (completedSurvey != null)
+			model.addAttribute("completed", completedSurvey);
 		return "/patient";
 	}
 	

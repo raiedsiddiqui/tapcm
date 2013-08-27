@@ -7,11 +7,12 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
-	<link href="http://cdn.jsdelivr.net/bootstrap.lightbox/0.6/bootstrap-lightbox.css"></link>
-	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
-	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	<script src="http://cdn.jsdelivr.net/bootstrap.lightbox/0.6/bootstrap-lightbox.js"></script>
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+	<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
+	<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 	
 
 	<style type="text/css">
@@ -66,7 +67,7 @@
      					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
+							<li class="active"><a href="<c:url value="/profile"/>">My Profile</a></li>
 							<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 						</ul>

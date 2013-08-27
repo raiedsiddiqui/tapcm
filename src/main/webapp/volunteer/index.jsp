@@ -7,10 +7,14 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-	<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet"></link>
-	<script src="http://code.jquery.com/jquery-2.0.0.min.js"></script>
-	<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/0.0.11/js/bootstrap-datetimepicker.min.js"></script>
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
+		  		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
 
 	<style type="text/css">
 		html,body{
@@ -38,12 +42,20 @@
 				pickDate: false,
 				pickSeconds: false
 			});
+			
 			$('#dp').datetimepicker({
 				pickTime: false,
 				startDate: new Date()
   			});
+  			
+ 			$('#bookAppt').click(function(){
+		        var btn = $(this)
+		        btn.button('loading')
+		        setTimeout(function () {
+		            btn.button('reset')
+		        }, 3000)
+		    });
 		});
-		
 	</script>
 </head>
 	
@@ -62,16 +74,21 @@
      					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<c:forEach items="${patients}" var="p">
-								<c:choose>
-									<c:when test="${not empty p.preferredName}">
-										<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.preferredName}</a></li>
-									</c:when>
-									<c:otherwise>
-										<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.displayName}</a></li>
-									</c:otherwise>
-								</c:choose>
-							</c:forEach>
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">My Visits<b class="caret"></b></a>
+								<ul class="dropdown-menu">
+								<c:forEach items="${patients}" var="p">
+									<c:choose>
+										<c:when test="${not empty p.preferredName}">
+											<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.preferredName}</a></li>
+										</c:when>
+										<c:otherwise>
+											<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.displayName}</a></li>
+										</c:otherwise>
+									</c:choose>
+								</c:forEach>
+								</ul>
+							</li>
 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
 							<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
@@ -103,6 +120,9 @@
 			</div>
 		</div>
 		</c:if>
+		<c:if test="${not empty booked}">
+			<div class="alert alert-info">The appointment was successfully booked</div>
+		</c:if>
 		<div class="row-fluid">
 			<div class="span12">
 				<p>
@@ -126,10 +146,10 @@
 							</tr>
 							<c:forEach items="${appointments_today}" var="a">
 							<tr>
-								<td>${a.patient}</td>
+								<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
 								<td>${a.time}</td>
 								<td>${a.status}</td>
-								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
+								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this appointment?')">Delete</a></td>
 							</tr>
 							</c:forEach>
 						</table>
@@ -223,7 +243,7 @@
   		</div>
   		<div class="modal-footer">
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    		<button type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
+    		<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
   		</div>
 	</div>
 </body>

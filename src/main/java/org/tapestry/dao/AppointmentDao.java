@@ -150,7 +150,7 @@ public class AppointmentDao {
     		statement.setString(4, "Awaiting Approval");
     		statement.execute();
     	} catch (SQLException e){
-    		System.out.println("Error: Could not create appointment");
+    		System.out.println("Error: Could not book appointment");
     		e.printStackTrace();
     	} finally {
     		try{
