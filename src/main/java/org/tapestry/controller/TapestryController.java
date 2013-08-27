@@ -173,8 +173,10 @@ public class TapestryController{
 			return "volunteer/index";
 		}
 		else if (request.isUserInRole("ROLE_ADMIN")){
-			String name = request.getUserPrincipal().getName();
-			model.addAttribute("name", name);
+			User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+			model.addAttribute("name", loggedInUser.getName());
 			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
 			model.addAttribute("volunteers", volunteers);
 			if (messageSent != null)
@@ -201,7 +203,10 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
-	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model){
+	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+		model.addAttribute("unread", unreadMessages);
 		ArrayList<User> userList = userDao.getAllUsers();
 		model.addAttribute("users", userList);
 		model.addAttribute("active", userDao.countActiveUsers());
@@ -212,7 +217,10 @@ public class TapestryController{
 		return "admin/manage_users";
 	}
 	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
-	public String managePatients(ModelMap model){
+	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+		model.addAttribute("unread", unreadMessages);
 		ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
 		model.addAttribute("volunteers", volunteers);
 	    ArrayList<Patient> patientList = patientDao.getAllPatients();
