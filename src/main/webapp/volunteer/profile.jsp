@@ -93,7 +93,7 @@
 							<input type="submit" class="btn btn-primary" value="Save changes" />
 						</fieldset>
 					</form>
-					<form id="change-password" method="post" action="<c:url value="/change_password"/>">
+					<form id="change-password" method="post" action="<c:url value="/change_password/${vol.userID}"/>">
 						<fieldset>
 							<c:if test="${not empty errors}">
 							<c:choose>

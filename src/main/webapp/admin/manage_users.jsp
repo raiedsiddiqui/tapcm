@@ -68,7 +68,7 @@
 					</td>
 					<td>
 						<button id="cpb-${u.userID}" class="btn btn-info" onclick="document.getElementById('cp-${u.userID}').style.display='block'; document.getElementById('cpb-${u.userID}').style.display='none'">Change password</button> 
-						<form class="form-inline" style="display:none" id="cp-${u.userID}">
+						<form class="form-inline" method="POST" style="display:none" id="cp-${u.userID}" action="<c:url value="/change_password/${u.userID}"/>">
 							<input type="text" name="newPassword"/>
 							<input type="submit" class="btn btn-primary" value="Change"/>
 						</form>

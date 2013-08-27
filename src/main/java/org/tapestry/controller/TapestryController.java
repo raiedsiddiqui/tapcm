@@ -519,24 +519,31 @@ public class TapestryController{
 			return "redirect:/profile";
 	}
 	
-	@RequestMapping(value="/change_password", method=RequestMethod.POST)
-	public String changePassword(SecurityContextHolderAwareRequestWrapper request){
-		String currentUsername = request.getUserPrincipal().getName();
-		User loggedInUser = userDao.getUserByUsername(currentUsername);
-		String currentPassword = request.getParameter("currentPassword");
-		String newPassword = request.getParameter("newPassword");
-		String confirmPassword = request.getParameter("confirmPassword");
-		if (!newPassword.equals(confirmPassword)){
-			return "redirect:/profile?error=confirm";
-		}
-		if (!userDao.userHasPassword(loggedInUser.getUserID(), currentPassword)){
-			return "redirect:/profile?error=current";
+	@RequestMapping(value="/change_password/{id}", method=RequestMethod.POST)
+	public String changePassword(@PathVariable("id") int userID, SecurityContextHolderAwareRequestWrapper request){
+		String newPassword;
+		String target;
+		if (request.isUserInRole("ROLE_USER")){
+			String currentPassword = request.getParameter("currentPassword");
+			newPassword = request.getParameter("newPassword");
+			String confirmPassword = request.getParameter("confirmPassword");
+			if (!newPassword.equals(confirmPassword)){
+				return "redirect:/profile?error=confirm";
+			}
+			if (!userDao.userHasPassword(userID, currentPassword)){
+				return "redirect:/profile?error=current";
+			}
+			target = "redirect:/profile?success=true";
+		} else {
+			System.out.println("Admin is changing password");
+			newPassword = request.getParameter("newPassword");
+			target = "redirect:/manage_users";
 		}
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
 		String hashedPassword = enc.encodePassword(newPassword, null);
-		userDao.setPasswordForUser(loggedInUser.getUserID(), hashedPassword);
-		activityDao.logActivity("Changed password", loggedInUser.getUserID());
-		return "redirect:/profile?success=true";
+		userDao.setPasswordForUser(userID, hashedPassword);
+		activityDao.logActivity("Changed password", userID);
+		return target;
 	}
 	
 	@RequestMapping(value="/remove_picture/{id}", method=RequestMethod.GET)
