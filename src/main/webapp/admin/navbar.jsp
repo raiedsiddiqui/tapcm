@@ -10,7 +10,7 @@
      		<a class="brand" href="<c:url value="/"/>">Home</a>
      		<div class="nav-collapse collapse">
 				<ul class="nav">
-					<li><a href="<c:url value="/manage_users"/>">Manage Volunteers</a></li>
+					<li><a href="<c:url value="/manage_users"/>">Manage Users</a></li>
 					<li><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
 					<li><a href="<c:url value="/manage_appointments"/>">Manage Appointments</a></li>
 					<li><a href="<c:url value="/manage_survey_templates"/>">Manage Survey Templates</a></li>

@@ -20,6 +20,14 @@
 		.row-fluid{
 			margin:10px;
 		}
+		
+		td{
+			width:20%;
+		}
+		
+		form input{
+			width:auto;
+		}
 	</style>
 </head>
 	
@@ -38,6 +46,7 @@
 					<th>Username</th>
 					<th>Role</th>
 					<th>Enable/Disable</th>
+					<th>Change password</th>
 				</tr>
 				<c:forEach items="${users}" var="u">
 				<c:if test="${u.role eq 'ROLE_ADMIN'}">
@@ -55,6 +64,13 @@
 					<td>
 						<c:if test="${u.enabled eq 'true'}"><a href="<c:url value="/disable_user/${u.userID}"/>" class="btn btn-danger">Click to disable</a></c:if>
 						<c:if test="${u.enabled eq 'false'}"><a href="<c:url value="/enable_user/${u.userID}"/>" class="btn">Click to enable</a></c:if>
+					</td>
+					<td>
+						<button id="cpb-${u.userID}" class="btn btn-info" onclick="document.getElementById('cp-${u.userID}').style.display='block'; document.getElementById('cpb-${u.userID}').style.display='none'">Change password</button> 
+						<form class="form-inline" style="display:none" id="cp-${u.userID}">
+							<input type="text" name="newPassword"/>
+							<input type="submit" class="btn btn-primary" value="Change"/>
+						</form>
 					</td>
 					<!-- Disabling remove user as we should not be removing data from the database -->
 					<!-- <td><a href="<c:url value="/remove_user/${u.userID}"/>" class="btn btn-danger">Remove</a></td> -->
