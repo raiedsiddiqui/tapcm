@@ -199,8 +199,8 @@ public class SurveyResultDao
             sr.setEditDate(result.getString("editDate"));
             sr.setResults(result.getBytes("data"));
             
-            sr.setPriority(result.getInt("priority"));
-		} catch (SQLException e) {
+            sr = sr.processMumpsResults(sr);
+		} catch (Exception e) {
 			System.out.println("Error: Failed to create Survey Result object");
 			e.printStackTrace();
 		}

@@ -1,11 +1,15 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -13,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
@@ -20,6 +25,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.util.FileCopyUtils;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyMap;
@@ -35,6 +42,7 @@ import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.SurveyFactory;
+import org.tapestry.surveys.ResultParser;
 import org.yaml.snakeyaml.Yaml;
 
 @Controller
@@ -240,5 +248,43 @@ public class SurveyController{
    		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
    		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
    		return "redirect:/manage_surveys";
+   	}
+   	
+   	@RequestMapping(value="/view_survey_results/{resultID}", method=RequestMethod.GET)
+   	public String viewSurveyResults(@PathVariable("resultID") int id, HttpServletRequest request, ModelMap model){
+   		SurveyResult r = surveyResultDao.getSurveyResultByID(id);
+   		String xml;
+   		try{
+   			xml = new String(r.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		LinkedHashMap<String, String> res = ResultParser.getResults(xml);
+   		model.addAttribute("results", res);
+   		model.addAttribute("id", id);
+   		return "/admin/view_survey_results";
+   	}
+   	
+   	@RequestMapping(value="/export_csv/{resultID}", method=RequestMethod.GET)
+   	@ResponseBody
+   	public String downloadCSV(@PathVariable("resultID") int id, HttpServletResponse response){
+   		SurveyResult r = surveyResultDao.getSurveyResultByID(id);
+   		String xml;
+   		try{
+   			xml = new String(r.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		String res = ResultParser.resultsAsCSV(ResultParser.getResults(xml));
+   		response.setContentType("text/csv");
+   		response.setContentLength(res.length());
+   		response.setHeader("Content-Disposition", "attachment; filename=\"result.csv\"");
+   		try{
+   			PrintWriter pw = new PrintWriter(response.getOutputStream());
+   			pw.write(res);
+   		} catch (Exception e) {
+   			e.printStackTrace();
+   		}
+   		return res;
    	}
 }

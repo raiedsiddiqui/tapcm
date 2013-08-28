@@ -42,6 +42,7 @@
 					<th>Status</th>
 					<th>Last Edit Date</th>
 					<th>Remove</th>
+					<th>View/Export</th>
 				</tr>
 				<c:forEach items="${surveys}" var="s">
 				<tr>
@@ -54,6 +55,16 @@
 						</c:choose></td>
 					<td>${s.editDate}</td>
 					<td><a href="<c:url value="/delete_survey/${s.resultID}"/>" class="btn btn-danger">Remove</a></td>
+					<td>
+						<c:choose>
+							<c:when test="${s.completed}">
+							<a href="<c:url value="/view_survey_results/${s.resultID}"/>" class="btn btn-success">View Results</a>
+							</c:when>
+							<c:otherwise>
+							<a href="#" class="btn btn-success disabled">View Results</a>
+							</c:otherwise>
+						</c:choose>
+					</td>
 				</tr>
 				</c:forEach>
 			</table>
