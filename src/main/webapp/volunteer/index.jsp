@@ -125,10 +125,7 @@
 		</c:if>
 		<div class="row-fluid">
 			<div class="span12">
-				<p>
-					<strong>Appointments:</strong>
-					<a href="#bookAppointment" role="button" class="btn btn-primary" data-toggle="modal">Book appointment</a>
-				</p>
+				<h3>Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
 				<ul class="nav nav-tabs" id="appointmentSelect">
 					<li class="active"><a href="#today" data-toggle="tab">Today</a></li>
 					<li><a href="#all" data-toggle="tab">All</a></li>
@@ -185,28 +182,6 @@
 					</c:choose>
 					</div>
 				</div>
-			</div>
-		</div>
-		<div class="row-fluid">
-			<div class="span12">
-				<p><strong>Recent Activities:</strong></p>
-				<table class="table">
-				<c:choose>
-						<c:when test="${not empty activities}">
-						<table class="table">
-						<c:forEach items="${activities}" var="a">
-							<tr>
-								<td>${a.date}</td>
-								<td>${a.description}</td>
-							</tr>
-							</c:forEach>
-						</table>
-						</c:when>
-						<c:otherwise>
-							<p style="margin-left:25px">No activities</p>
-						</c:otherwise>
-					</c:choose>
-				</table>
 			</div>
 		</div>
 	</div>
