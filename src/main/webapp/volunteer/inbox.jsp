@@ -56,9 +56,15 @@
 		</div>
 		<div class="row-fluid">
 			<div class="span12" style="padding:0px 15px;">
-				<ul class="breadcrumb">
-					<li><h2><a href="<c:url value="/inbox"/>">Inbox</a></h2></li>
-				</ul>
+			<ul class="breadcrumb">
+				<li><h2><a href="<c:url value="/inbox"/>">Inbox</a></h2></li>
+				<a href="#modalSend" data-toggle="modal" class="btn btn-primary pull-right">Message Administrator</a>
+			</ul>
+			<c:if test="${not empty success}">
+			<div class="alert alert-info">
+				<p>Message sent</p>
+			</div>
+			</c:if>
 				<c:choose>
 					<c:when test="${not empty messages}">
 					<table class="table">
@@ -85,6 +91,29 @@
 						<p style="margin-left:25px">You have no messages</p>
 					</c:otherwise>
 				</c:choose>
+			</div>
+			<div class="modal hide fade" id="modalSend">
+				<div class="modal-header">
+    				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+					<h3>Message Administrator</h3>
+				</div>
+				<div class="modal-body">
+					<form id="messageAdministrator" method="post" action="<c:url value="/send_message"/>">
+						<label>Subject:</label>
+						<input type="text" name="msgSubject" required/>
+						<label>Send to:</label>
+						<select multiple id="rec" name="recipient" form="messageAdministrator">
+							<c:forEach items="${administrators}" var="a">
+							<option value="${a.userID}">${a.name}</option>
+							</c:forEach>
+						</select><br />
+						<label>Message:</label>
+						<textarea name="msgBody"></textarea><br />
+					</form>
+				</div>
+				<div class="modal-footer">
+					<input type="submit" form="messageAdministrator" class="btn btn-primary" value="Send" />
+  				</div>
 			</div>
 		</div>
 	</div>

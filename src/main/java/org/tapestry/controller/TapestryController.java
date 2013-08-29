@@ -151,7 +151,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
-	public String welcome(@RequestParam(value="success", required=false) Boolean messageSent, @RequestParam(value="booked", required=false) Boolean booked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
 			String username = request.getUserPrincipal().getName();
 			User u = userDao.getUserByUsername(username);
@@ -177,10 +177,6 @@ public class TapestryController{
 			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
 			model.addAttribute("name", loggedInUser.getName());
-			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
-			model.addAttribute("volunteers", volunteers);
-			if (messageSent != null)
-				model.addAttribute("success", messageSent);
 			return "admin/index";
 		}
 		else{ //This should not happen, but catch any unforseen behavior
@@ -360,16 +356,23 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
-	public String viewInbox(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("messages", messages);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
-		if (request.isUserInRole("ROLE_USER"))
+		if (messageSent != null)
+			model.addAttribute("success", messageSent);
+		if (request.isUserInRole("ROLE_USER")) {
+			ArrayList<User> administrators = userDao.getAllUsersWithRole("ROLE_ADMIN");
+			model.addAttribute("administrators", administrators);
 			return "/volunteer/inbox";
-		else
+		} else {
+			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+			model.addAttribute("volunteers", volunteers);
 			return "/admin/inbox";
+		}
 	}
 	
 	@RequestMapping(value="/view_message/{msgID}", method=RequestMethod.GET)
@@ -465,7 +468,7 @@ public class TapestryController{
 			}
 		}
 
-		return "redirect:/?success=true";
+		return "redirect:/inbox?success=true";
 	}
 	
 	@RequestMapping(value="/delete_message/{msgID}", method=RequestMethod.GET)
