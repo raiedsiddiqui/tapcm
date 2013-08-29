@@ -46,10 +46,14 @@ public class ResultParser {
                     Element questionText = (Element) questionTextList.item(0);
                     //questionAnswerString += questionText.getTextContent().trim();
                 }
-                NodeList questionAnswerList = question.getElementsByTagName("AnswerValue");
+                NodeList questionAnswerList = question.getElementsByTagName("QuestionAnswer");
                 if (questionAnswerList.getLength() > 0){
-                    Element questionAnswer = (Element) questionAnswerList.item(0);
-                    questionAnswerString += questionAnswer.getTextContent().trim();
+                	for (int j = 0; j < questionAnswerList.getLength(); j++){
+                		Element questionAnswer = (Element) questionAnswerList.item(j);
+                		questionAnswerString += questionAnswer.getTextContent().trim();
+                		if (questionAnswer.getNextSibling() != null)
+                			questionAnswerString += ", ";
+                	}
                 }
                 results.put(questionString, questionAnswerString);
             }
