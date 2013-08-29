@@ -116,7 +116,9 @@
             		</div>
             		<br/>
             		<div style="padding: 3px;background-color: #e1ebef;font-family: Verdana, Arial, Helvetica, sans-serif;">
+                		<% if (!message.equals("")) { %>
                 		<div class="alert alert-warning notificationMessage"><%=message%></div>
+                		<% } %>
                 		Answer: 
                 
                 		<%
@@ -129,7 +131,7 @@
                 			<input type="text" size="5" style="text-align: center;" id="answer" name="answer" value="<%=answer%>"<%if (survey.isComplete()) {%> readonly<%}%>> (Number)
                 
                 		<%} else if (question.getQuestionType().equals(SurveyQuestion.ANSWER_TEXT)) {%>
-                			<input type="text" size="40" name="answer" id="answer" onload="this.focus()" value="<%=answer%>"<%if (survey.isComplete()) {%> readonly<%}%>> (Text)
+                			<textarea name="answer" id="answer" onload="this.focus()" <%if (survey.isComplete()) {%> readonly<%}%>><%=answer%></textarea>
 
                 		<%} else if (question.getQuestionType().equals(SurveyQuestion.ANSWER_HIDDEN)) {%>
                 			<input type="hidden" size="40" name="answer" id="answer" onload="this.focus()" value="<%=answer%>"<%if (survey.isComplete()) {%> readonly<%}%>>

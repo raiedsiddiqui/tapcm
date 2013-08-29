@@ -237,7 +237,11 @@ public class SurveyController{
 		if (request.isUserInRole("ROLE_ADMIN")){
    			return "redirect:/manage_surveys";
    		} else {
-   			return "redirect:/patient/" + currentPatient.getPatientID() + "?complete=" + surveyResult.getSurveyTitle();
+   			if (isComplete) {
+   				return "redirect:/patient/" + currentPatient.getPatientID() + "?complete=" + surveyResult.getSurveyTitle();
+   			} else {
+   				return "redirect:/patient/" + currentPatient.getPatientID() + "?aborted=" + surveyResult.getSurveyTitle();
+   			}
    		}
 	}
   
