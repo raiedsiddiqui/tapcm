@@ -64,7 +64,7 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="<c:url value="/"/>">Home</a>
+     					<a class="brand" href="<c:url value="/"/>">Home 1</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<li class="active"><a href="<c:url value="/profile"/>">My Profile</a></li>

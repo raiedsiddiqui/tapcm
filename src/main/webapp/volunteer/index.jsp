@@ -75,7 +75,7 @@
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">My Visits<b class="caret"></b></a>
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">My Visits 1<b class="caret"></b></a>
 								<ul class="dropdown-menu">
 								<c:forEach items="${patients}" var="p">
 									<c:choose>
