@@ -24,7 +24,7 @@
      				<div class="area">
 	      				<form class="form-horizontal" action="<c:url value="j_spring_security_check" />" method="POST">
        						<div class="heading">
-        						<h4 class="form-heading">Sign In</h4>
+        						<h4 class="form-heading">Sign In Please</h4>
        						</div>
        						<div class="control-group">
 	        					<label class="control-label" for="username">Username</label>
