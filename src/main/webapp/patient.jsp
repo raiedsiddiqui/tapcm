@@ -11,6 +11,14 @@
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 	<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
+
+	<!-- CUSTOM CSS -->
+	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" />      
+	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" /> 
+
+	  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+	<!-- 	CUSTOM CSS END -->
+
 	<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 
 	<style type="text/css">
@@ -50,8 +58,9 @@
 </head>
 	
 <body>
-  <img src="<c:url value="/resources/images/logo.png"/>" />
-	<div class="content">
+  
+	<div id="headerholder">	
+	  <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
 		<div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">
@@ -71,9 +80,29 @@
 				</div>	
 			</div>
 		</div>
+	</div>
+<!-- 	breadcrumb START-->	
+	<div id="crumbs"> 
+		<ul>
+			<li> <a href="">My Clients</a> </li>
+			<li><a href="">
+				<c:choose>
+						<c:when test="${not empty patient.preferredName}">
+						<b>${patient.preferredName} (${patient.gender})</b>
+						</c:when>
+						<c:otherwise>
+						<b>${patient.displayName} (${patient.gender})</b>
+						</c:otherwise>
+				</c:choose>
+				</a>
+			</li>
+		</ul>	
+	</div>
+<!-- 	breadcrumb END-->	
+	<div class="content">
 		<div style="padding: 0px 15px;">
 			<div class="row-fluid">
-				<div class="span3">
+<!-- 				<div class="span3">
 					<c:choose>
 						<c:when test="${not empty patient.preferredName}">
 							<h2>${patient.preferredName} (${patient.gender})</h2>
@@ -82,7 +111,7 @@
 							<h2>${patient.displayName} (${patient.gender})</h2>
 						</c:otherwise>
 					</c:choose>
-				</div>
+				</div> -->
 				<div class="span3 btn-group">
 					<c:if test="${not empty patient.notes}">
 						<a href="#modalNotes" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
@@ -95,14 +124,18 @@
 			<c:if test="${not empty inProgress}">
 				<p class="alert alert-warning">Exited survery: ${inProgress}</p>
 			</c:if>
+			<div class="sheading">Active Surveys</div>
 			<c:forEach items="${surveys}" var="s">
 			<div class="row-fluid">
-				<a href="<c:url value="/open_survey/${s.resultID}"/>" class="span12 btn btn-primary" style="height:50px; margin-bottom:10px;">
+				<a href="<c:url value="/open_survey/${s.resultID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
 					<b>${s.surveyTitle}</b><br/>
 					${s.description}
 				</a>
 			</div>
 			</c:forEach>
+
+			<div class="sheading">Completed Surveys</div>
+
 		</div>
 		<!--
 		<div class="span8">

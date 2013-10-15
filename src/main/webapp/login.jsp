@@ -4,14 +4,20 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>Tapestry</title>
-  		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+
+  <!-- FONTS -->
+  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+
  	</head>
  	<body>
-  		<img src="${pageContext.request.contextPath}/resources/images/logo.png" />
+    <div id="maincontent">
+  		<img id="logo" src="${pageContext.request.contextPath}/resources/images/logo.png" />
   		<div class="container-fluid">
    			<div class="row-fluid">
 	    		<div class="span12">
@@ -29,18 +35,18 @@
        						<div class="control-group">
 	        					<label class="control-label" for="username">Username</label>
         						<div class="controls">
-	         						<input type="text" name="j_username" placeholder="E.g. ashwinhegde" />
+	         						<input id="logininput" type="text" name="j_username" placeholder="username" />
         						</div>
        						</div>
        						<div class="control-group">
 								<label class="control-label" for="password">Password</label>
         						<div class="controls">
-	         						<input type="password" name="j_password" placeholder="Min. 8 Characters" />
+	         						<input id="logininput" type="password" name="j_password" placeholder="password" />
         						</div>
        						</div>
        						<div class="control-group">
 	        					<div class="controls">
-									<input type="submit" value="Login" style="margin-bottom:10px;"></input>
+									<input id="logininput" type="submit" value="Login" style="margin-bottom:10px;"></input>
 									<p>Tapestry 13.08.26</p>
         						</div>
        						</div>
@@ -49,5 +55,6 @@
     			</div>
    			</div>
   		</div>
+    </div>
  	</body>
 </html>

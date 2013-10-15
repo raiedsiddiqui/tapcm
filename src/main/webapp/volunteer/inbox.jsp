@@ -12,6 +12,8 @@
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 
+		<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
+		<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" />  
 	<style type="text/css">
 		html,body{
 			height:100%;
@@ -32,27 +34,31 @@
 </head>
 	
 <body>	
-  <img src="<c:url value="/resources/images/logo.png"/>" />
-	<div class="content">
-		<div class="navbar">
-			<div class="navbar-inner">
-				<div class="container">
-					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        					<span class="icon-bar"></span>
-        					<span class="icon-bar"></span>
-       				 		<span class="icon-bar"></span>
-     					</a>
-     					
-     					<a class="brand" href="<c:url value="/"/>">Home</a>
-     					<div class="nav-collapse collapse">
-						<ul class="nav">
-							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
-							<li class="active"><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
-							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
-						</ul>
-					</div>
-				</div>	
+<div id="headerholder">	
+	<img src="<c:url value="/resources/images/logo.png"/>" />
+
+	<div class="navbar">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				 		<span class="icon-bar"></span>
+					</a>
+					
+					<a class="brand" href="<c:url value="/"/>">Home</a>
+					<div class="nav-collapse collapse">
+				<ul class="nav">
+					<li><a href="<c:url value="/profile"/>">My Profile</a></li>
+					<li class="active"><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
+					<li><a href="<c:url value="/logout"/>">Log Out</a></li>
+				</ul>
 			</div>
+		</div>	
+	</div>
+
+</div>
+	<div class="content">
 		</div>
 		<div class="row-fluid">
 			<div class="span12" style="padding:0px 15px;">

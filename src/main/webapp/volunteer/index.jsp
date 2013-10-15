@@ -6,15 +6,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Tapestry</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
-		  		
+		<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
+		<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" />      
+
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
+
+		<!-- FONTS -->
+		<link href='http://fonts.googleapis.com/css?family=Krona+One' rel='stylesheet' type='text/css'>
+		<!-- FONTS -->
+  		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
 
 	<style type="text/css">
 		html,body{
@@ -60,9 +67,9 @@
 </head>
 	
 <body>	
-  <img src="<c:url value="/resources/images/logo.png"/>" />
-	<div class="content">
-		<div class="navbar">
+<div id="headerholder">	
+  <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
+  		<div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">
 					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -70,12 +77,11 @@
         					<span class="icon-bar"></span>
        				 		<span class="icon-bar"></span>
      					</a>
-     					
      					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">My Visits 1<b class="caret"></b></a>
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Appointments<b class="caret"></b></a>
 								<ul class="dropdown-menu">
 								<c:forEach items="${patients}" var="p">
 									<c:choose>
@@ -97,8 +103,19 @@
 				</div>	
 			</div>
 		</div>
-		<h2>Welcome, ${name}</h2>
-		<c:if test="${not empty announcements}">
+	</div>
+
+<!-- 	breadcrumb START-->	
+	<div id="crumbs"> 
+		<ul>
+			<li><a href=""><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
+		</ul>	
+	</div>
+<!-- 	breadcrumb END-->	
+	
+	<div class="content">
+<!-- 		<h2>Welcome, ${name}</h2>-->		
+	<c:if test="${not empty announcements}">
 		<div class="row-fluid">
 			<div class="span12">
 				<p><strong>Announcements</strong></p>
@@ -125,13 +142,13 @@
 		</c:if>
 		<div class="row-fluid">
 			<div class="span12">
-				<h3>Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
-				<ul class="nav nav-tabs" id="appointmentSelect">
+				<h3>My Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
+<!-- 				<ul class="nav nav-tabs" id="appointmentSelect">
 					<li class="active"><a href="#today" data-toggle="tab">Today</a></li>
-					<li><a href="#all" data-toggle="tab">All</a></li>
-				</ul>
+ 					<li class="active"><a href="#all" data-toggle="tab">All</a></li>
+				</ul>-->
 				<div class="tab-content">
-					<div class="tab-pane active" id="today">	
+<!-- 					<div class="tab-pane active" id="today">	
 					<c:choose>
 						<c:when test="${not empty appointments_today}">
 						<table class="table">
@@ -155,24 +172,32 @@
 							<p style="margin-left:25px">No appointments for today</p>
 						</c:otherwise>
 					</c:choose>
-					</div>					
-					<div class="tab-pane" id="all">	
+					</div>	 -->				
+					<div class="tab-pane active" id="all">	
 					<c:choose>
 						<c:when test="${not empty appointments_all}">
 						<table class="table">
-							<tr>
+	<!-- 						<tr>
 								<th>Patient</th>
 								<th>Time</th>
 								<th>Approval Status</th>
 								<th>Delete</th>
-							</tr>
+							</tr> -->
 							<c:forEach items="${appointments_all}" var="a">
-							<tr>
-								<td>${a.patient}</td>
+<!-- 							<tr>
+								<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
 								<td>${a.date} ${a.time}</td>
 								<td>${a.status}</td>
 								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
-							</tr>
+							</tr> -->
+
+							<div class="pname">
+								<div class="app-date"> ${a.date} </div>
+<!-- 								<div class="patient-info"><a class="patientinfo" href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></div>
+ -->								
+								<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>								 
+
+							</div>
 							</c:forEach>
 						</table>
 						</c:when>

@@ -1,0 +1,206 @@
+body {
+	margin: 0 auto;
+}
+img {
+
+}
+
+@media (min-width: 960px) {
+
+
+#logo {
+	height: 50px !important;
+	width: 220px !important;
+	float: left;
+}
+
+#maincontent {
+	margin: 0 auto;
+/*	border: 1px solid black;
+*/	width: 80%;
+margin-top: 15%;
+}
+
+.control-label {
+/*	width: 370px !important;
+*/	font-size: 70px;
+	font-family: 'Roboto Slab', serif;
+
+
+}
+
+.form-horizontal .control-group {
+	margin-bottom: 50px !important;
+}
+
+.form-horizontal .controls {
+	float: right;
+
+}
+
+#logininput {
+	height: 50px;
+	font-size: 34px;
+	font-family: 'Roboto Slab', serif;
+	-webkit-tap-highlight-color: rgba(0,0,0,0); 
+
+}
+
+/*.form-horizontal .controls {
+	margin-left: 0;
+}*/
+
+.heading {
+	margin-bottom: 30px !important;
+}
+
+.navbar {
+	width: 600px !important;
+	float: right !important;
+}
+
+.content {
+	clear: both !important;
+	padding-left: 1%;
+	padding-right: 1%;
+}
+
+.navbar-inner {
+	height: 60px;
+}
+a {
+	font-size: 18px;
+}
+
+.form-search input, .form-inline input, .form-horizontal input, .form-search textarea, .form-inline textarea, .form-horizontal textarea, .form-search select, .form-inline select, .form-horizontal select, .form-search .help-inline, .form-inline .help-inline, .form-horizontal .help-inline, .form-search .uneditable-input, .form-inline .uneditable-input, .form-horizontal .uneditable-input, .form-search .input-prepend, .form-inline .input-prepend, .form-horizontal .input-prepend, .form-search .input-append, .form-inline .input-append, .form-horizontal .input-append {
+	width: 70%;
+	float: right;
+}
+
+.pname {
+	margin-bottom: 8px;
+	width: 90%;
+}
+
+.patientinfo {
+	padding: 4px;
+	width: 90%;
+	height: 20%;
+}
+.app-data {
+	font-style: oblique;
+	font-size: 20px;
+}
+.patient-info {
+	width: 90%;
+	border: 1px solid red;
+	height: 40px;
+}
+
+
+.patientinfo:hover {
+	background-color: lightgray;
+
+}
+
+.cbutton {
+	width: 88%;
+	height: 60px;
+	text-align: left;
+	padding-left: 20px;
+	padding-right: 20px;
+	font-size: 35px; 
+	font-family: 'Krona One', sans-serif;
+
+}
+
+#headerholder {
+	border-bottom: 2px solid lightgray;
+	height: 70px;
+}
+
+
+
+
+
+#squestion2 {
+	width: 100%;
+	text-align: center;
+}
+
+#answer {
+	width: 90%;
+	height: 300px;
+	font-size: 20px;
+}
+
+.sheading {
+	width:90%;
+	background-color: lightgray;
+	font-family: 'Roboto Slab', serif;
+	font-size: 20px;
+	margin-bottom: 20px;
+	height: 30px;
+}
+}
+/*Lanscape CSS ENDS*/
+.squestion {
+	margin: 0 auto;
+	/*border: 1px solid black;*/
+	width: 90%;
+	height: 550px;
+}
+
+#saveclose {
+	color:red;
+	float:right;
+}
+.tright {
+	float:right;
+}
+
+.tleft {
+	float:left;
+}
+.survey-list {
+	width:85% !important;
+	font-size: 30px;
+	font-family: 'Roboto Slab', serif;
+
+}
+
+#qtext {
+	margin-top: 3%;
+	line-height: 1;
+}
+
+#answer-buttons {
+	margin-top: 20px;
+	height: 40px;
+}
+input[type=submit] {
+    -webkit-border-radius:0px;
+}
+input[type=button] {
+    -webkit-border-radius:0px;
+}
+
+.btn-primary {
+background-image: linear-gradient(to bottom,rgba(106, 175, 65, 0.84),#6AAF41) !important;
+background-image: -webkit-gradient(linear, left bottom, right top, from(rgba(106, 175, 65, 0.84)), to(#6AAF41));
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active, .btn-primary.active, .btn-primary.disabled, .btn-primary[disabled] {
+	background-color: #6AAF41;
+	color: white;
+}
+
+.span12 h3 {
+	font-size: 25px;
+	font-family: 'Roboto Slab', serif;
+	}
+
+.app-date {
+	font-family: 'Roboto Slab', serif; 
+	font-size: 20px;
+}

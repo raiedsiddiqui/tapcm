@@ -15,6 +15,9 @@
 	<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 	
 
+	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
+	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
+
 	<style type="text/css">
 		html,body{
 			height:100%;
@@ -53,9 +56,9 @@
 </head>
 	
 <body>
+<div id="headerholder">	
   <img src="<c:url value="/resources/images/logo.png"/>" />
-	<div class="content">
-		<div class="navbar">
+  <div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">
 					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -74,7 +77,18 @@
 					</div>
 				</div>
 			</div>
-		</div>
+
+	</div>
+</div>
+	<!-- 	breadcrumb START
+	<div id="crumbs"> 
+		<ul>
+			<li> <a href="">My Clients</a> </li>
+		</ul>	
+	</div>
+	 	breadcrumb END-->
+	<div class="content">
+	</div>
 		
 		<div class="container-fluid">
 			<div class="row-fluid">
@@ -121,7 +135,7 @@
 	  				</form>
 				</div>
 				
-				<div class="span8">
+<!-- 				<div class="span8">
 					<h2>Pictures</h2>
 					<form id="uploadPic" action="<c:url value="upload_picture_to_profile" />" method="POST" enctype="multipart/form-data">
 						<label>Upload picture</label>
@@ -150,11 +164,10 @@
 					<p>No pictures uploaded</p>
 					</c:otherwise>
 					</c:choose>
-				</div>
+				</div> -->
 			</div>
 		</div>
 
-	</div>
 
 </body>
 </html>
