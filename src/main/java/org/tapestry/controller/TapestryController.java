@@ -202,6 +202,14 @@ public class TapestryController{
 		return "confirm-logout";
 	}
 	
+	@RequestMapping(value="/client", method=RequestMethod.GET)
+	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(loggedInUser.getUserID());
+		model.addAttribute("clients", clients);
+		return "volunteer/client";
+	}
+	
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
 	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());

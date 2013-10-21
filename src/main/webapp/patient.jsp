@@ -73,7 +73,7 @@
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
-							<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
+							<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 						</ul>
 					</div>
@@ -84,7 +84,7 @@
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
 		<ul>
-			<li> <a href="">My Clients</a> </li>
+			<li> <a href="<c:url value="/client"/>">My Clients</a> </li>
 			<li><a href="">
 				<c:choose>
 						<c:when test="${not empty patient.preferredName}">

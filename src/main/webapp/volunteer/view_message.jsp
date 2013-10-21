@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Tapestry</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>

@@ -108,7 +108,7 @@
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
 		<ul>
-			<li><a href=""><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
+			<li><a href="<c:url value="/client"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
 		</ul>	
 	</div>
 <!-- 	breadcrumb END-->	

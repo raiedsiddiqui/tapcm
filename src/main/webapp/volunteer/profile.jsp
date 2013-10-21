@@ -6,13 +6,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Tapestry</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
-	<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
+		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 	
 
 	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
@@ -57,7 +57,7 @@
 	
 <body>
 <div id="headerholder">	
-  <img src="<c:url value="/resources/images/logo.png"/>" />
+  <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
   <div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">
@@ -67,7 +67,7 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="<c:url value="/"/>">Home 1</a>
+     					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
 							<li class="active"><a href="<c:url value="/profile"/>">My Profile</a></li>
