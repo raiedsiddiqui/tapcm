@@ -46,6 +46,7 @@
 		<intercept-url pattern="/unapprove_appointment/**" access="ROLE_ADMIN" />
 		<intercept-url pattern="/upload_survey_template" access="ROLE_ADMIN" />
 		<intercept-url pattern="/delete_survey_template/**" access = "ROLE_ADMIN" />
+		<intercept-url pattern="/assign_survey/**" access="ROLE_USER" />
 		<intercept-url pattern="/assign_surveys" access="ROLE_ADMIN" />
 		<intercept-url pattern="/delete_survey/**" access="ROLE_ADMIN" />
 		<intercept-url pattern="/open_survey/**" access="ROLE_USER" />

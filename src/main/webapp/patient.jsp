@@ -122,19 +122,38 @@
 				<p class="alert alert-success">Completed survey: ${completed}</p>
 			</c:if>
 			<c:if test="${not empty inProgress}">
-				<p class="alert alert-warning">Exited survery: ${inProgress}</p>
+				<p class="alert alert-warning">Exited survey: ${inProgress}</p>
 			</c:if>
-			<div class="sheading">Active Surveys</div>
-			<c:forEach items="${surveys}" var="s">
-			<div class="row-fluid">
-				<a href="<c:url value="/open_survey/${s.resultID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
-					<b>${s.surveyTitle}</b><br/>
-					${s.description}
-				</a>
-			</div>
+			<div class="sheading">Incomplete Surveys</div>
+			<c:forEach items="${inProgressSurveys}" var="ips">
+				<div class="row-fluid">
+					<a href="<c:url value="/open_survey/${ips.resultID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+						<b>${ips.surveyTitle}</b><br/>
+						${ips.description}
+					</a>
+				</div>
 			</c:forEach>
 
 			<div class="sheading">Completed Surveys</div>
+			<c:forEach items="${completedSurveys}" var="cs">
+				<div class="row-fluid">
+					<div class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+						<b>${cs.surveyTitle}</b><br/>
+						${cs.description}
+					</div>
+				</div>
+			</c:forEach>
+			
+			<div class="sheading">Assign Survey</div>
+			<c:forEach items="${surveys}" var="s">
+				<div class="row-fluid">
+					<a href="<c:url value="/assign_survey/${s.surveyID}/${patient.patientID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+						<b>${s.title}</b><br/>
+						${s.description}
+					</a>
+				</div>
+			</c:forEach>
+			
 
 		</div>
 		<!--

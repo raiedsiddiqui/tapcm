@@ -2,14 +2,12 @@ package org.tapestry.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.util.FileCopyUtils;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyMap;
@@ -144,6 +141,40 @@ public class SurveyController{
     		}
 		}
 		return "redirect:/manage_surveys";
+	}
+	
+	@RequestMapping(value="/assign_survey/{patientID}/{surveyID}", method=RequestMethod.GET)
+	public String assignSurvey(@PathVariable("patientID") int patientId, @PathVariable("surveyID") int surveyId, HttpServletRequest request) throws JAXBException, DatatypeConfigurationException, Exception{
+		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+		SurveyTemplate st = surveyTemplateDao.getSurveyTemplateByID(surveyId);
+		List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(surveyId));
+		
+		SurveyFactory surveyFactory = new SurveyFactory();
+		PHRSurvey template = surveyFactory.getSurveyTemplate(st);
+		SurveyResult sr = new SurveyResult();
+        sr.setSurveyID(surveyId);
+        sr.setPatientID(patientId);
+        
+        String documentId;
+        //if requested survey that's already done
+    	if (specificSurveys.size() < template.getMaxInstances())
+    	{
+    		PHRSurvey blankSurvey = template;
+    		blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
+    		sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
+    		documentId = surveyResultDao.assignSurvey(sr);
+    		blankSurvey.setDocumentId(documentId);
+    		surveys.addSurvey(blankSurvey);
+    		specificSurveys = surveys.getSurveyListById(Integer.toString(surveyId)); //reload
+    	}
+    	else
+    	{
+    		return "redirect:/patient/" + patientId;
+    	}
+    	
+		return "redirect:/open_survey/" + documentId;
 	}
 	
 	@RequestMapping(value="open_survey/{resultID}", method=RequestMethod.GET)
