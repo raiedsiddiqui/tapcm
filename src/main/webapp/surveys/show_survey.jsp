@@ -59,6 +59,7 @@
 			font-size:25px;
 			font-family: 'Bitter', serif;
 			font-weight: 400;
+			text-align: left;
 		}
 		
 		input[type="radio"], input[type="checkbox"]{
@@ -105,8 +106,11 @@
             			<input id="saveclose" type="button" value="<%if (!survey.isComplete()) {%>End <%}%>Survey" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>?survey_completed=<%=completed%>'">
             			<input type="hidden" name="documentid" value="<%=documentId%>">
             			
-            			Question: 
-            			
+            		
+					<b>${surveyTitle}</b><br/>
+					${description}
+							</a>
+            		
             			<div id="qtext" style="padding: 3px;border-top: 1px solid #cdcdcd;border-bottom: 1px solid #cdcdcd;font-family: 'Bitter', serif; font-weight:700;">
            				<%
            					String questionText = question.getQuestionTextRenderKeys(survey);
