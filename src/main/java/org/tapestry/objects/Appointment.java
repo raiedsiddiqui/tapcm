@@ -12,8 +12,9 @@ public class Appointment{
 	private String patient;
 	private String time;
 	private String date;
-	private String desc;
+	private String comments;
 	private String status;
+	private boolean completed;
 	
 	/**
 	 * Empty constructor
@@ -72,8 +73,8 @@ public class Appointment{
 	/**
 	 * @return The text description of the appointment
 	 */
-	public String getDescription(){
-		return desc;
+	public String getComments(){
+		return comments;
 	}
 	
 	/**
@@ -81,6 +82,13 @@ public class Appointment{
 	 */
 	public String getStatus(){
 		return status;
+	}
+	
+	/**
+	 * @return The completion status of the appointment
+	 */
+	public boolean isCompleted(){
+		return completed;
 	}
 	
 	//Mutators
@@ -134,8 +142,8 @@ public class Appointment{
 	/**
 	 * @param desc The text description for the appointment
 	 */
-	public void setDescription(String desc){
-		this.desc = desc;
+	public void setComments(String comments){
+		this.comments = comments;
 	}
 	
 	/**
@@ -143,5 +151,12 @@ public class Appointment{
 	 */
 	public void setStatus(String status){
 		this.status = status;
+	}
+	
+	/**
+	 * @param approved The completion status of the appointment
+	 */
+	public void setCompleted(boolean completed){
+		this.completed = completed;
 	}
 }

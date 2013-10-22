@@ -36,6 +36,8 @@
 		<intercept-url pattern="/remove_patient/*" access="ROLE_ADMIN" />
 		<intercept-url pattern="/patient/*" access="ROLE_USER" />
 		<intercept-url pattern="/client" access="ROLE_USER" />
+		<intercept-url pattern="/visit_complete/*" access="ROLE_USER" />
+		<intercept-url pattern="/complete_visit/*" access="ROLE_USER" />
 		<intercept-url pattern="/inbox" access="ROLE_USER, ROLE_ADMIN" />
 		<intercept-url pattern="/view_message/**" access="ROLE_USER, ROLE_ADMIN" />
 		<intercept-url pattern="/send_message" access="ROLE_ADMIN, ROLE_USER" />

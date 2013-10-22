@@ -52,8 +52,9 @@ public class AppointmentDao {
     		}
     		a.setDate(result.getString("appt_date"));
     		a.setTime(result.getString("appt_time"));
-    		a.setDescription(result.getString("details"));
+    		a.setComments(result.getString("comments"));
     		a.setStatus(result.getString("status"));
+    		a.setCompleted(result.getBoolean("completed"));
     		return a;
     	} catch (SQLException e){
     		System.out.println("Error: Could not create Appointment object");
@@ -64,7 +65,7 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllAppointments(){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, status FROM appointments ORDER BY date_time DESC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed FROM appointments ORDER BY date_time DESC");
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
        		while(result.next()){
@@ -93,7 +94,7 @@ public class AppointmentDao {
     	
     public ArrayList<Appointment> getAllAppointmentsForVolunteer(int volunteer){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, status FROM appointments WHERE volunteer=? AND date_time>=CURDATE() ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 ORDER BY date_time ASC");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -118,7 +119,7 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllAppointmentsForVolunteerForToday(int volunteer){
        	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, details, status FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE() ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE() AND completed=0 ORDER BY date_time ASC");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -132,6 +133,44 @@ public class AppointmentDao {
     		System.out.println("Error: Could not retrieve all appointments for today for user #" + volunteer);
     		e.printStackTrace();
     		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public Appointment getAppointmentById(int appointmentId){
+       	try{
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed FROM appointments WHERE appointment_ID=?");
+    		statement.setInt(1, appointmentId);
+    		ResultSet result = statement.executeQuery();
+    		result.first();
+       		return createFromSearch(result);
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve appointment with appointment ID:" + appointmentId);
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void completeAppointment(int id, String comments) {
+    	try{
+    		statement = con.prepareStatement("UPDATE appointments SET comments=?, completed=1 WHERE appointment_ID=? ");
+    		statement.setString(1, comments);
+    		statement.setInt(2, id);
+    		statement.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not book appointment");
+    		e.printStackTrace();
     	} finally {
     		try{
     			statement.close();

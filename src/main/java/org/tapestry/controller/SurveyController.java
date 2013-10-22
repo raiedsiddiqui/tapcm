@@ -143,40 +143,6 @@ public class SurveyController{
 		return "redirect:/manage_surveys";
 	}
 	
-	@RequestMapping(value="/assign_survey/{patientID}/{surveyID}", method=RequestMethod.GET)
-	public String assignSurvey(@PathVariable("patientID") int patientId, @PathVariable("surveyID") int surveyId, HttpServletRequest request) throws JAXBException, DatatypeConfigurationException, Exception{
-		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
-   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
-   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
-		SurveyTemplate st = surveyTemplateDao.getSurveyTemplateByID(surveyId);
-		List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(surveyId));
-		
-		SurveyFactory surveyFactory = new SurveyFactory();
-		PHRSurvey template = surveyFactory.getSurveyTemplate(st);
-		SurveyResult sr = new SurveyResult();
-        sr.setSurveyID(surveyId);
-        sr.setPatientID(patientId);
-        
-        String documentId;
-        //if requested survey that's already done
-    	if (specificSurveys.size() < template.getMaxInstances())
-    	{
-    		PHRSurvey blankSurvey = template;
-    		blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
-    		sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
-    		documentId = surveyResultDao.assignSurvey(sr);
-    		blankSurvey.setDocumentId(documentId);
-    		surveys.addSurvey(blankSurvey);
-    		specificSurveys = surveys.getSurveyListById(Integer.toString(surveyId)); //reload
-    	}
-    	else
-    	{
-    		return "redirect:/patient/" + patientId;
-    	}
-    	
-		return "redirect:/open_survey/" + documentId;
-	}
-	
 	@RequestMapping(value="open_survey/{resultID}", method=RequestMethod.GET)
 	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {
 		String username = request.getUserPrincipal().getName();

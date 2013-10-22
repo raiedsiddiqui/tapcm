@@ -366,7 +366,7 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/patient/{patient_id}", method=RequestMethod.GET)
-	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false) String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false) String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, @RequestParam(value="appointmentId", required=false) Long appointmentId, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -396,7 +396,23 @@ public class TapestryController{
 		} else {
 			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
 		}
+		model.addAttribute("appointmentId", appointmentId);
 		return "/patient";
+	}
+	
+	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
+	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
+		Appointment appointment = appointmentDao.getAppointmentById(id);
+		Patient patient = patientDao.getPatientByID(appointment.getPatientID());
+		model.addAttribute("appointment", appointment);
+		model.addAttribute("patient", patient);
+		return "/volunteer/visit_complete";
+	}
+	
+	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
+	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request) {
+		appointmentDao.completeAppointment(id, request.getParameter("comments"));
+		return "redirect:/";
 	}
 	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)

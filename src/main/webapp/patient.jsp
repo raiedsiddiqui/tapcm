@@ -112,9 +112,12 @@
 						</c:otherwise>
 					</c:choose>
 				</div> -->
-				<div class="span3 btn-group">
+				<div class="span12 btn-group">
 					<c:if test="${not empty patient.notes}">
 						<a href="#modalNotes" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
+					</c:if>
+					<c:if test="${not empty appointmentId}">
+						<a href="<c:url value="/visit_complete/${appointmentId}"/>" role="button" class="btn btn-primary pull-right">Visit Complete</a>
 					</c:if>
 				</div>
 			</div>

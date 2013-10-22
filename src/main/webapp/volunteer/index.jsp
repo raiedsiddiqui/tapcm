@@ -195,7 +195,7 @@
 								<div class="app-date"> ${a.date} </div>
 <!-- 								<div class="patient-info"><a class="patientinfo" href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></div>
  -->								
-								<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>								 
+								<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}?appointmentId=${a.appointmentID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>								 
 
 							</div>
 							</c:forEach>

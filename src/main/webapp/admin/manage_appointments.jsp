@@ -62,6 +62,8 @@
 					<th>Patient</th>
 					<th>Time</th>
 					<th>Status</th>
+					<th>Incomplete/Complete</th>
+					<th>Comments</th>
 					<th>Approve</th>
 					<th>Decline</th>
 					<th>Delete</th>
@@ -72,6 +74,11 @@
 					<td>${a.patient}</td>
 					<td>${a.date} ${a.time}</td>
 					<td>${a.status}</td>
+					<td><c:choose>
+						<c:when test="${!a.completed}">Incomplete</c:when>
+						<c:otherwise>Complete</c:otherwise>
+						</c:choose></td>
+					<td>${a.comments}</td>
 					<td><a href="<c:url value="/approve_appointment/${a.appointmentID}"/>" class="btn btn-primary">Approve</a></td>
 					<td><a href="<c:url value="/decline_appointment/${a.appointmentID}"/>" class="btn btn-danger">Decline</a></td>
 					<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
