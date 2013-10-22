@@ -56,6 +56,30 @@ public class PatientDao {
     		}
     	}
 	}
+	
+	/**
+	* Returns the patient with the given ID
+	* @param id The ID of the patient to find
+	* @return A Patient object representing the result
+	*/
+	public Patient getNewestPatient(){
+		try{
+			statement = con.prepareStatement("SELECT * FROM patients ORDER BY patient_ID DESC LIMIT 1");
+			ResultSet results = statement.executeQuery();
+			results.first();
+			return createFromSearch(results);
+		} catch (SQLException e){
+			System.out.println("Error: could not retrieve patient");
+			e.printStackTrace();
+			return null;
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+	}
 
 	/**
 	* Creates a Patient object from a database query
