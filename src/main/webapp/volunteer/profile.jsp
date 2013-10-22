@@ -18,6 +18,8 @@
 	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
 	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
 
+	  		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+
 	<style type="text/css">
 		html,body{
 			height:100%;
