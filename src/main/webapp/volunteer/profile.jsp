@@ -80,14 +80,14 @@
 
 	</div>
 </div>
-	<!-- 	breadcrumb START
-	<div id="crumbs"> 
+<!-- 	 	breadcrumb START
+ -->	<div id="crumbs"> 
 		<ul>
-			<li> <a href="">My Clients</a> </li>
+			<li><a href="<c:url value="/client"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
 		</ul>	
 	</div>
-	 	breadcrumb END-->
-	<div class="content">
+<!-- 	 	breadcrumb END
+ -->	<div class="content">
 	</div>
 		
 		<div class="container-fluid">
