@@ -34,7 +34,59 @@
 			<c:if test="${not empty failed}">
 				<div class="alert alert-error">Failed to assign survey: You must select at least one patient</div>
 			</c:if>
-			<table class="table">
+			
+			<c:forEach items="${patients}" var="p">
+				<div class="accordion-group">
+					<div class="accordion-heading">
+				    	<a class="accordion-toggle" data-toggle="collapse" href="#collapse${p.patientID}">
+				        	${p.displayName}
+				      	</a>
+				    </div>
+				    
+				    <div id="collapse${p.patientID}" class="accordion-body collapse">
+				    	<div class="accordion-inner">
+					      	<table class="table">
+								<tr>
+									<th>Survey</th>
+									<th>Patient</th>
+									<th>Date Assigned</th>
+									<th>Status</th>
+									<th>Last Edit Date</th>
+									<th>Remove</th>
+									<th>View/Export</th>
+								</tr>
+					      		<c:forEach items="${surveys}" var="s">
+					      			<c:if test="${p.patientID == s.patientID}">
+					      				<tr>
+											<td><a href="<c:url value="/show_survey/${s.resultID}"/>">${s.surveyTitle}</a></td>
+											<td>${s.patientName}</td>
+											<td>${s.startDate}</td>
+											<td><c:choose>
+													<c:when test="${!s.completed}">Incomplete</c:when>
+													<c:otherwise>Complete</c:otherwise>
+												</c:choose></td>
+											<td>${s.editDate}</td>
+											<td><a href="<c:url value="/delete_survey/${s.resultID}"/>" class="btn btn-danger">Remove</a></td>
+											<td>
+												<c:choose>
+													<c:when test="${s.completed}">
+													<a href="<c:url value="/view_survey_results/${s.resultID}"/>" class="btn btn-success">View Results</a>
+													</c:when>
+													<c:otherwise>
+													<a href="#" class="btn btn-success disabled">View Results</a>
+													</c:otherwise>
+												</c:choose>
+											</td>
+										</tr>
+									</c:if>
+								</c:forEach>
+							</table>
+				    	</div>
+					</div>
+				</div>
+			</c:forEach>
+			
+			<!--<table class="table">
 				<tr>
 					<th>Survey</th>
 					<th>Patient</th>
@@ -67,7 +119,7 @@
 					</td>
 				</tr>
 				</c:forEach>
-			</table>
+			</table> -->
 			<a class="btn btn-primary" onClick="showAssignSurvey()">Assign Surveys</a>
 		</div>
 
