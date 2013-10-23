@@ -117,6 +117,31 @@ public class AppointmentDao {
     	}
     }
     
+    public ArrayList<Appointment> getAllAppointmentsForPatient(int patientId){
+    	try{
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed FROM appointments WHERE patient=? AND date_time>=CURDATE() AND completed=0 ORDER BY date_time ASC");
+    		statement.setInt(1, patientId);
+    		ResultSet result = statement.executeQuery();
+       		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
+       		while(result.next()){
+       			Appointment a = createFromSearch(result);
+       			if (a != null)
+       				allAppointments.add(a);
+        	}
+       		return allAppointments;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve all appointments for patient #" + patientId);
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
     public ArrayList<Appointment> getAllAppointmentsForVolunteerForToday(int volunteer){
        	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE() AND completed=0 ORDER BY date_time ASC");
@@ -151,6 +176,26 @@ public class AppointmentDao {
        		return createFromSearch(result);
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve appointment with appointment ID:" + appointmentId);
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public Appointment getAppointmentByMostRecentIncomplete(int patientId){
+       	try{
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed FROM appointments WHERE patient=? AND completed=0 ORDER BY date_time ASC LIMIT 1");
+    		statement.setInt(1, patientId);
+    		ResultSet result = statement.executeQuery();
+    		result.first();
+       		return createFromSearch(result);
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve oldest incomplete appointment for patient ID:" + patientId);
     		e.printStackTrace();
     		return null;
     	} finally {

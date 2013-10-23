@@ -56,7 +56,50 @@
 			<c:if test="${not empty success}">
 				<div class="alert alert-info">Appointment has been successfully booked</div>
 			</c:if>
-			<table class="table">
+			
+			<c:forEach items="${patients}" var="p">
+				<div class="accordion-group">
+					<div class="accordion-heading">
+				    	<a class="accordion-toggle" data-toggle="collapse" href="#collapse${p.firstName}${p.lastName}">
+				        	${p.displayName}
+				      	</a>
+				    </div>
+				    <div id="collapse${p.firstName}${p.lastName}" class="accordion-body collapse">
+				    	<div class="accordion-inner">
+				    		<div class="accordion-group">
+				    			<c:forEach items="${appointments}" var="a">
+				    				<c:if test="${p.patientID == a.patientID}">
+				    					<a href="<c:url value="/approve_appointment/${a.appointmentID}"/>" class="btn btn-primary pull-right">Approve</a>
+										<a href="<c:url value="/decline_appointment/${a.appointmentID}"/>" class="btn btn-danger pull-right">Decline</a>
+										<a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger pull-right">Delete</a>
+										<div class="accordion-heading">
+									    	<a class="accordion-toggle" data-toggle="collapse" href="#collapse${a.appointmentID}">${a.date}</a>
+									    </div>
+									    
+									    <div id="collapse${a.appointmentID}" class="accordion-body collapse">
+				    						<div class="accordion-inner">
+				    							<c:if test="${not empty a.comments}">
+				    								Comments: ${a.comments} <br /><br />
+				    							</c:if>
+				    							<c:forEach items="${activities}" var="act">
+				    								<c:if test="${a.appointmentID == act.appointment}">
+				    									${act.description} <br />
+				    								</c:if>
+				    							</c:forEach>
+				    						</div>
+				    					</div>
+				    				</c:if>
+				    			</c:forEach>
+				    		</div>
+				    	</div>
+				    </div>
+				</div>
+			</c:forEach>
+			
+			<br />
+			<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book new appointment</a>
+				    									
+			<!-- <table class="table">
 				<tr>
 					<th>Volunteer</th>
 					<th>Patient</th>
@@ -87,7 +130,7 @@
 			</table>
 			<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book new appointment</a>
 		</div>
-	</div>
+	</div> -->
 	
 	<!-- Modal -->
 	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">

@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
+import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
@@ -39,6 +41,7 @@ public class AppointmentController{
 	private UserDao userDao;
 	private PatientDao patientDao;
 	private AppointmentDao appointmentDao;
+	private ActivityDao activityDao;
 	
    	//Mail-related settings;
    	private Properties props;
@@ -80,6 +83,7 @@ public class AppointmentController{
 		userDao = new UserDao(DB, UN, PW);
 		patientDao = new PatientDao(DB, UN, PW);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
+		activityDao = new ActivityDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -104,8 +108,10 @@ public class AppointmentController{
    	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
    		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();
    		ArrayList<Patient> allPatients = patientDao.getAllPatients();
+   		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
    		model.addAttribute("appointments", allAppointments);
    		model.addAttribute("patients", allPatients);
+   		model.addAttribute("activities", allAppointmentActivities);
    		if(appointmentBooked != null)
    			model.addAttribute("success", appointmentBooked);
    		return "admin/manage_appointments";

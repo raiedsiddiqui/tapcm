@@ -168,19 +168,24 @@ public class TapestryController{
 
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
-	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, @RequestParam(value="patientId", required=false) Integer patientId, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
 			String username = request.getUserPrincipal().getName();
 			User u = userDao.getUserByUsername(username);
 			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
-			ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
-			ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
 			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(u.getUserID());
+			if(patientId != null) {
+				ArrayList<Appointment> appointmentsForPatient = appointmentDao.getAllAppointmentsForPatient(patientId);
+				model.addAttribute("appointments_patient", appointmentsForPatient);
+			} else {
+				ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
+				ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
+				model.addAttribute("appointments_today", appointmentsForToday);
+				model.addAttribute("appointments_all", allAppointments);
+			}
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
-			model.addAttribute("appointments_today", appointmentsForToday);
-			model.addAttribute("appointments_all", allAppointments);;
 			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
 			model.addAttribute("unread", unreadMessages);
 			model.addAttribute("activities", activityLog);

@@ -69,6 +69,26 @@ public class ActivityDao {
     	}
     }
     
+    public void logActivity(String description, int volunteer, int patient, int appointment){
+    	try{
+    		statement = con.prepareStatement("INSERT INTO activities (description,volunteer,patient,appointment) VALUES (?, ?, ?, ?)");
+    		statement.setString(1, description);
+    		statement.setInt(2, volunteer);
+    		statement.setInt(3, patient);
+    		statement.setInt(4, appointment);
+    		statement.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not record event");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
     public int countEntries(){
     	try{
     		statement = con.prepareStatement("SELECT COUNT(event_ID) AS c FROM activities");
@@ -90,13 +110,50 @@ public class ActivityDao {
     
     public ArrayList<Activity> getAllActivities(){
     	try{
-    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer FROM activities ORDER BY event_timestamp DESC");
+    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment FROM activities ORDER BY event_timestamp DESC");
     		ResultSet result = statement.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
     			Activity a = new Activity();
     			a.setDate(result.getString("event_timestamp"));
     			a.setDescription(result.getString("description"));
+    			a.setAppointment(result.getInt("appointment"));
+    			
+    			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+    			statement.setInt(1, result.getInt("volunteer"));
+    			ResultSet r = statement.executeQuery();
+    			if(r.isBeforeFirst()) {
+    				r.first();
+	    			a.setVolunteer(r.getString("name"));
+    			} else {
+    				a.setVolunteer("");
+    			}
+    			log.add(a);
+    		}
+    		return log;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve activities log");
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public ArrayList<Activity> getAllActivitiesWithAppointments(){
+    	try{
+    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment FROM activities WHERE appointment IS NOT NULL ORDER BY event_timestamp DESC");
+    		ResultSet result = statement.executeQuery();
+    		ArrayList<Activity> log = new ArrayList<Activity>();
+    		while (result.next()){
+    			Activity a = new Activity();
+    			a.setDate(result.getString("event_timestamp"));
+    			a.setDescription(result.getString("description"));
+    			a.setAppointment(result.getInt("appointment"));
     			
     			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
     			statement.setInt(1, result.getInt("volunteer"));

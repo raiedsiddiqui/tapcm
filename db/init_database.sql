@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS activities (
 	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	volunteer SMALLINT UNSIGNED NOT NULL,
 	patient SMALLINT UNSIGNED,
+	appointment SMALLINT UNSIGNED,
 	description TEXT,
 	PRIMARY KEY (event_ID)
 );

@@ -83,10 +83,10 @@
 							<div class="pname">
 								<c:choose>
 									<c:when test="${not empty p.preferredName}">
-										<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${c.patientID}"/>'">${c.preferredName}</button>
+										<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/?patientId=${c.patientID}"/>'">${c.preferredName}</button>
 									</c:when>
 									<c:otherwise>
-										<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${c.patientID}"/>'">${c.displayName}</button>
+										<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/?patientId=${c.patientID}"/>'">${c.displayName}</button>
 									</c:otherwise>
 								</c:choose>
 							</div>

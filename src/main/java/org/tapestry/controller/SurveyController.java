@@ -28,11 +28,13 @@ import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
+import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.UserDao;
+import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
 import org.tapestry.objects.SurveyTemplate;
@@ -52,6 +54,7 @@ public class SurveyController{
 	private SurveyResultDao surveyResultDao;
 	private SurveyTemplateDao surveyTemplateDao;
 	private PatientDao patientDao;
+	private AppointmentDao appointmentDao;
 	private ActivityDao activityDao;
 	private UserDao userDao;
 	
@@ -78,6 +81,7 @@ public class SurveyController{
 		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
 		patientDao = new PatientDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
+		appointmentDao = new AppointmentDao(DB, UN, PW);
 		userDao = new UserDao(DB, UN, PW);
    	}
    	
@@ -201,6 +205,7 @@ public class SurveyController{
 		User currentUser = userDao.getUserByUsername(request.getRemoteUser());
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		Patient currentPatient = patientDao.getPatientByID(surveyResult.getPatientID());
+		Appointment appointment = appointmentDao.getAppointmentByMostRecentIncomplete(currentPatient.getPatientID());
 		
 		if (isComplete) {
 			byte[] data = null;
@@ -214,9 +219,9 @@ public class SurveyController{
 			surveyResultDao.updateSurveyResults(id, data);
 			surveyResultDao.markAsComplete(id);
 			if(currentPatient.getPreferredName() != null && currentPatient.getPreferredName() != "") {
-				activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getPreferredName(), currentUser.getUserID(), currentPatient.getPatientID());
+				activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getPreferredName(), currentUser.getUserID(), currentPatient.getPatientID(), appointment.getAppointmentID());
 			} else {
-				activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID());
+				activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID(), appointment.getAppointmentID());
 			}
 		}
 		
@@ -225,9 +230,9 @@ public class SurveyController{
 			byte[] data = SurveyAction.updateSurveyResult(currentSurvey);
 			surveyResultDao.updateSurveyResults(id, data);
 			if(currentPatient.getPreferredName() != null && currentPatient.getPreferredName() != "") {
-				activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getPreferredName(), currentUser.getUserID(), currentPatient.getPatientID());
+				activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getPreferredName(), currentUser.getUserID(), currentPatient.getPatientID(), appointment.getAppointmentID());
 			} else {
-				activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID());
+				activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID(), appointment.getAppointmentID());
 			}
 		}
 		
@@ -235,9 +240,9 @@ public class SurveyController{
    			return "redirect:/manage_surveys";
    		} else {
    			if (isComplete) {
-   				return "redirect:/patient/" + currentPatient.getPatientID() + "?complete=" + surveyResult.getSurveyTitle();
+   				return "redirect:/patient/" + currentPatient.getPatientID() + "?complete=" + surveyResult.getSurveyTitle() + "&appointmentId=" + appointment.getAppointmentID();
    			} else {
-   				return "redirect:/patient/" + currentPatient.getPatientID() + "?aborted=" + surveyResult.getSurveyTitle();
+   				return "redirect:/patient/" + currentPatient.getPatientID() + "?aborted=" + surveyResult.getSurveyTitle() + "&appointmentId=" + appointment.getAppointmentID();
    			}
    		}
 	}

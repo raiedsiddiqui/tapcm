@@ -175,32 +175,44 @@
 					</div>	 -->				
 					<div class="tab-pane active" id="all">	
 					<c:choose>
-						<c:when test="${not empty appointments_all}">
-						<table class="table">
-	<!-- 						<tr>
-								<th>Patient</th>
-								<th>Time</th>
-								<th>Approval Status</th>
-								<th>Delete</th>
-							</tr> -->
-							<c:forEach items="${appointments_all}" var="a">
-<!-- 							<tr>
-								<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
-								<td>${a.date} ${a.time}</td>
-								<td>${a.status}</td>
-								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
-							</tr> -->
-
-							<div class="pname">
-								<div class="app-date"> ${a.date} </div>
-<!-- 								<div class="patient-info"><a class="patientinfo" href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></div>
- -->								
-								<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}?appointmentId=${a.appointmentID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>								 
-
-							</div>
-							</c:forEach>
-						</table>
+						<c:when test="${not empty appointments_patient}">
+							<table class="table">
+								<c:forEach items="${appointments_patient}" var="a">
+									<div class="pname">
+										<div class="app-date"> ${a.date} </div>
+										<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}?appointmentId=${a.appointmentID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>
+									</div>
+								</c:forEach>
+							</table>
 						</c:when>
+						
+						<c:when test="${not empty appointments_all}">
+							<table class="table">
+		<!-- 						<tr>
+									<th>Patient</th>
+									<th>Time</th>
+									<th>Approval Status</th>
+									<th>Delete</th>
+								</tr> -->
+								<c:forEach items="${appointments_all}" var="a">
+	<!-- 							<tr>
+									<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
+									<td>${a.date} ${a.time}</td>
+									<td>${a.status}</td>
+									<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
+								</tr> -->
+	
+								<div class="pname">
+									<div class="app-date"> ${a.date} </div>
+	<!-- 								<div class="patient-info"><a class="patientinfo" href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></div>
+	 -->								
+									<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}?appointmentId=${a.appointmentID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>								 
+	
+								</div>
+								</c:forEach>
+							</table>
+						</c:when>
+						
 						<c:otherwise>
 							<p style="margin-left:25px">No appointments</p>
 						</c:otherwise>

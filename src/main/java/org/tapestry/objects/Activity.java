@@ -4,6 +4,7 @@ public class Activity{
 	private String description;
 	private String date;
 	private String volunteer;
+	private int appointment;
 	
 	public Activity(){
 	}
@@ -20,6 +21,10 @@ public class Activity{
 		this.volunteer = volunteer;
 	}
 	
+	public void setAppointment(int appointment){
+		this.appointment = appointment;
+	}
+	
 	public String getDescription(){
 		return description;
 	}
@@ -30,5 +35,9 @@ public class Activity{
 	
 	public String getVolunteer(){
 		return volunteer;
+	}
+	
+	public int getAppointment(){
+		return appointment;
 	}
 }
