@@ -58,10 +58,9 @@
 </head>
 	
 <body>
-  
-	<div id="headerholder">	
-	  <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-		<div class="navbar">
+<div id="headerholder">	
+  <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
+  		<div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">
 					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -69,9 +68,25 @@
         					<span class="icon-bar"></span>
        				 		<span class="icon-bar"></span>
      					</a>
-     					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
+     					<li><a class="brand" href="<c:url value="/client"/>">Clients</a></li>
+     					
+							<li class="dropdown">
+<!-- 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Appointments<b class="caret"></b></a>
+ -->								<ul class="dropdown-menu">
+								<c:forEach items="${patients}" var="p">
+									<c:choose>
+										<c:when test="${not empty p.preferredName}">
+											<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.preferredName}</a></li>
+										</c:when>
+										<c:otherwise>
+											<li><a href="<c:url value="/patient/${p.patientID}"/>">${p.displayName}</a></li>
+										</c:otherwise>
+									</c:choose>
+								</c:forEach>
+								</ul>
+							</li>
 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
 							<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
@@ -84,6 +99,7 @@
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
 		<ul>
+			<li> <a href="<c:url value="/"/>">My Appointments</a> </li>
 			<li> <a href="<c:url value="/client"/>">My Clients</a> </li>
 			<li><a href="">
 				<c:choose>

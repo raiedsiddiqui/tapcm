@@ -77,9 +77,10 @@
         					<span class="icon-bar"></span>
        				 		<span class="icon-bar"></span>
      					</a>
-     					<a class="brand" href="<c:url value="/"/>">Home</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
+     					<li><a class="brand" href="<c:url value="/client"/>">Clients</a></li>
+     					
 							<li class="dropdown">
 <!-- 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Appointments<b class="caret"></b></a>
  -->								<ul class="dropdown-menu">
@@ -108,7 +109,7 @@
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
 		<ul>
-			<li><a href="<c:url value="/client"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
+			<li><a href="<c:url value="/"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Appointments</a> </li>
 		</ul>	
 	</div>
 <!-- 	breadcrumb END-->	

@@ -57,8 +57,16 @@
 			</div>
 		</div>	
 	</div>
-
 </div>
+</div>
+
+<!-- 	breadcrumb START-->	
+	<div id="crumbs"> 
+		<ul>
+			<li><a href="<c:url value="/"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Appointments</a> </li>
+		</ul>	
+	</div>
+<!-- 	breadcrumb END-->	
 	<div class="content">
 		</div>
 		<div class="row-fluid">

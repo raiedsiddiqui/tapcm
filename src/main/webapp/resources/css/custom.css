@@ -61,7 +61,7 @@ margin-top: 15%;
 }
 
 .navbar {
-	width: 600px !important;
+	width: 630px !important;
 	float: right !important;
 }
 
@@ -143,8 +143,8 @@ a {
 }
 
 .navbar-inner {
-	padding-left:0 !important;
-}
+/*	padding-left:0 !important;
+*/}
 }
 /*Lanscape CSS ENDS*/
 
@@ -230,7 +230,7 @@ background-image: -webkit-gradient(linear, left bottom, right top, from(rgba(106
 }
 
 .modal {
-	left: 40% !important;
+	left: 30% !important;
 }
 
 .modal.fade.in {
@@ -239,4 +239,57 @@ background-image: -webkit-gradient(linear, left bottom, right top, from(rgba(106
 
 .modal-footer .btn + .btn {
 	font-size: 30px !important;
+}
+.bootstrap-datetimepicker-widget {
+	font-size: 20px;
+	width: 599px;
+	height: 400px;
+	line-height: 2em;
+}
+
+th.next {
+	font-size: 40px !important;
+}
+
+th.prev {
+	font-size: 40px !important;
+}
+
+i.icon-chevron-up{
+	font-size: 40px;
+}
+
+i.icon-chevron-down{
+	font-size: 40px;
+}
+
+span.timepicker-minute {
+	font-size: 50px;
+}
+
+span.timepicker-hour {
+	font-size: 50px;
+}
+
+i.icon-time {
+	font-size: 50px;
+}
+
+i.icon-calendar {
+	font-size: 50px;
+}
+
+span.add-on {
+	height:50px !important;
+}
+i.icon-calendar {
+	font-size: 50px;
+}
+
+i.icon-time {
+	font-size: 50px;
+}
+
+#td > input {
+	height: 50px !important;
 }
