@@ -73,19 +73,30 @@
 										<a href="<c:url value="/decline_appointment/${a.appointmentID}"/>" class="btn btn-danger pull-right">Decline</a>
 										<a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger pull-right">Delete</a>
 										<div class="accordion-heading">
-									    	<a class="accordion-toggle" data-toggle="collapse" href="#collapse${a.appointmentID}">${a.date}</a>
+									    	<a class="accordion-toggle" data-toggle="collapse" href="#collapse${a.appointmentID}">${a.date} ${a.time}   (${a.status})</a>
 									    </div>
 									    
 									    <div id="collapse${a.appointmentID}" class="accordion-body collapse">
 				    						<div class="accordion-inner">
-				    							<c:if test="${not empty a.comments}">
-				    								Comments: ${a.comments} <br /><br />
-				    							</c:if>
-				    							<c:forEach items="${activities}" var="act">
-				    								<c:if test="${a.appointmentID == act.appointment}">
-				    									${act.description} <br />
-				    								</c:if>
-				    							</c:forEach>
+				    							<c:if test="${a.completed}">
+					    							<c:choose>
+					    								<c:when test="${a.contactedAdmin}">
+					    									Volunteer contacted Ernie<br /><br />
+					    								</c:when>
+					    								<c:otherwise>
+					    									Volunteer did not contact Ernie<br /><br />
+					    								</c:otherwise>
+					    							</c:choose>
+					    							<c:if test="${not empty a.comments}">
+					    								Comments: ${a.comments} <br /><br />
+					    							</c:if>
+					    							Activites Completed:<br />
+					    							<c:forEach items="${activities}" var="act">
+					    								<c:if test="${a.appointmentID == act.appointment}">
+					    									${act.time}: ${act.description} <br />
+					    								</c:if>
+					    							</c:forEach>
+					    						</c:if>
 				    						</div>
 				    					</div>
 				    				</c:if>

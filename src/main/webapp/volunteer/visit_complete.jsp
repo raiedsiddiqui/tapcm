@@ -86,17 +86,18 @@
 	<div id="crumbs"> 
 		<ul>
 			<li><a href="<c:url value="/client"/>">My Clients</a> </li>
-			<li><a href="<c:url value="/patient/${patient.patientID}?appointmentId=${appointment.appointmentID}"/>">
+			<li><a href="<c:url value="/?patientId=${patient.patientID}"/>">
 				<c:choose>
-						<c:when test="${not empty patient.preferredName}">
-						${patient.preferredName} (${patient.gender})
-						</c:when>
-						<c:otherwise>
-						${patient.displayName} (${patient.gender})
-						</c:otherwise>
+					<c:when test="${not empty patient.preferredName}">
+						<b>${patient.preferredName} (${patient.gender})</b>
+					</c:when>
+					<c:otherwise>
+						<b>${patient.displayName} (${patient.gender})</b>
+					</c:otherwise>
 				</c:choose>
 				</a>
 			</li>
+			<li><a href="<c:url value="/patient/${patient.patientID}?appointmentId=${appointment.appointmentID}"/>">${appointment.date}</a></li>
 			<li><a href="">
 					<b>Visit Complete</b>
 				</a>
@@ -107,7 +108,7 @@
 	<div class="content">
 		<form id="appt-form" method="post" action="<c:url value="/complete_visit/${appointment.appointmentID}"/>">
 	 		Date: ${appointment.date} <br />
-	 		Contacted Ernie<br />
+	 		<input type="checkbox" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie<br />
 	 		Visit Comments:<br />
 	 		<textarea name="comments" id="comments"></textarea><br />
 	 		<a href="<c:url value="/patient/${appointment.patientID}?appointmentId=${appointment.appointmentID}"/>" class="tleft btn btn-danger">Cancel</a>

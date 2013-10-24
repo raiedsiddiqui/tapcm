@@ -3,6 +3,7 @@ package org.tapestry.objects;
 public class Activity{
 	private String description;
 	private String date;
+	private String time;
 	private String volunteer;
 	private int appointment;
 	
@@ -15,6 +16,10 @@ public class Activity{
 	
 	public void setDate(String date){
 		this.date = date;
+	}
+	
+	public void setTime(String time){
+		this.time = time;
 	}
 	
 	public void setVolunteer(String volunteer){
@@ -31,6 +36,10 @@ public class Activity{
 	
 	public String getDate(){
 		return date;
+	}
+	
+	public String getTime(){
+		return time;
 	}
 	
 	public String getVolunteer(){

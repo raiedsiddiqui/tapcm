@@ -15,6 +15,7 @@ public class Appointment{
 	private String comments;
 	private String status;
 	private boolean completed;
+	private boolean contactedAdmin;
 	
 	/**
 	 * Empty constructor
@@ -91,6 +92,13 @@ public class Appointment{
 		return completed;
 	}
 	
+	/**
+	 * @return The contacted admin status of the appointment
+	 */
+	public boolean isContactedAdmin(){
+		return contactedAdmin;
+	}
+	
 	//Mutators
 	
 	/**
@@ -140,23 +148,30 @@ public class Appointment{
 	}
 	
 	/**
-	 * @param desc The text description for the appointment
+	 * @param comments The comments for the appointment
 	 */
 	public void setComments(String comments){
 		this.comments = comments;
 	}
 	
 	/**
-	 * @param approved The approval status of the appointment
+	 * @param status The approval status of the appointment
 	 */
 	public void setStatus(String status){
 		this.status = status;
 	}
 	
 	/**
-	 * @param approved The completion status of the appointment
+	 * @param completed The completion status of the appointment
 	 */
 	public void setCompleted(boolean completed){
 		this.completed = completed;
+	}
+	
+	/**
+	 * @param contactedAdmin The contact admin status of the appointment
+	 */
+	public void setContactedAdmin(boolean contactedAdmin){
+		this.contactedAdmin = contactedAdmin;
 	}
 }

@@ -51,7 +51,7 @@
 									<th>Patient</th>
 									<th>Date Assigned</th>
 									<th>Status</th>
-									<th>Last Edit Date</th>
+									<th>Complete Date/Last Edit</th>
 									<th>Remove</th>
 									<th>View/Export</th>
 								</tr>

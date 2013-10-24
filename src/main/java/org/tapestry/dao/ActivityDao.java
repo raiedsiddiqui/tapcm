@@ -146,7 +146,7 @@ public class ActivityDao {
     
     public ArrayList<Activity> getAllActivitiesWithAppointments(){
     	try{
-    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment FROM activities WHERE appointment IS NOT NULL ORDER BY event_timestamp DESC");
+    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment, TIME(event_timestamp) AS time FROM activities WHERE appointment IS NOT NULL ORDER BY event_timestamp DESC");
     		ResultSet result = statement.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
@@ -154,6 +154,8 @@ public class ActivityDao {
     			a.setDate(result.getString("event_timestamp"));
     			a.setDescription(result.getString("description"));
     			a.setAppointment(result.getInt("appointment"));
+    			String time = result.getString("time");
+    			a.setTime(time.substring(0, time.length() - 3));
     			
     			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
     			statement.setInt(1, result.getInt("volunteer"));

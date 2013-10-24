@@ -125,17 +125,18 @@
 		<ul>
 			<li> <a href="<c:url value="/client"/>">My Clients</a> </li>
 <!-- 			<li> <a href="<c:url value="#"/>">Appt Date</a> </li> -->
-			<li><a href="">
+			<li><a href="<c:url value="/?patientId=${patient.patientID}"/>">
 				<c:choose>
-						<c:when test="${not empty patient.preferredName}">
+					<c:when test="${not empty patient.preferredName}">
 						<b>${patient.preferredName} (${patient.gender})</b>
-						</c:when>
-						<c:otherwise>
+					</c:when>
+					<c:otherwise>
 						<b>${patient.displayName} (${patient.gender})</b>
-						</c:otherwise>
+					</c:otherwise>
 				</c:choose>
 				</a>
 			</li>
+			<li><a href="">${appointment.date}</a></li>
 		</ul>	
 	</div>
 <!-- 	breadcrumb END-->	
@@ -156,8 +157,8 @@
 					<c:if test="${not empty patient.notes}">
 						<a href="#modalNotes" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 					</c:if>
-					<c:if test="${not empty appointmentId}">
-						<a href="<c:url value="/visit_complete/${appointmentId}"/>" role="button" class="btn btn-primary pull-right">Visit Complete</a>
+					<c:if test="${not empty appointment}">
+						<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right">Visit Complete</a>
 					</c:if>
 					<a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a>
 				</div>

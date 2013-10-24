@@ -99,7 +99,7 @@
 						<c:forEach items="${clients}" var="c">
 							<div class="pname">
 								<c:choose>
-									<c:when test="${not empty p.preferredName}">
+									<c:when test="${not empty c.preferredName}">
 										<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/?patientId=${c.patientID}"/>'">${c.preferredName}</button>
 									</c:when>
 									<c:otherwise>

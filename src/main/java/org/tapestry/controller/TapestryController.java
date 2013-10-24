@@ -175,15 +175,27 @@ public class TapestryController{
 			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
 			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(u.getUserID());
+			ArrayList<Appointment> approvedAppointments = new ArrayList<Appointment>();
+			ArrayList<Appointment> pendingAppointments = new ArrayList<Appointment>();
+			ArrayList<Appointment> declinedAppointments = new ArrayList<Appointment>();
 			if(patientId != null) {
-				ArrayList<Appointment> appointmentsForPatient = appointmentDao.getAllAppointmentsForPatient(patientId);
-				model.addAttribute("appointments_patient", appointmentsForPatient);
+				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId);
+				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId);
+				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId);
+				Patient patient = patientDao.getPatientByID(patientId);
+				model.addAttribute("patient", patient);
 			} else {
-				ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
+				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(u.getUserID());
+				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(u.getUserID());
+				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(u.getUserID());
+				/*ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
 				ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
 				model.addAttribute("appointments_today", appointmentsForToday);
-				model.addAttribute("appointments_all", allAppointments);
+				model.addAttribute("appointments_all", allAppointments);*/
 			}
+			model.addAttribute("approved_appointments", approvedAppointments);
+			model.addAttribute("pending_appointments", pendingAppointments);
+			model.addAttribute("declined_appointments", declinedAppointments);
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
 			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
@@ -224,6 +236,8 @@ public class TapestryController{
 	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(loggedInUser.getUserID());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+		model.addAttribute("unread", unreadMessages);
 		model.addAttribute("clients", clients);
 		return "volunteer/client";
 	}
@@ -371,7 +385,7 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/patient/{patient_id}", method=RequestMethod.GET)
-	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false) String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, @RequestParam(value="appointmentId", required=false) Long appointmentId, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false) String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, @RequestParam(value="appointmentId", required=false) Integer appointmentId, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -391,6 +405,10 @@ public class TapestryController{
 		Collections.sort(completedSurveyResultList);
 		Collections.sort(incompleteSurveyResultList);
 		ArrayList<SurveyTemplate> surveyList = surveyTemplateDao.getAllSurveyTemplates();
+		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
+		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
+		model.addAttribute("appointment", appointment);
+		model.addAttribute("patients", patientsForUser);
 		model.addAttribute("completedSurveys", completedSurveyResultList);
 		model.addAttribute("inProgressSurveys", incompleteSurveyResultList);
 		model.addAttribute("surveys", surveyList);
@@ -401,7 +419,6 @@ public class TapestryController{
 		} else {
 			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
 		}
-		model.addAttribute("appointmentId", appointmentId);
 		return "/patient";
 	}
 	
@@ -416,7 +433,8 @@ public class TapestryController{
 	
 	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
 	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request) {
-		appointmentDao.completeAppointment(id, request.getParameter("comments"));
+		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
+		appointmentDao.completeAppointment(id, request.getParameter("comments"), contactedAdmin);
 		return "redirect:/";
 	}
 	

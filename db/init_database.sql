@@ -61,9 +61,10 @@ CREATE TABLE IF NOT EXISTS appointments (
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
 	patient SMALLINT UNSIGNED NOT NULL, /* Same as patient_ID */
 	date_time DATETIME NOT NULL, /*Contains both date and time, separated using functions in query*/
-	comments TEXT,
+	comments TEXT, /*Volunteer visit comments*/
 	status TEXT NOT NULL, /*Approval status of appointment*/
 	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the appointment (0=incomplete)*/
+	contactedAdmin BOOLEAN NOT NULL DEFAULT 0, /*The status of the volunteer contacted the admin*/
 	PRIMARY KEY(appointment_ID)
 );
 

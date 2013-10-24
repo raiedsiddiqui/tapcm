@@ -110,7 +110,20 @@
 	<div id="crumbs"> 
 		<ul>
 			<li><a href="<c:url value="/client"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
-		</ul>	
+			<c:if test="${not empty patient}">
+				<li><a href="">
+						<c:choose>
+							<c:when test="${not empty patient.preferredName}">
+								<b>${patient.preferredName} (${patient.gender})</b>
+							</c:when>
+							<c:otherwise>
+								<b>${patient.displayName} (${patient.gender})</b>
+							</c:otherwise>
+						</c:choose>
+					</a>
+				</li>
+			</c:if>		
+		</ul>
 	</div>
 <!-- 	breadcrumb END-->	
 	
@@ -143,12 +156,75 @@
 		</c:if>
 		<div class="row-fluid">
 			<div class="span12">
-				<h3>My Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
+				<c:choose>
+					<c:when test="${not empty patient}">
+						<c:choose>
+							<c:when test="${not empty patient.preferredName}">
+								<h3>${patient.preferredName}'s Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
+							</c:when>
+							<c:otherwise>
+								<h3>${patient.displayName}'s Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
+							</c:otherwise>
+						</c:choose>
+					</c:when>
+					<c:otherwise>
+						<h3>My Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
+					</c:otherwise>
+				</c:choose>
 <!-- 				<ul class="nav nav-tabs" id="appointmentSelect">
 					<li class="active"><a href="#today" data-toggle="tab">Today</a></li>
  					<li class="active"><a href="#all" data-toggle="tab">All</a></li>
 				</ul>-->
 				<div class="tab-content">
+					<div class="tab-pane active" id="all">
+						<h4>Approved Appointments:</h4>
+						<table class="table>
+							<c:forEach items="${approved_appointments}" var="aa">
+								<div class="pname">
+									<div class="app-date"> ${aa.date} </div>
+									<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${aa.patientID}?appointmentId=${aa.appointmentID}"/>'">${aa.patient} <span class="tright"> ${aa.time}</button>
+								</div>
+							</c:forEach>
+						</table>
+						
+						<div class="accordion-group">
+							<div class="accordion-heading">
+						    	<a class="accordion-toggle" data-toggle="collapse" href="#collapsePending">
+						        	Pending Appointments
+						      	</a>
+						    </div>
+						    
+						    <div id="collapsePending" class="accordion-body collapse">
+				    			<div class="accordion-inner">
+				    				<c:forEach items="${pending_appointments}" var="pa">
+										<div class="pname">
+											<div class="app-date"> ${pa.date} </div>
+											<button type="button" class="btn btn-primary btn-lg btn-block cbutton">${pa.patient} <span class="tright"> ${pa.time}</button>
+										</div>
+									</c:forEach>
+								</div>
+							</div>
+						</div>
+						
+						<div class="accordion-group2">
+							<div class="accordion-heading">
+						    	<a class="accordion-toggle" data-toggle="collapse" href="#collapseDeclined">
+						        	Declined Appointments
+						      	</a>
+						    </div>
+						    
+						    <div id="collapseDeclined" class="accordion-body collapse">
+				    			<div class="accordion-inner">
+				    				<c:forEach items="${declined_appointments}" var="da">
+										<div class="pname">
+											<div class="app-date"> ${da.date} </div>
+											<button type="button" class="btn btn-primary btn-lg btn-block cbutton">${da.patient} <span class="tright"> ${da.time}</button>
+										</div>
+									</c:forEach>
+								</div>
+							</div>
+						</div>
+						    
 <!-- 					<div class="tab-pane active" id="today">	
 					<c:choose>
 						<c:when test="${not empty appointments_today}">
@@ -174,8 +250,7 @@
 						</c:otherwise>
 					</c:choose>
 					</div>	 -->				
-					<div class="tab-pane active" id="all">	
-					<c:choose>
+<!--					<c:choose>
 						<c:when test="${not empty appointments_patient}">
 							<table class="table">
 								<c:forEach items="${appointments_patient}" var="a">
@@ -188,14 +263,14 @@
 						</c:when>
 						
 						<c:when test="${not empty appointments_all}">
-							<table class="table">
+							<table class="table"> -->
 		<!-- 						<tr>
 									<th>Patient</th>
 									<th>Time</th>
 									<th>Approval Status</th>
 									<th>Delete</th>
 								</tr> -->
-								<c:forEach items="${appointments_all}" var="a">
+	<!--							<c:forEach items="${appointments_all}" var="a"> -->
 	<!-- 							<tr>
 									<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
 									<td>${a.date} ${a.time}</td>
@@ -203,11 +278,11 @@
 									<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
 								</tr> -->
 	
-								<div class="pname">
-									<div class="app-date"> ${a.date} </div>
+	<!--							<div class="pname">
+									<div class="app-date"> ${a.date} </div> -->
 	<!-- 								<div class="patient-info"><a class="patientinfo" href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></div>
 	 -->								
-									<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}?appointmentId=${a.appointmentID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>								 
+	<!--								<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}?appointmentId=${a.appointmentID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>								 
 	
 								</div>
 								</c:forEach>
@@ -217,7 +292,7 @@
 						<c:otherwise>
 							<p style="margin-left:25px">No appointments</p>
 						</c:otherwise>
-					</c:choose>
+					</c:choose> -->
 					</div>
 				</div>
 			</div>
