@@ -79,7 +79,7 @@
 
 <div id="headerholder">	
   <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-  <div class="navbar">
+<!--   <div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">
 					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -91,7 +91,7 @@
      				<a class="brand" href="<c:url value="/"/>">Home</a>
 				</div>
 			</div>
-		</div>		
+		</div>	 -->	
 </div>
 	<div class="content">
 		

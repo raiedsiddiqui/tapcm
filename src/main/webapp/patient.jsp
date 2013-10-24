@@ -8,9 +8,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 
 	<!-- CUSTOM CSS -->
 	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" />      
@@ -18,8 +22,6 @@
 
 	  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
 	<!-- 	CUSTOM CSS END -->
-
-	<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 
 	<style type="text/css">
 		html,body{
@@ -54,6 +56,28 @@
 		}
 		
 	</style>
+
+	<script type="text/javascript">
+		$(function(){
+			$('#tp').datetimepicker({
+				pickDate: false,
+				pickSeconds: false
+			});
+			
+			$('#dp').datetimepicker({
+				pickTime: false,
+				startDate: new Date()
+  			});
+  			
+ 			$('#bookAppt').click(function(){
+		        var btn = $(this)
+		        btn.button('loading')
+		        setTimeout(function () {
+		            btn.button('reset')
+		        }, 3000)
+		    });
+		});
+	</script>
 	
 </head>
 	
@@ -70,7 +94,7 @@
      					</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-     					<li><a class="brand" href="<c:url value="/client"/>">Clients</a></li>
+     					<li><a class="brand" href="<c:url value="/"/>">Appointments</a></li>
      					
 							<li class="dropdown">
 <!-- 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Appointments<b class="caret"></b></a>
@@ -99,8 +123,8 @@
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
 		<ul>
-			<li> <a href="<c:url value="/"/>">My Appointments</a> </li>
 			<li> <a href="<c:url value="/client"/>">My Clients</a> </li>
+<!-- 			<li> <a href="<c:url value="#"/>">Appt Date</a> </li> -->
 			<li><a href="">
 				<c:choose>
 						<c:when test="${not empty patient.preferredName}">
@@ -135,6 +159,7 @@
 					<c:if test="${not empty appointmentId}">
 						<a href="<c:url value="/visit_complete/${appointmentId}"/>" role="button" class="btn btn-primary pull-right">Visit Complete</a>
 					</c:if>
+					<a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a>
 				</div>
 			</div>
 			<c:if test="${not empty completed}">
@@ -289,6 +314,43 @@
   		</div>
   		<div class="modal-footer">
    			<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
+  		</div>
+	</div>
+
+
+		<!-- Modal -->
+	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+  		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    		<h3 id="modalHeader">Book Appointment</h3>
+  		</div>
+  		<div class="modal-body">
+  			<form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
+  				<label>With patient:</label>
+				<select name="patient" form="appt-form">
+					<c:forEach items="${patients}" var="p">
+					<option value="${p.patientID}">${p.displayName}</option>
+					</c:forEach>
+				</select><br />
+				<label>Date:</label>		
+				<div id="dp" class="input-append">
+					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate" readonly>
+					<span class="add-on">
+						<i class="icon-calendar"></i>
+					</span>
+				</div>
+				<label>Time:</label>
+				<div id="tp" class="input-append">
+					<input data-format="hh:mm:00" type="text" name="appointmentTime" readonly>
+				    <span class="add-on">
+				    	<i class="icon-time"></i>
+				    </span>
+				</div>
+  			</form>
+  		</div>
+  		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    		<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
   		</div>
 	</div>
 </body>

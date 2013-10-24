@@ -47,7 +47,7 @@
 				 		<span class="icon-bar"></span>
 					</a>
 					
-					<a class="brand" href="<c:url value="/"/>">Home</a>
+					<a class="brand" href="<c:url value="/"/>">Appointments</a>
 					<div class="nav-collapse collapse">
 				<ul class="nav">
 					<li><a href="<c:url value="/profile"/>">My Profile</a></li>
@@ -63,7 +63,7 @@
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
 		<ul>
-			<li><a href="<c:url value="/"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Appointments</a> </li>
+			<li><a href="<c:url value="/client"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
 		</ul>	
 	</div>
 <!-- 	breadcrumb END-->	
