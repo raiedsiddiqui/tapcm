@@ -33,8 +33,8 @@
 			height:100%;
 		}
 		.content{
-			overflow-x:auto;
-			overflow-y:auto;
+/*			overflow-x:auto;
+		overflow-y:auto;*/	
 			border-radius:5px;
 			-moz-border-radius:5px;
 			-webkit-border-radius:5px;

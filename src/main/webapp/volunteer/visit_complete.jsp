@@ -77,6 +77,7 @@
 <!--      					<a class="brand" href="<c:url value="/"/>">Home</a>
  -->     					<div class="nav-collapse collapse">
 						<ul class="nav">
+							<li><a class="brand" href="<c:url value="/"/>">Appointments</a></li>
 <!-- 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>-->							
 						<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
@@ -113,7 +114,7 @@
 	<div class="content">
 		<form id="appt-form" method="post" action="<c:url value="/complete_visit/${appointment.appointmentID}"/>">
 	 		<h2> Date: ${appointment.date} <h2> <!-- <br /> -->
-	 		<input id="contactedcheck" type="checkbox" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie
+	 		<input id="contactedcheck" type="radio" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie
 	 		<br />
 	 		<h3> What does the clinic need to know about today's visit?
 			<br/>Example: unsafe walking, poor access to food, patient not behaving appropriately </h3><br />
