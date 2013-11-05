@@ -52,6 +52,10 @@
 		.thumbnail{
 			width:320px;
 		}
+		input[type="radio"] {
+			height:50px;	
+			width:50px;
+		}
 	</style>
 	
 	<script type="text/javascript">
