@@ -7,12 +7,17 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
+	
+		<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
 		<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" />      
+		<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
+
 
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
@@ -28,8 +33,8 @@
 			height:100%;
 		}
 		.content{
-			overflow-x:auto;
-			border-radius:5px;
+/*			overflow-x:auto;
+*/			border-radius:5px;
 			-moz-border-radius:5px;
 			-webkit-border-radius:5px;
 			-o-border-radius:5px;
@@ -79,7 +84,7 @@
      					</a>
      					<div class="nav-collapse collapse">
 						<ul class="nav">
-     					<li><a class="brand" href="<c:url value="/"/>">Appointments</a></li>
+     					<li class="active"><a class="brand" href="<c:url value="/"/>">Appointments</a></li>
      					
 							<li class="dropdown">
 <!-- 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Appointments<b class="caret"></b></a>
@@ -96,7 +101,7 @@
 								</c:forEach>
 								</ul>
 							</li>
-							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
+							<!-- <li><a href="<c:url value="/profile"/>">My Profile</a></li> -->
 							<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 						</ul>
@@ -124,6 +129,12 @@
 				</li>
 			</c:if>		
 		</ul>
+
+
+	</div>
+
+	<div id="visitandbook" class="span12 btn-group">
+		<a href="#bookAppointment" role="button" class="btn btn-primary pull-right lgbtn" data-toggle="modal">Book appointment</a>
 	</div>
 <!-- 	breadcrumb END-->	
 	
@@ -160,7 +171,8 @@
 					<c:when test="${not empty patient}">
 						<c:choose>
 							<c:when test="${not empty patient.preferredName}">
-								<h3>${patient.preferredName}'s Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
+								<!-- <h3>${patient.preferredName}'s Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3> -->
+								<h3> Select an appointment </h3>
 							</c:when>
 							<c:otherwise>
 								<h3>${patient.displayName}'s Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
@@ -168,7 +180,8 @@
 						</c:choose>
 					</c:when>
 					<c:otherwise>
-						<h3>My Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
+						<h3>My Appointments: </h3>
+
 					</c:otherwise>
 				</c:choose>
 <!-- 				<ul class="nav nav-tabs" id="appointmentSelect">
@@ -177,7 +190,7 @@
 				</ul>-->
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">
-						<h4>Approved Appointments:</h4>
+						<div class="sheading"><h4>Approved Appointments:</h4></div>
 						<table class="table>
 							<c:forEach items="${approved_appointments}" var="aa">
 								<div class="pname">
@@ -186,7 +199,9 @@
 								</div>
 							</c:forEach>
 						</table>
-						
+						<div class="sheading">
+							<h4> Pending/Declined Appointments </h4>
+						</div>
 						<div class="accordion-group">
 							<div class="accordion-heading">
 						    	<a class="accordion-toggle" data-toggle="collapse" href="#collapsePending">
@@ -199,7 +214,7 @@
 				    				<c:forEach items="${pending_appointments}" var="pa">
 										<div class="pname">
 											<div class="app-date"> ${pa.date} </div>
-											<button type="button" class="btn btn-primary btn-lg btn-block cbutton">${pa.patient} <span class="tright"> ${pa.time}</button>
+											<button type="button" class="pendingappt btn-lg btn-block cbutton">${pa.patient} <span class="tright"> ${pa.time}</button>
 										</div>
 									</c:forEach>
 								</div>
@@ -218,7 +233,7 @@
 				    				<c:forEach items="${declined_appointments}" var="da">
 										<div class="pname">
 											<div class="app-date"> ${da.date} </div>
-											<button type="button" class="btn btn-primary btn-lg btn-block cbutton">${da.patient} <span class="tright"> ${da.time}</button>
+											<button type="button" class="inactiveclr btn-lg btn-block cbutton">${da.patient} <span class="tright"> ${da.time}</button>
 										</div>
 									</c:forEach>
 								</div>

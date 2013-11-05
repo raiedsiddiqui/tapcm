@@ -11,7 +11,7 @@ img {
 }
 #headerholder {
 	border-bottom: 2px solid lightgray;
-	height: 70px;
+	height: auto;
 }
 
 
@@ -24,7 +24,7 @@ img {
 	margin: 0 auto;
 /*	border: 1px solid black;
 */	width: 80%;
-margin-top: 15%;
+	margin-top: 15%;
 }
 
 .control-label {
@@ -61,7 +61,7 @@ margin-top: 15%;
 }
 
 .navbar {
-	width: 720px !important;
+	width: 600px !important;
 	float: right !important;
 }
 
@@ -125,6 +125,17 @@ a {
 	font-size: 20px;
 	margin-bottom: 20px;
 	height: 30px;
+	padding-left:8px;
+}
+
+.sheadingactive {
+	width:90%;
+	background-color: lightgray;
+	font-family: 'Roboto Slab', serif;
+	font-size: 20px;
+	margin-bottom: 20px;
+	height: 30px;
+	padding-left:8px;
 }
 
 .navbar .nav > li > a
@@ -145,6 +156,8 @@ a {
 .navbar-inner {
 /*	padding-left:0 !important;
 */}
+
+
 }
 /*Lanscape CSS ENDS*/
 
@@ -230,11 +243,11 @@ background-image: -webkit-gradient(linear, left bottom, right top, from(rgba(106
 }
 
 .modal {
-	left: 30% !important;
-}
+/*	left: 40% !important;
+*/}
 
 .modal.fade.in {
-	width: 80%;
+	width: auto;
 }
 
 .modal-footer .btn + .btn {
@@ -293,3 +306,93 @@ i.icon-time {
 #td > input {
 	height: 50px !important;
 }
+
+div.accordion-heading {
+/*	margin-top: 10% !important;
+*/}
+
+input > #contacted {
+	width:50px;
+	height:50px;
+} 
+
+#visitcomments {
+	font-size: 30px;
+	height:140px;
+	width: 80%;
+}
+
+div#visitandbook.span12.btn-group {
+/*	border:1px solid gray;
+*/	width:100%;
+	float:right;
+	margin-bottom: 10px;
+	margin-top:10px;
+}
+
+.lgbtn {
+	padding-right:10px;
+	margin-right:10px;
+	font-size: 20px !important;
+	height:25px;
+}
+
+.completevisitbtn {
+	padding-right:10px;
+	margin-right:10px;
+	font-size: 30px !important;
+	height:40px;
+}
+
+#crumbs ul li a::before {
+	border-top: 20px solid transparent;
+	border-bottom: 20px solid transparent;
+}
+
+#crumbs ul li a::after {
+	border-top: 20px solid transparent;
+	border-bottom: 20px solid transparent;	
+}
+
+#crumbs ul li a {
+	height: 30px;
+	padding: 10px 10px 0 60px;
+}
+
+div#crumbs {
+	border-bottom: 1px solid lightgray;
+	border-top: 1px solid lightgray;
+	clear: both;
+	padding-top:10px;
+}
+
+div.tab-content {
+	width: 90%;
+}
+
+div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
+	right: 249px !important;
+}
+
+.bootstrap-datetimepicker-widget {
+	width: 449px !important;
+}
+
+.inactiveclr {
+	background-image: linear-gradient(to bottom, rgba(150, 150, 150, 0.84), #C2C2C2) !important;
+	background-image: -webkit-gradient(linear, left bottom, right top, from(rgba(150, 150, 150, 0.84)), to(#C2C2C2)) !important;
+
+	text-align: center;
+	color:white;
+	padding-top:5px;
+}
+
+.pendingappt {
+	background-image: linear-gradient(to bottom,rgb(237, 181, 13),#B1AD18) !important;
+	background-image: -webkit-gradient(linear, left bottom, right top, from(rgb(237, 181, 13)), to(#B1AD18)) !important;
+	text-align: left;
+	color:white;
+	padding-top:5px;
+
+}
+

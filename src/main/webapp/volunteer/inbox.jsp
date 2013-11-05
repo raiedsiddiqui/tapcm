@@ -7,13 +7,17 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
+		<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+	
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 
-		<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
 		<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
+				<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
+
 		  		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'> 
 	<style type="text/css">
 		html,body{
@@ -50,7 +54,7 @@
 					<a class="brand" href="<c:url value="/"/>">Appointments</a>
 					<div class="nav-collapse collapse">
 				<ul class="nav">
-					<li><a href="<c:url value="/profile"/>">My Profile</a></li>
+					<!-- <li><a href="<c:url value="/profile"/>">My Profile</a></li> -->
 					<li class="active"><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 					<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 				</ul>

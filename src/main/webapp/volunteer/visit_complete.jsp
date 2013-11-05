@@ -7,6 +7,10 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
+
+		<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
@@ -15,8 +19,9 @@
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 	
 
-	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
 	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
+	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
+
 
 	  		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
 
@@ -69,11 +74,11 @@
        				 		<span class="icon-bar"></span>
      					</a>
      					
-     					<a class="brand" href="<c:url value="/"/>">Home</a>
-     					<div class="nav-collapse collapse">
+<!--      					<a class="brand" href="<c:url value="/"/>">Home</a>
+ -->     					<div class="nav-collapse collapse">
 						<ul class="nav">
-							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
-							<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
+<!-- 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>-->							
+						<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 						</ul>
 					</div>
@@ -107,12 +112,14 @@
 <!-- 	breadcrumb END-->
 	<div class="content">
 		<form id="appt-form" method="post" action="<c:url value="/complete_visit/${appointment.appointmentID}"/>">
-	 		Date: ${appointment.date} <br />
-	 		<input type="checkbox" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie<br />
-	 		Visit Comments:<br />
-	 		<textarea name="comments" id="comments"></textarea><br />
+	 		<h2> Date: ${appointment.date} <h2> <!-- <br /> -->
+	 		<input id="contactedcheck" type="checkbox" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie
+	 		<br />
+	 		<h3> What does the clinic need to know about today's visit?
+			<br/>Example: unsafe walking, poor access to food, patient not behaving appropriately </h3><br />
+	 		<textarea id="visitcomments" name="comments" id="comments"></textarea><br />
 	 		<a href="<c:url value="/patient/${appointment.patientID}?appointmentId=${appointment.appointmentID}"/>" class="tleft btn btn-danger">Cancel</a>
- 			<input class="tright btn btn-primary" type="submit" value="Complete Visit" />
+ 			<input class="completevisitbtn btn btn-primary pull-right" type="submit" value="Submit" />
  		</form>
  		
  	</div>

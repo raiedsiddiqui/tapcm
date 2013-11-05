@@ -6,6 +6,10 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
@@ -17,8 +21,9 @@
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 
 	<!-- CUSTOM CSS -->
-	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" />      
+	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
 	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" /> 
+     
 
 	  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
 	<!-- 	CUSTOM CSS END -->
@@ -111,7 +116,7 @@
 								</c:forEach>
 								</ul>
 							</li>
-							<li><a href="<c:url value="/profile"/>">My Profile</a></li>
+							<!-- <li><a href="<c:url value="/profile"/>">My Profile</a></li> -->
 							<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 						</ul>
@@ -137,7 +142,17 @@
 				</a>
 			</li>
 			<li><a href="">${appointment.date}</a></li>
-		</ul>	
+		</ul>
+
+	<div id="visitandbook" class="span12 btn-group">
+			<c:if test="${not empty patient.notes}">
+				<a href="#modalNotes" class="btn btn-large btn-inverse lgbtn" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
+			</c:if>
+			<c:if test="${not empty appointment}">
+				<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Visit Complete</a>
+			</c:if>
+			<a href="#bookAppointment" role="button" class="btn btn-primary pull-right lgbtn" data-toggle="modal">Book appointment</a>
+	</div>	
 	</div>
 <!-- 	breadcrumb END-->	
 	<div class="content">
@@ -153,15 +168,15 @@
 						</c:otherwise>
 					</c:choose>
 				</div> -->
-				<div class="span12 btn-group">
+				<!-- <div id="visitandbook" class="span12 btn-group">
 					<c:if test="${not empty patient.notes}">
-						<a href="#modalNotes" class="btn btn-large btn-inverse" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
+						<a href="#modalNotes" class="btn btn-large btn-inverse lgbtn" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 					</c:if>
 					<c:if test="${not empty appointment}">
-						<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right">Visit Complete</a>
+						<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Visit Complete</a>
 					</c:if>
-					<a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a>
-				</div>
+					<a href="#bookAppointment" role="button" class="btn btn-primary pull-right lgbtn" data-toggle="modal">Book appointment</a>
+				</div> -->
 			</div>
 			<c:if test="${not empty completed}">
 				<p class="alert alert-success">Completed survey: ${completed}</p>
@@ -174,8 +189,11 @@
 			  <div class="accordion-group">
 			    <div class="accordion-heading">
 			      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionSurveys" href="#collapseOne"> -->
-			        <div class="sheading">Incomplete Surveys</div>
-			      <!-- </a>
+			       
+			        <div class="sheading">Active Surveys</div>
+
+
+			        			      <!-- </a>
 			    </div>
 			    <div id="collapseOne" class="accordion-body collapse">
 			      <div class="accordion-inner"> -->
@@ -200,7 +218,7 @@
 <!-- 			    <div id="collapseTwo" class="accordion-body collapse">
  -->			      <c:forEach items="${completedSurveys}" var="cs">
 						<div class="row-fluid">
-							<div class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+							<div class="span12 survey-list inactiveclr" style="height:50px; margin-bottom:10px;">
 								<b>${cs.surveyTitle}</b><br/>
 								${cs.description}
 							</div>

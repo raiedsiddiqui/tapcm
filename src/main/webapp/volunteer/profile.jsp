@@ -14,9 +14,8 @@
 		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
 	
-
-	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
 	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
+	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
 
 	  		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
 
@@ -123,7 +122,7 @@
 							<input type="submit" class="btn btn-primary" value="Save changes" />
 						</fieldset>
 					</form>
-					<form id="change-password" method="post" action="<c:url value="/change_password/${vol.userID}"/>">
+<!-- 					<form id="change-password" method="post" action="<c:url value="/change_password/${vol.userID}"/>">
 						<fieldset>
 							<c:if test="${not empty errors}">
 							<c:choose>
@@ -148,7 +147,7 @@
 							<br />
 							<input type="submit" class="btn btn-primary" value="Save changes" />
 						</fieldset>
-	  				</form>
+	  				</form> -->
 				</div>
 				
 <!-- 				<div class="span8">
