@@ -49,7 +49,7 @@
 								<tr>
 									<th>Survey</th>
 									<th>Patient</th>
-									<th>Date Assigned</th>
+									<th>Date Started</th>
 									<th>Status</th>
 									<th>Complete Date/Last Edit</th>
 									<th>Remove</th>

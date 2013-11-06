@@ -47,6 +47,11 @@
 				<p>Message sent</p>
 			</div>
 			</c:if>
+			<c:if test="${not empty failure}">
+			<div class="alert alert-error">
+				<p>Message failed to send: make sure you select a recipient</p>
+			</div>
+			</c:if>
 				<c:choose>
 					<c:when test="${not empty messages}">
 					<table class="table">

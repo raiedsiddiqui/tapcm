@@ -145,7 +145,7 @@
                 			if (question.getQuestionType().equals(SurveyQuestion.ANSWER_NUMBER) ||
                 			question.getQuestionType().equals(SurveyQuestion.ANSWER_DECIMAL)) {                
                 		%>
-                			<input type="text" size="5" style="text-align: center;" id="answer" name="answer" value="<%=answer%>"<%if (survey.isComplete()) {%> readonly<%}%>> (Number)
+                			<input type="number" style="text-align: center;" id="answer" name="answer" value="<%=answer%>"<%if (survey.isComplete()) {%> readonly<%}%>> (Number)
                 
                 		<%} else if (question.getQuestionType().equals(SurveyQuestion.ANSWER_TEXT)) {%>
                 			<textarea name="answer" id="answer" onload="this.focus()" <%if (survey.isComplete()) {%> readonly<%}%>><%=answer%></textarea>

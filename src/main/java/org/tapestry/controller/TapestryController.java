@@ -336,7 +336,9 @@ public class TapestryController{
 		Patient p = new Patient();
 		p.setFirstName(request.getParameter("firstname").trim());
 		p.setLastName(request.getParameter("lastname").trim());
-		p.setPreferredName(request.getParameter("preferredname").trim());
+		if(request.getParameter("preferredname") != "") {
+			p.setPreferredName(request.getParameter("preferredname").trim());
+		}
 		int v = Integer.parseInt(request.getParameter("volunteer"));
 		p.setVolunteer(v);
 		p.setGender(request.getParameter("gender"));
@@ -425,6 +427,8 @@ public class TapestryController{
 	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
 	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
 		Appointment appointment = appointmentDao.getAppointmentById(id);
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(appointment.getVolunteerID());
+		model.addAttribute("unread", unreadMessages);
 		Patient patient = patientDao.getPatientByID(appointment.getPatientID());
 		model.addAttribute("appointment", appointment);
 		model.addAttribute("patient", patient);
@@ -454,7 +458,7 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
-	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent,@RequestParam(value="failure", required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("messages", messages);
@@ -462,6 +466,8 @@ public class TapestryController{
 		model.addAttribute("unread", unreadMessages);
 		if (messageSent != null)
 			model.addAttribute("success", messageSent);
+		if (messageFailed != null)
+			model.addAttribute("failure", messageFailed);
 		if (request.isUserInRole("ROLE_USER")) {
 			ArrayList<User> administrators = userDao.getAllUsersWithRole("ROLE_ADMIN");
 			model.addAttribute("administrators", administrators);
@@ -538,31 +544,35 @@ public class TapestryController{
 		else{ //Send to one person
 			
 			String[] recipients = request.getParameterValues("recipient");
-			for (String recipientIDAsString: recipients){ //Annoyingly, the request comes as strings
-				int recipientID = Integer.parseInt(recipientIDAsString);
-				m.setRecipient(recipientID);
-				m.setSubject(request.getParameter("msgSubject"));
-				messageDao.sendMessage(m);
-				
-				User recipient = userDao.getUserByID(recipientID);
-				
-				if (mailAddress != null){
-					try{
-						MimeMessage message = new MimeMessage(session);
-						message.setFrom(new InternetAddress(mailAddress));
-						message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
-						message.setSubject("Tapestry: New message notification");
-						String msg = "You have received a message. To review it, log into Tapestry and open your inbox.";
-						message.setText(msg);
-						System.out.println(msg);
-						System.out.println("Sending...");
-						Transport.send(message);
-						System.out.println("Email sent notifying " + recipient.getEmail());
-					} catch (MessagingException e) {
-						System.out.println("Error: Could not send email");
-						System.out.println(e.toString());
+			if(recipients != null) {
+				for (String recipientIDAsString: recipients){ //Annoyingly, the request comes as strings
+					int recipientID = Integer.parseInt(recipientIDAsString);
+					m.setRecipient(recipientID);
+					m.setSubject(request.getParameter("msgSubject"));
+					messageDao.sendMessage(m);
+					
+					User recipient = userDao.getUserByID(recipientID);
+					
+					if (mailAddress != null){
+						try{
+							MimeMessage message = new MimeMessage(session);
+							message.setFrom(new InternetAddress(mailAddress));
+							message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(recipient.getEmail()));
+							message.setSubject("Tapestry: New message notification");
+							String msg = "You have received a message. To review it, log into Tapestry and open your inbox.";
+							message.setText(msg);
+							System.out.println(msg);
+							System.out.println("Sending...");
+							Transport.send(message);
+							System.out.println("Email sent notifying " + recipient.getEmail());
+						} catch (MessagingException e) {
+							System.out.println("Error: Could not send email");
+							System.out.println(e.toString());
+						}
 					}
 				}
+			} else {
+				return "redirect:/inbox?failure=true";
 			}
 		}
 

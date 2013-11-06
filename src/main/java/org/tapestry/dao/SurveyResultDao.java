@@ -244,7 +244,7 @@ public class SurveyResultDao
 	public String assignSurvey(SurveyResult sr) {
 		String resultId = null;
 		try {
-			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data, startDate) values (?,?,?, now())");
+			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data) values (?,?,?)");
 			statement.setInt(1, sr.getPatientID());
 			statement.setInt(2, sr.getSurveyID());
 			statement.setBytes(3, sr.getResults());
@@ -331,5 +331,26 @@ public class SurveyResultDao
     			//Ignore
     		}
     	}
+	}
+	
+	/**
+	 * Set start date of survey result
+	 * @param id The ID of the survey result
+	 */
+	public void updateStartDate(int id) {
+		try{
+			statement = con.prepareStatement("UPDATE survey_results SET startDate=now() WHERE result_ID=?");
+			statement.setInt(1, id);
+			statement.execute();
+		} catch (SQLException e){
+			System.out.println("Error: Could not save survey start date");
+			e.printStackTrace();
+		} finally {
+			try{
+				statement.close();
+			} catch (Exception e) {
+				//Ignore
+			}
+		}
 	}
 }

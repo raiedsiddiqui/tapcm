@@ -154,6 +154,10 @@ public class SurveyController{
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		Patient p = patientDao.getPatientByID(surveyResult.getPatientID());
 		
+		if(surveyResult.getStartDate() == null) {
+			surveyResultDao.updateStartDate(id);
+		}
+		
 		if(p.getPreferredName() != null && p.getPreferredName() != "") {
 			activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getPreferredName(), u.getUserID());
 		} else {

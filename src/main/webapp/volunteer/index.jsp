@@ -169,15 +169,7 @@
 			<div class="span12">
 				<c:choose>
 					<c:when test="${not empty patient}">
-						<c:choose>
-							<c:when test="${not empty patient.preferredName}">
-								<!-- <h3>${patient.preferredName}'s Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3> -->
-								<h3> Select an appointment </h3>
-							</c:when>
-							<c:otherwise>
-								<h3>${patient.displayName}'s Appointments: <a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a></h3>
-							</c:otherwise>
-						</c:choose>
+						<h3> Select an appointment </h3>
 					</c:when>
 					<c:otherwise>
 						<h3>My Appointments: </h3>

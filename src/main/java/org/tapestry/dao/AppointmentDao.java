@@ -321,7 +321,7 @@ public class AppointmentDao {
     
     public Appointment getAppointmentByMostRecentIncomplete(int patientId){
        	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND completed=0 ORDER BY date_time ASC LIMIT 1");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND completed=0 AND status='Approved' ORDER BY date_time ASC LIMIT 1");
     		statement.setInt(1, patientId);
     		ResultSet result = statement.executeQuery();
     		result.first();
