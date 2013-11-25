@@ -74,6 +74,7 @@
 <body>	
 <div id="headerholder">	
   <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
+  <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" />
   		<div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">
@@ -183,7 +184,7 @@
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">
 						<div class="sheading"><h4>Approved Appointments:</h4></div>
-						<table class="table>
+						<table class="table">
 							<c:forEach items="${approved_appointments}" var="aa">
 								<div class="pname">
 									<div class="app-date"> ${aa.date} </div>
@@ -328,7 +329,7 @@
 					</span>
 				</div>
 				<label>Time:</label>
-				<div id="tp" class="input-append">
+				<div id="tp" class="input-append" role="dialog">
 					<input data-format="hh:mm:00" type="text" name="appointmentTime" readonly>
 				    <span class="add-on">
 				    	<i class="icon-time"></i>

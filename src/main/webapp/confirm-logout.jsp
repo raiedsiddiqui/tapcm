@@ -15,11 +15,13 @@
 <body>
 <div id="headerholder">	
 	<img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
+	    <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" />
+
 </div>
-	<div class="container">
-		<h2>Are you sure you want to log out?<h2>
-		<button class="btn btn-info" onClick="history.back()">Cancel</button>
-		<a href="<c:url value="/j_spring_security_logout"/>" class="btn btn-primary lgbtn tright">Yes</a>
-	</div>
+<div id="logouttext">
+	<h2 id="logoutheader">Are you sure you want to log out?</h2>
+	<button class="btn btn-info" onClick="history.back()" style="float:left">Cancel</button>
+	<a href="<c:url value="/j_spring_security_logout"/>" class="btn btn-primary logoutbtn" style="float:right">Yes</a>
+</div>
 </body>
 </html>

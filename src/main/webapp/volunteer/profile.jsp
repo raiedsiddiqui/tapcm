@@ -59,6 +59,8 @@
 <body>
 <div id="headerholder">	
   <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
+    <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" />
+
   		<div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">

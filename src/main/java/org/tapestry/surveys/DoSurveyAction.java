@@ -170,15 +170,15 @@ public class DoSurveyAction
 						{
 							logger.debug("user hit back and changed an answer");
 							//clear all questions following it
-							int currentSurveySize = currentSurvey.getQuestions().size();
+							// int currentSurveySize = currentSurvey.getQuestions().size();
 							int currentQuestionIndex = currentSurvey.getQuestions().indexOf(question);
-							for (int i = currentQuestionIndex + 1; i < currentSurveySize; i++)
-							{
-								currentSurvey.getQuestions().remove(currentQuestionIndex + 1);
-							}
+							// for (int i = currentQuestionIndex + 1; i < currentSurveySize; i++)
+							// {
+							// 	currentSurvey.getQuestions().remove(currentQuestionIndex + 1);
+							// }
 							question.setAnswers(answers);
 							saved = true;
-							moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);
+							moreQuestions = true;
 						}
 						//if user didn't go back, and requesting the next question
 					}

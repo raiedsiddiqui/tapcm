@@ -9,6 +9,11 @@ img {
 	width: 220px !important;
 	float: left;
 }
+#logofam {
+	height: 60px;
+	width: 120px;
+	float:left;
+}
 #headerholder {
 	border-bottom: 2px solid lightgray;
 	height: auto;
@@ -396,3 +401,21 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 
 }
 
+#logouttext {
+	width: 700px;
+	margin: 0 auto;
+	clear:both;
+	text-align: center;
+}
+
+#logoutheader {
+	margin-bottom: 70px;
+}
+
+.logoutbtn {
+	padding: 10px 40px 10px 40px;
+	text-align: center;
+	margin-right:0px;
+	font-size: 40px !important;
+	height:25px;
+}

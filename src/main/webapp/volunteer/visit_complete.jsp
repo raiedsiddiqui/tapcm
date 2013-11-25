@@ -69,6 +69,8 @@
 <body>
 <div id="headerholder">	
   <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
+    <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" />
+
   <div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">
@@ -118,8 +120,8 @@
 	<div class="content">
 		<form id="appt-form" method="post" action="<c:url value="/complete_visit/${appointment.appointmentID}"/>">
 	 		<h2> Date: ${appointment.date} <h2> <!-- <br /> -->
-	 		<input id="contactedcheck" type="radio" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie
-	 		<br />
+<!-- 	 		<input id="contactedcheck" type="radio" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie
+	 		<br /> -->
 	 		<h3> What does the clinic need to know about today's visit?
 			<br/>Example: unsafe walking, poor access to food, patient not behaving appropriately </h3><br />
 	 		<textarea id="visitcomments" name="comments" id="comments"></textarea><br />

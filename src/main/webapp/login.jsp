@@ -18,6 +18,8 @@
  	<body>
     <div id="maincontent">
   		<img id="logo" src="${pageContext.request.contextPath}/resources/images/logo.png" />
+        <img id="logofam" src="${pageContext.request.contextPath}/resources/images/fammed.png"/>
+
   		<div class="container-fluid">
    			<div class="row-fluid">
 	    		<div class="span12">
@@ -47,7 +49,7 @@
        						<div class="control-group">
 	        					<div class="controls">
 									<input id="logininput" type="submit" value="Login" style="margin-bottom:10px;"></input>
-									<p>Tapestry 13.08.26</p>
+									<p>Tapestry 13.11.14</p>
         						</div>
        						</div>
       					</form>
