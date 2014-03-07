@@ -30,6 +30,9 @@
 	
 <body>	
   <img src="<c:url value="/resources/images/logo.png"/>" />
+      <!-- <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" /> -->
+  	<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
+         <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/> 
 	<div class="content">
 		<div class="navbar">
 			<div class="navbar-inner">

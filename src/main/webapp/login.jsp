@@ -18,7 +18,10 @@
  	<body>
     <div id="maincontent">
   		<img id="logo" src="${pageContext.request.contextPath}/resources/images/logo.png" />
-        <img id="logofam" src="${pageContext.request.contextPath}/resources/images/fammed.png"/>
+        <!-- <img id="logofam" src="${pageContext.request.contextPath}/resources/images/fammed.png"/> -->
+        <img id="logofhs" src="${pageContext.request.contextPath}/resources/images/fhs.png"/>
+        <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>
+
 
   		<div class="container-fluid">
    			<div class="row-fluid">

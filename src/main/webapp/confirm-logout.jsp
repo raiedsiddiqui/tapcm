@@ -15,8 +15,8 @@
 <body>
 <div id="headerholder">	
 	<img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-	    <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" />
-
+	<!-- <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" /> -->
+	<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
 </div>
 <div id="logouttext">
 	<h2 id="logoutheader">Are you sure you want to log out?</h2>

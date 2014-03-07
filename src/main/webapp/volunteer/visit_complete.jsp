@@ -69,8 +69,9 @@
 <body>
 <div id="headerholder">	
   <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-    <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" />
-
+    <!-- <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" /> -->
+  	<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
+  	<img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>
   <div class="navbar">
 			<div class="navbar-inner">
 				<div class="container">

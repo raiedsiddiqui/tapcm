@@ -14,12 +14,25 @@ img {
 	width: 120px;
 	float:left;
 }
-#headerholder {
-	border-bottom: 2px solid lightgray;
-	height: auto;
+
+#logofhs {
+	height: 50px;
+	width: 95px;
+	float: left;
 }
 
+#logodeg {
+	width: 200px;
+	height: 40px;
+}
+#headerholder {
+/*	border-bottom: 2px solid lightgray;
+*/	height: auto;
+}
 
+.navbar {
+	margin-bottom: 0px !important;
+}
 @media (min-width: 960px) {
 
 
@@ -66,7 +79,7 @@ img {
 }
 
 .navbar {
-	width: 570px !important;
+	width: 480px !important;
 	float: right !important;
 }
 
@@ -145,15 +158,15 @@ a {
 
 .navbar .nav > li > a
 {
-	padding: 18px 12px 23px !important;
+	padding: 18px 5px 23px !important;
 	font-size: 25px !important;
-	border-left: 3px solid gray;
+	border-left: 2px solid gray;
 	font-family: 'Roboto Slab', serif;
 }
 
 .navbar .brand {
 	font-size: 25px !important;
-	padding: 18px 35px 23px;
+	padding: 18px 3px 23px;
 	font-family: 'Roboto Slab', serif;
 
 }
