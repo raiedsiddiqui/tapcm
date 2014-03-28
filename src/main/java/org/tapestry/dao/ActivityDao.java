@@ -6,7 +6,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
 import org.tapestry.objects.Activity;
+
+import java.util.List;
+
+import org.tapestry.controller.Utils;
 
 /**
  * ActivityDAO
@@ -14,8 +20,10 @@ import org.tapestry.objects.Activity;
  */
 public class ActivityDao {
 	
-	private PreparedStatement statement;
-	private Connection con;
+	private PreparedStatement stmt;
+	private Connection con;	
+	
+	private static Logger logger = Logger.getLogger(ActivityDao.class);
 	
 	/**
 	* Constructor
@@ -34,16 +42,16 @@ public class ActivityDao {
     
     public void logActivity(String description, int volunteer){
     	try{
-    		statement = con.prepareStatement("INSERT INTO activities (description,volunteer) VALUES (?, ?)");
-    		statement.setString(1, description);
-    		statement.setInt(2, volunteer);
-    		statement.execute();
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer) VALUES (?, ?)");
+    		stmt.setString(1, description);
+    		stmt.setInt(2, volunteer);
+    		stmt.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not record event");
     		e.printStackTrace();
     	} finally {
     		try{
-    			statement.close();
+    			stmt.close();
     		} catch (Exception e) {
     			//Ignore
     		}
@@ -52,37 +60,99 @@ public class ActivityDao {
     
     public void logActivity(String description, int volunteer, int patient){
     	try{
-    		statement = con.prepareStatement("INSERT INTO activities (description,volunteer,patient) VALUES (?, ?, ?)");
-    		statement.setString(1, description);
-    		statement.setInt(2, volunteer);
-    		statement.setInt(3, patient);
-    		statement.execute();
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,patient) VALUES (?, ?, ?)");
+    		stmt.setString(1, description);
+    		stmt.setInt(2, volunteer);
+    		stmt.setInt(3, patient);
+    		stmt.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not record event");
     		e.printStackTrace();
     	} finally {
     		try{
-    			statement.close();
+    			//close  statement
+    			if (stmt != null)
+    				stmt.close();  
+    			
     		} catch (Exception e) {
     			//Ignore
     		}
     	}
     }
     
-    public void logActivity(String description, int volunteer, int patient, int appointment){
+    public void logActivity(Activity activity){
     	try{
-    		statement = con.prepareStatement("INSERT INTO activities (description,volunteer,patient,appointment) VALUES (?, ?, ?, ?)");
-    		statement.setString(1, description);
-    		statement.setInt(2, volunteer);
-    		statement.setInt(3, patient);
-    		statement.setInt(4, appointment);
-    		statement.execute();
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,"
+    				+ "event_timestamp,start_Time,end_Time, patient) VALUES (?, ?, ?, ?, ?, ?)");
+    		    		
+    		stmt.setString(1, activity.getDescription());
+    		stmt.setInt(2, Integer.parseInt(activity.getVolunteer()));   	
+    		stmt.setString(3, activity.getDate());
+    		stmt.setString(4, activity.getStartTime());
+    		stmt.setString(5, activity.getEndTime()); 
+    		stmt.setInt(6, 0);
+    		
+    		stmt.execute();
+    		
     	} catch (SQLException e){
     		System.out.println("Error: Could not record event");
     		e.printStackTrace();
     	} finally {
     		try{
-    			statement.close();
+    			//close  statement
+    			if (stmt != null)
+    				stmt.close();  
+    			
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void updateActivity( Activity activity){
+		try{
+			stmt = con.prepareStatement("UPDATE activities SET event_timestamp=?,description=?,"
+					+ "start_Time=?, end_Time=? WHERE event_ID=?");
+			
+			stmt.setString(1, activity.getDate());
+			stmt.setString(2, activity.getDescription());
+			stmt.setString(3, activity.getStartTime());
+			stmt.setString(4, activity.getEndTime());
+			stmt.setInt(5, activity.getActivityId());
+			
+			stmt.execute();
+		}catch (SQLException e){
+			logger.error("Error: updating activity is failed ");		
+			
+			e.printStackTrace();
+		}finally {
+    		try{
+    			//close resultSet and statement
+    			if (stmt != null)
+    				stmt.close();  
+    
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+		}
+	}
+    
+    public void logActivity(String description, int volunteer, int patient, int appointment){
+    	try{
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,patient,appointment) VALUES (?, ?, ?, ?)");
+    		stmt.setString(1, description);
+    		stmt.setInt(2, volunteer);
+    		stmt.setInt(3, patient);
+    		stmt.setInt(4, appointment);
+    		stmt.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not record event");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			//close  statement
+    			if (stmt != null)
+    				stmt.close();  
     		} catch (Exception e) {
     			//Ignore
     		}
@@ -91,8 +161,8 @@ public class ActivityDao {
     
     public int countEntries(){
     	try{
-    		statement = con.prepareStatement("SELECT COUNT(event_ID) AS c FROM activities");
-    		ResultSet result = statement.executeQuery();
+    		stmt = con.prepareStatement("SELECT COUNT(event_ID) AS c FROM activities");
+    		ResultSet result = stmt.executeQuery();
     		result.first();
     		return result.getInt("c");
     	} catch (SQLException e){
@@ -101,7 +171,9 @@ public class ActivityDao {
     		return 0;
     	} finally {
     		try{
-    			statement.close();
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
     		} catch (Exception e){
     			//Ignore;
     		}
@@ -110,8 +182,8 @@ public class ActivityDao {
     
     public ArrayList<Activity> getAllActivities(){
     	try{
-    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment FROM activities ORDER BY event_timestamp DESC");
-    		ResultSet result = statement.executeQuery();
+    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment FROM activities ORDER BY event_timestamp DESC");
+    		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
     			Activity a = new Activity();
@@ -119,9 +191,9 @@ public class ActivityDao {
     			a.setDescription(result.getString("description"));
     			a.setAppointment(result.getInt("appointment"));
     			
-    			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-    			statement.setInt(1, result.getInt("volunteer"));
-    			ResultSet r = statement.executeQuery();
+    			stmt = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+    			stmt.setInt(1, result.getInt("volunteer"));
+    			ResultSet r = stmt.executeQuery();
     			if(r.isBeforeFirst()) {
     				r.first();
 	    			a.setVolunteer(r.getString("name"));
@@ -137,7 +209,9 @@ public class ActivityDao {
     		return null;
     	} finally {
     		try{
-    			statement.close();
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
     		} catch (Exception e) {
     			//Ignore
     		}
@@ -146,8 +220,9 @@ public class ActivityDao {
     
     public ArrayList<Activity> getAllActivitiesWithAppointments(){
     	try{
-    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment, TIME(event_timestamp) AS time FROM activities WHERE appointment IS NOT NULL ORDER BY event_timestamp DESC");
-    		ResultSet result = statement.executeQuery();
+    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment, "
+    				+ "TIME(event_timestamp) AS time FROM activities WHERE appointment IS NOT NULL ORDER BY event_timestamp DESC");
+    		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
     			Activity a = new Activity();
@@ -157,9 +232,9 @@ public class ActivityDao {
     			String time = result.getString("time");
     			a.setTime(time.substring(0, time.length() - 3));
     			
-    			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-    			statement.setInt(1, result.getInt("volunteer"));
-    			ResultSet r = statement.executeQuery();
+    			stmt = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+    			stmt.setInt(1, result.getInt("volunteer"));
+    			ResultSet r = stmt.executeQuery();
     			if(r.isBeforeFirst()) {
     				r.first();
 	    			a.setVolunteer(r.getString("name"));
@@ -175,25 +250,38 @@ public class ActivityDao {
     		return null;
     	} finally {
     		try{
-    			statement.close();
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
     		} catch (Exception e) {
     			//Ignore
     		}
     	}
     }
+    //get all activities set by volunteers , not by Admin(logged in and logged out...)
+    public List<Activity> getAllActivitiesForVolunteer(int user, boolean isVolunteer){
+    	List<Activity> activities = new ArrayList<Activity>();
+    	
+    	if (isVolunteer)
+    		activities = getAllActivitiesForVolunteer(user);
+    	
+    	return activities;
+    }
     
-    public ArrayList<Activity> getAllActivitiesForVolunteer(int user){
+    
+    
+    
+    public List<Activity> getAllActivitiesForVolunteer(int user){
     	try{
-    		statement = con.prepareStatement("SELECT event_timestamp, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");
-    		statement.setInt(1, user);
-    		ResultSet result = statement.executeQuery();
-    		ArrayList<Activity> log = new ArrayList<Activity>();
-    		while (result.next()){
-    			Activity a = new Activity();
-    			a.setDate(result.getString("event_timestamp"));
-    			a.setDescription(result.getString("description"));
-    			log.add(a);
-    		}
+    		//filter out all logged in/out, or password changing... by setting patient = 0
+    		stmt = con.prepareStatement("SELECT * FROM activities WHERE volunteer=? AND patient = 0");
+    		
+    		stmt.setInt(1, user);
+    		ResultSet result = stmt.executeQuery();
+    		
+    		List<Activity> log = new ArrayList<Activity>();
+    		log = getActivitiesByResultSet(result);
+
     		return log;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve activities log");
@@ -201,7 +289,9 @@ public class ActivityDao {
     		return null;
     	} finally {
     		try{
-    			statement.close();
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
     		} catch (Exception e) {
     			//Ignore
     		}
@@ -218,17 +308,17 @@ public class ActivityDao {
     			  sqlStatement = sqlStatement.substring(0, sqlStatement.length() - 3);
     		}
     		sqlStatement += "ORDER BY event_timestamp DESC";
-    		statement = con.prepareStatement(sqlStatement);
-    		ResultSet result = statement.executeQuery();
+    		stmt = con.prepareStatement(sqlStatement);
+    		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
     			Activity a = new Activity();
     			a.setDate(result.getString("event_timestamp"));
     			a.setDescription(result.getString("description"));
     			
-    			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-    			statement.setInt(1, result.getInt("volunteer"));
-    			ResultSet r = statement.executeQuery();
+    			stmt = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+    			stmt.setInt(1, result.getInt("volunteer"));
+    			ResultSet r = stmt.executeQuery();
     			if(r.isBeforeFirst()) {
     				r.first();
 	    			a.setVolunteer(r.getString("name"));
@@ -242,6 +332,14 @@ public class ActivityDao {
     		System.out.println("Error: Could not retrieve activities log");
     		e.printStackTrace();
     		return null;
+    	}finally {
+    		try{
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e){
+    			//Ignore
+    		}
     	}
     }
     
@@ -252,18 +350,18 @@ public class ActivityDao {
      */
     public ArrayList<Activity> getPage(int start, int n){
     	try{
-    		statement = con.prepareStatement("SELECT event_timestamp, description, volunteer FROM activities ORDER BY event_timestamp DESC LIMIT ?,?");
-    		statement.setInt(1, start);
-    		statement.setInt(2, n);
-    		ResultSet result = statement.executeQuery();
+    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer FROM activities ORDER BY event_timestamp DESC LIMIT ?,?");
+    		stmt.setInt(1, start);
+    		stmt.setInt(2, n);
+    		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> page = new ArrayList<Activity>();
     		while (result.next()){
     			Activity a = new Activity();
     			a.setDate(result.getString("event_timestamp"));
     			a.setDescription(result.getString("description"));
-    			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-    			statement.setInt(1, result.getInt("volunteer"));
-    			ResultSet r = statement.executeQuery();
+    			stmt = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+    			stmt.setInt(1, result.getInt("volunteer"));
+    			ResultSet r = stmt.executeQuery();
     			if(r.isBeforeFirst()) {
     				r.first();
 	    			a.setVolunteer(r.getString("name"));
@@ -279,7 +377,9 @@ public class ActivityDao {
     		return null;
     	} finally {
     		try{
-    			statement.close();
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
     		} catch (Exception e){
     			//Ignore
     		}
@@ -288,9 +388,9 @@ public class ActivityDao {
     
     public ArrayList<Activity> getLastNActivitiesForVolunteer(int user, int n){
     	try{
-    		statement = con.prepareStatement("SELECT event_timestamp, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");
-    		statement.setInt(1, user);
-    		ResultSet result = statement.executeQuery();
+    		stmt = con.prepareStatement("SELECT event_timestamp, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");
+    		stmt.setInt(1, user);
+    		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		int count = 0;
     		while (result.next() && count < n){
@@ -307,11 +407,133 @@ public class ActivityDao {
     		return null;
     	} finally {
     		try{
-    			statement.close();
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
     		} catch (Exception e) {
     			//Ignore
     		}
     	}
     }
+    
+    public Activity getActivityLogById(int activityId){
+    	Activity activity = new Activity();
+    	
+    	try{
+    		String sql = "SELECT event_ID, event_timestamp, description, start_Time, end_Time FROM activities WHERE event_ID = ?";
+    		stmt = con.prepareStatement(sql);
+    		stmt.setInt(1, activityId);
+    		
+    		ResultSet rs = stmt.executeQuery();
+    		List<Activity> activities = new ArrayList<Activity>();
+    		activities = getActivitiesByResultSet(rs);
+    		    		
+    		activity = activities.get(0);
+    		activity.setActivityId(activityId);
+        		
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve activitie log");
+    		e.printStackTrace();
+    	
+    	} finally {
+    		try{
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+		
+		return activity;
+    }
+    
+    private List<Activity> getActivitiesByResultSet(ResultSet rs){
+    	List<Activity> activities = new ArrayList<Activity>();
+    	Activity activity = null;
+    	String date = null;
+    	String time = null;
+    	String startTime = null;
+    	String endTime = null;
+    	
+    	try{
+    		while (rs.next()){    			
+    			activity = new Activity();
+    			
+    			date = rs.getString("event_timestamp");    			
+    			date = date.substring(0,10);    
+    			
+    			activity.setDate(date);
+    			activity.setDescription(rs.getString("description")); 
+    		
+    			activity.setActivityId(rs.getInt("event_ID"));
+    		
+    			startTime = rs.getString("start_Time");    			
+    			endTime = rs.getString("end_Time");
+    			    			
+    			//startTime and endTime are optional, could be 00:00  
+    			String strStartTime = null;
+    			if (!Utils.isNullOrEmpty(startTime)){
+    				strStartTime = startTime.substring(11,16);
+        			activity.setStartTime(strStartTime);
+    			}
+    			 
+    			String strEndTime = null;
+    			if (!Utils.isNullOrEmpty(endTime)){
+    				strEndTime = endTime.substring(11,16);
+        			activity.setEndTime(strEndTime);
+    			}
+    			
+    			
+    			if (startTime != null & startTime != "" && endTime != null & endTime != ""){  	    				    				
+    				time = Utils.timeFormat(strStartTime) + " - " 
+    						+ Utils.timeFormat(strEndTime);
+    				
+    				activity.setTime(time);
+    			}    			
+    			
+    			if ((!Utils.isNullOrEmpty(strStartTime)) && strStartTime.equals("00:00"))
+    			{
+    				if(strEndTime.endsWith("00:00"))
+    					activity.setTime("");
+    				else
+    					activity.setTime("- " + Utils.timeFormat(strEndTime));
+    			}
+    			else
+    			{
+    				if((!Utils.isNullOrEmpty(strEndTime)) &&strEndTime.endsWith("00:00"))
+    					activity.setTime(Utils.timeFormat(strStartTime) + " -");
+    			}
+    			
+    			activities.add(activity);
+        		
+        	}
+    	}catch (SQLException e){
+			e.printStackTrace();
+		}     	
+    	
+    	return activities;
+    }
+    
+    public void deleteActivityById(int activityId){
+    	try{
+			stmt = con.prepareStatement("DELETE FROM activities WHERE event_ID=?");
+			stmt.setInt(1, activityId);
+			stmt.execute();
+		} catch (SQLException e){
+			logger.error("Error: Could not delete activity");			
+			e.printStackTrace();
+		} finally {
+    		try{    			
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    
     
 }
