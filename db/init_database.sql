@@ -49,8 +49,6 @@ CREATE TABLE IF NOT EXISTS survey_results (
 CREATE TABLE IF NOT EXISTS activities (
 	event_ID INT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED INT allows for 4,294,967,295 events, which should be enough*/
 	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	start_time TIMESTAMP NULL;
-	end_time TIMESTAMP NULL;
 	volunteer SMALLINT UNSIGNED NOT NULL,
 	patient SMALLINT UNSIGNED,
 	appointment SMALLINT UNSIGNED,
@@ -87,31 +85,5 @@ CREATE TABLE IF NOT EXISTS pictures (
     owner SMALLINT, /* the ID of the user or patient the picture belongs to */
     owner_is_user BOOLEAN, /* 1 if the value of owner refers to a user, 0 if a patient */
     PRIMARY KEY (picture_ID)
-);
-
-CREATE TABLE IF NOT EXISTS narratives (
-    narrative_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    title VARCHAR(50) NOT NULL,
-    contents TEXT,
-    edit_Date TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP, /*edit_Date represents the last edit date*/
-    user_ID INT NOT NULL,
-    patient_ID SMALLINT UNSIGNED NOT NULL;
-    appointment SMALLINT UNSIGNED NOT NULL,
-    PRIMARY KEY (narrative_ID)
-);
-
-CREATE TABLE IF NOT EXISTS volunteers (
-	volunteer_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	firstname VARCHAR(255) NOT NULL,
-	lastname VARCHAR(255) NOT NULL,
-	preferredname VARCHAR(255),
-	age_type VARCHAR(1);/* 1 character, expecting value like 'Y' for younger, 'O' for older */
-	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
-	email VARCHAR(50),
-	experience_level VARCHAR(1), /* Using VARCHAR(1) for 1 character, expecting value like "E", "B", "I"...*/
-	city VARCHAR(50),
-	province VARCHAR(3),
-	phone_number VARCHAR(20),
-	PRIMARY KEY (volunteer_ID)	
 );
 COMMIT;

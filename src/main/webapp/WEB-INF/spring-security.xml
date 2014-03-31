@@ -42,12 +42,6 @@
 		<intercept-url pattern="/view_message/**" access="ROLE_USER, ROLE_ADMIN" />
 		<intercept-url pattern="/send_message" access="ROLE_ADMIN, ROLE_USER" />
 		<intercept-url pattern="/delete_message/**" access="ROLE_USER, ROLE_ADMIN" />
-		<intercept-url pattern="/view_narratives" access="ROLE_USER"/>
-		<intercept-url pattern="/modify_narrative" access="ROLE_USER"/>
-		<intercept-url pattern="/new_narrative" access="ROLE_USER"/>		
-		<intercept-url pattern="/view_activityLogs" access="ROLE_USER"/>
-		<intercept-url pattern="/new_activityLogs" access="ROLE_USER"/>		
-		<intercept-url pattern="/delete_narrative/**" access="ROLE_USER" />
 		<intercept-url pattern="/profile" access="ROLE_USER" />
 		<intercept-url pattern="/book_appointment" access="ROLE_ADMIN, ROLE_USER" />
 		<intercept-url pattern="/delete_appointment/**" access="ROLE_ADMIN, ROLE_USER" />
@@ -64,7 +58,6 @@
 		<intercept-url pattern="/user_logs/**" access="ROLE_ADMIN" />
 		<intercept-url pattern="/view_survey_results/**" access="ROLE_ADMIN" />
 		<intercept-url pattern="/export_csv/**" access="ROLE_ADMIN" />
-		<intercept-url pattern="/view_volunteers" access="ROLE_ADMIN"/>
 		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
 	</http>
  

@@ -30,30 +30,23 @@ import org.tapestry.surveys.SurveyFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.yaml.snakeyaml.Yaml;
-
 import java.io.IOException;
 import java.util.Map;
-
 import org.springframework.core.io.ClassPathResource;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
-import org.survey_component.services.SurveyServiceIndivo;
 
 import javax.annotation.PostConstruct;
-
 import java.util.Properties;
-
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Transport;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
@@ -73,7 +66,6 @@ import java.util.Collections;
 */
 @Controller
 public class TapestryController{
-	protected static Logger logger = Logger.getLogger(TapestryController.class);
 	
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
@@ -87,7 +79,7 @@ public class TapestryController{
    	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
    	private ActivityDao activityDao;
- 
+   	
    	//Mail-related settings;
    	private Properties props;
    	private String mailAddress = "";
@@ -121,13 +113,9 @@ public class TapestryController{
 			mailPort = config.get("mailPort");
 			useTLS = config.get("mailUsesTLS");
 			useAuth = config.get("mailRequiresAuth");
-			
 		} catch (IOException e) {
 			System.out.println("Error reading from config file");
 			System.out.println(e.toString());
-			
-			logger.error("Error reading from config file");
-			e.printStackTrace();
 		}
 		
 		//Create the DAOs
@@ -196,11 +184,6 @@ public class TapestryController{
 				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId);
 				Patient patient = patientDao.getPatientByID(patientId);
 				model.addAttribute("patient", patient);
-				
-				//set patientId in the session for other screen, like narratives 
-				HttpSession  session = request.getSession();		
-				session.setAttribute("patientId", patientId);
-				
 			} else {
 				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(u.getUserID());
 				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(u.getUserID());
@@ -210,7 +193,6 @@ public class TapestryController{
 				model.addAttribute("appointments_today", appointmentsForToday);
 				model.addAttribute("appointments_all", allAppointments);*/
 			}
-			
 			model.addAttribute("approved_appointments", approvedAppointments);
 			model.addAttribute("pending_appointments", pendingAppointments);
 			model.addAttribute("declined_appointments", declinedAppointments);
@@ -251,7 +233,7 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/client", method=RequestMethod.GET)
-	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(loggedInUser.getUserID());
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
@@ -405,11 +387,7 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/patient/{patient_id}", method=RequestMethod.GET)
-	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false)
-					String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, 
-					@RequestParam(value="appointmentId", required=false) Integer appointmentId, 
-					SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		
+	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false) String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, @RequestParam(value="appointmentId", required=false) Integer appointmentId, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -443,11 +421,6 @@ public class TapestryController{
 		} else {
 			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
 		}
-				
-		//save selected appointmentId in the session for other screen, like narrative
-		HttpSession  session = request.getSession();		
-		session.setAttribute("appointmentId", appointmentId);
-		
 		return "/patient";
 	}
 	
@@ -735,7 +708,7 @@ public class TapestryController{
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.POST)
 	public String viewFilteredUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap m){
-		List<Activity> activityLog = new ArrayList<Activity>();
+		ArrayList<Activity> activityLog = new ArrayList<Activity>();
 		String name = request.getParameter("name");
 		if(name != null) {
 			ArrayList<User> u = userDao.getUsersByPartialName(name);

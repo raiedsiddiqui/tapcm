@@ -223,12 +223,6 @@
 			<artifactId>indivo-survey-model</artifactId>
 			<version>3.2-SNAPSHOT</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>displaytag</groupId>
-			<artifactId>displaytag</artifactId>
-			<version>1.2</version>
-		</dependency>
 	</dependencies>
 	
 	<build>

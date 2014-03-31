@@ -1,24 +1,13 @@
 package org.tapestry.objects;
 
 public class Activity{
-	private int activityId;	
 	private String description;
 	private String date;
 	private String time;
-	private String startTime;
-	private String endTime;	
 	private String volunteer;
 	private int appointment;
 	
 	public Activity(){
-	}
-	
-	public int getActivityId() {
-		return activityId;
-	}
-
-	public void setActivityId(int activityId) {
-		this.activityId = activityId;
 	}
 	
 	public void setDescription(String desc){
@@ -60,21 +49,4 @@ public class Activity{
 	public int getAppointment(){
 		return appointment;
 	}
-	
-	public String getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(String startTime) {
-		this.startTime = startTime;
-	}
-
-	public String getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
-	}
-
 }

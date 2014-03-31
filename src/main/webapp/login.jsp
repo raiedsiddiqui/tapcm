@@ -27,8 +27,7 @@
    			<div class="row-fluid">
 	    		<div class="span12">
 					<c:if test="${not empty error}">
-					<div class="alert alert-error">Login failed <br /> Caused :
-							${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</div>
+					<div class="alert alert-error">Login failed</div>
 					</c:if>
 					<c:if test="${not empty usernameChanged}">
 					<div class="alert alert-info">Your username has changed. Please log in again using the new credentials.</div>

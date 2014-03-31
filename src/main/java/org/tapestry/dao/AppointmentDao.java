@@ -6,10 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.tapestry.controller.TapestryController;
 import org.tapestry.objects.Appointment;
-import org.apache.log4j.Logger;
 
 /**
  * AppointmentDAO
@@ -17,7 +14,6 @@ import org.apache.log4j.Logger;
  * all appointments for a user; adding new appointments.
  */
 public class AppointmentDao {
-	protected static Logger logger = Logger.getLogger(AppointmentDao.class);
 	
 	private PreparedStatement statement;
 	private Connection con;
@@ -49,14 +45,12 @@ public class AppointmentDao {
     		ResultSet r = statement.executeQuery();
     		if (r.first()){
     			String preferredName = r.getString("preferredName");
-    			//add empty checking for preferedName
-    			if(preferredName != null && !(preferredName.equals(""))) {
-	    			a.setPatient(preferredName);	    			
+    			if(preferredName != null) {
+	    			a.setPatient(preferredName);
     			} else {
-    			
     				String firstName = r.getString("firstname");
 	    			String lastName = r.getString("lastname");
-	    			a.setPatient(firstName + " " + lastName.substring(0,1) + ".");	    		
+	    			a.setPatient(firstName + " " + lastName.substring(0,1) + ".");
     			}
     		} else {
     			return null; //If we book an appointment for a patient that doesn't exist, the above query will fail
@@ -131,18 +125,16 @@ public class AppointmentDao {
     }
     
     public ArrayList<Appointment> getAllApprovedAppointmentsForVolunteer(int volunteerId){
-    	try{    		
+    	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 AND status='Approved' ORDER BY date_time ASC");
     		statement.setInt(1, volunteerId);
     		ResultSet result = statement.executeQuery();
-       		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();       		
-       		
+       		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
        		while(result.next()){
        			Appointment a = createFromSearch(result);
        			if (a != null)
        				allAppointments.add(a);
-       			
-        	}     
+        	}
        		return allAppointments;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve all approved appointments for volunteer #" + volunteerId);
@@ -150,8 +142,7 @@ public class AppointmentDao {
     		return null;
     	} finally {
     		try{
-    			if (statement != null)
-    				statement.close();
+    			statement.close();
     		} catch (Exception e) {
     			//Ignore
     		}
@@ -184,7 +175,6 @@ public class AppointmentDao {
     }
     
     public ArrayList<Appointment> getAllDeclinedAppointmentsForVolunteer(int volunteerId){
- 
     	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 AND status='Declined' ORDER BY date_time ASC");
     		statement.setInt(1, volunteerId);
@@ -210,7 +200,7 @@ public class AppointmentDao {
     }
     
     public ArrayList<Appointment> getAllApprovedAppointmentsForPatient(int patientId){
-    	try{    		
+    	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND date_time>=CURDATE() AND completed=0 AND status='Approved' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		ResultSet result = statement.executeQuery();
@@ -220,7 +210,6 @@ public class AppointmentDao {
        			if (a != null)
        				allAppointments.add(a);
         	}
-       		
        		return allAppointments;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve all approved appointments for patient #" + patientId);

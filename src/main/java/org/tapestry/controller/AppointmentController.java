@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
@@ -24,9 +23,7 @@ import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
 import org.yaml.snakeyaml.Yaml;
-
 import java.util.Properties;
-
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Transport;
@@ -36,7 +33,6 @@ import javax.mail.internet.MimeMessage;
 
 @Controller
 public class AppointmentController{
-	protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
