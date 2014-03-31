@@ -189,6 +189,10 @@ public class VolunteerDao {
 			stmt.setString(10, volunteer.getAgeType());
 			stmt.setInt(11, volunteer.getVolunteerId());
 			
+			System.out.println("Experience Level is   " +volunteer.getExperienceLevel() + "and it's length is " +volunteer.getExperienceLevel().toString().length());
+			
+			
+			
 			stmt.execute();
 		}catch (SQLException e){
 			logger.error("Error: updating volunteer is failed ");		
