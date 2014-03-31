@@ -168,17 +168,76 @@ public class DoSurveyAction
 						}
 						else
 						{
-							logger.debug("user hit back and changed an answer");
-							//clear all questions following it
-							// int currentSurveySize = currentSurvey.getQuestions().size();
-							int currentQuestionIndex = currentSurvey.getQuestions().indexOf(question);
-							// for (int i = currentQuestionIndex + 1; i < currentSurveySize; i++)
+
+							// //CUSTOM CODE START
+							// //x=index+2
+							// int tcurrentQuestionIndex = currentSurvey.getQuestions().indexOf(question); //gets the current question index
+							// SurveyQuestion tmpgetnextQuestionId = currentSurvey.getQuestions().get(tcurrentQuestionIndex+1); //ID of next question in list
+							// //String tmpgetnextQuestionId2 = currentSurvey.getQuestions().get(tcurrentQuestionIndex).getId();
+							// //String tmpgetnextQuestionId3 = currentSurvey.getQuestions().get(tcurrentQuestionIndex-1).getId();
+							// //String ttnextQuestionId = currentSurvey.getQuestions().get(tcurrentQuestionIndex + 1).getId();
+							// SurveyQuestion tnextQuestionId;
+							
+							// String tmpnextQuestionId = currentSurvey.getNextQuestionId(questionId);
+							// logger.debug("going to question id: " + tmpnextQuestionId);
+							// tnextQuestionId = currentSurvey.getQuestionById(tmpnextQuestionId);
+							
+							// if (tmpgetnextQuestionId.equals(tnextQuestionId))
 							// {
-							// 	currentSurvey.getQuestions().remove(currentQuestionIndex + 1);
+							// 	question.setAnswers(answers);
+							// 	saved = true;
+							// 	moreQuestions = true;
 							// }
-							question.setAnswers(answers);
-							saved = true;
-							moreQuestions = true;
+
+							//if new index == x 
+							//then dont delete future answers
+							//else
+							//remove all questions after it
+
+							//CUSTOM CODE END
+							//else 
+							//{
+								//make copy of existing list
+								ArrayList<SurveyQuestion> tempquestions = new ArrayList<SurveyQuestion>(); //Create a temp array list to transfer answered questions
+
+								// for (int x=0;x<currentSurvey.getQuestions().size()-1;x++)  //Loop through getQuestions list
+								// {
+								// 	tempquestions.add(currentSurvey.getQuestions().get(x)); //add each element to the temp lit from getQuestions
+								// }
+
+								//remove all future answers
+
+								logger.debug("user hit back and changed an answer");
+								//clear all questions following it
+								int currentSurveySize = currentSurvey.getQuestions().size(); //stores number of questions
+								int currentQuestionIndex = currentSurvey.getQuestions().indexOf(question); //gets the current question index
+								for (int i = currentQuestionIndex +1; i < currentSurveySize; i++)
+								{
+									tempquestions.add(currentSurvey.getQuestions().get(currentQuestionIndex +1));
+									currentSurvey.getQuestions().remove(currentQuestionIndex + 1);  //goes through quesitons list and removes each question after it
+								}
+								question.setAnswers(answers);
+								saved = true;
+								//add new question
+								moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);
+
+								//check if old index and new index contain same questions in the same list
+								int sizeofcurrentquestionslist = currentSurvey.getQuestions().size(); //Size of new getQuestions aftre removing future questions
+
+								if (currentSurvey.getQuestions().get(sizeofcurrentquestionslist-1).getId().equals(tempquestions.get(0).getId()))
+								{
+									currentSurvey.getQuestions().remove(sizeofcurrentquestionslist-1);
+									for (int y=0;y<tempquestions.size();y++) 
+									{
+										currentSurvey.getQuestions().add(tempquestions.get(y));
+									}
+									moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);
+								}
+								
+								//if same then replace temp list with new list
+								//if not then add the one new item.
+
+							
 						}
 						//if user didn't go back, and requesting the next question
 					}
