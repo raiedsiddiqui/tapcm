@@ -49,7 +49,7 @@
 				<form action="<c:url value="/view_volunteers"/>" method="POST">
 					<fieldset>
 						<label>Name:</label>
-						<input type="text" name="searchName" value="${searchName}" />
+						<input type="text" name="searchName" value="${searchName}" required />
 						<input class="btn btn-primary" type="submit" value="Search" />
 					</fieldset>
 				</form>
