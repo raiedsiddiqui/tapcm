@@ -174,8 +174,9 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			if (!Utils.isNullOrEmpty(request.getParameter("email")))
 				volunteer.setEmail(request.getParameter("email"));
 			
-			if (!Utils.isNullOrEmpty(request.getParameter("level")))
-				volunteer.setExperienceLevel((request.getParameter("level")));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("level")))					
+				volunteer.setExperienceLevel((request.getParameter("level")));			
 			
 			if (!Utils.isNullOrEmpty(request.getParameter("type")))
 				volunteer.setAgeType((request.getParameter("type")));
