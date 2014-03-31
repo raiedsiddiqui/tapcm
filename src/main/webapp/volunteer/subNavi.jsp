@@ -84,7 +84,7 @@
 				<div class="nav-collapse collapse">
 					<ul class="nav">					
 						<li class="active"><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
-						<li><a href="<c:url value="/view_narratives"/>">Narratives</a></li>
+						<!--  li><a href="<c:url value="/view_narratives"/>">Narratives</a></li>-->
 						<li><a href="<c:url value="/view_activityLogs"/>">Activity Logs</a></li>
 						<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 					</ul>
