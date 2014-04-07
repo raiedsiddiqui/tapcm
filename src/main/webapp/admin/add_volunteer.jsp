@@ -43,27 +43,17 @@
 						<label>Last Name:</label>
 						<input type="text" name="lastname"  required/>
 						<label>Preferred Name:</label>
-						<input type="text" name="preferredname" "/>
-						<label>Gender:</label>
-						<select name="gender" form="add_volunteer">
-							<option value="M" selected>Male</option>	
-							<option value="F" >Female</option>
-							<option value="O" >Other</option>
-						</select>						
-						<label>Email:</label>
-						<input id="email" name="email" required>
-						<label>Experience:</label>
-						<select name="level" form="add_volunteer">
-							<option value="E" selected>Experienced</option>
-							<option value="I" >Intermediate</option>
-							<option value="B" >Beginner</option>
-						</select>	
-						<select name="type" form="add_volunteer">
-							<option value="Y" selected>Younger</option>
-							<option value="O">Older</option>							
-						</select>					
-						<label>City:</label>
-						<input id="city" name="city">
+						<input type="text" name="preferredname"/>
+
+						<label class="col-md-4">Street:</label>
+						<input type="text" name="street"  required/>
+
+						<label>Apt#:</label>
+						<input type="text" name="apt"  required/>
+
+						<label>Country:</label>
+						<input type="text" name="country"  required/>
+
 						<label>Province:</label>
 						<select name="province" form="add_volunteer">
 							<option value="AB" selected>Alberta</option>
@@ -81,10 +71,90 @@
 							<option value="YT" >Yukon</option>
 							
 						</select>
-						<label>Phone Number:</label>
-						<input id="phoneNum" name="phoneNum"><br/>
+
+						<label>City:</label>
+						<input id="city" name="city">
+
+						<label>Postal Code:</label>
+						<input id="city" name="city">
+
+<!-- 						<label>Gender:</label>
+						<select name="gender" form="add_volunteer">
+							<option value="M" selected>Male</option>	
+							<option value="F" >Female</option>
+							<option value="O" >Other</option>
+						</select>	 -->	
+
+						<label>Home Phone:</label>
+						<input id="phoneNum" name="phoneNum">
+						
+						<label>Cell Phone:</label>
+						<input id="city" name="city">
+
+						<label>Email:</label>
+						<input id="email" name="email" required>
+
+						<label>Emergency Contact:</label>
+						<input id="city" name="city">
+
+						<label>Emergency #:</label>
+						<input id="city" name="city">
+
+						<h2> User Account </h2>
+
+						<label>Username:</label>
+						<input id="city" name="city">
+
+						<label>Password:</label>
+						<input id="city" name="city">
+
+						<label>Experience:</label>
+						<select name="level" form="add_volunteer">
+							<option value="E" selected>Experienced</option>
+							<option value="I" >Intermediate</option>
+							<option value="B" >Beginner</option>
+						</select>	
+<!-- 						<select name="type" form="add_volunteer">
+							<option value="Y" selected>Younger</option>
+							<option value="O">Older</option>							
+						</select>	 -->				
+	
+						<h2> Availability </h2>
+						<div>
+							<h4>Monday <input type="checkbox"> N/A</h4>
+							<select></select> TO <select></select> <br>
+							<select></select> TO <select></select>
+
+						<div>
+
+						<div>
+							<h4>Tuesday <input type="checkbox" > N/A </h4>
+							<select></select> TO <select></select><br>
+							<select></select> TO <select></select>
+						<div>
+
+						<div>
+							<h4>Wednesday <input type="checkbox"> N/A</h4>
+							<select></select> TO <select></select><br>
+							<select></select> TO <select></select>
+						<div>
+
+						<div>
+							<h4>Thursday <input type="checkbox" > N/A</h4>
+							<select></select> TO <select></select><br>
+							<select></select> TO <select></select>
+						<div>
+
+						<div>
+							<h4>Friday <input type="checkbox"> N/A</h4>
+							<select></select> TO <select></select><br>
+							<select></select> TO <select></select>
+						<div>
+						<h2> Comments </h2>
+						<input type="text">
+
 						<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
-						<input class="btn btn-primary" type="submit" value="Save" />
+						<input class="btn btn-primary" type="submit" value="Create" />
 					</fieldset>
 				</form>
 			</div>		
