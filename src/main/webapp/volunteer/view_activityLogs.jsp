@@ -18,6 +18,12 @@
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">						
 						<table class="table">
+							<tr>
+								<th>Date</th>
+								<th>Time</th>
+								<th>Description</th>
+								<th></th>
+							</tr>
 	
 							<c:forEach items="${activityLogs}" var="al">
 								<tr>

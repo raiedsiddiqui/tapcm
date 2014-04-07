@@ -38,51 +38,140 @@
 			<div class="row-fluid">
 				<form id="modify_volunteer" action="<c:url value="/update_volunteer"/>" method="POST">
 					<fieldset>
-						<label>First Name:</label>
-						<input type="text" name="firstname" value="${volunteer.firstName}" required/>
-						<label>Last Name:</label>
-						<input type="text" name="lastname" value="${volunteer.lastName}"  required/>
-						<label>Preferred Name:</label>
-						<input type="text" name="preferredname" value="${volunteer.preferredName}"/>
-						<label>Gender:</label>
-						<select name="gender" form="modify_volunteer">
-							<option value="M" <c:if test="${volunteer.gender eq 'M'}">selected</c:if>>Male</option>	
-							<option value="F" <c:if test="${volunteer.gender eq 'F'}">selected</c:if>>Female</option>
-							<option value="O" <c:if test="${volunteer.gender eq 'O'}">selected</c:if>>Other</option>
-						</select>						
-						<label>Email:</label>
-						<input id="email" name="email" value="${volunteer.email}" required>
-						<label>Experience:</label>
-						<select name="level" form="modify_volunteer">
-							<option value='E' <c:if test="${volunteer.experienceLevel eq 'E'}">selected</c:if>>Experienced</option>
-							<option value='I' <c:if test="${volunteer.experienceLevel eq 'I'}">selected</c:if>>Intermediate</option>
-							<option value='B' <c:if test="${volunteer.experienceLevel eq 'B'}">selected</c:if> >Beginner</option>
-						</select>	
-						<select name="type" form="modify_volunteer">
-							<option value='Y' <c:if test="${volunteer.ageType eq 'Y'}">selected</c:if>>Younger</option>
-							<option value='O' <c:if test="${volunteer.ageType eq 'O'}">selected</c:if>>Older</option>							
-						</select>					
-						<label>City:</label>
-						<input id="city" name="city" value="${volunteer.city}">
-						<label>Province:</label>
-						<select name="province" form="modify_volunteer">
-							<option value='AB' <c:if test="${volunteer.province eq 'AB'}">selected</c:if>>Alberta</option>
-							<option value='BC' <c:if test="${volunteer.province eq 'BC'}">selected</c:if>>British Colunmbia</option>							
-							<option value='MB' <c:if test="${volunteer.province eq 'MB'}">selected</c:if>>Manitoba</option>
-							<option value='NB' <c:if test="${volunteer.province eq 'NB'}">selected</c:if>>New Brunswik</option>
-							<option value='NL' <c:if test="${volunteer.province eq 'NL'}">selected</c:if>>Newfoundland and Labrador</option>
-							<option value='NS' <c:if test="${volunteer.province eq 'NS'}">selected</c:if>>Nova Scotia</option>							
-							<option value='ON' <c:if test="${volunteer.province eq 'ON'}">selected</c:if>>Ontario</option>
-							<option value='PE' <c:if test="${volunteer.province eq 'PE'}">selected</c:if>>PrinceEdword Island</option>
-							<option value='QC' <c:if test="${volunteer.province eq 'QC'}">selected</c:if>>Quebec</option>
-							<option value='SK' <c:if test="${volunteer.province eq 'SK'}">selected</c:if>>Saskatchewan</option>							
-							<option value='NT' <c:if test="${volunteer.province eq 'NT'}">selected</c:if>>Northwest Terriotories</option>
-							<option value='NU' <c:if test="${volunteer.province eq 'NU'}">selected</c:if>>Nunavut</option>
-							<option value='YT' <c:if test="${volunteer.province eq 'YT'}">selected</c:if>>Yukon</option>
+					<table>
+							<tr>
+								<td colspan='3'></td>
+							</tr>
+							<tr>
+								<td><label>First Name:</label>
+									<input type="text" name="firstname" value="${volunteer.firstName}" required/></td>
+								<td><label>Last Name:</label>
+									<input type="text" name="lastname" value="${volunteer.lastName}"  required/></td>
+								<td><label>Street #:</label>
+									<input name="streetnum" value="${volunteer.streetNumber}"/>
+								</td>
+							</tr>
+							<tr>
+								<td><label>Street:</label>
+									<input type="text" name="street" value="${volunteer.street}"/></td>
+								<td><label>Apt #:</label>
+									<input type="text" name="aptnum" value="${volunteer.aptNumber}"/></td>
+								<td><label>Country:</label>
+									<select name="country" form="modify_volunteer">
+										<option value="CA" <c:if test="${volunteer.country eq 'CA'}">selected</c:if>>Canada</option>
+										<option value="ST" <c:if test="${volunteer.country eq 'ST'}">selected</c:if>>USA</option>
+										<option value="CH" <c:if test="${volunteer.country eq 'CH'}">selected</c:if>>China</option>
+										<option value="RU" <c:if test="${volunteer.country eq 'RU'}">selected</c:if>>Russia</option>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label>Province:</label>
+									<select name="province" form="modify_volunteer">
+										<option value='AB' <c:if test="${volunteer.province eq 'AB'}">selected</c:if>>Alberta</option>
+										<option value='BC' <c:if test="${volunteer.province eq 'BC'}">selected</c:if>>British Colunmbia</option>							
+										<option value='MB' <c:if test="${volunteer.province eq 'MB'}">selected</c:if>>Manitoba</option>
+										<option value='NB' <c:if test="${volunteer.province eq 'NB'}">selected</c:if>>New Brunswik</option>
+										<option value='NL' <c:if test="${volunteer.province eq 'NL'}">selected</c:if>>Newfoundland and Labrador</option>
+										<option value='NS' <c:if test="${volunteer.province eq 'NS'}">selected</c:if>>Nova Scotia</option>							
+										<option value='ON' <c:if test="${volunteer.province eq 'ON'}">selected</c:if>>Ontario</option>
+										<option value='PE' <c:if test="${volunteer.province eq 'PE'}">selected</c:if>>PrinceEdword Island</option>
+										<option value='QC' <c:if test="${volunteer.province eq 'QC'}">selected</c:if>>Quebec</option>
+										<option value='SK' <c:if test="${volunteer.province eq 'SK'}">selected</c:if>>Saskatchewan</option>							
+										<option value='NT' <c:if test="${volunteer.province eq 'NT'}">selected</c:if>>Northwest Terriotories</option>
+										<option value='NU' <c:if test="${volunteer.province eq 'NU'}">selected</c:if>>Nunavut</option>
+										<option value='YT' <c:if test="${volunteer.province eq 'YT'}">selected</c:if>>Yukon</option>
+										
+									</select>
+								</td>
+								<td>
+									<label>City:</label>
+									<input name="city" value="${volunteer.city}"/>
+								</td>
+								<td>
+									<label>Postal Code:</label>
+									<input  name="postalcode" value="${volunteer.postalCode}"/>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label>Home Phone:</label>
+									<input  name="homephone" value="${volunteer.homePhone}"/>
+								</td>
+								<td>
+									<label>Cell Phone:</label>
+									<input  name="cellphone" value="${volunteer.cellPhone}"/>
+								</td>
+								<td>
+									<label>Email:</label>
+									<input name="email" value="${volunteer.email}" required/>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<label>Emergency Contact:</label>
+									<input name="emergencycontact" value="${volunteer.emergencyContact}"/>
+								</td>
+								<td>
+									<label>Emergency #:</label>
+									<input name="emergencyphone" value="${volunteer.emergencyPhone}"/>
+								</td>
+								<td>&nbsp</td>
+							</tr>
+							<tr>
+								<td colspan='3'>User Account</td>
+							</tr>
 							
-						</select>
-						<label>Phone Number:</label>
-						<input id="phoneNum" name="phoneNum" value="${volunteer.phoneNumber}"><br/>
+							<tr>
+								<td>
+									<label>Username:</label>
+									<input name="username"value="${volunteer.userName}"/>
+								</td>
+								<td>
+									<label>Password:</label>
+									<input name=password" disabled/>									
+								</td>
+								<td>
+									<label>Experience:</label>
+									<select name="level" form="modify_volunteer">
+										<option value='E' <c:if test="${volunteer.experienceLevel eq 'E'}">selected</c:if>>Experienced</option>
+										<option value='I' <c:if test="${volunteer.experienceLevel eq 'I'}">selected</c:if>>Intermediate</option>
+										<option value='B' <c:if test="${volunteer.experienceLevel eq 'B'}">selected</c:if> >Beginner</option>
+									</select>	
+								</td>
+							</tr>
+							<tr>
+								<td colspan='3' >Availability</td>
+							</tr>
+							<tr>
+								<table>
+									<tr>
+										<td>Monday <input type="checkbox" name="noAvailable" value="noMonday"/> N/A</td>
+										<td>Tuesday <input type="checkbox" name="noAvailable" value="noTuesday"/> N/A</td>
+										<td>Wednesday <input type="checkbox" name="noAvailable" value="nowednesday"/> N/A</td>
+										<td>Thursday <input type="checkbox" name="noAvailable" value="noThursday"/> N/A</td>
+										<td>Friday <input type="checkbox" name="noAvailable" value="noFriday"/> N/A</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+										<td></td>
+									</tr>
+								</table>								
+							</tr>
+							<tr>
+								<td colspan='3'>Notes</td>
+							</tr>
+							<tr>
+								<td colspan='3'><input type="textarea" maxlength="50" name="notes" value="${volunteer.notes}"/></td>
+							</tr>
+							
+						</table>
+			
+						
 						<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
 						<input class="btn btn-primary" type="submit" value="Save Change" />
 						<input id="volunteerId" name="volunteerId" type="hidden" value="${volunteer.volunteerId}"/>

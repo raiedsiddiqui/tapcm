@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -99,6 +100,16 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		return "/admin/add_volunteer";
 	}
 		
+	//display detail of a volunteer
+	@RequestMapping(value="/display_volunteer/{volunteerId}", method=RequestMethod.GET)
+	public String displayVolunteer(SecurityContextHolderAwareRequestWrapper request, 
+				@PathVariable("volunteerId") int id, ModelMap model){
+		return "/admin/display_volunteer";
+	}
+	
+	
+	
+	
 	//create a new volunteer and save in DB
 	@RequestMapping(value="/add_volunteer", method=RequestMethod.POST)
 	public String addVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
@@ -107,27 +118,39 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		volunteer.setFirstName(request.getParameter("firstname").trim());
 		volunteer.setLastName(request.getParameter("lastname").trim());
-		volunteer.setGender(request.getParameter("gender"));		
-		volunteer.setEmail(request.getParameter("email"));		
-		volunteer.setExperienceLevel(request.getParameter("level"));		
-		volunteer.setAgeType(request.getParameter("type"));
-		volunteer.setProvince(request.getParameter("province"));		
+		volunteer.setEmail(request.getParameter("email").trim());	
+		volunteer.setExperienceLevel(request.getParameter("level"));	
 		
-		String preferredName = request.getParameter("preferredname");
+		if (!Utils.isNullOrEmpty(request.getParameter("province")))
+			volunteer.setStreet(request.getParameter("province"));
+		if (!Utils.isNullOrEmpty(request.getParameter("conuntry")))
+			volunteer.setStreet(request.getParameter("conuntry"));	
+		if (!Utils.isNullOrEmpty(request.getParameter("street")))
+			volunteer.setStreet(request.getParameter("street"));
+		if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
+			volunteer.setStreetNumber(request.getParameter("streetnum"));
+		if (!Utils.isNullOrEmpty(request.getParameter("username")))
+			volunteer.setUserName(request.getParameter("username").trim());				
+		if(!Utils.isNullOrEmpty(request.getParameter("city")))
+			volunteer.setCity(request.getParameter("city").trim());		
+		if(!Utils.isNullOrEmpty(request.getParameter("homephone")))
+			volunteer.setHomePhone(request.getParameter("homephone").trim());
+		if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
+			volunteer.setCellPhone(request.getParameter("cellphone"));
+		if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
+			volunteer.setEmergencyContact(request.getParameter("emergencycontact").trim());
+		if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
+			volunteer.setPostalCode(request.getParameter("postalcode"));
+		if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
+			volunteer.setEmergencyPhone(request.getParameter("emergencyphone").trim());
+		if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
+			volunteer.setAptNumber(request.getParameter("aptnum"));
+		if (!Utils.isNullOrEmpty(request.getParameter("notes")))
+			volunteer.setNotes(request.getParameter("notes"));
 		
-		if(!Utils.isNullOrEmpty(preferredName)) 
-			volunteer.setPreferredName(preferredName.trim());	
+		volunteerDao.addVolunteer(volunteer);			
 		
-		String city = request.getParameter("city");
-		if(!Utils.isNullOrEmpty(city))
-			volunteer.setCity(city.trim());
-					 
-		String phone = request.getParameter("phoneNum");
-		if(!Utils.isNullOrEmpty(phone))
-			volunteer.setPhoneNumber(phone.trim());
-		
-		volunteerDao.addVolunteer(volunteer);				
-		
+		//set displayed message information 
 		HttpSession session = request.getSession();
 		session.setAttribute("volunteerMessage", "C");
 		
@@ -165,21 +188,21 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			if (!Utils.isNullOrEmpty(request.getParameter("lastname")))
 				volunteer.setLastName(request.getParameter("lastname"));				
 			
-			if (!Utils.isNullOrEmpty(request.getParameter("preferredname")))
-				volunteer.setPreferredName(request.getParameter("preferredname"));
+			if (!Utils.isNullOrEmpty(request.getParameter("username")))
+				volunteer.setUserName(request.getParameter("username"));
 			
-			if (!Utils.isNullOrEmpty(request.getParameter("gender")))
-				volunteer.setGender(request.getParameter("gender"));
+//			if (!Utils.isNullOrEmpty(request.getParameter("gender")))
+//				volunteer.setGender(request.getParameter("gender"));
 		
 			if (!Utils.isNullOrEmpty(request.getParameter("email")))
 				volunteer.setEmail(request.getParameter("email"));
 			
 			
 			if (!Utils.isNullOrEmpty(request.getParameter("level")))					
-				volunteer.setExperienceLevel((request.getParameter("level")));			
+				volunteer.setExperienceLevel((request.getParameter("level")));	
 			
-			if (!Utils.isNullOrEmpty(request.getParameter("type")))
-				volunteer.setAgeType((request.getParameter("type")));
+			if (!Utils.isNullOrEmpty(request.getParameter("street")))
+				volunteer.setStreet(request.getParameter("street"));
 		
 			if (!Utils.isNullOrEmpty(request.getParameter("city")))
 				volunteer.setCity(request.getParameter("city"));
@@ -187,8 +210,33 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			if (!Utils.isNullOrEmpty(request.getParameter("province")))
 				volunteer.setProvince(request.getParameter("province"));
 			
-			if (!Utils.isNullOrEmpty(request.getParameter("phoneNum")))
-				volunteer.setPhoneNumber(request.getParameter("phoneNum"));
+			if (!Utils.isNullOrEmpty(request.getParameter("country")))
+				volunteer.setCountry(request.getParameter("country"));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
+				volunteer.setStreetNumber(request.getParameter("streetnum"));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
+				volunteer.setAptNumber(request.getParameter("aptnum"));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
+				volunteer.setPostalCode(request.getParameter("postalcode"));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("homephone")))
+				volunteer.setHomePhone(request.getParameter("homephone"));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
+				volunteer.setCellPhone(request.getParameter("cellphone"));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
+				volunteer.setEmergencyContact(request.getParameter("emergencycontact"));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
+				volunteer.setEmergencyPhone(request.getParameter("emergencyphone"));
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
+				volunteer.setNotes(request.getParameter("notes"));
+			
 			
 			volunteerDao.updateVolunteer(volunteer);
 		}

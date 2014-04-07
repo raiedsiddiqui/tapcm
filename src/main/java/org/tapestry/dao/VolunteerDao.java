@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.tapestry.controller.Utils;
@@ -137,22 +139,37 @@ public class VolunteerDao {
 	}
 	
 	public void addVolunteer(Volunteer volunteer){
-		System.out.println("coming here...");
+		
 		try{
-			stmt = con.prepareStatement("INSERT INTO volunteers (firstname, lastname, preferredname,"
-					+ "gender, email, experience_level, city, province, phone_number, age_type) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
+			stmt = con.prepareStatement("INSERT INTO volunteers (firstname, lastname, street,"
+					+ "username, email, experience_level, city, province, home_phone, cell_phone,"
+					+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
+					+ " availability, street_number) "
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			
-			stmt.setString(1, volunteer.getFirstName());
+			stmt.setString(1, volunteer.getFirstName()); 
 			stmt.setString(2, volunteer.getLastName());	
-			stmt.setString(3, volunteer.getPreferredName());
-			stmt.setString(4, volunteer.getGender());
+			stmt.setString(3, volunteer.getStreet());
+			stmt.setString(4, volunteer.getUserName());
 			stmt.setString(5, volunteer.getEmail());
 			stmt.setString(6, volunteer.getExperienceLevel());
 			stmt.setString(7, volunteer.getCity());
 			stmt.setString(8, volunteer.getProvince());
-			stmt.setString(9, volunteer.getPhoneNumber());
-			stmt.setString(10, volunteer.getAgeType());
+			stmt.setString(9, volunteer.getHomePhone());
+			stmt.setString(10, volunteer.getCellPhone());
+			stmt.setString(11, volunteer.getPostalCode());
+			stmt.setString(12, volunteer.getCountry());
+			stmt.setString(13, volunteer.getEmergencyContact());
+			stmt.setString(14, volunteer.getEmergencyPhone());
+			stmt.setString(15, volunteer.getAptNumber());
+			stmt.setString(16, volunteer.getNotes());		
+			
+			if (volunteer.getAvailability() != null)
+				stmt.setString(17, volunteer.getAvailability().toString());
+			else 
+				stmt.setString(17, "");
+			
+			stmt.setString(18, volunteer.getStreetNumber());
 			
 			stmt.execute();
 		}catch (SQLException e){
@@ -173,30 +190,38 @@ public class VolunteerDao {
 	public void updateVolunteer(Volunteer volunteer){
 		
 		try{
-			stmt = con.prepareStatement("UPDATE volunteers SET firstname=?,lastname=?,preferredname=?,"
-					+ "gender=?, email=?, experience_level=?, city=?, province=?, phone_number=?, age_type=?"
-					+ " WHERE volunteer_ID=?");
+
+			stmt = con.prepareStatement("UPDATE volunteers SET firstname=?,lastname=?, username=?, street=?,"
+					+ "email=?, experience_level=?, city=?, province=?, home_phone=?, cell_phone=?,"
+					+ "postal_code=?, country=?, emergency_contact=?, emergency_phone=?, appartment=?, "
+					+ "notes=?, availability=?, street_number=? WHERE volunteer_ID=?");
 			
 			stmt.setString(1, volunteer.getFirstName());
 			stmt.setString(2, volunteer.getLastName());
-			stmt.setString(3, volunteer.getPreferredName());
-			stmt.setString(4, volunteer.getGender());
+			stmt.setString(3, volunteer.getUserName());
+			stmt.setString(4, volunteer.getStreet());
 			stmt.setString(5, volunteer.getEmail());
 			stmt.setString(6, volunteer.getExperienceLevel());
 			stmt.setString(7, volunteer.getCity());
 			stmt.setString(8, volunteer.getProvince());
-			stmt.setString(9, volunteer.getPhoneNumber());
-			stmt.setString(10, volunteer.getAgeType());
-			stmt.setInt(11, volunteer.getVolunteerId());
-			
-			System.out.println("Experience Level is   " +volunteer.getExperienceLevel() + "and it's length is " +volunteer.getExperienceLevel().toString().length());
-			
-			
+			stmt.setString(9, volunteer.getHomePhone());
+			stmt.setString(10, volunteer.getCellPhone());
+			stmt.setString(11, volunteer.getPostalCode());
+			stmt.setString(12, volunteer.getCountry());
+			stmt.setString(13, volunteer.getEmergencyContact());
+			stmt.setString(14, volunteer.getEmergencyPhone());
+			stmt.setString(15, volunteer.getAptNumber());
+			stmt.setString(16, volunteer.getNotes());
+//			stmt.setString(17, volunteer.getAvailability().toString());
+			stmt.setString(17, "");
+			stmt.setString(18,  volunteer.getStreetNumber());
+
+			stmt.setInt(19, volunteer.getVolunteerId());
 			
 			stmt.execute();
 		}catch (SQLException e){
 			logger.error("Error: updating volunteer is failed ");		
-			
+			System.out.println("updating volunteer is failed");
 			e.printStackTrace();
 		}finally {
     		try{
@@ -263,8 +288,7 @@ public class VolunteerDao {
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		Volunteer volunteer = null;
 		String level = "";
-		String gender = "";
-		String type = "";
+//		String gender = "";
 		
 		try{
 			while(rs.next())
@@ -280,22 +304,22 @@ public class VolunteerDao {
 				sb.append(rs.getString("lastname"));
 				
 				volunteer.setDisplayName(sb.toString());
-				volunteer.setPreferredName(rs.getString("preferredname"));
+				volunteer.setUserName(rs.getString("username"));
 				volunteer.setEmail(rs.getString("email"));
 				
-				type = rs.getString("age_type");
+
 				level = rs.getString("experience_level");
-				gender = rs.getString("gender");
+//				gender = rs.getString("gender");
 				
 				if (modified)
 				{					
-					if (!Utils.isNullOrEmpty(type))
-					{
-						if (type.equals("Y"))
-							volunteer.setAgeType("Younger");
-						else if (type.equals("O"))
-							volunteer.setAgeType("Older");
-					}
+//					if (!Utils.isNullOrEmpty(type))
+//					{
+//						if (type.equals("Y"))
+//							volunteer.setAgeType("Younger");
+//						else if (type.equals("O"))
+//							volunteer.setAgeType("Older");
+//					}
 					
 					if (!Utils.isNullOrEmpty(level)){
 						
@@ -307,26 +331,36 @@ public class VolunteerDao {
 							volunteer.setExperienceLevel("Intermediate");
 					}
 					
-					if (!Utils.isNullOrEmpty(gender)){					
-						if(gender.equals("F"))
-							volunteer.setGender("Female");
-						else if(gender.equals("M"))
-							volunteer.setGender("Male");
-						else if(gender.equals("O"))
-							volunteer.setGender("Other");
-					}
+//					if (!Utils.isNullOrEmpty(gender)){					
+//						if(gender.equals("F"))
+//							volunteer.setGender("Female");
+//						else if(gender.equals("M"))
+//							volunteer.setGender("Male");
+//						else if(gender.equals("O"))
+//							volunteer.setGender("Other");
+//					}
 				}
 				else
-				{
-					volunteer.setAgeType(type);
+				{		
 					volunteer.setExperienceLevel(level);
-					volunteer.setGender(gender);
+		//			volunteer.setGender(gender);
 				}
 				
 				volunteer.setCity(rs.getString("city"));
 				volunteer.setProvince(rs.getString("province"));
-				volunteer.setPhoneNumber(rs.getString("phone_number"));
+				volunteer.setHomePhone(rs.getString("home_phone"));
+				volunteer.setCellPhone(rs.getString("cell_phone"));
+				volunteer.setStreet(rs.getString("street"));
+				volunteer.setStreetNumber(rs.getString("street_number"));
+				volunteer.setAptNumber(rs.getString("appartment"));
+				volunteer.setCountry(rs.getString("country"));
+				volunteer.setEmergencyContact(rs.getString("emergency_contact"));
+				volunteer.setEmergencyPhone(rs.getString("emergency_phone"));
+				volunteer.setPostalCode(rs.getString("postal_code"));
+				volunteer.setNotes(rs.getString("notes"));
 				
+				Map availability = new HashMap();
+				volunteer.setAvailability(availability);
 				volunteers.add(volunteer);
 			}
 						

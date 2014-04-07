@@ -65,6 +65,7 @@
 		<intercept-url pattern="/view_survey_results/**" access="ROLE_ADMIN" />
 		<intercept-url pattern="/export_csv/**" access="ROLE_ADMIN" />
 		<intercept-url pattern="/view_volunteers" access="ROLE_ADMIN"/>
+		<intercept-url pattern="/display_volunteer" access="ROLE_ADMIN"/>
 		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
 	</http>
  

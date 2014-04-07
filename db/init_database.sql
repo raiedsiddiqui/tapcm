@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS activities (
 CREATE TABLE IF NOT EXISTS appointments (
 	appointment_ID SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 appointments*/
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
+	partner TINYINT UNSIGNED,
 	patient SMALLINT UNSIGNED NOT NULL, /* Same as patient_ID */
 	date_time DATETIME NOT NULL, /*Contains both date and time, separated using functions in query*/
 	comments TEXT, /*Volunteer visit comments*/
@@ -105,13 +106,24 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	firstname VARCHAR(255) NOT NULL,
 	lastname VARCHAR(255) NOT NULL,
 	preferredname VARCHAR(255),
+	username VARCHAR(50),
 	age_type VARCHAR(1);/* 1 character, expecting value like 'Y' for younger, 'O' for older */
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
 	email VARCHAR(50),
 	experience_level VARCHAR(1), /* Using VARCHAR(1) for 1 character, expecting value like "E", "B", "I"...*/
+	street_number VARCHAR(20);
+	street VARCHAR(100),
+	appartment VARCHAR(10),	
 	city VARCHAR(50),
 	province VARCHAR(3),
-	phone_number VARCHAR(20),
+	contrry VARCHAR(50),
+	home_phone VARCHAR(20),
+	cell_phone VARCHAR(20),
+	emergency_contact VARCHAR(50),
+	emergency_phone VARCHAR(20),
+	postal_code VARCHAR(10),
+	notes TEXT,
+	availability TEXT,
 	PRIMARY KEY (volunteer_ID)	
 );
 COMMIT;

@@ -191,6 +191,7 @@ public class TapestryController{
 			ArrayList<Appointment> pendingAppointments = new ArrayList<Appointment>();
 			ArrayList<Appointment> declinedAppointments = new ArrayList<Appointment>();
 			if(patientId != null) {
+				
 				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId);
 				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId);
 				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId);
@@ -409,7 +410,7 @@ public class TapestryController{
 					String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, 
 					@RequestParam(value="appointmentId", required=false) Integer appointmentId, 
 					SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		
+				
 		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -447,7 +448,8 @@ public class TapestryController{
 		//save selected appointmentId in the session for other screen, like narrative
 		HttpSession  session = request.getSession();		
 		session.setAttribute("appointmentId", appointmentId);
-		
+		session.setAttribute("patientId", id);
+				
 		return "/patient";
 	}
 	

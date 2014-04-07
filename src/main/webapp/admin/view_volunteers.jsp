@@ -60,7 +60,7 @@
 			<table class="table">
 				<tr>
 					<th>Name</th>
-					<th>Older/Younger</th>
+					<th>Username</th>
 					<th>Experience</th>
 					<th>City</th>
 					<th>Phone Number</th>
@@ -68,11 +68,12 @@
 				</tr>
 				<c:forEach items="${volunteers}" var="vl">
 					<tr>
-						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>">${vl.displayName}</a></td>
-						<td>${vl.ageType}</td>
+						<td><a href="<c:url value="/display_volunteer/${vl.volunteerId}"/>">${vl.displayName}</a></td>						
+						<td>${vl.userName}</td>
 						<td>${vl.experienceLevel}</td>
 						<td>${vl.city}</td>
-						<td>${vl.phoneNumber}</td>
+						<td>${vl.homePhone}</td>
+						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-danger">Edit</a></td>
 						<td><a href="<c:url value="/delete_volunteer/${vl.volunteerId}"/>" class="btn btn-danger">Delete</a></td>
 					</tr>
 				</c:forEach>
