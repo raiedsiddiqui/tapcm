@@ -52,7 +52,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td><label>Street:</label>
+								<td><label class="col-md-4">Street:</label>
 									<input type="text" name="street"/></td>
 								<td><label>Apt #:</label>
 									<input type="text" name="aptnum"/></td>
@@ -120,7 +120,7 @@
 								<td>&nbsp</td>
 							</tr>
 							<tr>
-								<td colspan='3'>User Account</td>
+								<td colspan='3'><h2> User Account </h2></td>
 							</tr>
 							
 							<tr>
@@ -142,54 +142,45 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan='3' >Availability</td>
+								<td colspan='3' ><h2> Availability </h2></td>
 							</tr>
 							<tr>
 								<table>
 									<tr>
-										<td>Monday <input type="checkbox" name="noAvailable" value="noMonday"/> N/A</td>
-										<td>Tuesday <input type="checkbox" name="noAvailable" value="noTuesday"/> N/A</td>
-										<td>Wednesday <input type="checkbox" name="noAvailable" value="nowednesday"/> N/A</td>
-										<td>Thursday <input type="checkbox" name="noAvailable" value="noThursday"/> N/A</td>
-										<td>Friday <input type="checkbox" name="noAvailable" value="noFriday"/> N/A</td>
+										<td><h4>Monday <input type="checkbox"> N/A</h4></td>
+										<td><h4>Tuesday <input type="checkbox" > N/A </h4></td>
+										<td><h4>Wednesday <input type="checkbox"> N/A</h4></td>
+										<td><h4>Thursday <input type="checkbox" > N/A</h4></td>
+										<td><h4>Friday <input type="checkbox"> N/A</h4></td>
 									</tr>
 									<tr>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
+										<td><select></select> TO <select></select></td>
+										<td><select></select> TO <select></select></td>
+										<td><select></select> TO <select></select></td>
+										<td><select></select> TO <select></select></td>
+										<td><select></select> TO <select></select></td>
+									</tr>
+									<tr>
+										<td><select></select> TO <select></select></td>
+										<td><select></select> TO <select></select></td>
+										<td><select></select> TO <select></select></td>
+										<td><select></select> TO <select></select></td>
+										<td><select></select> TO <select></select></td>
 									</tr>
 								</table>								
 							</tr>
 							<tr>
-								<td colspan='3'>Notes</td>
+								<td colspan='3'><h2> Comments </h2></td>
 							</tr>
 							<tr>
 								<td colspan='3'><input type="textarea" maxlength="50" name="notes"/></td>
 							</tr>
 							
 						</table>
-						
-						
-						<!--  label>Preferred Name:</label>
-						<input type="text" name="preferredname" />
-						<label>Gender:</label>
-						<select name="gender" form="add_volunteer">
-							<option value="M" selected>Male</option>	
-							<option value="F" >Female</option>
-							<option value="O" >Other</option>
-						</select>						
-						
-						
-						<!--  select name="type" form="add_volunteer">
-							<option value="Y" selected>Younger</option>
-							<option value="O">Older</option>							
-						</select>-->					
-												
-						
+
 						<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
-						<input class="btn btn-primary" type="submit" value="Create Volunteer" />
+						<input class="btn btn-primary" type="submit" value="Create" />
+
 					</fieldset>
 				</form>
 			</div>		
