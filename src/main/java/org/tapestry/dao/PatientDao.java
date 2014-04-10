@@ -1,6 +1,8 @@
 package org.tapestry.dao;
 
+import org.tapestry.controller.Utils;
 import org.tapestry.objects.Patient;
+
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -96,13 +98,34 @@ public class PatientDao {
             		p.setGender(result.getString("gender"));
             		p.setVolunteer(result.getInt("volunteer"));
             		p.setNotes(result.getString("notes"));
+            		
             		//Set volunteer name
-            		statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-           			statement.setInt(1, p.getVolunteer());
-           			ResultSet r = statement.executeQuery();
-           			r.first();
-           			String name = r.getString("name");
-           			p.setVolunteerName(name);
+//            		statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+//           			statement.setInt(1, p.getVolunteer());
+            		//get volunteer from volunteers table instead of users
+            		            		
+            		statement = con.prepareStatement("SELECT firstname, lastname FROM volunteers WHERE volunteer_ID=?");
+            		statement.setInt(1, p.getVolunteer());
+            		
+           			ResultSet rs = statement.executeQuery();
+           			while(rs.next()){           				
+           				StringBuilder sb = new StringBuilder();
+               			if (!Utils.isNullOrEmpty(rs.getString("firstname"))){
+               				sb.append(rs.getString("firstname"));
+               				sb.append(" ");               				
+               			}
+               			
+               			if (rs.getString("lastname") != null){
+               				sb.append(rs.getString("lastname"));               				
+               			}
+               			
+               			if (!Utils.isNullOrEmpty(sb.toString()))
+               				p.setVolunteerName(sb.toString());
+               			else
+               				p.setVolunteerName("");
+               			
+           			}           			
+           			
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
 			e.printStackTrace();

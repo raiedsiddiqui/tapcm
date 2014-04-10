@@ -93,7 +93,7 @@
 						<input type="checkbox" style="margin-bottom:10px;" value="true" name="isAnnouncement" onclick="document.getElementById('rec').disabled = !document.getElementById('rec').disabled;">Broadcast message</input><br/>
 						<select multiple id="rec" name="recipient" form="messageVolunteer">
 							<c:forEach items="${volunteers}" var="v">
-							<option value="${v.userID}">${v.name}</option>
+							<option value="${v.volunteerId}">${v.firstName}</option>
 							</c:forEach>
 						</select><br />
 						<label>Message:</label>

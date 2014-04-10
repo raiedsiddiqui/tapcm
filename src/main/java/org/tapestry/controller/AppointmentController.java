@@ -110,9 +110,10 @@ public class AppointmentController{
    	
    	@RequestMapping(value="/manage_appointments", method=RequestMethod.GET)
    	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-   		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();
+   		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
    		ArrayList<Patient> allPatients = patientDao.getAllPatients();
    		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
+   		
    		model.addAttribute("appointments", allAppointments);
    		model.addAttribute("patients", allPatients);
    		model.addAttribute("activities", allAppointmentActivities);

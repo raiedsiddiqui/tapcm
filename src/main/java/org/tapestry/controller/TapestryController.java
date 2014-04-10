@@ -26,6 +26,8 @@ import org.tapestry.objects.Activity;
 import org.tapestry.objects.Picture;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.SurveyFactory;
+import org.tapestry.dao.VolunteerDao;
+import org.tapestry.objects.Volunteer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,6 +89,7 @@ public class TapestryController{
    	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
    	private ActivityDao activityDao;
+   	private VolunteerDao volunteerDao;
  
    	//Mail-related settings;
    	private Properties props;
@@ -139,6 +142,8 @@ public class TapestryController{
 		surveyTemplateDao = new SurveyTemplateDao(database, dbUsername, dbPassword);
 		surveyResultDao = new SurveyResultDao(database, dbUsername, dbPassword);
 		activityDao = new ActivityDao(database, dbUsername, dbPassword);
+		volunteerDao = new VolunteerDao(database, dbUsername, dbPassword);
+		
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -184,7 +189,13 @@ public class TapestryController{
 		if (request.isUserInRole("ROLE_USER")){
 			String username = request.getUserPrincipal().getName();
 			User u = userDao.getUserByUsername(username);
-			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
+			
+			//get volunteer Id from login user
+			Volunteer volunteer = volunteerDao.getVolunteerIdByUsername(u.getUsername());
+			int volunteerId= volunteer.getVolunteerId();
+			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
+			
+//			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
 			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(u.getUserID());
 			ArrayList<Appointment> approvedAppointments = new ArrayList<Appointment>();
@@ -254,7 +265,12 @@ public class TapestryController{
 	@RequestMapping(value="/client", method=RequestMethod.GET)
 	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(loggedInUser.getUserID());
+		//get volunteer Id from login user
+		Volunteer volunteer = volunteerDao.getVolunteerIdByUsername(loggedInUser.getUsername());
+		int volunteerId= volunteer.getVolunteerId();
+		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(volunteerId);		
+		
+//		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(loggedInUser.getUserID());
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		model.addAttribute("clients", clients);
@@ -277,10 +293,13 @@ public class TapestryController{
 	}
 	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
 	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+		
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
-		ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
+	//	ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
+		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();
+		
 		model.addAttribute("volunteers", volunteers);
 	    ArrayList<Patient> patientList = patientDao.getAllPatients();
         model.addAttribute("patients", patientList);
@@ -430,7 +449,14 @@ public class TapestryController{
 		Collections.sort(completedSurveyResultList);
 		Collections.sort(incompleteSurveyResultList);
 		ArrayList<SurveyTemplate> surveyList = surveyTemplateDao.getAllSurveyTemplates();
-		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
+		
+//		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
+		//use volunteerId to replace userId
+		Volunteer volunteer = volunteerDao.getVolunteerIdByUsername(u.getUsername());
+		int volunteerId= volunteer.getVolunteerId();
+		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
+		
+	
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
 		model.addAttribute("appointment", appointment);
 		model.addAttribute("patients", patientsForUser);
@@ -502,7 +528,8 @@ public class TapestryController{
 			model.addAttribute("administrators", administrators);
 			return "/volunteer/inbox";
 		} else {
-			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+//			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+			List<Volunteer> volunteers = volunteerDao.getAllVolunteers();
 			model.addAttribute("volunteers", volunteers);
 			return "/admin/inbox";
 		}
@@ -544,6 +571,7 @@ public class TapestryController{
 		m.setText(request.getParameter("msgBody"));
 		if (request.getParameter("isAnnouncement") != null && request.getParameter("isAnnouncement").equals("true")){ //Sound to all volunteers
 			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+			
 			for (User u: volunteers){
 				m.setSubject("ANNOUNCEMENT: " + request.getParameter("msgSubject"));
 				m.setRecipient(u.getUserID());
@@ -705,8 +733,11 @@ public class TapestryController{
 	@RequestMapping(value="/edit_patient/{id}", method=RequestMethod.GET)
 	public String editPatientForm(@PathVariable("id") int patientID, ModelMap model){
 		Patient p = patientDao.getPatientByID(patientID);
-		model.addAttribute("patient", p);
-		ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
+		model.addAttribute("patient", p);		
+		
+//		ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
+		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();	
+		
 		model.addAttribute("volunteers", volunteers);
 		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
 	}

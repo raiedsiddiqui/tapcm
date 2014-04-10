@@ -52,7 +52,7 @@ public class VolunteerDao {
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		
 		try{
-			stmt = con.prepareStatement("SELECT * FROM volunteers ORDER BY lastname DESC ");			
+			stmt = con.prepareStatement("SELECT * FROM volunteers ORDER BY firstname DESC ");			
 			rs = stmt.executeQuery();
 			
 			volunteers = getVolunteersByResultSet(rs, true);
@@ -138,6 +138,73 @@ public class VolunteerDao {
 		return volunteer;
 	}
 	
+	public Volunteer getVolunteerIdByUsername(String username){		
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();	
+		Volunteer volunteer = new Volunteer();
+		try{
+			stmt = con.prepareStatement("SELECT * FROM volunteers WHERE username = ? ");		
+			stmt.setString(1, username);
+			rs = stmt.executeQuery();
+						
+			volunteers = getVolunteersByResultSet(rs, false);
+			volunteer = volunteers.get(0);
+				
+			if (rs != null)
+				rs.close();
+			
+		}catch (SQLException e){			
+			logger.error("Error: Could not retrieve volunteers");				
+			e.printStackTrace();			
+		}finally {
+    		try{
+    			//close statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+		
+		return volunteer;
+	}
+	
+	public List<String> getAllExistUsernames(){
+		List<String> uList = new ArrayList<String>();
+		String username;
+		try{			
+			stmt = con.prepareStatement("SELECT username FROM volunteers");					
+			rs = stmt.executeQuery();
+			
+			try{
+				while(rs.next())
+				{
+					username = rs.getString("username");
+					uList.add(username);
+				}
+							
+			}catch (SQLException e){
+				e.printStackTrace();
+			}
+										
+			if (rs != null)
+				rs.close();
+			
+		}catch (SQLException e){			
+			logger.error("Error: Could not retrieve volunteers");				
+			e.printStackTrace();			
+		}finally {
+    		try{
+    			//close statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+		
+		return uList;
+	}
+	
 	public void addVolunteer(Volunteer volunteer){
 		
 		try{
@@ -162,13 +229,8 @@ public class VolunteerDao {
 			stmt.setString(13, volunteer.getEmergencyContact());
 			stmt.setString(14, volunteer.getEmergencyPhone());
 			stmt.setString(15, volunteer.getAptNumber());
-			stmt.setString(16, volunteer.getNotes());		
-			
-			if (volunteer.getAvailability() != null)
-				stmt.setString(17, volunteer.getAvailability().toString());
-			else 
-				stmt.setString(17, "");
-			
+			stmt.setString(16, volunteer.getNotes());					
+			stmt.setString(17, volunteer.getAvailability());				
 			stmt.setString(18, volunteer.getStreetNumber());
 			
 			stmt.execute();
@@ -211,9 +273,8 @@ public class VolunteerDao {
 			stmt.setString(13, volunteer.getEmergencyContact());
 			stmt.setString(14, volunteer.getEmergencyPhone());
 			stmt.setString(15, volunteer.getAptNumber());
-			stmt.setString(16, volunteer.getNotes());
-//			stmt.setString(17, volunteer.getAvailability().toString());
-			stmt.setString(17, "");
+			stmt.setString(16, volunteer.getNotes());		
+			stmt.setString(17, volunteer.getAvailability());
 			stmt.setString(18,  volunteer.getStreetNumber());
 
 			stmt.setInt(19, volunteer.getVolunteerId());
@@ -358,9 +419,8 @@ public class VolunteerDao {
 				volunteer.setEmergencyPhone(rs.getString("emergency_phone"));
 				volunteer.setPostalCode(rs.getString("postal_code"));
 				volunteer.setNotes(rs.getString("notes"));
+				volunteer.setAvailability(rs.getString("availability"));				
 				
-				Map availability = new HashMap();
-				volunteer.setAvailability(availability);
 				volunteers.add(volunteer);
 			}
 						

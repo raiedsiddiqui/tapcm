@@ -42,7 +42,7 @@
 		</c:if>
 		<c:if test="${not empty volunteerUpdate }">
 			<div class ="alert alert-info"><spring:message code="message_modifyVolunteer"/></div>
-		</c:if>
+		</c:if>		
 		<div class="row-fluid">
 			<h2>Volunteers </h2>
 			<div class="row-fluid">
@@ -73,7 +73,7 @@
 						<td>${vl.experienceLevel}</td>
 						<td>${vl.city}</td>
 						<td>${vl.homePhone}</td>
-						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-danger">Edit</a></td>
+						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-info">Edit</a></td>
 						<td><a href="<c:url value="/delete_volunteer/${vl.volunteerId}"/>" class="btn btn-danger">Delete</a></td>
 					</tr>
 				</c:forEach>
