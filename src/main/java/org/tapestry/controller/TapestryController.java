@@ -191,8 +191,7 @@ public class TapestryController{
 			User u = userDao.getUserByUsername(username);
 			
 			//get volunteer Id from login user
-			Volunteer volunteer = volunteerDao.getVolunteerIdByUsername(u.getUsername());
-			int volunteerId= volunteer.getVolunteerId();
+			int volunteerId = volunteerDao.getVolunteerIdByUsername(u.getUsername());			
 			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
 			
 //			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
@@ -265,9 +264,8 @@ public class TapestryController{
 	@RequestMapping(value="/client", method=RequestMethod.GET)
 	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		//get volunteer Id from login user
-		Volunteer volunteer = volunteerDao.getVolunteerIdByUsername(loggedInUser.getUsername());
-		int volunteerId= volunteer.getVolunteerId();
+		//get volunteer Id from login user		
+		int volunteerId= volunteerDao.getVolunteerIdByUsername(loggedInUser.getUsername());
 		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(volunteerId);		
 		
 //		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(loggedInUser.getUserID());
@@ -291,6 +289,24 @@ public class TapestryController{
 		}
 		return "admin/manage_users";
 	}
+	
+	
+	@RequestMapping(value="/manage_users", method=RequestMethod.POST)
+	public String searchOnUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+	
+		String name = request.getParameter("searchName");		
+		List<User> userList = userDao.getUsersByPartialName(name);		
+		model.addAttribute("users", userList);
+	
+		if(failed != null) {
+			model.addAttribute("failed", true);
+		}		 
+		
+		model.addAttribute("searchName", name);
+		
+		return "admin/manage_users";
+	}
+	
 	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
 	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
 		
@@ -310,15 +326,25 @@ public class TapestryController{
 	public String addUser(SecurityContextHolderAwareRequestWrapper request){
 		//Add a new user
 		User u = new User();
-		u.setName(request.getParameter("name").trim());
+		
+		//set name with firstname + lastname
+		StringBuffer sb = new StringBuffer();
+		sb.append(request.getParameter("firstname").trim());
+		sb.append(" ");
+		sb.append(request.getParameter("lastname").trim());
+		u.setName(sb.toString());
+//		u.setName(request.getParameter("name").trim());
 		u.setUsername(request.getParameter("username").trim());
 		u.setRole(request.getParameter("role"));
 		
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
-		String hashedPassword = enc.encodePassword("password", null); //Default
-		
+		String hashedPassword = enc.encodePassword(request.getParameter("password"), null); 
+//		String hashedPassword = enc.encodePassword("password", null); //Default		
 		u.setPassword(hashedPassword);
 		u.setEmail(request.getParameter("email").trim());
+		u.setPhoneNumber(request.getParameter("phonenumber"));
+		u.setSite(request.getParameter("site"));		
+		
 		boolean success = userDao.createUser(u);
 		if (mailAddress != null && success){
 			try{
@@ -451,9 +477,8 @@ public class TapestryController{
 		ArrayList<SurveyTemplate> surveyList = surveyTemplateDao.getAllSurveyTemplates();
 		
 //		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
-		//use volunteerId to replace userId
-		Volunteer volunteer = volunteerDao.getVolunteerIdByUsername(u.getUsername());
-		int volunteerId= volunteer.getVolunteerId();
+		//use volunteerId to replace userId		
+		int volunteerId= volunteerDao.getVolunteerIdByUsername(u.getUsername());
 		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
 		
 	

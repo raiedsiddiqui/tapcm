@@ -16,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.ActivityDao;
+import org.tapestry.dao.VolunteerDao;
 import org.tapestry.objects.Activity;
+import org.tapestry.objects.User;
+
 import org.tapestry.controller.Utils;
 
 @Controller
@@ -25,6 +28,7 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 	
 	private ActivityDao activityDao = null;
 	private UserDao userDao = null;
+	private VolunteerDao volunteerDao = null;
 	
 	@PostConstruct
 	public void readDatabaseConfig(){
@@ -37,17 +41,15 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 				
 		userDao = new UserDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
+		volunteerDao = new VolunteerDao(DB, UN, PW);
 	}
 	
 	@RequestMapping(value="/view_activityLogs", method=RequestMethod.GET)
-	public String viewActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		HttpSession  session = request.getSession();		
-		session.setAttribute("userDao", userDao);
-		
-		int loggedInUserId = Utils.getLoggedInUserId(session, request);	
-	
+		int volunteerId = getVolunteerIdFromLoginUser(request);	
 		List<Activity> activities = new ArrayList<Activity>();
-		activities = activityDao.getAllActivitiesForVolunteer(loggedInUserId, true);
+		activities = activityDao.getAllActivitiesForVolunteer(volunteerId, true);
 		
 		//check if there is message should be displayed
 		if (session.getAttribute("ActivityMessage") != null)
@@ -81,9 +83,7 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 	@RequestMapping(value="/add_activityLogs", method=RequestMethod.POST)
 	public String addActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		HttpSession  session = request.getSession();		
-		session.setAttribute("userDao", userDao);
-		
-		int loggedInUserId = Utils.getLoggedInUserId(session, request);		
+		int volunteerId = getVolunteerIdFromLoginUser(request);	
 		
 		String date = request.getParameter("activityDate");
 		String startTime = request.getParameter("activityStartTime");	
@@ -92,7 +92,7 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		
 		Activity activity = new Activity();
 		activity.setDescription(description);
-		activity.setVolunteer(String.valueOf(loggedInUserId));				
+		activity.setVolunteer(String.valueOf(volunteerId));				
 		activity.setDate(date);		
 		
 		//format start_Time and end_Time to match data type in DB
@@ -149,8 +149,9 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		Activity activity = new Activity();
 		
 		HttpSession  session = request.getSession();		
-		session.setAttribute("userDao", userDao);
-		loggedInUserId = Utils.getLoggedInUserId(session, request);	
+		int volunteerId = getVolunteerIdFromLoginUser(request);	
+//		session.setAttribute("userDao", userDao);
+//		loggedInUserId = Utils.getLoggedInUserId(session, request);	
 		
 		if (!Utils.isNullOrEmpty(request.getParameter("activityId")))
 		{
@@ -158,7 +159,7 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 			iActivityId = Integer.parseInt(activityId);
 			
 			activity = activityDao.getActivityLogById(iActivityId);
-			activity.setVolunteer(String.valueOf(loggedInUserId));
+			activity.setVolunteer(String.valueOf(volunteerId));
 			
 			String date = null;
 			if(!Utils.isNullOrEmpty(request.getParameter("activityDate")))
@@ -194,6 +195,26 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		session.setAttribute("ActivityMessage","U");
 		return "redirect:/view_activityLogs";
 	
+	}
+	
+	private int getVolunteerIdFromLoginUser(SecurityContextHolderAwareRequestWrapper request){
+		String name = null;		
+		int volunteerId = 0;
+		String username = null;
+		User loggedInUser = null;
+	
+		if (request.getUserPrincipal() != null){			
+			name = request.getUserPrincipal().getName();	
+					
+			if (name != null){							
+				loggedInUser = userDao.getUserByUsername(name);
+				username = loggedInUser.getUsername();
+				
+				volunteerId = volunteerDao.getVolunteerIdByUsername(username);
+			}
+		}
+		
+		return volunteerId;
 	}
 
 }

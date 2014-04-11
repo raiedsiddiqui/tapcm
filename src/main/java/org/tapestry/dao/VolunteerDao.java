@@ -138,7 +138,7 @@ public class VolunteerDao {
 		return volunteer;
 	}
 	
-	public Volunteer getVolunteerIdByUsername(String username){		
+	public int getVolunteerIdByUsername(String username){		
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();	
 		Volunteer volunteer = new Volunteer();
 		try{
@@ -165,7 +165,7 @@ public class VolunteerDao {
     		}
     	}
 		
-		return volunteer;
+		return volunteer.getVolunteerId();
 	}
 	
 	public List<String> getAllExistUsernames(){

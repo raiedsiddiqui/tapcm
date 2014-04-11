@@ -187,4 +187,11 @@ public class AppointmentController{
 		appointmentDao.declineAppointment(id);
 		return "redirect:/manage_appointments";
 	}
+	
+	//view_appointments
+	@RequestMapping(value="/view_appointments", method=RequestMethod.GET)
+	public String viewAppointmentByAdmin( SecurityContextHolderAwareRequestWrapper request){
+		
+		return "/admin/view_appointments";
+	}
 }

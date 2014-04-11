@@ -1,12 +1,15 @@
 package org.tapestry.dao;
 
+import org.tapestry.controller.Utils;
 import org.tapestry.objects.User;
+
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 
 /**
@@ -105,6 +108,12 @@ public class UserDao {
 			u.setUsername(result.getString("username"));
 			u.setEmail(result.getString("email"));
 			u.setPassword(result.getString("password"));
+			
+			if (!Utils.isNullOrEmpty(result.getString("site")))
+				u.setSite(result.getString("site"));
+			if (!Utils.isNullOrEmpty(result.getString("phone_number")))
+				u.setPhoneNumber(result.getString("phone_number"));
+			
 			if (result.getString("enabled").equals("1"))
 				u.setEnabled(true);
 			else
@@ -179,12 +188,16 @@ public class UserDao {
 			
 			//If the username doesn't exist, create the user
 			if(!rs.isBeforeFirst()) {
-				statement = con.prepareStatement("INSERT INTO users (username, name, password, role, email, enabled) VALUES (?, ?, ?, ?, ?, 1)");
+				statement = con.prepareStatement("INSERT INTO users (username, name, password, role, email,"
+						+ " phone_number, site, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
 				statement.setString(1, u.getUsername());
 				statement.setString(2, u.getName());
 				statement.setString(3, u.getPassword());
 				statement.setString(4, u.getRole());
 				statement.setString(5, u.getEmail());
+				statement.setString(6, u.getPhoneNumber());
+				statement.setString(7, u.getSite());
+				
 				statement.execute();
 				success = true;
 			}

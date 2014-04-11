@@ -3,8 +3,6 @@ package org.tapestry.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
@@ -23,12 +21,16 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
 import org.tapestry.dao.AppointmentDao;
+import org.tapestry.dao.ActivityDao;
 import org.tapestry.objects.Appointment;
+import org.tapestry.objects.Message;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
+import org.tapestry.objects.Activity;
 import org.tapestry.controller.Utils;
 
 import java.util.Properties;
@@ -41,8 +43,10 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	private VolunteerDao volunteerDao = null;
 	private AppointmentDao appointmentDao = null;
 	private UserDao userDao = null;
+	private ActivityDao activityDao = null;
+	private MessageDao messageDao = null;
 	
-	private Properties props;
+//	private Properties props;
    	private String mailAddress = "";
    	private Session session;
 	
@@ -65,6 +69,8 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		volunteerDao = new VolunteerDao(DB, UN, PW);		
 		appointmentDao = new AppointmentDao(DB, UN, PW);
 		userDao = new UserDao(DB, UN, PW);
+		activityDao = new ActivityDao(DB, UN, PW);
+		messageDao = new MessageDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -146,6 +152,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	public String displayVolunteer(SecurityContextHolderAwareRequestWrapper request, 
 				@PathVariable("volunteerId") int id, ModelMap model){
 		
+		//get volunteer by id
 		Volunteer volunteer = new Volunteer();
 		volunteer = volunteerDao.getVolunteerById(id);
 		
@@ -170,19 +177,32 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		model.addAttribute("volunteer", volunteer);
 		
+		//set availability
 		if (!Utils.isNullOrEmpty(volunteer.getAvailability()))
-			saveAvailability(volunteer.getAvailability(),model);
+			saveAvailability(volunteer.getAvailability(),model);		
 		
+		//get all completed appointments
 		List<Appointment> appointments = new ArrayList<Appointment>();		
 		appointments = appointmentDao.getAllCompletedAppointmentsForVolunteer(id);	
 		model.addAttribute("completedVisits", appointments);
 		
+		//get all upcoming appointments
 		appointments = new ArrayList<Appointment>();		
 		appointments = appointmentDao.getAllUpcomingAppointmentsForVolunteer(id);
 		model.addAttribute("upcomingVisits", appointments);
 		
+		//get all activities
+		List<Activity> activities = activityDao.getAllActivitiesForVolunteer(id);		
+		model.addAttribute("activityLogs", activities);
+		
+		//get all messages		
+		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(id);
+		model.addAttribute("messages", messages);		
+		
 		return "/admin/display_volunteer";
 	}	
+	
+	
 	
 	private void saveAvailability(String availability, ModelMap model){
 		List<String> aList = new ArrayList<String>();		

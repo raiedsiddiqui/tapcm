@@ -37,15 +37,29 @@
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
-			<h2>Users <small>${total} users, ${active} enabled</small></h2>
+			<c:if test="${(not empty total) && ( not empty active) }">			
+				<h2>Users <small>${total} users, ${active} enabled</small></h2>			
+			</c:if>
+			
 			<c:if test="${not empty failed}">
 				<div class="alert alert-error">Failed to create user: Username already exists</div>
 			</c:if>
+			<div class="row-fluid">
+				<form action="<c:url value="/manage_users"/>" method="POST">
+					<fieldset>
+						<label>Name:</label>
+						<input type="text" name="searchName" value="${searchName}" required />
+						<input class="btn btn-primary" type="submit" value="Search" />
+					</fieldset>
+				</form>
+			</div>
 			<table class="table">
 				<tr>
 					<th>Name</th>
 					<th>Username</th>
 					<th>Role</th>
+					<th>Site</th>
+					<th>Phone Number</th>
 					<th>Enable/Disable</th>
 					<th>Change password</th>
 				</tr>
@@ -59,9 +73,13 @@
 					<td>${u.name}</td>
 					<td>${u.username}</td>
 					<td>
-						<c:if test="${u.role eq 'ROLE_ADMIN'}">Administrator</c:if>
+						<c:if test="${u.role eq 'ROLE_ADMIN'}">Central Administrator</c:if>
 						<c:if test="${u.role eq 'ROLE_USER'}">Volunteer</c:if>
+						<c:if test="${u.role eq 'ROLE_LOCAL_ADMIN'}">Local Administrator</c:if>
+						<c:if test="${u.role eq 'ROLE_RESEARCHER'}">Researcher</c:if>
 					</td>
+					<td>${u.site}</td>
+					<td>${u.phoneNumber}</td>
 					<td>
 						<c:if test="${u.enabled eq 'true'}"><a href="<c:url value="/disable_user/${u.userID}"/>" class="btn btn-danger">Click to disable</a></c:if>
 						<c:if test="${u.enabled eq 'false'}"><a href="<c:url value="/enable_user/${u.userID}"/>" class="btn">Click to enable</a></c:if>
@@ -94,15 +112,31 @@
   		</div>
   		<div class="modal-body">
   			<form id="newUser" action="<c:url value="/add_user"/>" method="post">
-						<label>Name:</label>
-						<input type="text" name="name" required/>
-						<label>Username:</label>
-						<input type="text" name="username" required/>
+  				<label><h3>Personal Information</h3></label><br/>
+						<label>First Name:</label>
+						<input type="text" name="firstname" required/>
+						<label>Last Name:</label>
+						<input type="text" name="lastname" required/>					
 						<label>Email</label>
 						<input type="email" name="email" required/>
-						<label>Role</label>
-						<input type="radio" name="role" value="ROLE_ADMIN">Administrator</input> <br/>
-						<input type="radio" name="role" value="ROLE_USER" checked>Volunteer</input> <br/>
+						<label>Phone #:</label>
+						<input type="text" name="phonenumber" required/>
+					<label><h3>User Account</h3></label><br/>
+						<label>Username:</label>
+						<input type="text" name="username" required/>
+						<label>Password: </label>
+						<input name="password" type="password" required/>
+						<label>Site: </label>
+						<select name="site" form="newUser">
+										<option value="DFM" selected >DFM</option>
+										<option value="UBC" >UBC</option>							
+										<option value="Mcgill"  >Mcgill</option>
+						</select>
+						<label><h3>User Role</h3></label>
+						<input type="radio" name="role" value="ROLE_ADMIN">Central Admin</input> <br/>
+						<input type="radio" name="role" value="ROLE_LOCAL_ADMIN" >Local Admin</input> <br/>
+						<input type="radio" name="role" value="ROLE_RESEARCHER" checked>Researcher</input> <br/>
+						
 			</form>
   		</div>
   		<div class="modal-footer">
