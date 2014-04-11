@@ -46,97 +46,77 @@
 			<td width ="200" valign="top">
 				<table>
 					<tr><th>Monday</th></tr>
-					<c:forEach items="${availabilities}" var="a">					
-						<c:if test="${a.key eq 'Monday'}">
-							<c:forEach items="${a.value}" var="al">
-								<c:choose>
-									<c:when test="${empty al}">
-										<tr><td>N/A</td></tr>
-									</c:when>
-									<c:otherwise>
-										<tr><td>${al}</td></tr>
-									</c:otherwise>
-								</c:choose>								
-							</c:forEach>
-							
-						</c:if>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty monAvailability }">
+							<tr><td>N/A</td></tr>		
+						</c:when>
+						<c:otherwise >
+						    <c:forEach items="${monAvailability}" var="moA">	
+						    	<tr><td>${moA}</td></tr>		
+						    </c:forEach>							
+						</c:otherwise>
+					</c:choose>						
 				</table>
 			</td>
 			<td width ="200" valign="top">
 				<table>
 					<tr><th>Tuesday</th></tr>
-					<c:forEach items="${availabilities}" var="a">
-						<c:if test="${a.key eq 'Tuesday'}">
-							<c:forEach items="${a.value}" var="al">
-									<c:choose>
-										<c:when test="${empty al}">
-											<tr><td>N/A</td></tr>
-										</c:when>
-										<c:otherwise>
-											<tr><td>${al}</td></tr>
-										</c:otherwise>
-									</c:choose>								
-								</c:forEach>
-						</c:if>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty tueAvailability }">
+							<tr><td>N/A</td></tr>		
+						</c:when>
+						<c:otherwise >
+						    <c:forEach items="${tueAvailability}" var="tuA">	
+						    	<tr><td>${tuA}</td></tr>		
+						    </c:forEach>							
+						</c:otherwise>
+					</c:choose>
 				</table>
 			</td>
 			<td width ="200" valign="top">
 				<table>
 					<tr><th>Wednesday</th></tr>
-					<c:forEach items="${availabilities}" var="a">
-						<c:if test="${a.key eq 'Wednesday'}">
-							<c:forEach items="${a.value}" var="al">
-									<c:choose>
-										<c:when test="${empty al}">
-											<tr><td>N/A</td></tr>
-										</c:when>
-										<c:otherwise>
-											<tr><td>${al}</td></tr>
-										</c:otherwise>
-									</c:choose>								
-								</c:forEach>
-							</c:if>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty wedAvailability }">
+							<tr><td>N/A</td></tr>		
+						</c:when>
+						<c:otherwise >
+						    <c:forEach items="${wedAvailability}" var="weA">	
+						    	<tr><td>${weA}</td></tr>		
+						    </c:forEach>							
+						</c:otherwise>
+					</c:choose>
 				</table>
 			</td>
 			<td width ="200" valign="top">
 				<table>
 					<tr><th>Thursday</th></tr>
-					<c:forEach items="${availabilities}" var="a">
-						<c:if test="${a.key eq 'Thursday'}">
-							<c:forEach items="${a.value}" var="al">
-								<c:choose>
-									<c:when test="${empty al}">
-										<tr><td>N/A</td></tr>
-									</c:when>
-									<c:otherwise>
-										<tr><td>${al}</td></tr>
-									</c:otherwise>
-								</c:choose>								
-							</c:forEach>
-						</c:if>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty thuAvailability }">
+							<tr><td>N/A</td></tr>		
+						</c:when>
+						<c:otherwise >
+						    <c:forEach items="${thuAvailability}" var="thA">	
+						    	<tr><td>${thA}</td></tr>		
+						    </c:forEach>							
+						</c:otherwise>
+					</c:choose>
 				</table>
 			</td>
 			<td width ="200" valign="top">
+			
 				<table>
 					<tr><th>Friday</th></tr>					
-					<c:forEach items="${availabilities}" var="a">
-						<c:if test="${a.key eq 'Friday'}">
-							<c:forEach items="${a.value}" var="al">
-								<c:choose>
-									<c:when test="${!empty al}">
-										<tr><td>${al}</td></tr>
-									</c:when>
-									<c:otherwise>
-										<tr><td>N/A</td></tr>
-									</c:otherwise>
-								</c:choose>											
-							</c:forEach>
-						</c:if>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty friAvailability }">
+							<tr><td>N/A</td></tr>		
+						</c:when>
+						<c:otherwise >
+						    <c:forEach items="${friAvailability}" var="frA">	
+						    	<tr><td>${frA}</td></tr>		
+						    </c:forEach>							
+						</c:otherwise>
+					</c:choose>
 				</table>
 			</td>
 		

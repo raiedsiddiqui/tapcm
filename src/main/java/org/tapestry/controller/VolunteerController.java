@@ -171,10 +171,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		model.addAttribute("volunteer", volunteer);
 		
 		if (!Utils.isNullOrEmpty(volunteer.getAvailability()))
-		{
-			Map<String, List<String>> mAvailableTime = formatAvailability(volunteer.getAvailability());
-			model.addAttribute("availabilities", mAvailableTime);
-		}
+			saveAvailability(volunteer.getAvailability(),model);
 		
 		List<Appointment> appointments = new ArrayList<Appointment>();		
 		appointments = appointmentDao.getAllCompletedAppointmentsForVolunteer(id);	
@@ -187,37 +184,37 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		return "/admin/display_volunteer";
 	}	
 	
-	private Map<String, List<String>> formatAvailability(String availability){
+	private void saveAvailability(String availability, ModelMap model){
 		List<String> aList = new ArrayList<String>();		
 		List<String> lMonday = new ArrayList<String>();
 		List<String> lTuesday = new ArrayList<String>();
 		List<String> lWednesday = new ArrayList<String>();
 		List<String> lThursday = new ArrayList<String>();
-		List<String> lFriday = new ArrayList<String>();
-		Map<String, List<String>> mAvailability = new HashMap<String, List<String>>();
+		List<String> lFriday = new ArrayList<String>();		
 		
 		aList = Arrays.asList(availability.split(";"));
 	
 		for (String l : aList){
 			if (l.startsWith("mon"))
-				lMonday.add(l.substring(4));
+				lMonday.add(l.substring(4));	
+			
 			if (l.startsWith("tue"))
 				lTuesday.add(l.substring(4));
+			
 			if (l.startsWith("wed"))
 				lWednesday.add(l.substring(4));
+			
 			if (l.startsWith("thu"))
 				lThursday.add(l.substring(4));
+			
 			if (l.startsWith("fri"))
 				lFriday.add(l.substring(4));			
 		}
-		
-		mAvailability.put("Monday", lMonday);
-		mAvailability.put("Tuesday", lTuesday);
-		mAvailability.put("Wednesday",lWednesday);
-		mAvailability.put("Thursday", lThursday);
-		mAvailability.put("Friday", lFriday);
-		
-		return mAvailability;
+		model.addAttribute("monAvailability", lMonday);		
+		model.addAttribute("tueAvailability", lTuesday);
+		model.addAttribute("wedAvailability", lWednesday);
+		model.addAttribute("thuAvailability", lThursday);
+		model.addAttribute("friAvailability", lFriday);
 		
 	}
 	
