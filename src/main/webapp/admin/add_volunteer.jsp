@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -19,7 +20,18 @@
 		<style type="text/css">
 			.row-fluid{
 				margin:10px;
-			}
+				}
+				
+			div.dropdown_container {
+   					 width:20px;
+				}
+			
+			select.my_dropdown {
+			    width:auto;
+				}
+				
+				
+			
 		</style>
 		
 		<script type="text/javascript">
@@ -36,6 +48,9 @@
 		<div class="row-fluid">
 			<h2>Volunteers </h2>
 			<div class="row-fluid">
+			<c:if test="${not empty userNameExist}">			
+				<div class="alert alert-error"><spring:message code="message_username_exist"/></div>
+			</c:if>			
 				<form id="add_volunteer" action="<c:url value="/add_volunteer"/>" method="POST">
 					<fieldset>
 						<table>
@@ -130,7 +145,7 @@
 								</td>
 								<td>
 									<label>Password:</label>
-									<input name=password"/>									
+									<input type="password" name="password"/>									
 								</td>
 								<td>
 									<label>Experience:</label>
@@ -147,25 +162,43 @@
 							<tr>
 								<table>
 									<tr>
-										<td><h4>Monday <input type="checkbox"> N/A</h4></td>
-										<td><h4>Tuesday <input type="checkbox" > N/A </h4></td>
-										<td><h4>Wednesday <input type="checkbox"> N/A</h4></td>
-										<td><h4>Thursday <input type="checkbox" > N/A</h4></td>
-										<td><h4>Friday <input type="checkbox"> N/A</h4></td>
+										<td width="180"><h4>Monday <input type="checkbox"> N/A | </h4></td>
+										<td width="180"><h4>Tuesday <input type="checkbox" > N/A | </h4></td>
+										<td width="180"><h4>Wednesday <input type="checkbox"> N/A | </h4></td>
+										<td width="180"><h4>Thursday <input type="checkbox" > N/A |</h4></td>
+										<td width="180"><h4>Friday <input type="checkbox"> N/A </h4></td>
 									</tr>
 									<tr>
-										<td><select></select> TO <select></select></td>
-										<td><select></select> TO <select></select></td>
-										<td><select></select> TO <select></select></td>
-										<td><select></select> TO <select></select></td>
-										<td><select></select> TO <select></select></td>
+										<td><input type="checkbox" name="availableTime" value="mon-09:00-10:00">09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-09:00-10:00">09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-09:00-10:00">09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-09:00-10:00">09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-09:00-10:00">09:00--10:00</td>
+										
 									</tr>
 									<tr>
-										<td><select></select> TO <select></select></td>
-										<td><select></select> TO <select></select></td>
-										<td><select></select> TO <select></select></td>
-										<td><select></select> TO <select></select></td>
-										<td><select></select> TO <select></select></td>
+										<td><input type="checkbox" name="availableTime" value="mon-10:00-11:00">10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-10:00-11:00">10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-10:00-11:00">10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-10:00-11:00">10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-10:00-11:00">10:00--11:00</td>
+										
+									</tr>
+									<tr>
+										<td><input type="checkbox" name="availableTime" value="mon-11:00-12:00">11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-11:00-12:00">11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-11:00-12:00">11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-11:00-12:00">11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-11:00-12:00">11:00--12:00</td>
+										
+									</tr>
+									<tr>
+										<td><input type="checkbox" name="availableTime" value="mon-13:00-14:00">13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-13:00-14:00">13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-13:00-14:00">13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-13:00-14:00">13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-13:00-14:00">13:00--14:00</td>
+										
 									</tr>
 								</table>								
 							</tr>
@@ -173,7 +206,7 @@
 								<td colspan='3'><h2> Comments </h2></td>
 							</tr>
 							<tr>
-								<td colspan='3'><input type="textarea" maxlength="50" name="notes"/></td>
+								<td colspan='3'><input type="textarea" rows="6" cols="80"  name="notes"/></td>
 							</tr>
 							
 						</table>

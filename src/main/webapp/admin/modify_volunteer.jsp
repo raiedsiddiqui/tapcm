@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -120,7 +121,7 @@
 								<td>&nbsp</td>
 							</tr>
 							<tr>
-								<td colspan='3'>User Account</td>
+								<td colspan='3'><h2>User Account</h2></td>
 							</tr>
 							
 							<tr>
@@ -142,25 +143,50 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan='3' >Availability</td>
-							</tr>
+								<td colspan='3' ><h2> Availability </h2></td>
+							</tr>							
 							<tr>
 								<table>
 									<tr>
-										<td>Monday <input type="checkbox" name="noAvailable" value="noMonday"/> N/A</td>
-										<td>Tuesday <input type="checkbox" name="noAvailable" value="noTuesday"/> N/A</td>
-										<td>Wednesday <input type="checkbox" name="noAvailable" value="nowednesday"/> N/A</td>
-										<td>Thursday <input type="checkbox" name="noAvailable" value="noThursday"/> N/A</td>
-										<td>Friday <input type="checkbox" name="noAvailable" value="noFriday"/> N/A</td>
+										<td width="180"><h4>Monday <input type="checkbox"> N/A | </h4></td>
+										<td width="180"><h4>Tuesday <input type="checkbox" > N/A | </h4></td>
+										<td width="180"><h4>Wednesday <input type="checkbox"> N/A | </h4></td>
+										<td width="180"><h4>Thursday <input type="checkbox" > N/A |</h4></td>
+										<td width="180"><h4>Friday <input type="checkbox"> N/A </h4></td>
+									</tr>									
+									<tr><c:set var="availability" value="${volunteer.availability}"/>
+										<td><input type="checkbox" name="availableTime" value="mon-09:00-10:00" <c:if test="${fn:contains(availability, 'mon-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-09:00-10:00" <c:if test="${fn:contains(availability, 'tue-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-09:00-10:00" <c:if test="${fn:contains(availability, 'wed-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-09:00-10:00" <c:if test="${fn:contains(availability, 'thu-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-09:00-10:00" <c:if test="${fn:contains(availability, 'fri-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
+										
 									</tr>
 									<tr>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
-										<td></td>
+										<td><input type="checkbox" name="availableTime" value="mon-10:00-11:00" <c:if test="${fn:contains(availability, 'mon-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-10:00-11:00" <c:if test="${fn:contains(availability, 'tue-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-10:00-11:00" <c:if test="${fn:contains(availability, 'wed-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-10:00-11:00" <c:if test="${fn:contains(availability, 'thu-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-10:00-11:00" <c:if test="${fn:contains(availability, 'fri-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
+										
 									</tr>
-								</table>								
+									<tr>
+										<td><input type="checkbox" name="availableTime" value="mon-11:00-12:00" <c:if test="${fn:contains(availability, 'mon-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-11:00-12:00" <c:if test="${fn:contains(availability, 'tue-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-11:00-12:00" <c:if test="${fn:contains(availability, 'wed-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-11:00-12:00" <c:if test="${fn:contains(availability, 'thu-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-11:00-12:00" <c:if test="${fn:contains(availability, 'fri-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
+										
+									</tr>
+									<tr>
+										<td><input type="checkbox" name="availableTime" value="mon-13:00-14:00" <c:if test="${fn:contains(availability, 'mon-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-13:00-14:00" <c:if test="${fn:contains(availability, 'tue-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-13:00-14:00" <c:if test="${fn:contains(availability, 'wed-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-13:00-14:00" <c:if test="${fn:contains(availability, 'thu-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-13:00-14:00" <c:if test="${fn:contains(availability, 'fri-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
+										
+									</tr>
+								</table>										
 							</tr>
 							<tr>
 								<td colspan='3'>Notes</td>

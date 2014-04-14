@@ -6,6 +6,7 @@ public class Volunteer {
 	private int volunteerId;
 	private String firstName;
 	private String lastName;
+	private String password;	
 	private String preferredName;
 	private String displayName;	
 	private String streetNumber;	
@@ -24,8 +25,27 @@ public class Volunteer {
 	private String emergencyPhone;
 	private String postalCode;
 	private String notes;
-	private Map availability;	
+	private String availability;	
+	private String address;
 	
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	public Volunteer(){
 		
 	}
@@ -197,13 +217,12 @@ public class Volunteer {
 		this.notes = notes;
 	}
 
-	public Map getAvailability() {
+	public String getAvailability() {
 		return availability;
 	}
 
-	public void setAvailability(Map availability) {
+	public void setAvailability(String availability) {
 		this.availability = availability;
-	}
+	}	
 	
-
 }

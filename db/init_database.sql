@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
 	name VARCHAR(255) NOT NULL,
 	username VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL,
+	phonenumber VARCHAR(20),
+	site VARCHAR(50),
 	enabled BOOLEAN NOT NULL,
 	email VARCHAR(50) NOT NULL,
 	role VARCHAR(45),

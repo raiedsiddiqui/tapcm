@@ -6,8 +6,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.tapestry.controller.TapestryController;
+import org.tapestry.controller.Utils;
 import org.tapestry.objects.Appointment;
 import org.apache.log4j.Logger;
 
@@ -78,18 +79,48 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllAppointments(){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments ORDER BY date_time DESC");
+//    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+//    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments ORDER BY date_time DESC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments ORDER BY date_time DESC");
+    		
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
-       		while(result.next()){
-       			Appointment a = createFromSearch(result);
-       			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-       			statement.setInt(1, result.getInt("volunteer"));
-       			ResultSet rs = statement.executeQuery();
-       			rs.first();
-       			a.setVolunteer(rs.getString("name"));
+       		
+       		while(result.next()){       			
+       			Appointment a = createFromSearch(result);   
+       			
        			if (a != null)
-       				allAppointments.add(a);
+       			{
+//      			statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+	       			statement = con.prepareStatement("SELECT firstname, lastname FROM volunteers WHERE volunteer_ID=?");
+	       			statement.setInt(1, result.getInt("volunteer"));
+	       			ResultSet rs = statement.executeQuery();
+	       			rs.first();	       			
+	       			
+	       			StringBuffer sb = new StringBuffer();
+	       			
+	       			while(rs.next()){
+	       				if (!Utils.isNullOrEmpty(rs.getString("firstname")))
+		       			{
+		       				sb.append(rs.getString("firstname"));
+		       				sb.append(" ");		       				
+		       			}
+	       				
+	       				if (!Utils.isNullOrEmpty(rs.getString("lastname")))
+		       			{
+		       				sb.append(rs.getString("lastname"));
+		       			}
+		       				
+	       				if (!Utils.isNullOrEmpty(sb.toString()))
+	       					a.setVolunteer(sb.toString());
+	       			}	       			
+	       			
+	       			allAppointments.add(a);
+       			
+       			}
+//       			if (a != null)
+//       				allAppointments.add(a);
         	}
        		return allAppointments;
     	} catch (SQLException e){
@@ -107,7 +138,8 @@ public class AppointmentDao {
     	
     public ArrayList<Appointment> getAllAppointmentsForVolunteer(int volunteer){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
+    				+ " TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 ORDER BY date_time ASC");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -132,7 +164,8 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllApprovedAppointmentsForVolunteer(int volunteerId){
     	try{    		
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 AND status='Approved' ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 AND status='Approved' ORDER BY date_time ASC");
     		statement.setInt(1, volunteerId);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();       		
@@ -160,7 +193,8 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllPendingAppointmentsForVolunteer(int volunteerId){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 AND status='Awaiting Approval' ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 AND status='Awaiting Approval' ORDER BY date_time ASC");
     		statement.setInt(1, volunteerId);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -186,7 +220,8 @@ public class AppointmentDao {
     public ArrayList<Appointment> getAllDeclinedAppointmentsForVolunteer(int volunteerId){
  
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 AND status='Declined' ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 AND status='Declined' ORDER BY date_time ASC");
     		statement.setInt(1, volunteerId);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -211,7 +246,8 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllApprovedAppointmentsForPatient(int patientId){
     	try{    		
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND date_time>=CURDATE() AND completed=0 AND status='Approved' ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND date_time>=CURDATE() AND completed=0 AND status='Approved' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -237,7 +273,8 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllPendingAppointmentsForPatient(int patientId){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND date_time>=CURDATE() AND completed=0 AND status='Awaiting Approval' ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND date_time>=CURDATE() AND completed=0 AND status='Awaiting Approval' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -262,7 +299,8 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllDeclinedAppointmentsForPatient(int patientId){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND date_time>=CURDATE() AND completed=0 AND status='Declined' ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND date_time>=CURDATE() AND completed=0 AND status='Declined' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -287,7 +325,8 @@ public class AppointmentDao {
     
     public ArrayList<Appointment> getAllAppointmentsForVolunteerForToday(int volunteer){
        	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE() AND completed=0 ORDER BY date_time ASC");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
+    				+ " TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE volunteer=? AND DATE(date_time)=CURDATE() AND completed=0 ORDER BY date_time ASC");
     		statement.setInt(1, volunteer);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -312,7 +351,8 @@ public class AppointmentDao {
     
     public Appointment getAppointmentById(int appointmentId){
        	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE appointment_ID=?");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE appointment_ID=?");
     		statement.setInt(1, appointmentId);
     		ResultSet result = statement.executeQuery();
     		result.first();
@@ -332,7 +372,8 @@ public class AppointmentDao {
     
     public Appointment getAppointmentByMostRecentIncomplete(int patientId){
        	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND completed=0 AND status='Approved' ORDER BY date_time ASC LIMIT 1");
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments WHERE patient=? AND completed=0 AND status='Approved' ORDER BY date_time ASC LIMIT 1");
     		statement.setInt(1, patientId);
     		ResultSet result = statement.executeQuery();
     		result.first();
@@ -438,5 +479,79 @@ public class AppointmentDao {
     			//Ignore
     		}
     	}
+    }
+    
+    public List<Appointment> getAllCompletedAppointmentsForVolunteer(int volunteerId){
+    	List<Appointment> appointments = new ArrayList<Appointment>();
+    	Appointment apointment = null;
+    	try{
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
+    				+ " TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments"
+    				+ " WHERE volunteer=? AND completed=1 ORDER BY date_time ASC");
+    		statement.setInt(1, volunteerId);
+    		
+    		ResultSet rs = statement.executeQuery();
+       		
+       		while(rs.next()){
+       			apointment = new Appointment();
+       			apointment = createFromSearch(rs);
+       			if (apointment != null)
+       				appointments.add(apointment);
+        	}
+       		
+       		//close result set
+       		if (rs != null)
+       			rs.close();
+       		
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve all completed appointments for volunteer #" + volunteerId);
+    		e.printStackTrace();
+    		
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    	
+    	return appointments;
+    }
+    
+    public List<Appointment> getAllUpcomingAppointmentsForVolunteer(int volunteerId){
+    	List<Appointment> appointments = new ArrayList<Appointment>();
+    	Appointment apointment = null;
+    	try{
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
+    				+ " TIME(date_time) as appt_time, comments, status, completed, contactedAdmin FROM appointments"
+    				+ " WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 ORDER BY date_time ASC");
+    		statement.setInt(1, volunteerId);
+    		
+    		ResultSet rs = statement.executeQuery();
+       		
+       		while(rs.next()){
+       			apointment = new Appointment();
+       			apointment = createFromSearch(rs);
+       			if (apointment != null)
+       				appointments.add(apointment);
+        	}
+       		
+       		//close result set
+       		if (rs != null)
+       			rs.close();
+       		
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve all upcoming appointments for volunteer #" + volunteerId);
+    		e.printStackTrace();
+    		
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    	
+    	return appointments;
     }
 }

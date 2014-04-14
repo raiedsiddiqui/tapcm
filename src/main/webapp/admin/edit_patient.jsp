@@ -33,7 +33,7 @@
 				<label>Volunteer</label>
 				<select name="volunteer" form="editPatient">
 					<c:forEach items="${volunteers}" var="v">
-					<option value="${v.userID}" <c:if test="${v.name eq patient.volunteerName}">selected</c:if>>${v.name}</option>
+					<option value="${v.volunteerId}" <c:if test="${v.displayName eq patient.volunteerName}">selected</c:if>>${v.displayName}</option>
 					</c:forEach>
 				</select><br />
 				<label>Gender</label>

@@ -110,9 +110,10 @@ public class AppointmentController{
    	
    	@RequestMapping(value="/manage_appointments", method=RequestMethod.GET)
    	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-   		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();
+   		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
    		ArrayList<Patient> allPatients = patientDao.getAllPatients();
    		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
+   		
    		model.addAttribute("appointments", allAppointments);
    		model.addAttribute("patients", allPatients);
    		model.addAttribute("activities", allAppointmentActivities);
@@ -185,5 +186,12 @@ public class AppointmentController{
 	public String unapproveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
 		appointmentDao.declineAppointment(id);
 		return "redirect:/manage_appointments";
+	}
+	
+	//view_appointments
+	@RequestMapping(value="/view_appointments", method=RequestMethod.GET)
+	public String viewAppointmentByAdmin( SecurityContextHolderAwareRequestWrapper request){
+		
+		return "/admin/view_appointments";
 	}
 }

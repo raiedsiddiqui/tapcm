@@ -22,7 +22,7 @@
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
-			<h2>Patients</h2>
+			<h2>Patients</h2><a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add New</a>
 			<table class="table">
 				<tr>
 					<th>Name</th>
@@ -42,7 +42,7 @@
                 </tr>
                 </c:forEach>
 			</table>
-			<a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add new</a>
+			<!--  a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add New</a>-->
 		</div>
 	</div>
 	
@@ -63,7 +63,7 @@
 					<label>Volunteer</label>
 					<select name="volunteer" form="newPatient">
 						<c:forEach items="${volunteers}" var="v">
-						<option value="${v.userID}">${v.name}</option>
+						<option value="${v.volunteerId}">${v.firstName}</option>
 						</c:forEach>
 					</select><br />
 					<label>Gender</label>
