@@ -6,13 +6,18 @@
 	<title>Tapestry Admin</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" />
+
+<!-- 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  
+ -->		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
-				
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>				
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+
+		
 	
 	<style type="text/css">
 		.row-fluid{
@@ -47,31 +52,43 @@
 </head>
 
 <body>
-  <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 
-		<div class="row-fluid">
-			<h2>Appointments</h2>
+		<div class="row">		
+			<div class="col-md-9">
+				<h2>Appointments</h2>
+			</div>
+			<div class="col-md-3">
+				<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Scheduler</a>
+				<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book Appointment</a>
+			</div>
+		</div>
+
+
 			<c:if test="${not empty success}">
 				<div class="alert alert-info">Appointment has been successfully booked</div>
-			</c:if>
-			
+			 </c:if>
+			<!--<div class="panel-group" id="accordian">
 			<c:forEach items="${patients}" var="p">
-				<div class="accordion-group">
-					<div class="accordion-heading">
-				    	<a class="accordion-toggle" data-toggle="collapse" href="#collapse${p.firstName}${p.lastName}">
+				
+				<div class="panel panel-default">
+					<div class="panel-heading">
+				    	<h4 class="panel-title">
+				    		<a class="accordion-toggle" data-toggle="collapse" href="#collapse${p.firstName}${p.lastName}">
 				        	${p.displayName}
 				      	</a>
+				      </h4>
 				    </div>
-				    <div id="collapse${p.firstName}${p.lastName}" class="accordion-body collapse">
+				    <div id="collapse${p.firstName}${p.lastName}" class="panel-collapse collapse">
 				    	<div class="accordion-inner">
 				    		<div class="accordion-group">
 				    			<c:forEach items="${appointments}" var="a">
 				    				<c:if test="${p.patientID == a.patientID}">
-				    					<a href="<c:url value="/approve_appointment/${a.appointmentID}"/>" class="btn btn-primary pull-right">Approve</a>
-										<a href="<c:url value="/decline_appointment/${a.appointmentID}"/>" class="btn btn-danger pull-right">Decline</a>
-										<a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger pull-right">Delete</a>
+										<a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger pull-right btn-sm">Delete</a>
+										<a href="<c:url value="/decline_appointment/${a.appointmentID}"/>" class="btn btn-warning pull-right btn-sm">Decline</a>
+										
+										<a href="<c:url value="/approve_appointment/${a.appointmentID}"/>" class="btn btn-primary pull-right btn-sm">Approve</a>
 										<div class="accordion-heading">
 									    	<a class="accordion-toggle" data-toggle="collapse" href="#collapse${a.appointmentID}">${a.date} ${a.time}   (${a.status})</a>
 									    </div>
@@ -93,7 +110,7 @@
 					    							Activites Completed:<br />
 					    							<c:forEach items="${activities}" var="act">
 					    								<c:if test="${a.appointmentID == act.appointment}">
-					    									${act.time}: ${act.description} <br />
+					    									<h2>${act.time}: ${act.description}</h2> <br />
 					    								</c:if>
 					    							</c:forEach>
 					    						</c:if>
@@ -105,11 +122,10 @@
 				    	</div>
 				    </div>
 				</div>
-			</c:forEach>
-			
+			</c:forEach> -->
 			<br />
-			<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book new appointment</a>
-				    									
+<!-- 			<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book new appointment</a>
+ -->				    									
 			<!-- <table class="table">
 				<tr>
 					<th>Volunteer</th>
@@ -142,9 +158,95 @@
 			<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book new appointment</a>
 		</div>
 	</div> -->
-	
-	<!-- Modal -->
-	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
+	<div class="bs-example bs-example-tabs">
+    <ul id="myTab" class="nav nav-tabs">
+      <li class="active"><a href="#home" data-toggle="tab">Upcoming Appointments</a></li>
+      <li class=""><a href="#profile" data-toggle="tab">Past Appointments</a></li>
+<!--       <li class="dropdown">
+        <a href="#" id="myTabDrop1" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
+          <li><a href="#dropdown1" tabindex="-1" data-toggle="tab">@fat</a></li>
+          <li><a href="#dropdown2" tabindex="-1" data-toggle="tab">@mdo</a></li>
+        </ul>
+      </li> -->
+    </ul>
+    <div id="myTabContent" class="tab-content">
+      <div class="tab-pane fade active in" id="home">
+        <div class="panel-group" id="accordian">
+        <c:forEach items="${patients}" var="p">
+				
+				<div class="panel panel-default">
+					<div class="panel-heading">
+				    	<h4 class="panel-title">
+				    		<a data-toggle="collapse" data-parent="#accordion" href="#collapse${p.firstName}${p.lastName}">
+				        	${p.displayName}</a>
+				      </h4>
+				    </div>
+ 				    
+ 				    <div id="collapse${p.firstName}${p.lastName}" class="panel-collapse collapse">		
+ 				    	<div class="panel-body">		    	
+<!-- 					<div class="accordion-inner">
+				    		<div class="accordion-group"> -->
+				    			<c:forEach items="${appointments}" var="a">
+				    				<c:if test="${p.patientID == a.patientID}">
+										<a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger pull-right btn-sm">Delete</a>
+										<a href="<c:url value="/decline_appointment/${a.appointmentID}"/>" class="btn btn-warning pull-right btn-sm">Decline</a>
+										
+										<a href="<c:url value="/approve_appointment/${a.appointmentID}"/>" class="btn btn-primary pull-right btn-sm">Approve</a>
+										
+										<div class="panel">
+											<div class="panel-heading">
+				    							<h5 class="panel-title">
+									    			<a data-toggle="collapse" href="#collapse${a.appointmentID}">${a.date} ${a.time}   (${a.status})</a> </h5>
+									    	</div>
+									    
+
+									    <div id="collapse${a.appointmentID}" class="accordion-body collapse">
+				    						<div class="accordion-inner">
+				    							<c:if test="${a.completed}">
+					    							<c:choose>
+					    								<c:when test="${a.contactedAdmin}">
+					    									Volunteer contacted Ernie<br /><br />
+					    								</c:when>
+					    								<c:otherwise>
+					    									Volunteer did not contact Ernie<br /><br />
+					    								</c:otherwise>
+					    							</c:choose>
+					    							<c:if test="${not empty a.comments}">
+					    								Comments: ${a.comments} <br /><br />
+					    							</c:if>
+					    							Activites Completed:<br />
+					    							<c:forEach items="${activities}" var="act">
+					    								<c:if test="${a.appointmentID == act.appointment}">
+					    									<h2>${act.time}: ${act.description}</h2> <br />
+					    								</c:if>
+					    							</c:forEach>
+					    						</c:if>
+				    						</div>
+				    					</div>
+				    				</div>
+				    				</c:if>
+				    			</c:forEach>
+				    		</div>
+				    	<!-- </div> -->
+				    </div>				
+				</div>
+			</c:forEach>
+      </div>
+  </div>
+      <div class="tab-pane fade" id="profile">
+
+<p> PAST appointment DATA </p>
+      </div>
+<!--       <div class="tab-pane fade" id="dropdown1">
+        <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>
+      </div>
+      <div class="tab-pane fade" id="dropdown2">
+        <p>Trust fund seitan letterpress, keytar raw denim keffiyeh etsy art party before they sold out master cleanse gluten-free squid scenester freegan cosby sweater. Fanny pack portland seitan DIY, art party locavore wolf cliche high life echo park Austin. Cred vinyl keffiyeh DIY salvia PBR, banh mi before they sold out farm-to-table VHS viral locavore cosby sweater. Lomo wolf viral, mustache readymade thundercats keffiyeh craft beer marfa ethical. Wolf salvia freegan, sartorial keffiyeh echo park vegan.</p>
+      </div> -->
+  </div>
+	<!-- OLD Modal -->
+<!-- 	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
   		<div class="modal-header">
     		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
     		<h3 id="modalHeader">Book Appointment</h3>
@@ -177,6 +279,49 @@
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     		<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
   		</div>
-	</div>
+	</div> -->
+<!-- OLD Modal -->
+
+
+<div class="modal fade" id="bookAppointment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Book Appointment</h4>
+      </div>
+      <div class="modal-body">
+        
+        <form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
+  				<label>With patient:</label>
+				<select name="patient" form="appt-form">
+					<c:forEach items="${patients}" var="p">
+					<option value="${p.patientID}">${p.displayName}</option>
+					</c:forEach>
+				</select><br />
+				<label>Date:</label>		
+				<div id="dp" class="input-append">
+					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate">
+					<span class="add-on">
+						<i class="icon-calendar"></i>
+					</span>
+				</div>
+				<label>Time:</label>
+				<div id="tp" class="input-append">
+					<input data-format="hh:mm:00" type="text" name="appointmentTime">
+				    <span class="add-on">
+				    	<i class="icon-time"></i>
+				    </span>
+				</div>
+  			</form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
