@@ -31,7 +31,6 @@
 	</head>
 	
 	<body>
-	<img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<c:if test="${not empty volunteerCreated}">

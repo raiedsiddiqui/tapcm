@@ -1,0 +1,25 @@
+.container {
+	width: 100%;
+}
+
+#logo {
+	height: 50px !important;
+	width: 220px !important;
+	float: left;
+}
+#logofam {
+	height: 60px;
+	width: 120px;
+	float:left;
+}
+
+#logofhs {
+	height: 50px;
+	width: 95px;
+	float: left;
+}
+
+#logodeg {
+	width: 200px;
+	height: 40px;
+}

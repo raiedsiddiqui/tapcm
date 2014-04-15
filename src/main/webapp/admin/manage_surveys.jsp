@@ -9,7 +9,8 @@
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 	<script type="text/javascript">
 		function showAssignSurvey(){
 			document.getElementById("assignSurveyDiv").style.display="block";
@@ -24,7 +25,6 @@
 </head>
 
 <body>
-  <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		
@@ -35,16 +35,19 @@
 				<div class="alert alert-error">Failed to assign survey: You must select at least one patient</div>
 			</c:if>
 			
+			<div class="panel-group" id="accordian">
 			<c:forEach items="${patients}" var="p">
-				<div class="accordion-group">
-					<div class="accordion-heading">
-				    	<a class="accordion-toggle" data-toggle="collapse" href="#collapse${p.patientID}">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h4 class="panel-title">
+				    		<a class="accordion-toggle" data-toggle="collapse" href="#collapse${p.patientID}">
 				        	${p.displayName}
-				      	</a>
+				      		</a>
+				      	</h4>
 				    </div>
 				    
-				    <div id="collapse${p.patientID}" class="accordion-body collapse">
-				    	<div class="accordion-inner">
+				    <div id="collapse${p.patientID}" class="panel-collapse collapse">
+				    	<div class="panel-body">
 					      	<table class="table">
 								<tr>
 									<th>Survey</th>
@@ -85,7 +88,7 @@
 					</div>
 				</div>
 			</c:forEach>
-			
+		</div>
 			<!--<table class="table">
 				<tr>
 					<th>Survey</th>
