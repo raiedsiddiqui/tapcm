@@ -42,7 +42,6 @@
 	</head>
 	
 	<body>
-	<img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
@@ -57,106 +56,176 @@
 							<tr>
 								<td colspan='3'></td>
 							</tr>
-							<tr>
-								<td><label>First Name:</label>
-									<input type="text" name="firstname"  required/></td>
-								<td><label>Last Name:</label>
-									<input type="text" name="lastname"  required/></td>
-								<td><label>Street #:</label>
-									<input name="streetnum" />
-								</td>
-							</tr>
-							<tr>
-								<td><label class="col-md-4">Street:</label>
-									<input type="text" name="street"/></td>
-								<td><label>Apt #:</label>
-									<input type="text" name="aptnum"/></td>
-								<td><label>Country:</label>
-									<select name="country" form="add_volunteer">
-										<option value="CA" selected>Canada</option>
-										<option value="ST">USA</option>
-										<option value="CH">China</option>
-										<option value="RU">Russia</option>
-									</select>
-								</td>
-							</tr>
-							<tr>
-								<td>
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>First Name:</label>
+									<input type="text" name="firstname" class="form-control" required/>
+								</div>
+								<div class="col-md-4">
+									<label>Last Name:</label>
+									<input type="text" name="lastname" class="form-control" required/>
+								</div>
+							</div>
+
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Street #:</label>
+									<input type="text" name="streetnum" class="form-control" />
+								</div>
+								<div class="col-md-4">	
+									<label>Street:</label>
+									<input type="text" name="street" class="form-control"/>
+								</div>
+								<div class="col-md-4">	
+									<label>Apt #:</label>
+									<input type="text" name="aptnum" class="form-control"/>
+								</div>
+							</div>
+
+							<div class="row form-group">
+								<div class="col-md-4">	
+									<label>Country:</label>
+										<select name="country" form="add_volunteer" class="form-control"s>
+											<option value="CA" selected>Canada</option>
+											<option value="ST">USA</option>
+											<option value="CH">China</option>
+											<option value="RU">Russia</option>
+										</select>
+								</div>
+								<div class="col-md-4">	
 									<label>Province:</label>
-									<select name="province" form="add_volunteer">
-										<option value="AB" selected>Alberta</option>
-										<option value="BC" >British Colunmbia</option>							
-										<option value="MB" >Manitoba</option>
-										<option value="NB" >New Brunswik</option>
-										<option value="NL" >Newfoundland and Labrador</option>
-										<option value="NS" >Nova Scotia</option>							
-										<option value="ON" >Ontario</option>
-										<option value="PE" >PrinceEdword Island</option>
-										<option value="QC" >Quebec</option>
-										<option value="SK" >Saskatchewan</option>							
-										<option value="NT" >Northwest Terriotories</option>
-										<option value="NU" >Nunavut</option>
-										<option value="YT" >Yukon</option>
-										
-									</select>
-								</td>
-								<td>
+										<select name="province" form="add_volunteer" class="form-control">
+											<option value="AB" selected>Alberta</option>
+											<option value="BC" >British Colunmbia</option>							
+											<option value="MB" >Manitoba</option>
+											<option value="NB" >New Brunswik</option>
+											<option value="NL" >Newfoundland and Labrador</option>
+											<option value="NS" >Nova Scotia</option>							
+											<option value="ON" >Ontario</option>
+											<option value="PE" >PrinceEdword Island</option>
+											<option value="QC" >Quebec</option>
+											<option value="SK" >Saskatchewan</option>							
+											<option value="NT" >Northwest Terriotories</option>
+											<option value="NU" >Nunavut</option>
+											<option value="YT" >Yukon</option>
+											
+										</select>
+								</div>	
+								<div class="col-md-4">	
 									<label>City:</label>
-									<input name="city">
-								</td>
-								<td>
+									<input name="city" class="form-control" type="text">
+								</div>
+							</div>
+
+							<div class="row form-group">
+								<div class="col-md-4">	
 									<label>Postal Code:</label>
-									<input  name="postalcode"/>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<label>Home Phone:</label>
-									<input  name="homephone">
-								</td>
-								<td>
-									<label>Cell Phone:</label>
-									<input  name="cellphone">
-								</td>
-								<td>
-									<label>Email:</label>
-									<input name="email" required>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<label>Emergency Contact:</label>
-									<input name="emergencycontact">
-								</td>
-								<td>
-									<label>Emergency #:</label>
-									<input name="emergencyphone">
-								</td>
-								<td>&nbsp</td>
-							</tr>
-							<tr>
-								<td colspan='3'><h2> User Account </h2></td>
-							</tr>
+									<input name="postalcode" class="form-control" type="text"/>
+								</div>
 							
-							<tr>
-								<td>
-									<label>Username:</label>
-									<input name="username"/>
-								</td>
-								<td>
-									<label>Password:</label>
-									<input type="password" name="password"/>									
-								</td>
-								<td>
+							
+								<div class="col-md-4">		
+									<label >Home Phone:</label>
+									<input name="homephone" class="form-control" type="text">
+								</div>
+
+								<div class="col-md-4">	
+									<label>Cell Phone:</label>
+									<input name="cellphone" class="form-control" type="text">
+								</div>
+							</div>
+
+			
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Email:</label>
+									<input name="email" class="form-control" type="text" required>
+								</div>
+								<div class="col-md-4">
+									<label>Emergency Contact:</label>
+									<input name="emergencycontact" class="form-control" type="text">
+								</div>
+								<div class="col-md-4">		
+									<label>Emergency #:</label>
+									<input name="emergencyphone" class="form-control" type="text">
+								</div>
+							</div>	
+
+
+						<h2>User Account </h2>
+
+								<div class="row form-group">
+
+								<div class="col-md-4">
+									<div class="input-group input-group-lg">
+										<span class="input-group-addon">Username</span>
+								 		<input name="username" type="text" class="form-control">
+									</div>
+								</div>
+								
+								<div class="col-md-4">
+									<div class="input-group input-group-lg">
+								  		<span class="input-group-addon">Password</span>
+								  		<input type="password" name="password" class="form-control">
+									</div>
+								</div>
+																							
+								<div class="col-md-4">
 									<label>Experience:</label>
-									<select name="level" form="add_volunteer">
+									<select class="form-control" name="level" form="add_volunteer">
 										<option value="E" selected>Experienced</option>
 										<option value="I" >Intermediate</option>
 										<option value="B" >Beginner</option>
 									</select>	
-								</td>
-							</tr>
-							<tr>
+								</div>
+							</div>
+
+							
+
+						<h2>Availability </h2>
+						<div class="row form-group">
+								<div class="col-md-2">
+									<h4>Monday <input type="checkbox"> N/A</h4>
+									<select></select> TO <select></select>
+									<select></select> TO <select></select>
+								</div>
+								
+								<div class="col-md-2">
+									<h4>Tuesday <input type="checkbox" > N/A </h4>
+									<select></select> TO <select></select>
+									<select></select> TO <select></select>
+								</div>
+								
+								<div class="col-md-2">
+										<h4>Wednesday <input type="checkbox"> N/A</h4>
+										<select></select> TO <select></select>
+										<select></select> TO <select></select>
+								</div>
+										
+										
+									
+								<div class="col-md-2">
+									<h4>Thursday <input type="checkbox" > N/A</h4>		
+										<select></select> TO <select></select>
+										<select></select> TO <select></select>
+								</div>									
+								
+								<div class="col-md-2">
+								<h4>Friday <input type="checkbox"> N/A</h4>	
+										<select></select> TO <select></select>
+										<select></select> TO <select></select>
+								</div>
+							</div>
+							<h2> Comments </h2>
+					<div class="col-md-10">		
+						<input type="textarea" class="form-control" maxlength="50" name="notes"/>
+					</div>
+
+
+						<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
+						<input class="btn btn-primary" type="submit" value="Create" />
+
+							<!-- <tr>
 								<td colspan='3' ><h2> Availability </h2></td>
 							</tr>
 							<tr>
@@ -200,8 +269,8 @@
 										<td><input type="checkbox" name="availableTime" value="fri-13:00-14:00">13:00--14:00</td>
 										
 									</tr>
-								</table>								
-							</tr>
+								</table>		 -->						
+		<!-- 					</tr>
 							<tr>
 								<td colspan='3'><h2> Comments </h2></td>
 							</tr>
@@ -209,10 +278,10 @@
 								<td colspan='3'><input type="textarea" rows="6" cols="80"  name="notes"/></td>
 							</tr>
 							
-						</table>
-
+						</table> -->
+<!-- 
 						<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
-						<input class="btn btn-primary" type="submit" value="Create" />
+						<input class="btn btn-primary" type="submit" value="Create" /> -->
 
 					</fieldset>
 				</form>
