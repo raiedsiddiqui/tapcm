@@ -131,7 +131,7 @@
 								</td>
 								<td>
 									<label>Password:</label>
-									<input name=password" disabled/>									
+									<input name=password"/>									
 								</td>
 								<td>
 									<label>Experience:</label>

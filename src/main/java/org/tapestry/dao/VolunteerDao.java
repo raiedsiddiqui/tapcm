@@ -205,48 +205,56 @@ public class VolunteerDao {
 		return uList;
 	}
 	
-	public void addVolunteer(Volunteer volunteer){
+	public boolean addVolunteer(Volunteer volunteer){
+		boolean success = false;
+		//check if it is new record in DB
+		if(!isExist(volunteer)){
+			
+			try{
+				stmt = con.prepareStatement("INSERT INTO volunteers (firstname, lastname, street,"
+						+ "username, email, experience_level, city, province, home_phone, cell_phone,"
+						+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
+						+ " availability, street_number) "
+						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+				
+				stmt.setString(1, volunteer.getFirstName()); 
+				stmt.setString(2, volunteer.getLastName());	
+				stmt.setString(3, volunteer.getStreet());
+				stmt.setString(4, volunteer.getUserName());
+				stmt.setString(5, volunteer.getEmail());
+				stmt.setString(6, volunteer.getExperienceLevel());
+				stmt.setString(7, volunteer.getCity());
+				stmt.setString(8, volunteer.getProvince());
+				stmt.setString(9, volunteer.getHomePhone());
+				stmt.setString(10, volunteer.getCellPhone());
+				stmt.setString(11, volunteer.getPostalCode());
+				stmt.setString(12, volunteer.getCountry());
+				stmt.setString(13, volunteer.getEmergencyContact());
+				stmt.setString(14, volunteer.getEmergencyPhone());
+				stmt.setString(15, volunteer.getAptNumber());
+				stmt.setString(16, volunteer.getNotes());					
+				stmt.setString(17, volunteer.getAvailability());				
+				stmt.setString(18, volunteer.getStreetNumber());
+				
+				stmt.execute();
+				success = true;
+			}catch (SQLException e){
+				logger.error("Error: Could not create a volunteer");			
+				e.printStackTrace();
+			}finally {
+	    		try{
+	    			//close statement    			
+	    			if (stmt != null)
+	    				stmt.close();  
+	    
+	    		} catch (Exception e) {
+	    			//Ignore
+	    		}
+			}				
+		}
 		
-		try{
-			stmt = con.prepareStatement("INSERT INTO volunteers (firstname, lastname, street,"
-					+ "username, email, experience_level, city, province, home_phone, cell_phone,"
-					+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
-					+ " availability, street_number) "
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-			
-			stmt.setString(1, volunteer.getFirstName()); 
-			stmt.setString(2, volunteer.getLastName());	
-			stmt.setString(3, volunteer.getStreet());
-			stmt.setString(4, volunteer.getUserName());
-			stmt.setString(5, volunteer.getEmail());
-			stmt.setString(6, volunteer.getExperienceLevel());
-			stmt.setString(7, volunteer.getCity());
-			stmt.setString(8, volunteer.getProvince());
-			stmt.setString(9, volunteer.getHomePhone());
-			stmt.setString(10, volunteer.getCellPhone());
-			stmt.setString(11, volunteer.getPostalCode());
-			stmt.setString(12, volunteer.getCountry());
-			stmt.setString(13, volunteer.getEmergencyContact());
-			stmt.setString(14, volunteer.getEmergencyPhone());
-			stmt.setString(15, volunteer.getAptNumber());
-			stmt.setString(16, volunteer.getNotes());					
-			stmt.setString(17, volunteer.getAvailability());				
-			stmt.setString(18, volunteer.getStreetNumber());
-			
-			stmt.execute();
-		}catch (SQLException e){
-			logger.error("Error: Could not create a volunteer");			
-			e.printStackTrace();
-		}finally {
-    		try{
-    			//close statement    			
-    			if (stmt != null)
-    				stmt.close();  
-    
-    		} catch (Exception e) {
-    			//Ignore
-    		}
-		}	
+		
+		return success;
 	}
 	
 	public void updateVolunteer(Volunteer volunteer){
@@ -343,7 +351,7 @@ public class VolunteerDao {
 		
 		return count;
 	}
-	
+		
 	
 	private List<Volunteer> getVolunteersByResultSet(ResultSet rs, boolean modified){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
@@ -429,6 +437,104 @@ public class VolunteerDao {
 		}
 		
 		return volunteers;
+	}
+	
+	private boolean isExist(Volunteer volunteer){		
+		int count = 0;
+		
+		try{
+			stmt = con.prepareStatement("SELECT COUNT(*) as c FROM volunteers WHERE UPPER(firstname) = UPPER(?) "
+					+ "AND UPPER(lastname) = UPPER(?) AND UPPER(home_phone) = UPPER(?)");
+			stmt.setString(1, volunteer.getFirstName());
+			stmt.setString(2, volunteer.getLastName());
+			stmt.setString(3, volunteer.getHomePhone());
+			
+			rs = stmt.executeQuery();
+			rs.first();
+			
+			count = rs.getInt("c");
+			
+			if (rs != null)
+				rs.close();
+			
+		} catch (SQLException e){
+			System.out.println("Error: Could not count volunteers");
+			e.printStackTrace();
+			
+		} finally {
+    		try{//close statement
+    			if (stmt != null)
+    				stmt.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}	
+		
+		if (count > 0)
+			return true;
+		else 
+			return false;
+		
+	}
+	
+	
+	public List<Volunteer> getMatchedVolunteers(String type){
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+	
+		if (type.equals("E"))
+			volunteers = this.getAllVolunteers();
+		else if (type.equals("I"))
+		{
+			try{
+				stmt = con.prepareStatement("SELECT * FROM volunteers WHERE experience_level =? OR experience_level = ?");		
+				stmt.setString(1, "E");
+				stmt.setString(2, "I");
+				rs = stmt.executeQuery();
+							
+				volunteers = getVolunteersByResultSet(rs, false);
+			
+				if (rs != null)
+					rs.close();
+				
+			}catch (SQLException e){			
+				logger.error("Error: Could not retrieve volunteers");				
+				e.printStackTrace();			
+			}finally {
+	    		try{
+	    			//close statement    			
+	    			if (stmt != null)
+	    				stmt.close();  
+	    		} catch (Exception e) {
+	    			//Ignore
+	    		}
+	    	}
+		} else if (type.equals("B")){
+			try{
+				stmt = con.prepareStatement("SELECT * FROM volunteers WHERE experience_level =?");		
+				stmt.setString(1, "E");				
+				rs = stmt.executeQuery();
+							
+				volunteers = getVolunteersByResultSet(rs, false);
+			
+				if (rs != null)
+					rs.close();
+				
+			}catch (SQLException e){			
+				logger.error("Error: Could not retrieve volunteers");				
+				e.printStackTrace();			
+			}finally {
+	    		try{
+	    			//close statement    			
+	    			if (stmt != null)
+	    				stmt.close();  
+	    		} catch (Exception e) {
+	    			//Ignore
+	    		}
+	    	}
+		}
+		
+		return volunteers;
+		
 	}
 
 }

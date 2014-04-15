@@ -3,6 +3,7 @@ package org.tapestry.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -19,10 +20,12 @@ import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
+import org.tapestry.dao.VolunteerDao;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
+import org.tapestry.objects.Volunteer;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.Properties;
@@ -46,6 +49,7 @@ public class AppointmentController{
 	private PatientDao patientDao;
 	private AppointmentDao appointmentDao;
 	private ActivityDao activityDao;
+	private VolunteerDao volunteerDao;
 	
    	//Mail-related settings;
    	private Properties props;
@@ -88,6 +92,7 @@ public class AppointmentController{
 		patientDao = new PatientDao(DB, UN, PW);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
+		volunteerDao = new VolunteerDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -193,5 +198,19 @@ public class AppointmentController{
 	public String viewAppointmentByAdmin( SecurityContextHolderAwareRequestWrapper request){
 		
 		return "/admin/view_appointments";
+	}
+	
+	//display scheduler page
+	@RequestMapping(value="/view_scheduler", method=RequestMethod.GET)
+	public String viewScheduler( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		List<Patient> patients = new ArrayList<Patient>();
+		patients = patientDao.getAllPatients();
+		
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		volunteers = volunteerDao.getAllVolunteers();
+		
+		model.addAttribute("patients",patients);
+		model.addAttribute("volunteers",volunteers);
+		return "/admin/view_scheduler";
 	}
 }

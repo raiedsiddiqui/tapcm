@@ -50,7 +50,10 @@
 			<div class="row-fluid">
 			<c:if test="${not empty userNameExist}">			
 				<div class="alert alert-error"><spring:message code="message_username_exist"/></div>
-			</c:if>			
+			</c:if>		
+			<c:if test="${not empty volunteerExist }">
+				<div class="alert alert-error"><spring:message code="message_volunteer_exist"/></div>
+			</c:if>
 				<form id="add_volunteer" action="<c:url value="/add_volunteer"/>" method="POST">
 					<fieldset>
 						<table>

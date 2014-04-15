@@ -291,9 +291,14 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			if (!Utils.isNullOrEmpty(strAvailableTime))
 				volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
-			volunteerDao.addVolunteer(volunteer);			
+			boolean success = volunteerDao.addVolunteer(volunteer);			
 			//save in the table users
-			addUser(volunteer);
+			if (success)
+				addUser(volunteer);	
+			else{
+				model.addAttribute("volunteerExist", true);
+				return "/admin/add_volunteer";	
+			}
 			
 			//set displayed message information 
 			HttpSession session = request.getSession();

@@ -128,4 +128,16 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	availability TEXT,
 	PRIMARY KEY (volunteer_ID)	
 );
+CREATE TABLE IF NOT EXISTS report(
+	report_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	patient_ID MEDIUMINT UNSIGNED NOT NULL ,
+	appointment_ID MEDIUMINT UNSIGNED NOT NULL,
+	alert TEXT,
+	key_observations TEXT,
+	plan TEXT,
+	
+	PRIMARY KEY (report_ID)	
+	
+);
+
 COMMIT;

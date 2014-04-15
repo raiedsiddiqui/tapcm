@@ -10,6 +10,12 @@ public class Patient{
 	private int volunteer;
 	private String volunteerName;
 	private String notes;
+	private String displayName;
+	
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
 
 	/**
 	* Empty constructor
