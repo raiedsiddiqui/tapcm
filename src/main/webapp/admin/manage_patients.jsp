@@ -46,39 +46,52 @@
 	</div>
 	
 	<!-- Modal -->
-	<div id="addPatient" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
-  		<div class="modal-header">
+
+<div class="modal fade" id="addPatient" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
     		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
     		<h3 id="modalHeader">Add Patient</h3>
   		</div>
   		<div class="modal-body">
   			<form id="newPatient" method="post" action="<c:url value="/add_patient"/>">
-					<label>First Name:</label>
-					<input type="text" name="firstname" required/>
-					<label>Last Name:</label>
-					<input type="text" name="lastname" required/>
-					<label>Preferred Name:</label>
-					<input type="text" name="preferredname"/>
+  				<div class="row form-group">
+  					<div class="col-md-6">
+						<label>First Name:</label>
+						<input type="text" name="firstname" class="form-control" required/>
+					</div>
+					<div class="col-md-6">
+						<label>Last Name:</label>
+						<input type="text" name="lastname" class="form-control" required/>
+					</div>
+					<div class="col-md-6">
+						<label>Preferred Name:</label>
+						<input type="text" name="preferredname" class="form-control"/>
+					</div>
+				</div>		
 					<label>Volunteer</label>
-					<select name="volunteer" form="newPatient">
+					<select name="volunteer" form="newPatient" class="form-control">
 						<c:forEach items="${volunteers}" var="v">
-						<option value="${v.volunteerId}">${v.firstName}</option>
+							<option value="${v.volunteerId}">${v.firstName}</option>
 						</c:forEach>
 					</select><br />
 					<label>Gender</label>
-					<select name="gender" form="newPatient">
+					<select name="gender" form="newPatient" class="form-control">
 						<option value="M">Male</option>
 						<option value="F">Female</option>
 						<option value="O">Other</option>
 					</select>
 					<label>Notes</label>
-					<textarea name="notes"></textarea>
+					<textarea name="notes" class="form-control"></textarea>
 			</form>
   		</div>
   		<div class="modal-footer">
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 			<input class="btn btn-primary" form="newPatient" type="submit" value="Add" />
   		</div>
-	</div>
+  	</div>
+  </div>
+</div>
 </body>
 </html>

@@ -104,44 +104,71 @@
 	</div>
 	
 	<!-- Modal -->
-	<div id="addUser" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
-  		<div class="modal-header">
+<div class="modal fade" id="addUser" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
     		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
     		<h3 id="modalHeader">Add User</h3>
   		</div>
   		<div class="modal-body">
   			<form id="newUser" action="<c:url value="/add_user"/>" method="post">
-  				<label><h3>Personal Information</h3></label><br/>
+  				<label><h4>Personal Information</h4></label><br/>
+  				<div class="row form-group">
+  					<div class="col-md-6">
 						<label>First Name:</label>
-						<input type="text" name="firstname" required/>
+						<input type="text" name="firstname" class="form-control" required/>
+					</div>
+					<div class="col-md-6">
 						<label>Last Name:</label>
-						<input type="text" name="lastname" required/>					
+						<input type="text" name="lastname" class="form-control" required/>	
+					</div>
+				</div>		
+				<div class="row form-group">		
+					<div class="col-md-6">	
 						<label>Email</label>
-						<input type="email" name="email" required/>
+						<input type="email" name="email" class="form-control" required/>
+					</div>
+					<div class="col-md-6">	
 						<label>Phone #:</label>
-						<input type="text" name="phonenumber" required/>
-					<label><h3>User Account</h3></label><br/>
+						<input type="text" name="phonenumber" class="form-control" required/>
+					</div>
+				</div>
+				<label><h4>User Account</h4></label><br/>
+				<div class="row form-group">		
+					<div class="col-md-6">
 						<label>Username:</label>
-						<input type="text" name="username" required/>
+						<input type="text" name="username" class="form-control" required/>
+						</div>
+					<div class="col-md-6">
 						<label>Password: </label>
-						<input name="password" type="password" required/>
+						<input name="password" type="password" class="form-control" required/>
+					</div>
+				</div>
+				<div class="row form-group">
 						<label>Site: </label>
-						<select name="site" form="newUser">
+						<select name="site" form="newUser" class="form-control">
 										<option value="DFM" selected >DFM</option>
 										<option value="UBC" >UBC</option>							
 										<option value="Mcgill"  >Mcgill</option>
 						</select>
-						<label><h3>User Role</h3></label>
+				</div>
+				<label><h4>User Role</h4></label>
+				<div class="row form-group">
+						
 						<input type="radio" name="role" value="ROLE_ADMIN">Central Admin</input> <br/>
 						<input type="radio" name="role" value="ROLE_LOCAL_ADMIN" >Local Admin</input> <br/>
 						<input type="radio" name="role" value="ROLE_RESEARCHER" checked>Researcher</input> <br/>
+				</div>
 						
 			</form>
   		</div>
-  		<div class="modal-footer">
-    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			<input class="btn btn-primary" form="newUser" type="submit" value="Add" />
-  		</div>
+	  		<div class="modal-footer">
+	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+				<input class="btn btn-primary" form="newUser" type="submit" value="Add" />
+	  		</div>
+		</div>
 	</div>
+</div>
 </body>
 </html>
