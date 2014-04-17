@@ -177,11 +177,11 @@ public class AppointmentController{
 			return "redirect:/manage_appointments?success=true";
 		}
 	}
-	//
+	
 	@RequestMapping(value="/book_appointment/{volunteerId}", method=RequestMethod.GET)
 	public String addAppointment(@PathVariable("volunteerId") int volunteerId, @RequestParam(value="vId", required=false) int partnerId, 
 			@RequestParam(value="pId", required=false) int patientId, @RequestParam(value="time", required=false) String time,
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		//set up appointment
 		Appointment appointment = new Appointment();
 		appointment.setVolunteerID(volunteerId);
@@ -197,45 +197,33 @@ public class AppointmentController{
 		appointment.setDate(strDate.substring(0,10));
 		appointment.setTime(time);		
 				
+		//save new appointment in DB and send message 
 		if (appointmentDao.createAppointment(appointment))
 		{
+			Patient patient = patientDao.getPatientByID(patientId);
 			String vEmail = volunteerDao.getEmailByVolunteerId(volunteerId);
 			String pEmail = volunteerDao.getEmailByVolunteerId(partnerId);
 			
 			//send message to both volunteers
-			if (mailAddress != null){
-				try{
-					Patient patient = patientDao.getPatientByID(patientId);
-					
-					MimeMessage message = new MimeMessage(session);
-					message.setFrom(new InternetAddress(mailAddress));
-					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(vEmail));
-					message.setSubject("Tapestry: New appointment booked");
-					
-					StringBuffer sb = new StringBuffer();
-					sb.append(patient.getVolunteerName());
-					sb.append(" has booked an appointment with ");
-					sb.append(patient.getFirstName());
-					sb.append(" ");
-					sb.append(patient.getLastName());
-					sb.append( " for ");
-					sb.append(time);
-					sb.append(" on ");
-					sb.append(strDate);
-					sb.append(".\n");
-					sb.append("This appointment is awaiting confirmation.");
-					
-					String msg = sb.toString();				
-					message.setText(msg);
-					
-					System.out.println(msg);
-					System.out.println("Sending...");
-					Transport.send(message);
-					System.out.println("Email sent to administrators");
-				} catch (MessagingException e) {
-					System.out.println("Error: Could not send email");
-					System.out.println(e.toString());
-				}
+			if (mailAddress != null){			
+				//content of message
+				StringBuffer sb = new StringBuffer();
+				sb.append(patient.getVolunteerName());
+				sb.append(" has booked an appointment with ");
+				sb.append(patient.getFirstName());
+				sb.append(" ");
+				sb.append(patient.getLastName());
+				sb.append( " for ");
+				sb.append(time);
+				sb.append(" on ");
+				sb.append(strDate);
+				sb.append(".\n");
+				sb.append("This appointment is awaiting confirmation.");
+				
+				String msg = sb.toString();
+				
+				sendMessage(vEmail, msg, request);
+				sendMessage(pEmail, msg, request);
 			}
 			else {
 				System.out.println("Email address not set");
@@ -248,8 +236,8 @@ public class AppointmentController{
 			model.addAttribute("failedToCreateAppointment",true);
 		}
 		
-		List<Patient> patients = new ArrayList<Patient>();
-		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		List<Patient> patients = patientDao.getAllPatients();
+		List<Volunteer> volunteers = volunteerDao.getVolunteersWithAvailability();
 		model.addAttribute("patients",patients);
 		model.addAttribute("allvolunteers",volunteers);
 		
@@ -295,7 +283,7 @@ public class AppointmentController{
 		List<Volunteer> experiencedVolunteers = new ArrayList<Volunteer>();
 		List<Volunteer> noBeginnerVolunteers = new ArrayList<Volunteer>();
 		
-		allVolunteers = volunteerDao.getAllVolunteers();
+		allVolunteers = volunteerDao.getVolunteersWithAvailability();
 		experiencedVolunteers = volunteerDao.getMatchedVolunteersByLevel("B");
 		noBeginnerVolunteers = volunteerDao.getMatchedVolunteersByLevel("I");
 		
@@ -314,7 +302,7 @@ public class AppointmentController{
 		
 		String patientId = request.getParameter("patient");
 		patients = patientDao.getAllPatients();
-		volunteers = volunteerDao.getAllVolunteers();
+		volunteers = volunteerDao.getVolunteersWithAvailability();
 		
 		String volunteer1 = request.getParameter("volunteer1");		
 		String volunteer2 = request.getParameter("volunteer2");		
@@ -341,8 +329,7 @@ public class AppointmentController{
 		String[] aVolunteer1, aVolunteer2;
 		if (!Utils.isNullOrEmpty(v1.getAvailability()) )
 		{
-			aVolunteer1= v1.getAvailability().split(";");		
-				
+			aVolunteer1= v1.getAvailability().split(";");						
 			if (!Utils.isNullOrEmpty(v2.getAvailability()))
 			{
 				aVolunteer2 = v2.getAvailability().split(";");				
@@ -355,8 +342,7 @@ public class AppointmentController{
 						if (a1.equals(a2))
 							matchList.add(a1);
 					}
-				}
-					
+				}					
 				if (matchList.size() == 0)
 				{
 					model.addAttribute("noMatchTime",true);

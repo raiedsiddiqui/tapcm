@@ -74,6 +74,35 @@ public class VolunteerDao {
 		return volunteers;
 	}
 	
+	public List<Volunteer> getVolunteersWithAvailability(){
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		
+		try{
+			stmt = con.prepareStatement("SELECT * FROM volunteers WHERE availability != '' ORDER BY firstname DESC ");			
+			rs = stmt.executeQuery();
+			
+			volunteers = getVolunteersByResultSet(rs, true);
+			
+			if (rs != null)
+				rs.close();
+			
+			
+		}catch (SQLException e){			
+			logger.error("Error: Could not retrieve volunteers");				
+			e.printStackTrace();			
+		}finally {
+    		try{
+    			//close statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+		
+		return volunteers;
+	}
+	
 	public List<Volunteer> getVolunteersByName(String partialName){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		
@@ -262,7 +291,7 @@ public class VolunteerDao {
 			stmt = con.prepareStatement("UPDATE volunteers SET firstname=?,lastname=?, username=?, street=?,"
 					+ "email=?, experience_level=?, city=?, province=?, home_phone=?, cell_phone=?,"
 					+ "postal_code=?, country=?, emergency_contact=?, emergency_phone=?, appartment=?, "
-					+ "notes=?, availability=?, street_number=? WHERE volunteer_ID=?");
+					+ "notes=?, availability=?, street_number=?, password=? WHERE volunteer_ID=?");
 			
 			stmt.setString(1, volunteer.getFirstName());
 			stmt.setString(2, volunteer.getLastName());
@@ -282,8 +311,8 @@ public class VolunteerDao {
 			stmt.setString(16, volunteer.getNotes());		
 			stmt.setString(17, volunteer.getAvailability());
 			stmt.setString(18,  volunteer.getStreetNumber());
-
-			stmt.setInt(19, volunteer.getVolunteerId());
+			stmt.setString(19,  volunteer.getPassword());
+			stmt.setInt(20, volunteer.getVolunteerId());
 			
 			stmt.execute();
 		}catch (SQLException e){

@@ -204,6 +204,185 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	
 	
 	
+	
+	
+	//create a new volunteer and save in the table of volunteers and users in the DB
+	@RequestMapping(value="/add_volunteer", method=RequestMethod.POST)
+	public String addVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		
+		String username = request.getParameter("username").trim();
+		List<String> uList = volunteerDao.getAllExistUsernames();
+		
+		if (uList.contains(username))
+		{
+			model.addAttribute("userNameExist", true);			
+			return "/admin/add_volunteer";						
+		}
+		else
+		{
+			Volunteer volunteer = new Volunteer();
+			
+			volunteer.setFirstName(request.getParameter("firstname").trim());
+			volunteer.setLastName(request.getParameter("lastname").trim());
+			volunteer.setEmail(request.getParameter("email").trim());	
+			
+			
+			ShaPasswordEncoder enc = new ShaPasswordEncoder();
+			String hashedPassword = enc.encodePassword(request.getParameter("password"), null);
+			
+			volunteer.setPassword(hashedPassword);
+			volunteer.setExperienceLevel(request.getParameter("level"));	
+			
+			if (!Utils.isNullOrEmpty(request.getParameter("province")))
+				volunteer.setStreet(request.getParameter("province"));
+			if (!Utils.isNullOrEmpty(request.getParameter("conuntry")))
+				volunteer.setStreet(request.getParameter("conuntry"));	
+			if (!Utils.isNullOrEmpty(request.getParameter("street")))
+				volunteer.setStreet(request.getParameter("street"));
+			if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
+				volunteer.setStreetNumber(request.getParameter("streetnum"));
+			if (!Utils.isNullOrEmpty(request.getParameter("username")))
+				volunteer.setUserName(request.getParameter("username").trim());				
+			if(!Utils.isNullOrEmpty(request.getParameter("city")))
+				volunteer.setCity(request.getParameter("city").trim());		
+			if(!Utils.isNullOrEmpty(request.getParameter("homephone")))
+				volunteer.setHomePhone(request.getParameter("homephone").trim());
+			if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
+				volunteer.setCellPhone(request.getParameter("cellphone"));
+			if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
+				volunteer.setEmergencyContact(request.getParameter("emergencycontact").trim());
+			if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
+				volunteer.setPostalCode(request.getParameter("postalcode"));
+			if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
+				volunteer.setEmergencyPhone(request.getParameter("emergencyphone").trim());
+			if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
+				volunteer.setAptNumber(request.getParameter("aptnum"));
+			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
+				volunteer.setNotes(request.getParameter("notes"));
+		
+			String strAvailableTime = getAvailableTime(request, "availableTime");
+			volunteer.setAvailability(strAvailableTime);
+			//save a volunteer in the table volunteers
+			boolean success = volunteerDao.addVolunteer(volunteer);			
+			//save in the table users
+			if (success)
+				addUser(volunteer);	
+			else{
+				model.addAttribute("volunteerExist", true);
+				return "/admin/add_volunteer";	
+			}
+			
+			//set displayed message information 
+			HttpSession session = request.getSession();
+			session.setAttribute("volunteerMessage", "C");
+			
+			return "redirect:/view_volunteers";
+		}
+	}
+	
+	
+	@RequestMapping(value="/modify_volunteer/{volunteerId}", method=RequestMethod.GET)
+	public String modifyVolunteer(SecurityContextHolderAwareRequestWrapper request, 
+			@PathVariable("volunteerId") int id, ModelMap model){
+		Volunteer volunteer = new Volunteer();
+		volunteer = volunteerDao.getVolunteerById(id);
+				
+		model.addAttribute("volunteer", volunteer);
+				
+		return "/admin/modify_volunteer";
+	}
+	
+	//update 
+	@RequestMapping(value="/update_volunteer/{volunteerId}", method=RequestMethod.POST)
+	public String updateVolunteer(SecurityContextHolderAwareRequestWrapper request, 
+			@PathVariable("volunteerId") int id, ModelMap model){		
+		
+		HttpSession  session = request.getSession();
+		Volunteer volunteer;
+			
+		volunteer = volunteerDao.getVolunteerById(id);		
+		
+		if (!Utils.isNullOrEmpty(request.getParameter("firstname")))
+			volunteer.setFirstName(request.getParameter("firstname"));
+		
+		if (!Utils.isNullOrEmpty(request.getParameter("lastname")))
+			volunteer.setLastName(request.getParameter("lastname"));	
+		
+		//set encoded password for security
+		ShaPasswordEncoder enc = new ShaPasswordEncoder();
+		String hashedPassword = enc.encodePassword(request.getParameter("password"), null);
+		
+		volunteer.setPassword(hashedPassword);
+		
+		if (!Utils.isNullOrEmpty(request.getParameter("email")))
+			volunteer.setEmail(request.getParameter("email"));			
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("level")))		
+			volunteer.setExperienceLevel((request.getParameter("level")));	
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("street")))
+			volunteer.setStreet(request.getParameter("street"));
+		
+		if (!Utils.isNullOrEmpty(request.getParameter("city")))
+			volunteer.setCity(request.getParameter("city"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("province")))
+			volunteer.setProvince(request.getParameter("province"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("country")))
+			volunteer.setCountry(request.getParameter("country"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
+			volunteer.setStreetNumber(request.getParameter("streetnum"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
+			volunteer.setAptNumber(request.getParameter("aptnum"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
+			volunteer.setPostalCode(request.getParameter("postalcode"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("homephone")))
+			volunteer.setHomePhone(request.getParameter("homephone"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
+			volunteer.setCellPhone(request.getParameter("cellphone"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
+			volunteer.setEmergencyContact(request.getParameter("emergencycontact"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
+			volunteer.setEmergencyPhone(request.getParameter("emergencyphone"));
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("notes")))
+			volunteer.setNotes(request.getParameter("notes"));
+			
+		String strAvailableTime = getAvailableTime(request, "availableTime");		
+		
+		volunteer.setAvailability(strAvailableTime);
+			
+		volunteerDao.updateVolunteer(volunteer);
+			
+		//update users table as well
+		modifyUser(volunteer);
+		
+		session.setAttribute("volunteerMessage","U");
+		return "redirect:/view_volunteers";
+	
+	}
+	
+	@RequestMapping(value="/delete_volunteer/{volunteerId}", method=RequestMethod.GET)
+	public String deleteActivityById(@PathVariable("volunteerId") int id, 
+				SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		
+		volunteerDao.deleteVolunteerById(id);
+				
+		HttpSession  session = request.getSession();		
+		session.setAttribute("volunteerMessage", "D");		
+	
+		return "redirect:/view_volunteers";
+		
+	}
+	
 	private void saveAvailability(String availability, ModelMap model){
 		List<String> aList = new ArrayList<String>();		
 		List<String> lMonday = new ArrayList<String>();
@@ -238,74 +417,20 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 	}
 	
-	//create a new volunteer and save in the table of volunteers and users in the DB
-	@RequestMapping(value="/add_volunteer", method=RequestMethod.POST)
-	public String addVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	private void modifyUser(Volunteer volunteer){		
+		User user = userDao.getUserByUsername(volunteer.getUserName());
 		
-		String username = request.getParameter("username").trim();
-		List<String> uList = volunteerDao.getAllExistUsernames();
+		StringBuffer sb = new StringBuffer();
+		sb.append(volunteer.getFirstName());
+		sb.append(" ");
+		sb.append(volunteer.getLastName());
+		user.setName(sb.toString());
+			
+		user.setEmail(volunteer.getEmail());
+		userDao.modifyUser(user);
 		
-		if (uList.contains(username))
-		{
-			model.addAttribute("userNameExist", true);			
-			return "/admin/add_volunteer";						
-		}
-		else
-		{
-			Volunteer volunteer = new Volunteer();
-			
-			volunteer.setFirstName(request.getParameter("firstname").trim());
-			volunteer.setLastName(request.getParameter("lastname").trim());
-			volunteer.setEmail(request.getParameter("email").trim());	
-			volunteer.setPassword(request.getParameter("password").trim());
-			volunteer.setExperienceLevel(request.getParameter("level"));	
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("province")))
-				volunteer.setStreet(request.getParameter("province"));
-			if (!Utils.isNullOrEmpty(request.getParameter("conuntry")))
-				volunteer.setStreet(request.getParameter("conuntry"));	
-			if (!Utils.isNullOrEmpty(request.getParameter("street")))
-				volunteer.setStreet(request.getParameter("street"));
-			if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
-				volunteer.setStreetNumber(request.getParameter("streetnum"));
-			if (!Utils.isNullOrEmpty(request.getParameter("username")))
-				volunteer.setUserName(request.getParameter("username").trim());				
-			if(!Utils.isNullOrEmpty(request.getParameter("city")))
-				volunteer.setCity(request.getParameter("city").trim());		
-			if(!Utils.isNullOrEmpty(request.getParameter("homephone")))
-				volunteer.setHomePhone(request.getParameter("homephone").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
-				volunteer.setCellPhone(request.getParameter("cellphone"));
-			if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
-				volunteer.setEmergencyContact(request.getParameter("emergencycontact").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
-				volunteer.setPostalCode(request.getParameter("postalcode"));
-			if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
-				volunteer.setEmergencyPhone(request.getParameter("emergencyphone").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
-				volunteer.setAptNumber(request.getParameter("aptnum"));
-			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
-				volunteer.setNotes(request.getParameter("notes"));
-		
-			String strAvailableTime = getAvailableTime(request, "availableTime");
-			if (!Utils.isNullOrEmpty(strAvailableTime))
-				volunteer.setAvailability(strAvailableTime);
-			//save a volunteer in the table volunteers
-			boolean success = volunteerDao.addVolunteer(volunteer);			
-			//save in the table users
-			if (success)
-				addUser(volunteer);	
-			else{
-				model.addAttribute("volunteerExist", true);
-				return "/admin/add_volunteer";	
-			}
-			
-			//set displayed message information 
-			HttpSession session = request.getSession();
-			session.setAttribute("volunteerMessage", "C");
-			
-			return "redirect:/view_volunteers";
-		}
+		//update password
+		userDao.setPasswordForUser(user.getUserID(), volunteer.getPassword());		
 	}
 	
 	private void addUser(Volunteer volunteer){
@@ -319,10 +444,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		user.setUsername(volunteer.getUserName());
 		user.setRole("ROLE_USER");
 				
-		ShaPasswordEncoder enc = new ShaPasswordEncoder();
-		String hashedPassword = enc.encodePassword(volunteer.getPassword(), null);
-		
-		user.setPassword(hashedPassword);
+		user.setPassword(volunteer.getPassword());
 		user.setEmail(volunteer.getEmail());
 				
 		boolean success = userDao.createUser(user);
@@ -355,109 +477,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 					
 	}
 	
-	
-	@RequestMapping(value="/modify_volunteer/{volunteerId}", method=RequestMethod.GET)
-	public String modifyVolunteer(SecurityContextHolderAwareRequestWrapper request, 
-			@PathVariable("volunteerId") int id, ModelMap model){
-		Volunteer volunteer = new Volunteer();
-		volunteer = volunteerDao.getVolunteerById(id);
-		
-		model.addAttribute("volunteer", volunteer);
-				
-		return "/admin/modify_volunteer";
-	}
-	
-	//update 
-	@RequestMapping(value="/update_volunteer", method=RequestMethod.POST)
-	public String updateVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
-		
-		HttpSession  session = request.getSession();
-		Volunteer volunteer = new Volunteer();
-		
-		if (!Utils.isNullOrEmpty(request.getParameter("volunteerId")))
-		{
-			String volunteerId = request.getParameter("volunteerId").toString();
-			int iVolunteerId = Integer.parseInt(volunteerId);
-			volunteer.setVolunteerId(iVolunteerId);
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("firstname")))
-				volunteer.setFirstName(request.getParameter("firstname"));
-		
-			if (!Utils.isNullOrEmpty(request.getParameter("lastname")))
-				volunteer.setLastName(request.getParameter("lastname"));				
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("username")))
-				volunteer.setUserName(request.getParameter("username"));
-		
-			if (!Utils.isNullOrEmpty(request.getParameter("email")))
-				volunteer.setEmail(request.getParameter("email"));			
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("level")))					
-				volunteer.setExperienceLevel((request.getParameter("level")));	
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("street")))
-				volunteer.setStreet(request.getParameter("street"));
-		
-			if (!Utils.isNullOrEmpty(request.getParameter("city")))
-				volunteer.setCity(request.getParameter("city"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("province")))
-				volunteer.setProvince(request.getParameter("province"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("country")))
-				volunteer.setCountry(request.getParameter("country"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
-				volunteer.setStreetNumber(request.getParameter("streetnum"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
-				volunteer.setAptNumber(request.getParameter("aptnum"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
-				volunteer.setPostalCode(request.getParameter("postalcode"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("homephone")))
-				volunteer.setHomePhone(request.getParameter("homephone"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
-				volunteer.setCellPhone(request.getParameter("cellphone"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
-				volunteer.setEmergencyContact(request.getParameter("emergencycontact"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
-				volunteer.setEmergencyPhone(request.getParameter("emergencyphone"));
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
-				volunteer.setNotes(request.getParameter("notes"));
-			
-			String strAvailableTime = getAvailableTime(request, "availableTime");
-			if (!Utils.isNullOrEmpty(strAvailableTime))
-				volunteer.setAvailability(strAvailableTime);
-			
-			volunteerDao.updateVolunteer(volunteer);
-			
-		}
-		else 
-			logger.error("Volunteer ID is null");
-		
-		session.setAttribute("volunteerMessage","U");
-		return "redirect:/view_volunteers";
-	
-	}
-	
-	@RequestMapping(value="/delete_volunteer/{volunteerId}", method=RequestMethod.GET)
-	public String deleteActivityById(@PathVariable("volunteerId") int id, 
-				SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		
-		volunteerDao.deleteVolunteerById(id);
-				
-		HttpSession  session = request.getSession();		
-		session.setAttribute("volunteerMessage", "D");		
-	
-		return "redirect:/view_volunteers";
-		
-	}
+
 	
 	private String getAvailableTime(SecurityContextHolderAwareRequestWrapper request, String colName)
 	{
@@ -465,15 +485,19 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		String[] availableTime = request.getParameterValues(colName);		
 		String strAvailableTime = "";
 		
-		for (int i=0; i<availableTime.length; i++)
+		if (availableTime != null)
 		{
-			sb.append(availableTime[i]);
-			sb.append(";");			
+			for (int i=0; i<availableTime.length; i++)
+			{
+				sb.append(availableTime[i]);
+				sb.append(";");			
+			}
+			
+			strAvailableTime = sb.toString();
+			if (strAvailableTime.endsWith(";"))
+				strAvailableTime = strAvailableTime.substring(0, strAvailableTime.length()-1);
 		}
 		
-		strAvailableTime = sb.toString();
-		if (strAvailableTime.endsWith(";"))
-			strAvailableTime = strAvailableTime.substring(0, strAvailableTime.length()-1);
 		
 		return strAvailableTime;
 	}

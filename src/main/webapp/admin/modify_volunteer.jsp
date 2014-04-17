@@ -37,7 +37,7 @@
 		<div class="row-fluid">
 			<h2>Volunteers </h2>
 			<div class="row-fluid">
-				<form id="modify_volunteer" action="<c:url value="/update_volunteer"/>" method="POST">
+				<form id="modify_volunteer" action="<c:url value="/update_volunteer/${volunteer.volunteerId}"/>" method="POST">
 					<fieldset>
 					<table>
 							<tr>
@@ -127,11 +127,11 @@
 							<tr>
 								<td>
 									<label>Username:</label>
-									<input name="username"value="${volunteer.userName}"/>
+									<input name="username"value="${volunteer.userName}" disabled/>
 								</td>
 								<td>
 									<label>Password:</label>
-									<input name=password"/>									
+									<input type ="password" name="password"/>									
 								</td>
 								<td>
 									<label>Experience:</label>

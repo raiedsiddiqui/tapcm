@@ -49,27 +49,40 @@
 	<h3>Appointment Scheduler</h3>
 
 	<form  id="schedulerForm" method="post" action="<c:url value="/view_matchTime"/>">	
-		<input class="btn btn-primary" form="schedulerForm" type="submit" value="Go" />	
+		
 		<label><h4>Select Patient/Client: </h4></label>
 		<select name="patient" form="schedulerForm">
 			<c:forEach items="${patients}" var="p">
 				<option value="${p.patientID}">${p.displayName}</option>
 			</c:forEach>
 		</select>
-		<label><h4>Volunteer 1:</h4></label>
-		<select name="volunteer1" form="schedulerForm" id ="volunteer1">
-			<c:forEach items="${allvolunteers}" var="v">
-				<option value="${v.volunteerId}">${v.displayName}</option>
-			</c:forEach>
-			
-		</select><br />
-		<label><h4>Volunteer 2:</h4></label>
-		<select name="volunteer2" form="schedulerForm" id="volunteer2">
-			<c:forEach items="${allvolunteers}" var="v">
-				<option value="${v.volunteerId}">${v.displayName}</option>
-			</c:forEach>
-			
-		</select><br />
+		<table>
+			<tr>
+				<td>
+					<label><h4>Volunteer 1:</h4></label>
+					<select name="volunteer1" form="schedulerForm" id ="volunteer1">
+						<c:forEach items="${allvolunteers}" var="v">
+							<option value="${v.volunteerId}">${v.displayName}</option>
+						</c:forEach>
+						
+					</select>
+				</td>
+				<td>
+					<label><h4>Volunteer 2:</h4></label>
+					<select name="volunteer2" form="schedulerForm" id="volunteer2">
+						<c:forEach items="${allvolunteers}" var="v">
+							<option value="${v.volunteerId}">${v.displayName}</option>
+						</c:forEach>
+						
+					</select>
+				</td>
+				<td>
+					<input class="btn btn-primary" form="schedulerForm" type="submit" value="Go" />	
+				</td>
+			</tr>
+		</table>
+		
+		
 	</form>
 
 </div>
