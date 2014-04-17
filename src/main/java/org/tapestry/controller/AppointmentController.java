@@ -1,7 +1,10 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 
@@ -21,8 +24,10 @@ import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
+import org.tapestry.dao.MessageDao;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
+import org.tapestry.objects.Message;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
@@ -50,6 +55,7 @@ public class AppointmentController{
 	private AppointmentDao appointmentDao;
 	private ActivityDao activityDao;
 	private VolunteerDao volunteerDao;
+	private MessageDao messageDao;
 	
    	//Mail-related settings;
    	private Properties props;
@@ -93,6 +99,7 @@ public class AppointmentController{
 		appointmentDao = new AppointmentDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
 		volunteerDao = new VolunteerDao(DB, UN, PW);
+		messageDao = new MessageDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -170,6 +177,84 @@ public class AppointmentController{
 			return "redirect:/manage_appointments?success=true";
 		}
 	}
+	//
+	@RequestMapping(value="/book_appointment/{volunteerId}", method=RequestMethod.GET)
+	public String addAppointment(@PathVariable("volunteerId") int volunteerId, @RequestParam(value="vId", required=false) int partnerId, 
+			@RequestParam(value="pId", required=false) int patientId, @RequestParam(value="time", required=false) String time,
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		//set up appointment
+		Appointment appointment = new Appointment();
+		appointment.setVolunteerID(volunteerId);
+		appointment.setPatientID(patientId);
+		appointment.setPartner(String.valueOf(partnerId));
+		
+		//get Date and time for appointment
+		String day = "";
+		day = time.substring(0,3);
+		String strDate = Utils.getDateOfWeek(day);		 
+		time = time.substring(4,9);
+		
+		appointment.setDate(strDate.substring(0,10));
+		appointment.setTime(time);		
+				
+		if (appointmentDao.createAppointment(appointment))
+		{
+			String vEmail = volunteerDao.getEmailByVolunteerId(volunteerId);
+			String pEmail = volunteerDao.getEmailByVolunteerId(partnerId);
+			
+			//send message to both volunteers
+			if (mailAddress != null){
+				try{
+					Patient patient = patientDao.getPatientByID(patientId);
+					
+					MimeMessage message = new MimeMessage(session);
+					message.setFrom(new InternetAddress(mailAddress));
+					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(vEmail));
+					message.setSubject("Tapestry: New appointment booked");
+					
+					StringBuffer sb = new StringBuffer();
+					sb.append(patient.getVolunteerName());
+					sb.append(" has booked an appointment with ");
+					sb.append(patient.getFirstName());
+					sb.append(" ");
+					sb.append(patient.getLastName());
+					sb.append( " for ");
+					sb.append(time);
+					sb.append(" on ");
+					sb.append(strDate);
+					sb.append(".\n");
+					sb.append("This appointment is awaiting confirmation.");
+					
+					String msg = sb.toString();				
+					message.setText(msg);
+					
+					System.out.println(msg);
+					System.out.println("Sending...");
+					Transport.send(message);
+					System.out.println("Email sent to administrators");
+				} catch (MessagingException e) {
+					System.out.println("Error: Could not send email");
+					System.out.println(e.toString());
+				}
+			}
+			else {
+				System.out.println("Email address not set");
+				logger.error("Email address not set");
+			}
+			model.addAttribute("successToCreateAppointment",true);
+		}
+		else
+		{
+			model.addAttribute("failedToCreateAppointment",true);
+		}
+		
+		List<Patient> patients = new ArrayList<Patient>();
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		model.addAttribute("patients",patients);
+		model.addAttribute("allvolunteers",volunteers);
+		
+		return "/admin/view_scheduler";
+	}
 	
 	@RequestMapping(value="/delete_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String deleteAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
@@ -206,11 +291,146 @@ public class AppointmentController{
 		List<Patient> patients = new ArrayList<Patient>();
 		patients = patientDao.getAllPatients();
 		
-		List<Volunteer> volunteers = new ArrayList<Volunteer>();
-		volunteers = volunteerDao.getAllVolunteers();
+		List<Volunteer> allVolunteers = new ArrayList<Volunteer>();
+		List<Volunteer> experiencedVolunteers = new ArrayList<Volunteer>();
+		List<Volunteer> noBeginnerVolunteers = new ArrayList<Volunteer>();
+		
+		allVolunteers = volunteerDao.getAllVolunteers();
+		experiencedVolunteers = volunteerDao.getMatchedVolunteersByLevel("B");
+		noBeginnerVolunteers = volunteerDao.getMatchedVolunteersByLevel("I");
 		
 		model.addAttribute("patients",patients);
-		model.addAttribute("volunteers",volunteers);
+		model.addAttribute("allvolunteers",allVolunteers);
+		model.addAttribute("experiencedvolunteers",experiencedVolunteers);
+		model.addAttribute("nobeginnervolunteers",noBeginnerVolunteers);
 		return "/admin/view_scheduler";
+	}
+	
+	//load match time for both selected volunteers  /view_matchTime
+	@RequestMapping(value="/view_matchTime", method=RequestMethod.POST)
+	public String viewMatchAvailablities( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		List<Patient> patients = new ArrayList<Patient>();
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		
+		String patientId = request.getParameter("patient");
+		patients = patientDao.getAllPatients();
+		volunteers = volunteerDao.getAllVolunteers();
+		
+		String volunteer1 = request.getParameter("volunteer1");		
+		String volunteer2 = request.getParameter("volunteer2");		
+		
+		if (volunteer1.equals(volunteer2))
+		{
+			model.addAttribute("sameVolunteer",true);
+			model.addAttribute("allvolunteers", volunteers);
+			return "/admin/view_scheduler";
+		}
+
+		Volunteer v1 = volunteerDao.getVolunteerById(Integer.parseInt(volunteer1));
+		Volunteer v2 = volunteerDao.getVolunteerById(Integer.parseInt(volunteer2));
+		
+		String v1Level = v1.getExperienceLevel();
+		String v2Level = v2.getExperienceLevel();
+		
+		if(!isMatched(v1Level, v2Level)){
+			model.addAttribute("misMatchedVolunteer",true);
+			model.addAttribute("allvolunteers", volunteers);
+			return "/admin/view_scheduler";
+		}		
+					
+		String[] aVolunteer1, aVolunteer2;
+		if (!Utils.isNullOrEmpty(v1.getAvailability()) )
+		{
+			aVolunteer1= v1.getAvailability().split(";");		
+				
+			if (!Utils.isNullOrEmpty(v2.getAvailability()))
+			{
+				aVolunteer2 = v2.getAvailability().split(";");				
+				List<String> matchList = new ArrayList<String>();
+					
+				for( String a1: aVolunteer1 )
+				{
+					for(String a2 : aVolunteer2)
+					{
+						if (a1.equals(a2))
+							matchList.add(a1);
+					}
+				}
+					
+				if (matchList.size() == 0)
+				{
+					model.addAttribute("noMatchTime",true);
+					model.addAttribute("allvolunteers", volunteers);
+					return "/admin/view_scheduler";
+				}
+				else
+				{						
+					model.addAttribute("matchedAvailability",matchList);
+					model.addAttribute("volunteerOne",v1);
+					model.addAttribute("volunteerTwo",v2);
+					model.addAttribute("volunteers", volunteers);
+					model.addAttribute("patients", patients);		
+					model.addAttribute("selectedPatient", patientId);
+					return "/admin/make_scheduler";
+				}					 
+			}
+			else
+			{
+					model.addAttribute("noAvailableTime", true);
+					model.addAttribute("allvolunteers", volunteers);
+					return "/admin/view_scheduler";
+			}
+		}
+		else
+		{
+			model.addAttribute("allvolunteers", volunteers);
+			model.addAttribute("noAvailableTime", true);
+		
+			return "/admin/view_scheduler";
+		}
+		
+	}
+	
+	private boolean isMatched(String level1, String level2){
+		boolean matched = false;
+		if (level1.equals("E") || level2.equals("E"))		
+			matched = true;				
+		else if (level1.equals("I") && level2.equals("I"))
+			matched = true;
+		
+		return matched;
+	}
+	
+	
+	private boolean sendMessage(String email,String msg, SecurityContextHolderAwareRequestWrapper request){
+		boolean success = false;
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		Message m = new Message();
+		m.setSender(loggedInUser.getName());
+		m.setSenderID(loggedInUser.getUserID());
+		m.setText(msg);
+		
+		if (mailAddress != null){
+			try{
+				MimeMessage message = new MimeMessage(session);
+				message.setFrom(new InternetAddress(mailAddress));
+				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(email));
+				message.setSubject("Tapestry: New message notification");
+				
+				message.setText(msg);
+				System.out.println(msg);
+				System.out.println("Sending...");
+				Transport.send(message);
+				System.out.println("Email sent notifying " + email);
+				
+				messageDao.sendMessage(m);
+				success = true;
+			} catch (MessagingException e) {
+				System.out.println("Error: Could not send email");
+				System.out.println(e.toString());
+			}
+		}
+	
+		return success;
 	}
 }

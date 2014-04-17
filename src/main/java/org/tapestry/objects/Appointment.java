@@ -16,7 +16,16 @@ public class Appointment{
 	private String status;
 	private boolean completed;
 	private boolean contactedAdmin;
+	private String partner;
 	
+	public String getPartner() {
+		return partner;
+	}
+
+	public void setPartner(String partner) {
+		this.partner = partner;
+	}
+
 	/**
 	 * Empty constructor
 	 */

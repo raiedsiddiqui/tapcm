@@ -410,14 +410,22 @@ public class AppointmentDao {
     	}
     }
     
-    public void createAppointment(Appointment a){
+    public boolean createAppointment(Appointment a){
+    	boolean success = false;
     	try{
-    		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time, status) values (?,?,?,?)");
+    		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time, partner, status) values (?,?,?,?,?)");
     		statement.setInt(1, a.getVolunteerID());
     		statement.setInt(2, a.getPatientID());
     		statement.setString(3, a.getDate() + " " + a.getTime());
-    		statement.setString(4, "Awaiting Approval");
+    		
+    		if (!Utils.isNullOrEmpty(a.getPartner()))
+    			statement.setString(4, a.getPartner());
+    		else 
+    			statement.setString(4, null);
+    		statement.setString(5, "Awaiting Approval");
     		statement.execute();
+    		
+    		success = true;
     	} catch (SQLException e){
     		System.out.println("Error: Could not book appointment");
     		e.printStackTrace();
@@ -428,6 +436,8 @@ public class AppointmentDao {
     			//Ignore
     		}
     	}
+    	
+    	return success;
     }
     
     public void approveAppointment(int id){
