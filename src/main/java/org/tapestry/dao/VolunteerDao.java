@@ -7,12 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.tapestry.controller.Utils;
-import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 
 /**
@@ -214,8 +211,8 @@ public class VolunteerDao {
 				stmt = con.prepareStatement("INSERT INTO volunteers (firstname, lastname, street,"
 						+ "username, email, experience_level, city, province, home_phone, cell_phone,"
 						+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
-						+ " availability, street_number) "
-						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+						+ " availability, street_number, password) "
+						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
 				
 				stmt.setString(1, volunteer.getFirstName()); 
 				stmt.setString(2, volunteer.getLastName());	
@@ -235,6 +232,7 @@ public class VolunteerDao {
 				stmt.setString(16, volunteer.getNotes());					
 				stmt.setString(17, volunteer.getAvailability());				
 				stmt.setString(18, volunteer.getStreetNumber());
+				stmt.setString(19, volunteer.getPassword());
 				
 				stmt.execute();
 				success = true;
@@ -352,12 +350,20 @@ public class VolunteerDao {
 		return count;
 	}
 		
+	public String getEmailByVolunteerId(int volunteerId){
+		Volunteer volunteer = new Volunteer();
+		String emailAddress = "";		
+		
+		volunteer = getVolunteerById(volunteerId);
+		emailAddress = volunteer.getEmail();
+		
+		return emailAddress;
+	}
 	
 	private List<Volunteer> getVolunteersByResultSet(ResultSet rs, boolean modified){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		Volunteer volunteer = null;
 		String level = "";
-//		String gender = "";
 		
 		try{
 			while(rs.next())
@@ -367,29 +373,22 @@ public class VolunteerDao {
 				volunteer.setFirstName(rs.getString("firstname"));
 				volunteer.setLastName(rs.getString("lastname"));
 				
+				level = rs.getString("experience_level");
+				
 				StringBuffer sb = new StringBuffer();
 				sb.append(rs.getString("firstname"));
 				sb.append(" ");
 				sb.append(rs.getString("lastname"));
+				sb.append("(");
+				sb.append(level);
+				sb.append(")");
 				
 				volunteer.setDisplayName(sb.toString());
 				volunteer.setUserName(rs.getString("username"));
 				volunteer.setEmail(rs.getString("email"));
 				
-
-				level = rs.getString("experience_level");
-//				gender = rs.getString("gender");
-				
 				if (modified)
-				{					
-//					if (!Utils.isNullOrEmpty(type))
-//					{
-//						if (type.equals("Y"))
-//							volunteer.setAgeType("Younger");
-//						else if (type.equals("O"))
-//							volunteer.setAgeType("Older");
-//					}
-					
+				{	
 					if (!Utils.isNullOrEmpty(level)){
 						
 						if (level.equals("E"))
@@ -400,20 +399,10 @@ public class VolunteerDao {
 							volunteer.setExperienceLevel("Intermediate");
 					}
 					
-//					if (!Utils.isNullOrEmpty(gender)){					
-//						if(gender.equals("F"))
-//							volunteer.setGender("Female");
-//						else if(gender.equals("M"))
-//							volunteer.setGender("Male");
-//						else if(gender.equals("O"))
-//							volunteer.setGender("Other");
-//					}
+
 				}
-				else
-				{		
-					volunteer.setExperienceLevel(level);
-		//			volunteer.setGender(gender);
-				}
+				else						
+					volunteer.setExperienceLevel(level);		
 				
 				volunteer.setCity(rs.getString("city"));
 				volunteer.setProvince(rs.getString("province"));
@@ -477,14 +466,12 @@ public class VolunteerDao {
 		
 	}
 	
-	
-	public List<Volunteer> getMatchedVolunteers(String type){
+	public List<Volunteer> getMatchedVolunteersByLevel(String level){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
-	
-		if (type.equals("E"))
+		if (level.equals("E"))
 			volunteers = this.getAllVolunteers();
-		else if (type.equals("I"))
-		{
+		
+		if (level.equals("I")){
 			try{
 				stmt = con.prepareStatement("SELECT * FROM volunteers WHERE experience_level =? OR experience_level = ?");		
 				stmt.setString(1, "E");
@@ -507,8 +494,11 @@ public class VolunteerDao {
 	    		} catch (Exception e) {
 	    			//Ignore
 	    		}
-	    	}
-		} else if (type.equals("B")){
+			}
+		}
+		
+		if (level.equals("B"))
+		{
 			try{
 				stmt = con.prepareStatement("SELECT * FROM volunteers WHERE experience_level =?");		
 				stmt.setString(1, "E");				
@@ -534,7 +524,6 @@ public class VolunteerDao {
 		}
 		
 		return volunteers;
-		
 	}
 
 }

@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	lastname VARCHAR(255) NOT NULL,
 	preferredname VARCHAR(255),
 	username VARCHAR(50),
+	password VARCHAR(255) NOT NULL,
 	age_type VARCHAR(1);/* 1 character, expecting value like 'Y' for younger, 'O' for older */
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
 	email VARCHAR(50),

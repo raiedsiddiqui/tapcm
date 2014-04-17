@@ -186,7 +186,48 @@
 							
 
 						<h2>Availability </h2>
-						<div class="row form-group">
+						<table>
+									<tr>
+										<td width="180"><h4>Monday <input type="checkbox"> N/A | </h4></td>
+										<td width="180"><h4>Tuesday <input type="checkbox" > N/A | </h4></td>
+										<td width="180"><h4>Wednesday <input type="checkbox"> N/A | </h4></td>
+										<td width="180"><h4>Thursday <input type="checkbox" > N/A |</h4></td>
+										<td width="180"><h4>Friday <input type="checkbox"> N/A </h4></td>
+									</tr>
+									<tr>
+										<td><input type="checkbox" name="availableTime" value="mon-09:00-10:00">09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-09:00-10:00">09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-09:00-10:00">09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-09:00-10:00">09:00--10:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-09:00-10:00">09:00--10:00</td>
+										
+									</tr>
+									<tr>
+										<td><input type="checkbox" name="availableTime" value="mon-10:00-11:00">10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-10:00-11:00">10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-10:00-11:00">10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-10:00-11:00">10:00--11:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-10:00-11:00">10:00--11:00</td>
+										
+									</tr>
+									<tr>
+										<td><input type="checkbox" name="availableTime" value="mon-11:00-12:00">11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-11:00-12:00">11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-11:00-12:00">11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-11:00-12:00">11:00--12:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-11:00-12:00">11:00--12:00</td>
+										
+									</tr>
+									<tr>
+										<td><input type="checkbox" name="availableTime" value="mon-13:00-14:00">13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="tue-13:00-14:00">13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="wed-13:00-14:00">13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="thu-13:00-14:00">13:00--14:00</td>
+										<td><input type="checkbox" name="availableTime" value="fri-13:00-14:00">13:00--14:00</td>
+										
+									</tr>
+								</table>	
+						<!--  div class="row form-group">
 								<div class="col-md-2">
 									<h4>Monday <input type="checkbox"> N/A</h4>
 									<select></select> TO <select></select>
@@ -218,7 +259,7 @@
 										<select></select> TO <select></select>
 										<select></select> TO <select></select>
 								</div>
-							</div>
+							</div>-->
 							<h2> Comments </h2>
 					<div class="col-md-10">		
 						<input type="textarea" class="form-control" maxlength="50" name="notes"/>

@@ -1,8 +1,10 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.Properties;
 
 import javax.servlet.http.HttpSession;
@@ -125,6 +127,76 @@ public class Utils {
 		else
 			return true;
 		
+	}
+	
+	public static String getFormatDate(Date date){
+		//convert current date to the format matched in DB				
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		String strDate = sdf.format(new Date()); 
+		
+		return strDate;
+		
+	}
+	
+	public static String getDateOfWeek(String day){
+		Calendar now = Calendar.getInstance();  
+		int weekday = now.get(Calendar.DAY_OF_WEEK);  		
+		Date date;
+		
+		if(day.endsWith("mon"))
+		{
+			if (weekday != Calendar.MONDAY)  
+			{  
+			    // calculate how much to add  
+			    // the 2 is the difference between Saturday and Monday  
+			    int days = (Calendar.SATURDAY - weekday + 2) % 7;  
+			    now.add(Calendar.DAY_OF_YEAR, days);  
+			}  
+			// now get the date you want  
+			date = now.getTime();  
+		}		
+		else if (day.equals("tue"))
+		{
+			if (weekday != Calendar.TUESDAY)  
+			{  
+			    int days = (Calendar.SATURDAY - weekday + 3) % 7;  
+			    now.add(Calendar.DAY_OF_YEAR, days);  
+			}  
+			
+			date = now.getTime();  
+		}
+		else if (day.equals("wed"))
+		{
+			if (weekday != Calendar.WEDNESDAY)  
+			{  			    
+			    int days = (Calendar.SATURDAY - weekday + 4) % 7;  
+			    now.add(Calendar.DAY_OF_YEAR, days);  
+			}  		
+			date = now.getTime();  
+		}
+		else if (day.equals("thu"))
+		{
+			if (weekday != Calendar.THURSDAY)  
+			{  			 
+			    int days = (Calendar.SATURDAY - weekday + 5) % 7;  
+			    now.add(Calendar.DAY_OF_YEAR, days);  
+			}
+			 date = now.getTime();  
+		}
+		else if (day.equals("fri"))
+		{
+			if (weekday != Calendar.FRIDAY)  
+			{  
+			    int days = (Calendar.SATURDAY - weekday + 6) % 7;  
+			    now.add(Calendar.DAY_OF_YEAR, days);  
+			} 
+		 date = now.getTime();  
+		}
+		else
+		 date = new Date();
+		
+		String strDate = Utils.getFormatDate(date);
+		return strDate;
 	}
 	
 	
