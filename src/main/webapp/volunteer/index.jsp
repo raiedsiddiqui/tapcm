@@ -310,7 +310,7 @@
 		</div>
 	</div>
 
-	<!-- Modal -->
+	<!-- OLD Modal -->
 	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
   		<div class="modal-header">
     		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
@@ -345,5 +345,49 @@
     		<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
   		</div>
 	</div>
+
+<!-- OLD MODAL-->
+
+<div class="modal fade" id="bookAppointment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Book Appointment</h4>
+      </div>
+      <div class="modal-body">
+        
+        <form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
+  				<label>With patient:</label>
+				<select name="patient" form="appt-form">
+					<c:forEach items="${patients}" var="p">
+					<option value="${p.patientID}">${p.displayName}</option>
+					</c:forEach>
+				</select><br />
+				<label>Date:</label>		
+				<div id="dp" class="input-append">
+					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate">
+					<span class="add-on">
+						<i class="icon-calendar"></i>
+					</span>
+				</div>
+				<label>Time:</label>
+				<div id="tp" class="input-append">
+					<input data-format="hh:mm:00" type="text" name="appointmentTime">
+				    <span class="add-on">
+				    	<i class="icon-time"></i>
+				    </span>
+				</div>
+  			</form>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
