@@ -1,12 +1,13 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.HashMap;
 
 import javax.annotation.PostConstruct;
 
@@ -31,6 +32,7 @@ import org.tapestry.objects.Message;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
+import org.tapestry.objects.Availability;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.Properties;
@@ -137,7 +139,7 @@ public class AppointmentController{
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
 	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		int patientId = Integer.parseInt(request.getParameter("patient"));
-		Patient p = patientDao.getPatientByID(patientId);
+		Patient p = patientDao.getPatientByID(patientId);			
 		
 		Appointment a = new Appointment();
 		a.setVolunteerID(p.getVolunteer());
@@ -178,71 +180,6 @@ public class AppointmentController{
 		}
 	}
 	
-	@RequestMapping(value="/book_appointment/{volunteerId}", method=RequestMethod.GET)
-	public String addAppointment(@PathVariable("volunteerId") int volunteerId, @RequestParam(value="vId", required=false) int partnerId, 
-			@RequestParam(value="pId", required=false) int patientId, @RequestParam(value="time", required=false) String time,
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
-		//set up appointment
-		Appointment appointment = new Appointment();
-		appointment.setVolunteerID(volunteerId);
-		appointment.setPatientID(patientId);
-		appointment.setPartner(String.valueOf(partnerId));
-		
-		//get Date and time for appointment
-		String day = "";
-		day = time.substring(0,3);
-		String strDate = Utils.getDateOfWeek(day);		 
-		time = time.substring(4,9);
-		
-		appointment.setDate(strDate.substring(0,10));
-		appointment.setTime(time);		
-				
-		//save new appointment in DB and send message 
-		if (appointmentDao.createAppointment(appointment))
-		{
-			Patient patient = patientDao.getPatientByID(patientId);
-			String vEmail = volunteerDao.getEmailByVolunteerId(volunteerId);
-			String pEmail = volunteerDao.getEmailByVolunteerId(partnerId);
-			
-			//send message to both volunteers
-			if (mailAddress != null){			
-				//content of message
-				StringBuffer sb = new StringBuffer();
-				sb.append(patient.getVolunteerName());
-				sb.append(" has booked an appointment with ");
-				sb.append(patient.getFirstName());
-				sb.append(" ");
-				sb.append(patient.getLastName());
-				sb.append( " for ");
-				sb.append(time);
-				sb.append(" on ");
-				sb.append(strDate);
-				sb.append(".\n");
-				sb.append("This appointment is awaiting confirmation.");
-				
-				String msg = sb.toString();
-				
-				sendMessage(vEmail, msg, request);
-				sendMessage(pEmail, msg, request);
-			}
-			else {
-				System.out.println("Email address not set");
-				logger.error("Email address not set");
-			}
-			model.addAttribute("successToCreateAppointment",true);
-		}
-		else
-		{
-			model.addAttribute("failedToCreateAppointment",true);
-		}
-		
-		List<Patient> patients = patientDao.getAllPatients();
-		List<Volunteer> volunteers = volunteerDao.getVolunteersWithAvailability();
-		model.addAttribute("patients",patients);
-		model.addAttribute("allvolunteers",volunteers);
-		
-		return "/admin/view_scheduler";
-	}
 	
 	@RequestMapping(value="/delete_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String deleteAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
@@ -276,106 +213,195 @@ public class AppointmentController{
 	//display scheduler page
 	@RequestMapping(value="/view_scheduler", method=RequestMethod.GET)
 	public String viewScheduler( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		List<Patient> patients = new ArrayList<Patient>();
-		patients = patientDao.getAllPatients();
+		List<Patient> patients = getPatients();		
+		List<Volunteer> allVolunteers = getAllVolunteers();
 		
-		List<Volunteer> allVolunteers = new ArrayList<Volunteer>();
-		List<Volunteer> experiencedVolunteers = new ArrayList<Volunteer>();
-		List<Volunteer> noBeginnerVolunteers = new ArrayList<Volunteer>();
-		
-		allVolunteers = volunteerDao.getVolunteersWithAvailability();
-		experiencedVolunteers = volunteerDao.getMatchedVolunteersByLevel("B");
-		noBeginnerVolunteers = volunteerDao.getMatchedVolunteersByLevel("I");
+		List<Availability> matchList = getAllMatchedPairs(allVolunteers, allVolunteers);
 		
 		model.addAttribute("patients",patients);
-		model.addAttribute("allvolunteers",allVolunteers);
-		model.addAttribute("experiencedvolunteers",experiencedVolunteers);
-		model.addAttribute("nobeginnervolunteers",noBeginnerVolunteers);
+		model.addAttribute("allvolunteers",allVolunteers);		
+		model.addAttribute("matcheList", matchList);
+		model.addAttribute("showPatients", false);
+
 		return "/admin/view_scheduler";
+	}
+	
+	//Open add new appointment from scheduler
+	@RequestMapping(value="/add_appointment/{volunteerId}", method=RequestMethod.GET)
+	public String addAppointmentFromSecheduler(@PathVariable("volunteerId") int volunteerId, 
+			@RequestParam(value="vId", required=false) int partnerId, 			
+			@RequestParam(value="time", required=false) String time, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		
+		List<Patient> patients = getPatients();		
+		List<Volunteer> allVolunteers = getAllVolunteers();
+		
+		//format time 
+		StringBuffer sb = new StringBuffer();
+		sb.append(time.substring(4,9));
+		sb.append(":00");
+		
+		time = sb.toString();
+		//selectedPatient
+		model.addAttribute("patients",patients);
+		model.addAttribute("allvolunteers",allVolunteers);	
+		
+		model.addAttribute("selectedVolunteer",volunteerId);
+		model.addAttribute("selectedPartner",partnerId);
+		model.addAttribute("selectedTime", time);
+		
+
+		return "/admin/schedule_appointment";
 	}
 	
 	//load match time for both selected volunteers  /view_matchTime
 	@RequestMapping(value="/view_matchTime", method=RequestMethod.POST)
 	public String viewMatchAvailablities( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
-		List<Patient> patients = new ArrayList<Patient>();
-		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		List<Patient> patients = getPatients();		
+		List<Volunteer> volunteers = getAllVolunteers();
 		
 		String patientId = request.getParameter("patient");
-		patients = patientDao.getAllPatients();
-		volunteers = volunteerDao.getVolunteersWithAvailability();
-		
-		String volunteer1 = request.getParameter("volunteer1");		
-		String volunteer2 = request.getParameter("volunteer2");		
-		
-		if (volunteer1.equals(volunteer2))
-		{
-			model.addAttribute("sameVolunteer",true);
-			model.addAttribute("allvolunteers", volunteers);
-			return "/admin/view_scheduler";
-		}
+		String volunteerId1 = request.getParameter("volunteer1");		
+		String volunteerId2 = request.getParameter("volunteer2");		
 
-		Volunteer v1 = volunteerDao.getVolunteerById(Integer.parseInt(volunteer1));
-		Volunteer v2 = volunteerDao.getVolunteerById(Integer.parseInt(volunteer2));
-		
-		String v1Level = v1.getExperienceLevel();
-		String v2Level = v2.getExperienceLevel();
-		
-		if(!isMatched(v1Level, v2Level)){
-			model.addAttribute("misMatchedVolunteer",true);
-			model.addAttribute("allvolunteers", volunteers);
-			return "/admin/view_scheduler";
-		}		
-					
-		String[] aVolunteer1, aVolunteer2;
-		if (!Utils.isNullOrEmpty(v1.getAvailability()) )
+		Volunteer v1 = volunteerDao.getVolunteerById(Integer.parseInt(volunteerId1));
+		Volunteer v2 = volunteerDao.getVolunteerById(Integer.parseInt(volunteerId2));
+		//check if two volunteers are same persons
+		if (volunteerId1.equals(volunteerId2))
+			model.addAttribute("sameVolunteer",true);
+		else 
 		{
-			aVolunteer1= v1.getAvailability().split(";");						
-			if (!Utils.isNullOrEmpty(v2.getAvailability()))
-			{
-				aVolunteer2 = v2.getAvailability().split(";");				
-				List<String> matchList = new ArrayList<String>();
-					
-				for( String a1: aVolunteer1 )
-				{
-					for(String a2 : aVolunteer2)
-					{
-						if (a1.equals(a2))
-							matchList.add(a1);
-					}
-				}					
-				if (matchList.size() == 0)
-				{
-					model.addAttribute("noMatchTime",true);
-					model.addAttribute("allvolunteers", volunteers);
-					return "/admin/view_scheduler";
-				}
-				else
-				{						
-					model.addAttribute("matchedAvailability",matchList);
-					model.addAttribute("volunteerOne",v1);
-					model.addAttribute("volunteerTwo",v2);
-					model.addAttribute("volunteers", volunteers);
-					model.addAttribute("patients", patients);		
-					model.addAttribute("selectedPatient", patientId);
-					return "/admin/make_scheduler";
-				}					 
-			}
+			String v1Level = v1.getExperienceLevel();
+			String v2Level = v2.getExperienceLevel();
+			
+			// matching rule is Beginner can only be paired with Experienced
+			if(!isMatched(v1Level, v2Level))
+				model.addAttribute("misMatchedVolunteer",true);
 			else
 			{
+				String[] aVolunteer1, aVolunteer2;
+				Availability availability;
+				if (!Utils.isNullOrEmpty(v1.getAvailability()) )
+				{
+					aVolunteer1= v1.getAvailability().split(";");						
+					if (!Utils.isNullOrEmpty(v2.getAvailability()))
+					{
+						aVolunteer2 = v2.getAvailability().split(";");				
+						List<Availability> matchList = new ArrayList<Availability>();
+							
+						for( String a1: aVolunteer1 )
+						{
+							for(String a2 : aVolunteer2)
+							{
+								if (a1.equals(a2))
+								{//find matched available time for both volunteers
+									availability = new Availability();								
+									availability.setvDisplayName(v1.getDisplayName());
+						        	availability.setvPhone(v1.getHomePhone());
+						        	availability.setvEmail(v1.getEmail());
+						        	availability.setpDisplayName(v2.getDisplayName());
+						        	availability.setpPhone(v2.getHomePhone());
+						        	availability.setpEmail(v2.getEmail());
+						        	availability.setMatchedTime(a1);
+						        	availability.setvId(Integer.parseInt(volunteerId1));
+						        	availability.setpId(Integer.parseInt(volunteerId2));
+									matchList.add(availability);
+								}
+							}
+						}					
+						if (matchList.size() == 0)
+							model.addAttribute("noMatchTime",true);
+						else
+							model.addAttribute("matcheList",matchList);				 
+					}
+					else
+						model.addAttribute("noAvailableTime", true);
+				}
+				else							
 					model.addAttribute("noAvailableTime", true);
-					model.addAttribute("allvolunteers", volunteers);
-					return "/admin/view_scheduler";
+			}			
+		}
+		model.addAttribute("allvolunteers", volunteers);
+		model.addAttribute("volunteerOne",v1);
+		model.addAttribute("volunteerTwo",v2);
+		model.addAttribute("patients", patients);
+		model.addAttribute("selectedPatient", patientId);
+		model.addAttribute("showPatients", true);
+		
+		return "/admin/view_scheduler";		
+	}
+	
+	@RequestMapping(value="/schedule_appointment", method=RequestMethod.POST)
+	public String createAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		//set up appointment
+		Appointment appointment = new Appointment();
+		
+		int patientId = Integer.parseInt(request.getParameter("patient"));
+		int volunteerId = Integer.parseInt(request.getParameter("volunteer"));
+		int partnerId = Integer.parseInt(request.getParameter("partner"));
+		appointment.setVolunteerID(volunteerId);
+		appointment.setPatientID(patientId);
+		appointment.setPartner(String.valueOf(partnerId));
+		
+		//get Date and time for appointment
+		
+		String day = request.getParameter("appointmentDate");
+		String time = request.getParameter("appointmentTime");
+		
+		appointment.setDate(day);
+		appointment.setTime(time);		
+				
+		//save new appointment in DB and send message 
+		if (appointmentDao.createAppointment(appointment))
+		{
+			Patient patient = patientDao.getPatientByID(patientId);
+			String vEmail = volunteerDao.getEmailByVolunteerId(volunteerId);
+			String pEmail = volunteerDao.getEmailByVolunteerId(partnerId);
+//			String vName = volunteerDao.getVolunteerNameById(volunteerId);
+//			String pName = volunteerDao.getVolunteerNameById(partnerId);
+			String logginUser = request.getUserPrincipal().getName();
+			
+			//send message to both volunteers
+			if (mailAddress != null){			
+				//content of message
+				StringBuffer sb = new StringBuffer();
+				sb.append(logginUser);
+				sb.append(" has booked an appointment with ");
+				sb.append(patient.getFirstName());
+				sb.append(" ");
+				sb.append(patient.getLastName());
+				sb.append( " for ");
+				sb.append(time);
+				sb.append(" on ");
+				sb.append(day);
+				sb.append(".\n");
+				sb.append("This appointment is awaiting confirmation.");
+				
+				String msg = sb.toString();
+				
+				sendMessage(vEmail, msg, request);
+				sendMessage(pEmail, msg, request);
 			}
+			else {
+				System.out.println("Email address not set");
+				logger.error("Email address not set");
+			}
+			model.addAttribute("successToCreateAppointment",true);
 		}
 		else
 		{
-			model.addAttribute("allvolunteers", volunteers);
-			model.addAttribute("noAvailableTime", true);
-		
-			return "/admin/view_scheduler";
+			model.addAttribute("failedToCreateAppointment",true);
 		}
 		
+//		List<Patient> patients = patientDao.getAllPatients();
+//		List<Volunteer> volunteers = volunteerDao.getVolunteersWithAvailability();
+//		model.addAttribute("patients",patients);
+//		model.addAttribute("allvolunteers",volunteers);
+		
+//		return "/admin/view_scheduler";
+		return "redirect:/view_scheduler";
 	}
+	
 	
 	private boolean isMatched(String level1, String level2){
 		boolean matched = false;
@@ -419,4 +445,91 @@ public class AppointmentController{
 	
 		return success;
 	}
+	
+	private List<Patient> getPatients()
+	{
+		List<Patient> patients = new ArrayList<Patient>();
+		patients = patientDao.getAllPatients();
+		
+		return patients;
+	}
+	
+	private List<Volunteer> getAllVolunteers(){
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		volunteers = volunteerDao.getVolunteersWithAvailability();
+		
+		return volunteers;
+	}
+	
+	private List<Availability> getAllMatchedPairs(List<Volunteer> list1, List<Volunteer> list2){
+		String availability1, availability2;
+		String[] aSet1, aSet2;
+		List<Availability> aList = new ArrayList<Availability>();
+		Availability availability;
+		
+		for (Volunteer v1: list1)
+		{
+			availability1 = v1.getAvailability();
+			if (!Utils.isNullOrEmpty(availability1))
+			{				
+				aSet1 = availability1.split(";");		
+				
+				for (Volunteer v2: list2)
+				{
+					if (v1.getVolunteerId()!= v2.getVolunteerId())
+					{		
+						availability2 = v2.getAvailability();						
+						if ((!Utils.isNullOrEmpty(availability2)) && (isMatchVolunteer(v1, v2)))						
+						{
+							aSet2  = availability2.split(";");							
+							//find match availability					
+							for(int i = 0; i < aSet1.length; i++)
+							{								
+							    for(int j = 0; j <aSet2.length; j++)
+							    {
+							    	
+							        if(aSet1[i].toString().equals(aSet2[j].toString()) )		
+							        {								        	
+							        	availability = new Availability();
+							        	availability.setvDisplayName(v1.getDisplayName());
+							        	availability.setvPhone(v1.getHomePhone());
+							        	availability.setvEmail(v1.getEmail());
+							        	availability.setpDisplayName(v2.getDisplayName());
+							        	availability.setpPhone(v2.getHomePhone());
+							        	availability.setpEmail(v2.getEmail());
+							        	availability.setMatchedTime(aSet1[i].toString());
+							        	availability.setvId(v1.getVolunteerId());
+							        	availability.setpId(v2.getVolunteerId());
+							        	
+							        	aList.add(availability);	
+							        }
+							    }
+							}
+						}
+					}			
+				}
+			}
+		}		
+		
+		return aList;
+	}
+	
+	private boolean isMatchVolunteer(Volunteer vol1, Volunteer vol2){
+		String v1Type = vol1.getExperienceLevel();
+		String v2Type = vol2.getExperienceLevel();		
+		
+		boolean matched = false;		
+		
+		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type)){
+			matched = true;
+		}
+		else if ("Intermediate".equals(v1Type) && "Intermediate".equals(v2Type))
+		{
+			matched = true;
+		}
+		
+		return matched;
+	}
+	
+	
 }

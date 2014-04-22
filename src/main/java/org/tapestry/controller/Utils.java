@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
+import java.util.List;
+import java.util.Collections;
 
 import javax.servlet.http.HttpSession;
 
@@ -199,6 +201,9 @@ public class Utils {
 		return strDate;
 	}
 	
-	
+	public static List sortList(List list){	
+		Collections.sort(list);
+		return  list;
+	}
 	
 }
