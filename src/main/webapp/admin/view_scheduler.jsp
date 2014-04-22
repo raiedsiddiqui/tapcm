@@ -12,6 +12,7 @@
 			<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 			<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 			<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>	
+			<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
 			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
 
 		<style type="text/css">
@@ -19,6 +20,35 @@
 				margin:10px;
 			}
 		</style>	
+		<script type="text/javascript">
+		$(function(){
+			$('#tp').datetimepicker({
+				pickDate: false,
+				pickSeconds: false
+			});
+			$('#dp').datetimepicker({
+				pickTime: false,
+				startDate: new Date()
+  			});
+  			
+  			$('#bookAppt').click(function(){
+		        var btn = $(this)
+		        btn.button('loading')
+		        setTimeout(function () {
+		            btn.button('reset')
+		        }, 3000)
+		    });
+  			
+		});
+		
+		function getPatient(){
+			var selectedPatient = document.getElementById("patient");
+			document.getElementById("sPatient").value =selectedPatient.options[selectedPatient.selectedIndex].value;
+			document.getElementById("showPatient").value = selectedPatient.options[selectedPatient.selectedIndex].value;
+
+			}
+		
+	</script>
 	</head>
 <body>
 <div class="content">
@@ -49,20 +79,24 @@
 	<h3>Appointment Scheduler</h3>
 
 	<form  id="schedulerForm" method="post" action="<c:url value="/view_matchTime"/>">	
-		
-		<label><h4>Select Patient/Client: </h4></label>
-		<select name="patient" form="schedulerForm">
-			<c:forEach items="${patients}" var="p">
-				<option value="${p.patientID}">${p.displayName}</option>
+		<c:set var="v1" value="${volunteerOne }"/>
+		<c:set var="v2" value="${volunteerTwo }"/>
+		<c:if test="${showPatients}">			
+			<label><h4>Select Patient/Client: </h4></label>
+		<select name="patient" form="schedulerForm" id="patient" >
+			<c:forEach items="${patients}" var="p">				
+				<option value="${p.patientID}" <c:if test="${p.patientID eq selectedPatient}">selected</c:if>>${p.displayName}</option>
 			</c:forEach>
 		</select>
+		</c:if>
+		
 		<table>
 			<tr>
 				<td>
 					<label><h4>Volunteer 1:</h4></label>
 					<select name="volunteer1" form="schedulerForm" id ="volunteer1">
 						<c:forEach items="${allvolunteers}" var="v">
-							<option value="${v.volunteerId}">${v.displayName}</option>
+							<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq v1.volunteerId}">selected</c:if>>${v.displayName}</option>
 						</c:forEach>
 						
 					</select>
@@ -71,7 +105,7 @@
 					<label><h4>Volunteer 2:</h4></label>
 					<select name="volunteer2" form="schedulerForm" id="volunteer2">
 						<c:forEach items="${allvolunteers}" var="v">
-							<option value="${v.volunteerId}">${v.displayName}</option>
+							<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq v2.volunteerId}">selected</c:if>>${v.displayName}</option>
 						</c:forEach>
 						
 					</select>
@@ -80,11 +114,42 @@
 					<input class="btn btn-primary" form="schedulerForm" type="submit" value="Go" />	
 				</td>
 			</tr>
-		</table>
-		
-		
+		</table>		
 	</form>
 
+	<table width="1200">
+	<tr>
+		<th width="150">Volunteer One</th>
+		<th width="100">Phone #</th>
+		<th width="200">Email</th>
+		<th width="150">Volunteer Two</th>
+		<th width="100">Phone #</th>
+		<th width="200">Email</th>
+		<th width="150">Time Match</th>		
+		<td style="display:none;"></td>
+		<th>Action</th>
+		
+	</tr>
+	
+	
+	<c:forEach items="${matcheList}" var="ml">	
+		<tr>
+						<td>${ml.vDisplayName}</td>						
+						<td>${ml.vPhone}</td>
+						<td>${ml.vEmail}</td>
+						<td>${ml.pDisplayName}</td>						
+						<td>${ml.pPhone}</td>
+						<td>${ml.pEmail}</td>
+						<td>${ml.matchedTime}</td>		
+						<td><div id="patientId" name="patientId"></div></td>				
+						<td><a href="<c:url value="/add_appointment/${ml.vId}?vId=${ml.pId}&time=${ml.matchedTime}"/>">Book Appointment</a></td>
+						
+					</tr>
+	</c:forEach>
+	
+</table>
+
 </div>
+
 </body>
 </html>

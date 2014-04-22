@@ -389,6 +389,16 @@ public class VolunteerDao {
 		return emailAddress;
 	}
 	
+	public String getVolunteerNameById(int volunteerId){
+		Volunteer volunteer = new Volunteer();
+		String name = "";		
+		
+		volunteer = getVolunteerById(volunteerId);
+		name = volunteer.getDisplayName();
+		
+		return name;
+	}
+	
 	private List<Volunteer> getVolunteersByResultSet(ResultSet rs, boolean modified){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		Volunteer volunteer = null;
