@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
 	name VARCHAR(255) NOT NULL,
 	username VARCHAR(255) NOT NULL,
 	password VARCHAR(255) NOT NULL,
-	phonenumber VARCHAR(20),
+	phone_number VARCHAR(20),
 	site VARCHAR(50),
 	enabled BOOLEAN NOT NULL,
 	email VARCHAR(50) NOT NULL,
@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS survey_results (
 CREATE TABLE IF NOT EXISTS activities (
 	event_ID INT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED INT allows for 4,294,967,295 events, which should be enough*/
 	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	start_time TIMESTAMP NULL;
-	end_time TIMESTAMP NULL;
+	start_time TIMESTAMP NULL,
+	end_time TIMESTAMP NULL,
 	volunteer SMALLINT UNSIGNED NOT NULL,
 	patient SMALLINT UNSIGNED,
 	appointment SMALLINT UNSIGNED,
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS narratives (
     contents TEXT,
     edit_Date TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP, /*edit_Date represents the last edit date*/
     user_ID INT NOT NULL,
-    patient_ID SMALLINT UNSIGNED NOT NULL;
+    patient_ID SMALLINT UNSIGNED NOT NULL,
     appointment SMALLINT UNSIGNED NOT NULL,
     PRIMARY KEY (narrative_ID)
 );
@@ -110,16 +110,16 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	preferredname VARCHAR(255),
 	username VARCHAR(50),
 	password VARCHAR(255) NOT NULL,
-	age_type VARCHAR(1);/* 1 character, expecting value like 'Y' for younger, 'O' for older */
+	age_type VARCHAR(1),/* 1 character, expecting value like 'Y' for younger, 'O' for older */
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
 	email VARCHAR(50),
 	experience_level VARCHAR(1), /* Using VARCHAR(1) for 1 character, expecting value like "E", "B", "I"...*/
-	street_number VARCHAR(20);
+	street_number VARCHAR(20),
 	street VARCHAR(100),
 	appartment VARCHAR(10),	
 	city VARCHAR(50),
 	province VARCHAR(3),
-	contrry VARCHAR(50),
+	country VARCHAR(50),
 	home_phone VARCHAR(20),
 	cell_phone VARCHAR(20),
 	emergency_contact VARCHAR(50),
