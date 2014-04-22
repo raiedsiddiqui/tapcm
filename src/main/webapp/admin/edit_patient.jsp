@@ -18,13 +18,60 @@
 </head>
 	
 <body>	
-  <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
 			<h2>Edit Patient</h2>
 		  	<form id="editPatient" method="post" action="<c:url value="/submit_edit_patient/${patient.patientID}"/>">
-				<label>First Name:</label>
+				
+
+
+
+
+
+				<div class="row form-group">
+  					<div class="col-md-6">
+						<label>First Name:</label>
+						<input type="text" name="firstname" class="form-control" value="${patient.firstName}" required/>
+					</div>
+					<div class="col-md-6">
+						<label>Last Name:</label>
+						<input type="text" name="lastname" class="form-control" value="${patient.lastName}" required/>
+					</div>
+					<div class="col-md-6">
+						<label>Preferred Name:</label>
+						<input type="text" name="preferredname" class="form-control" value="${patient.preferredName}"/>
+					</div>
+				</div>	
+
+				<div class="row form-group">	
+					<div class="col-md-6">
+						<label>Volunteer</label>
+						<select name="volunteer" form="newPatient" class="form-control">
+							<c:forEach items="${volunteers}" var="v">
+								<option value="${v.volunteerId}" <c:if test="${v.displayName eq patient.volunteerName}">selected</c:if>>${v.displayName}</option>
+							</c:forEach>
+						</select><br />
+					</div>
+					<div class="col-md-6">
+						<label>Gender</label>
+						<select name="gender" form="newPatient" class="form-control">
+							<option value="M" <c:if test="${patient.gender eq 'M'}">selected</c:if>>Male</option>	
+							<option value="F" <c:if test="${patient.gender eq 'F'}">selected</c:if>>Female</option>
+							<option value="O" <c:if test="${patient.gender eq 'O'}">selected</c:if>>Other</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="row form-group">	
+					<div class="col-md-10">
+						<label>Notes</label>
+						<textarea name="notes" class="form-control">${patient.notes}s</textarea>
+					</div>
+				</div>	
+
+
+				<!-- <label>First Name:</label>
 				<input type="text" name="firstname" value="${patient.firstName}" required/>
 				<label>Last Name:</label>
 				<input type="text" name="lastname" value="${patient.lastName}" required/>
@@ -43,7 +90,7 @@
 					<option value="O" <c:if test="${patient.gender eq 'O'}">selected</c:if>>Other</option>
 				</select>
 				<label>Notes</label>
-				<textarea name="notes">${patient.notes}</textarea><br/>
+				<textarea name="notes">${patient.notes}</textarea><br/> -->
 				<input type="submit" value="Save changes" class="btn btn-primary"/>
 			</form>
 		</div>

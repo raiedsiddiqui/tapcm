@@ -31,7 +31,6 @@
 	</head>
 	
 	<body>
-	<img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
@@ -39,37 +38,47 @@
 			<div class="row-fluid">
 				<form id="modify_volunteer" action="<c:url value="/update_volunteer/${volunteer.volunteerId}"/>" method="POST">
 					<fieldset>
-					<table>
-							<tr>
-								<td colspan='3'></td>
-							</tr>
-							<tr>
-								<td><label>First Name:</label>
-									<input type="text" name="firstname" value="${volunteer.firstName}" required/></td>
-								<td><label>Last Name:</label>
-									<input type="text" name="lastname" value="${volunteer.lastName}"  required/></td>
-								<td><label>Street #:</label>
-									<input name="streetnum" value="${volunteer.streetNumber}"/>
-								</td>
-							</tr>
-							<tr>
-								<td><label>Street:</label>
-									<input type="text" name="street" value="${volunteer.street}"/></td>
-								<td><label>Apt #:</label>
-									<input type="text" name="aptnum" value="${volunteer.aptNumber}"/></td>
-								<td><label>Country:</label>
-									<select name="country" form="modify_volunteer">
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>First Name:</label>
+									<input type="text" name="firstname" class="form-control" value="${volunteer.firstName}" required/>
+								</div>
+								<div class="col-md-4">
+									<label>Last Name:</label>
+									<input type="text" name="lastname" class="form-control" value="${volunteer.lastName}" required/>
+								</div>
+							</div>
+
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Street #:</label>
+									<input type="text" name="streetnum" class="form-control" value="${volunteer.streetNumber}" />
+								</div>
+								<div class="col-md-4">	
+									<label>Street:</label>
+									<input type="text" name="street" class="form-control" value="${volunteer.street}"/>
+								</div>
+								<div class="col-md-4">	
+									<label>Apt #:</label>
+									<input type="text" name="aptnum" class="form-control" value="${volunteer.aptNumber}"/>
+								</div>
+							</div>		
+
+
+
+							<div class="row form-group">
+								<div class="col-md-4">	
+									<label>Country:</label>
+										<select name="country" form="add_volunteer" class="form-control"s>
 										<option value="CA" <c:if test="${volunteer.country eq 'CA'}">selected</c:if>>Canada</option>
 										<option value="ST" <c:if test="${volunteer.country eq 'ST'}">selected</c:if>>USA</option>
 										<option value="CH" <c:if test="${volunteer.country eq 'CH'}">selected</c:if>>China</option>
 										<option value="RU" <c:if test="${volunteer.country eq 'RU'}">selected</c:if>>Russia</option>
-									</select>
-								</td>
-							</tr>
-							<tr>
-								<td>
+										</select>
+								</div>
+								<div class="col-md-4">	
 									<label>Province:</label>
-									<select name="province" form="modify_volunteer">
+										<select name="province" form="add_volunteer" class="form-control">
 										<option value='AB' <c:if test="${volunteer.province eq 'AB'}">selected</c:if>>Alberta</option>
 										<option value='BC' <c:if test="${volunteer.province eq 'BC'}">selected</c:if>>British Colunmbia</option>							
 										<option value='MB' <c:if test="${volunteer.province eq 'MB'}">selected</c:if>>Manitoba</option>
@@ -83,69 +92,83 @@
 										<option value='NT' <c:if test="${volunteer.province eq 'NT'}">selected</c:if>>Northwest Terriotories</option>
 										<option value='NU' <c:if test="${volunteer.province eq 'NU'}">selected</c:if>>Nunavut</option>
 										<option value='YT' <c:if test="${volunteer.province eq 'YT'}">selected</c:if>>Yukon</option>
-										
-									</select>
-								</td>
-								<td>
+											
+										</select>
+								</div>	
+								<div class="col-md-4">	
 									<label>City:</label>
-									<input name="city" value="${volunteer.city}"/>
-								</td>
-								<td>
+									<input name="city" class="form-control" value="${volunteer.city}" type="text">
+								</div>
+							</div>
+
+
+							<div class="row form-group">
+								<div class="col-md-4">	
 									<label>Postal Code:</label>
-									<input  name="postalcode" value="${volunteer.postalCode}"/>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<label>Home Phone:</label>
-									<input  name="homephone" value="${volunteer.homePhone}"/>
-								</td>
-								<td>
-									<label>Cell Phone:</label>
-									<input  name="cellphone" value="${volunteer.cellPhone}"/>
-								</td>
-								<td>
-									<label>Email:</label>
-									<input name="email" value="${volunteer.email}" required/>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<label>Emergency Contact:</label>
-									<input name="emergencycontact" value="${volunteer.emergencyContact}"/>
-								</td>
-								<td>
-									<label>Emergency #:</label>
-									<input name="emergencyphone" value="${volunteer.emergencyPhone}"/>
-								</td>
-								<td>&nbsp</td>
-							</tr>
-							<tr>
-								<td colspan='3'><h2>User Account</h2></td>
-							</tr>
+									<input name="postalcode" class="form-control" type="text" value="${volunteer.postalCode}"/>
+								</div>
 							
-							<tr>
-								<td>
-									<label>Username:</label>
-									<input name="username"value="${volunteer.userName}" disabled/>
-								</td>
-								<td>
-									<label>Password:</label>
-									<input type ="password" name="password"/>									
-								</td>
-								<td>
+							
+								<div class="col-md-4">		
+									<label >Home Phone:</label>
+									<input name="homephone" class="form-control" type="text" value="${volunteer.homePhone}">
+								</div>
+
+								<div class="col-md-4">	
+									<label>Cell Phone:</label>
+									<input name="cellphone" class="form-control" type="text" value="${volunteer.cellPhone}">
+								</div>
+							</div>
+
+			
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Email:</label>
+									<input name="email" class="form-control" type="text" value="${volunteer.email}"  required>
+								</div>
+								<div class="col-md-4">
+									<label>Emergency Contact:</label>
+									<input name="emergencycontact" class="form-control" type="text" value="${volunteer.emergencyContact}">
+								</div>
+								<div class="col-md-4">		
+									<label>Emergency #:</label>
+									<input name="emergencyphone" class="form-control" type="text" value="${volunteer.emergencyPhone}">
+								</div>
+							</div>		
+
+
+
+						<h2>User Account </h2>
+
+								<div class="row form-group">
+
+								<div class="col-md-4">
+									<div class="input-group input-group-lg">
+										<span class="input-group-addon">Username</span>
+								 		<input name="username" type="text" class="form-control" value="${volunteer.userName}">
+									</div>
+								</div>
+								
+								<div class="col-md-4">
+									<div class="input-group input-group-lg">
+								  		<span class="input-group-addon">Password</span>
+								  		<input type="password" name="password" class="form-control" >
+									</div>
+								</div>
+																							
+								<div class="col-md-4">
 									<label>Experience:</label>
-									<select name="level" form="modify_volunteer">
+									<select class="form-control" name="level" form="add_volunteer">
 										<option value='E' <c:if test="${volunteer.experienceLevel eq 'E'}">selected</c:if>>Experienced</option>
 										<option value='I' <c:if test="${volunteer.experienceLevel eq 'I'}">selected</c:if>>Intermediate</option>
 										<option value='B' <c:if test="${volunteer.experienceLevel eq 'B'}">selected</c:if> >Beginner</option>
 									</select>	
-								</td>
-							</tr>
-							<tr>
-								<td colspan='3' ><h2> Availability </h2></td>
-							</tr>							
-							<tr>
+								</div>
+							</div>
+
+
+
+						<h2>Availability </h2>
 								<table>
 									<tr>
 										<td width="180"><h4>Monday <input type="checkbox"> N/A | </h4></td>
@@ -186,18 +209,16 @@
 										<td><input type="checkbox" name="availableTime" value="fri-13:00-14:00" <c:if test="${fn:contains(availability, 'fri-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
 										
 									</tr>
-								</table>										
-							</tr>
-							<tr>
-								<td colspan='3'>Notes</td>
-							</tr>
-							<tr>
-								<td colspan='3'><input type="textarea" maxlength="50" name="notes" value="${volunteer.notes}"/></td>
-							</tr>
-							
-						</table>
-			
+								</table>		
+
+
+					<h2> Comments </h2>
+					<div class="col-md-10">		
+						<input type="textarea" class="form-control" maxlength="50" name="notes" value="${volunteer.notes}"/>
+					</div>				
+
 						
+		
 						<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
 						<input class="btn btn-primary" type="submit" value="Save Change" />
 						<input id="volunteerId" name="volunteerId" type="hidden" value="${volunteer.volunteerId}"/>

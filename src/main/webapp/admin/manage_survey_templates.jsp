@@ -45,10 +45,10 @@
 				</tr>
 				</c:forEach>
 			</table>
-			<a href="#addSurvey" data-toggle="modal" class="btn btn-primary"">Add new</a>
+			<a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Add new</a>
 		</div>
 	
-	<!-- Modal -->
+	<!-- OLD Modal 
 	<div id="addSurvey" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
   		<div class="modal-header">
     		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
@@ -82,6 +82,45 @@
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 			<input class="btn btn-primary" form="uploadSurveyForm" type="submit" value="Upload" />
   		</div>
+	</div>-->
+
+<div class="modal fade" id="addSurvey" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    		<h3 id="modalHeader">Add Survey</h3>
+  		</div>
+  		<div class="modal-body">
+  			<form id="uploadSurveyForm" action="upload_survey_template" method="post" enctype="multipart/form-data">
+				<fieldset>
+					<legend>Add new survey</legend>
+					<label>Title:</label>
+					<input type="text" name="title" required/>
+					<label>Description:</label>
+					<input type="text" name="desc"/>
+					<label>Type:</label>
+					<select name="type">
+						<option value="MUMPS">MUMPS</option>
+					</select>
+					<label>Priority: (Higher numbers will be above lower numbers on the patient page)</label>
+					<select name="priority">
+						<c:forEach begin="0" end="9" varStatus="loop">
+						<option value="${loop.index}">${loop.index}</option>
+						</c:forEach>
+					</select>
+					<label>File:</label>
+					<input type="hidden" name="MAX_FILE_SIZE" value="2000000">
+					<input type="file" accept="text/*" name="file" required/>
+				</fieldset>
+			</form>
+  		</div>
+  		<div class="modal-footer">
+    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+			<input class="btn btn-primary" form="uploadSurveyForm" type="submit" value="Upload" />
+  		</div>
 	</div>
+	</div>
+</div>
 </body>
 </html>
