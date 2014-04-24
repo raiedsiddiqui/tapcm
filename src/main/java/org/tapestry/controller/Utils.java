@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.List;
@@ -201,9 +202,24 @@ public class Utils {
 		return strDate;
 	}
 	
-	public static List sortList(List list){	
-		Collections.sort(list);
+	public static List<String> sortList(List<String> list){			
+		if (list != null)
+			Collections.sort(list);
 		return  list;
+	}
+	
+	public static Map<String, String> getAvailabilityMap(){
+		Map<String, String> map = new HashMap<String, String>();
+		
+		String[] displayTime = {"08:00:00 AM", "08:30:00 AM", "09:00:00 AM","09:30:00 AM", "10:00:00 AM", "10:30:00 AM",
+				"11:00:00 AM","11:30:00 AM", "13:00:00 PM", "13:30:00 PM", "14:00:00 PM", "14:30:00 PM", "15:00:00 PM",
+				"15:30:00 PM", "16:00:00 PM"};
+		
+		for (int i= 1; i <= displayTime.length; i++){
+			map.put(String.valueOf(i), displayTime[i-1]);
+		}
+		
+		return map;
 	}
 	
 }

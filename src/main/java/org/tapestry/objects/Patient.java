@@ -9,12 +9,97 @@ public class Patient{
 	private String email;
 	private int volunteer;
 	private String volunteerName;
-	private String notes;
-	private String displayName;
+	private String notes;	
+	private String bod;// birth of date
+	private int age;
+	private String clinic;
+	private String mrp; // family doctor
+	private String city;
+	private String homePhone;
+	private String availability;
+	private String alerts;
+	private boolean myoscarVerified;
+	private int partner; // another volunteer(two volunteers should be assigned per visit)
 	
+	
+	public String getAlerts() {
+		return alerts;
+	}
 
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setAlerts(String alerts) {
+		this.alerts = alerts;
+	}
+
+	public boolean isMyoscarVerified() {
+		return myoscarVerified;
+	}
+
+	public void setMyoscarVerified(boolean myoscarVerified) {
+		this.myoscarVerified = myoscarVerified;
+	}
+
+	public int getPartner() {
+		return partner;
+	}
+
+	public void setPartner(int partner) {
+		this.partner = partner;
+	}
+
+	public String getAvailability() {
+		return availability;
+	}
+
+	public void setAvailability(String availability) {
+		this.availability = availability;
+	}
+
+	public String getBod() {
+		return bod;
+	}
+
+	public void setBod(String bod) {
+		this.bod = bod;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public String getClinic() {
+		return clinic;
+	}
+
+	public void setClinic(String clinic) {
+		this.clinic = clinic;
+	}
+
+	public String getMrp() {
+		return mrp;
+	}
+
+	public void setMrp(String mrp) {
+		this.mrp = mrp;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getHomePhone() {
+		return homePhone;
+	}
+
+	public void setHomePhone(String homePhone) {
+		this.homePhone = homePhone;
 	}
 
 	/**
@@ -160,4 +245,5 @@ public class Patient{
     public void setNotes(String notes){
     	this.notes = notes;
     }
+    
 }

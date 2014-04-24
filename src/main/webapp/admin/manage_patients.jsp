@@ -69,21 +69,45 @@
 						<label>Preferred Name:</label>
 						<input type="text" name="preferredname" class="form-control"/>
 					</div>
+					<div class="col-md-6">
+					<label>Gender:</label>
+						<select name="gender" form="newPatient" class="form-control">
+							<option value="M">Male</option>
+							<option value="F">Female</option>
+							<option value="O">Other</option>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label>Volunteer1:</label>
+						<select name="volunteer1" form="newPatient" class="form-control">
+							<c:forEach items="${volunteers}" var="v">
+								<option value="${v.volunteerId}">${v.firstName}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label>Volunteer2:</label>
+						<select name="volunteer2" form="newPatient" class="form-control">
+							<c:forEach items="${volunteers}" var="v">
+								<option value="${v.volunteerId}">${v.firstName}</option>
+							</c:forEach>
+						</select>
+					</div>
 				</div>		
-					<label>Volunteer</label>
-					<select name="volunteer" form="newPatient" class="form-control">
-						<c:forEach items="${volunteers}" var="v">
-							<option value="${v.volunteerId}">${v.firstName}</option>
-						</c:forEach>
-					</select><br />
-					<label>Gender</label>
-					<select name="gender" form="newPatient" class="form-control">
-						<option value="M">Male</option>
-						<option value="F">Female</option>
-						<option value="O">Other</option>
+					<label>MyOscar verified? </label>
+					<input type="radio" name="myoscar_verified" value="1" checked/>Yes
+					<input type="radio" name="myoscar_verified" value="0"/>No
+					<br/>
+					<label>Clinic:</label>
+					<select name="clinic" form="newPatient" class="form-control">
+						<option value="1">West End Clinic</option>
+						<option value="2">Stonechurch Family Health Center</option>
 					</select>
+					<label>Availability:</label><br/>
 					<label>Notes</label>
 					<textarea name="notes" class="form-control"></textarea>
+					<label>Alerts</label>
+					<textarea name="alerts" class="form-control"></textarea>
 			</form>
   		</div>
   		<div class="modal-footer">

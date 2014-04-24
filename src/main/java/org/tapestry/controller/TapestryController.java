@@ -394,6 +394,7 @@ public class TapestryController{
 		return "redirect:/manage_users";
 	}
 
+	/*
 	@RequestMapping(value="/add_patient", method=RequestMethod.POST)
 	public String addPatient(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
 		//Add a new patient
@@ -503,6 +504,7 @@ public class TapestryController{
 				
 		return "/patient";
 	}
+	*/
 	
 	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
 	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {

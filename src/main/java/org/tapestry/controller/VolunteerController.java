@@ -3,6 +3,9 @@ package org.tapestry.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
@@ -21,6 +24,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.util.StringUtils;
 import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
@@ -93,7 +97,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	}
 	//display all volunteers
 	@RequestMapping(value="/view_volunteers", method=RequestMethod.GET)
-	public String getAllVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String getAllVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		HttpSession  session = request.getSession();	
 		
@@ -202,10 +206,6 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		return "/admin/display_volunteer";
 	}	
 	
-	
-	
-	
-	
 	//create a new volunteer and save in the table of volunteers and users in the DB
 	@RequestMapping(value="/add_volunteer", method=RequestMethod.POST)
 	public String addVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
@@ -260,7 +260,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
 				volunteer.setNotes(request.getParameter("notes"));
 		
-			String strAvailableTime = getAvailableTime(request, "availableTime");
+			String strAvailableTime = getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
 			boolean success = volunteerDao.addVolunteer(volunteer);			
@@ -356,7 +356,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		if (!Utils.isNullOrEmpty(request.getParameter("notes")))
 			volunteer.setNotes(request.getParameter("notes"));
 			
-		String strAvailableTime = getAvailableTime(request, "availableTime");		
+		String strAvailableTime = getAvailableTime(request);		
 		
 		volunteer.setAvailability(strAvailableTime);
 			
@@ -389,32 +389,57 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		List<String> lTuesday = new ArrayList<String>();
 		List<String> lWednesday = new ArrayList<String>();
 		List<String> lThursday = new ArrayList<String>();
-		List<String> lFriday = new ArrayList<String>();		
-		
-		aList = Arrays.asList(availability.split(";"));
+		List<String> lFriday = new ArrayList<String>();	
+			
+		Map<String, String> showAvailableTime = Utils.getAvailabilityMap();		
+		aList = Arrays.asList(availability.split(","));		
 	
-		for (String l : aList){
-			if (l.startsWith("mon"))
-				lMonday.add(l.substring(4));	
+		for (String l : aList){			
+			if (l.startsWith("1"))
+				lMonday = getFormatedTimeList(l, showAvailableTime, lMonday);									
 			
-			if (l.startsWith("tue"))
-				lTuesday.add(l.substring(4));
+			if (l.startsWith("2"))
+				lTuesday = getFormatedTimeList(l, showAvailableTime, lTuesday);									
+
+			if (l.startsWith("3"))
+				lWednesday = getFormatedTimeList(l, showAvailableTime, lWednesday);					
 			
-			if (l.startsWith("wed"))
-				lWednesday.add(l.substring(4));
-			
-			if (l.startsWith("thu"))
-				lThursday.add(l.substring(4));
-			
-			if (l.startsWith("fri"))
-				lFriday.add(l.substring(4));			
-		}
+			if (l.startsWith("4"))
+				lThursday = getFormatedTimeList(l, showAvailableTime, lThursday);	
+						
+			if (l.startsWith("5"))
+				lFriday = getFormatedTimeList(l, showAvailableTime, lFriday);							
+		}	
+		
+		if ((lMonday == null)||(lMonday.size() == 0))
+			lMonday.add("1non");	
+		if ((lTuesday == null)||(lTuesday.size() == 0))
+			lTuesday.add("2non");
+		if ((lWednesday == null)||(lWednesday.size() == 0))
+			lWednesday.add("3non");
+		if ((lThursday == null)||(lThursday.size() == 0))
+			lThursday.add("4non");
+		if ((lFriday == null)||(lFriday.size() == 0))
+			lFriday.add("5non");
+		
 		model.addAttribute("monAvailability", lMonday);		
 		model.addAttribute("tueAvailability", lTuesday);
 		model.addAttribute("wedAvailability", lWednesday);
 		model.addAttribute("thuAvailability", lThursday);
-		model.addAttribute("friAvailability", lFriday);
+		model.addAttribute("friAvailability", lFriday);		
+	}
+	
+	private List<String> getFormatedTimeList(String str, Map<String, String> map, List<String> list){
+		String key;
+		key = str.substring(1);
 		
+		if (!key.equals("non"))
+		{
+			list.add(map.get(key));
+			Utils.sortList(list);
+		}	
+		
+		return list;
 	}
 	
 	private void modifyUser(Volunteer volunteer){		
@@ -477,30 +502,121 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 					
 	}
 	
-
-	
-	private String getAvailableTime(SecurityContextHolderAwareRequestWrapper request, String colName)
-	{
-		StringBuffer sb = new StringBuffer();		
-		String[] availableTime = request.getParameterValues(colName);		
+	private String getAvailableTime(SecurityContextHolderAwareRequestWrapper request)
+	{			
 		String strAvailableTime = "";
+		List<String> availability = new ArrayList<String>();
+		String mondayNull = request.getParameter("mondayNull");
+		String tuesdayNull = request.getParameter("tuesdayNull");
+		String wednesdayNull = request.getParameter("wednesdayNull");
+		String thursdayNull = request.getParameter("thursdayNull");
+		String fridayNull = request.getParameter("fridayNull");		
+		String from1, from2, to1, to2;		
 		
-		if (availableTime != null)
+		//get availability for Monday
+		if (!"non".equals(mondayNull))
 		{
-			for (int i=0; i<availableTime.length; i++)
-			{
-				sb.append(availableTime[i]);
-				sb.append(";");			
-			}
+			from1 = request.getParameter("monFrom1");		
+			from2 = request.getParameter("monFrom2");
+			to1 = request.getParameter("monTo1");
+			to2 = request.getParameter("monTo2");
 			
-			strAvailableTime = sb.toString();
-			if (strAvailableTime.endsWith(";"))
-				strAvailableTime = strAvailableTime.substring(0, strAvailableTime.length()-1);
+			availability = this.getAvailablePeriod(from1, to1, availability);
+			availability = this.getAvailablePeriod(from2, to2, availability);
 		}
+		else
+			availability.add("1non");		
 		
+		//get availability for Tuesday
+		if(!"non".equals(tuesdayNull))
+		{
+			from1 = request.getParameter("tueFrom1");
+			from2 = request.getParameter("tueFrom2");
+			to1 = request.getParameter("tueTo1");
+			to2 = request.getParameter("tueTo2");		
+						
+			availability = this.getAvailablePeriod(from1, to1, availability);				
+			availability = this.getAvailablePeriod(from2, to2, availability);
+		}
+		else
+			availability.add("2non");
+		
+		//get availability for Wednesday
+		if (!"non".equals(wednesdayNull))
+		{
+			from1 = request.getParameter("wedFrom1");
+			from2 = request.getParameter("wedFrom2");
+			to1 = request.getParameter("wedTo1");
+			to2 = request.getParameter("wedTo2");
+			
+			availability = this.getAvailablePeriod(from1, to1, availability);
+			availability = this.getAvailablePeriod(from2, to2, availability);		
+		}
+		else
+			availability.add("3non");
+		
+		//get availability for Thursday
+		if (!"non".equals(thursdayNull))
+		{
+			from1 = request.getParameter("thuFrom1");
+			from2 = request.getParameter("thuFrom2");
+			to1 = request.getParameter("thuTo1");
+			to2 = request.getParameter("thuTo2");
+			
+			availability = this.getAvailablePeriod(from1, to1, availability);
+			availability = this.getAvailablePeriod(from2, to2, availability);	
+		}
+		else
+			availability.add("4non");
+		
+		//get availability for Friday
+		if(!"non".equals(fridayNull))
+		{			
+			from1 = request.getParameter("friFrom1");
+			from2 = request.getParameter("friFrom2");
+			to1 = request.getParameter("friTo1");
+			to2 = request.getParameter("friTo2");	
+						
+			availability = this.getAvailablePeriod(from1, to1, availability);
+			availability = this.getAvailablePeriod(from2, to2, availability);
+		}
+		else
+			availability.add("5non");
+	
+		//convert arrayList to string for matching data type in DB
+		if (availability != null)
+			strAvailableTime=StringUtils.collectionToCommaDelimitedString(availability);	
 		
 		return strAvailableTime;
 	}
 	
+	private List<String> getAvailablePeriod(String from, String to, List<String> list){
+		StringBuffer sb;
+		int start, end;
+		String dayOfWeek;
+		
+		if(	(!from.equals(to)) && ((!"0".equals(from)) && (!"0".equals(to))))
+		{
+			//first letter in the string stands for the day of week
+			dayOfWeek = from.substring(0, 1);
+			from = from.substring(1);
+			to = to.substring(1);
+			
+			start = Integer.valueOf(from);
+			end = Integer.valueOf(to);
+			
+			//endTime must great than startTime
+			if (end > start){
+				for (int i = start; i <end; i++)
+				{
+					sb = new StringBuffer();		
+					sb = sb.append(dayOfWeek);
+					sb.append(String.valueOf(i));				
+					list.add(sb.toString());
+				}
+			}				
+		}			
+		return list;
+	}	
 
 }

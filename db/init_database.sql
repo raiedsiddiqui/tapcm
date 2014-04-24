@@ -23,6 +23,11 @@ CREATE TABLE IF NOT EXISTS patients (
 	email VARCHAR(50),
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
 	notes TEXT,
+	alerts TEXT,
+	availability VARCHAR(255),
+	clinic VARCHAR(255),
+	myoscar_verified TINYINT(1) NOT NULL, /* 0--not authenticated, 1--authenticated*/
+	volunteer2 TINYINT UNSIGNED NOT NULL,/* Same as user_ID */
 	PRIMARY KEY (patient_ID)
 );
 

@@ -25,12 +25,13 @@
 
 </head>
 <body>
+<%@include file="navbar.jsp" %>
 <div><h4><a href="<c:url value="/view_volunteers"/>" >Volunteers</a> > ${volunteer.displayName}</h4></div>
 <div>
 <table>
 	<tr>
-		<td width="500">
-			<h2>${volunteer.displayName}</h2><h3><a href="<c:url value="/modify_volunteer/${volunteer.volunteerId}"/>">Edit</a></h3>
+		<td width="400">
+			<h2>${volunteer.displayName}<a href="<c:url value="/modify_volunteer/${volunteer.volunteerId}"/>">Edit</a></h2>
 		</td>
 		<td>
 			<a  href="#displayActivityLog" class="btn btn-primary" data-toggle="modal">Activity Log</a>
@@ -80,12 +81,12 @@
 				<table>
 					<tr><th>Monday</th></tr>
 					<c:choose>
-						<c:when test="${empty monAvailability }">
+						<c:when test="${fn:contains(monAvailability, 'non')}">
 							<tr><td>N/A</td></tr>		
 						</c:when>
 						<c:otherwise >
 						    <c:forEach items="${monAvailability}" var="moA">	
-						    	<tr><td>${moA}</td></tr>		
+						    	<tr><td align="center">${moA}</td></tr>		
 						    </c:forEach>							
 						</c:otherwise>
 					</c:choose>						
@@ -95,12 +96,12 @@
 				<table>
 					<tr><th>Tuesday</th></tr>
 					<c:choose>
-						<c:when test="${empty tueAvailability }">
+						<c:when test="${fn:contains(tueAvailability, 'non') }">
 							<tr><td>N/A</td></tr>		
 						</c:when>
 						<c:otherwise >
 						    <c:forEach items="${tueAvailability}" var="tuA">	
-						    	<tr><td>${tuA}</td></tr>		
+						    	<tr><td align="center">${tuA}</td></tr>		
 						    </c:forEach>							
 						</c:otherwise>
 					</c:choose>
@@ -110,12 +111,12 @@
 				<table>
 					<tr><th>Wednesday</th></tr>
 					<c:choose>
-						<c:when test="${empty wedAvailability }">
+						<c:when test="${fn:contains(wedAvailability, 'non') }">
 							<tr><td>N/A</td></tr>		
 						</c:when>
 						<c:otherwise >
 						    <c:forEach items="${wedAvailability}" var="weA">	
-						    	<tr><td>${weA}</td></tr>		
+						    	<tr><td align="center">${weA}</td></tr>		
 						    </c:forEach>							
 						</c:otherwise>
 					</c:choose>
@@ -125,12 +126,12 @@
 				<table>
 					<tr><th>Thursday</th></tr>
 					<c:choose>
-						<c:when test="${empty thuAvailability }">
+						<c:when test="${fn:contains(thuAvailability, 'non') }">
 							<tr><td>N/A</td></tr>		
 						</c:when>
 						<c:otherwise >
 						    <c:forEach items="${thuAvailability}" var="thA">	
-						    	<tr><td>${thA}</td></tr>		
+						    	<tr><td align="center">${thA}</td></tr>		
 						    </c:forEach>							
 						</c:otherwise>
 					</c:choose>
@@ -139,14 +140,14 @@
 			<td width ="200" valign="top">
 			
 				<table>
-					<tr><th>Friday</th></tr>					
+					<tr><th>Friday</th></tr>		
 					<c:choose>
-						<c:when test="${empty friAvailability }">
+						<c:when test="${fn:contains(friAvailability, 'non')}">
 							<tr><td>N/A</td></tr>		
 						</c:when>
 						<c:otherwise >
 						    <c:forEach items="${friAvailability}" var="frA">	
-						    	<tr><td>${frA}</td></tr>		
+						    	<tr><td align="center">${frA}</td></tr>		
 						    </c:forEach>							
 						</c:otherwise>
 					</c:choose>

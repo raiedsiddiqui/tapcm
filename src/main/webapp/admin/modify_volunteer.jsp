@@ -69,7 +69,7 @@
 							<div class="row form-group">
 								<div class="col-md-4">	
 									<label>Country:</label>
-										<select name="country" form="add_volunteer" class="form-control"s>
+										<select name="country" form="modify_volunteer" class="form-control"s>
 										<option value="CA" <c:if test="${volunteer.country eq 'CA'}">selected</c:if>>Canada</option>
 										<option value="ST" <c:if test="${volunteer.country eq 'ST'}">selected</c:if>>USA</option>
 										<option value="CH" <c:if test="${volunteer.country eq 'CH'}">selected</c:if>>China</option>
@@ -78,7 +78,7 @@
 								</div>
 								<div class="col-md-4">	
 									<label>Province:</label>
-										<select name="province" form="add_volunteer" class="form-control">
+										<select name="province" form="modify_volunteer" class="form-control">
 										<option value='AB' <c:if test="${volunteer.province eq 'AB'}">selected</c:if>>Alberta</option>
 										<option value='BC' <c:if test="${volunteer.province eq 'BC'}">selected</c:if>>British Colunmbia</option>							
 										<option value='MB' <c:if test="${volunteer.province eq 'MB'}">selected</c:if>>Manitoba</option>
@@ -158,7 +158,7 @@
 																							
 								<div class="col-md-4">
 									<label>Experience:</label>
-									<select class="form-control" name="level" form="add_volunteer">
+									<select class="form-control" name="level" form="modify_volunteer">
 										<option value='E' <c:if test="${volunteer.experienceLevel eq 'E'}">selected</c:if>>Experienced</option>
 										<option value='I' <c:if test="${volunteer.experienceLevel eq 'I'}">selected</c:if>>Intermediate</option>
 										<option value='B' <c:if test="${volunteer.experienceLevel eq 'B'}">selected</c:if> >Beginner</option>
@@ -169,56 +169,386 @@
 
 
 						<h2>Availability </h2>
-								<table>
-									<tr>
-										<td width="180"><h4>Monday <input type="checkbox"> N/A | </h4></td>
-										<td width="180"><h4>Tuesday <input type="checkbox" > N/A | </h4></td>
-										<td width="180"><h4>Wednesday <input type="checkbox"> N/A | </h4></td>
-										<td width="180"><h4>Thursday <input type="checkbox" > N/A |</h4></td>
-										<td width="180"><h4>Friday <input type="checkbox"> N/A </h4></td>
-									</tr>									
-									<tr><c:set var="availability" value="${volunteer.availability}"/>
-										<td><input type="checkbox" name="availableTime" value="mon-09:00-10:00" <c:if test="${fn:contains(availability, 'mon-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
-										<td><input type="checkbox" name="availableTime" value="tue-09:00-10:00" <c:if test="${fn:contains(availability, 'tue-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
-										<td><input type="checkbox" name="availableTime" value="wed-09:00-10:00" <c:if test="${fn:contains(availability, 'wed-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
-										<td><input type="checkbox" name="availableTime" value="thu-09:00-10:00" <c:if test="${fn:contains(availability, 'thu-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
-										<td><input type="checkbox" name="availableTime" value="fri-09:00-10:00" <c:if test="${fn:contains(availability, 'fri-09:00-10:00')}">checked</c:if>>09:00--10:00</td>
-										
-									</tr>
-									<tr>
-										<td><input type="checkbox" name="availableTime" value="mon-10:00-11:00" <c:if test="${fn:contains(availability, 'mon-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
-										<td><input type="checkbox" name="availableTime" value="tue-10:00-11:00" <c:if test="${fn:contains(availability, 'tue-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
-										<td><input type="checkbox" name="availableTime" value="wed-10:00-11:00" <c:if test="${fn:contains(availability, 'wed-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
-										<td><input type="checkbox" name="availableTime" value="thu-10:00-11:00" <c:if test="${fn:contains(availability, 'thu-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
-										<td><input type="checkbox" name="availableTime" value="fri-10:00-11:00" <c:if test="${fn:contains(availability, 'fri-10:00-11:00')}">checked</c:if>>10:00--11:00</td>
-										
-									</tr>
-									<tr>
-										<td><input type="checkbox" name="availableTime" value="mon-11:00-12:00" <c:if test="${fn:contains(availability, 'mon-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
-										<td><input type="checkbox" name="availableTime" value="tue-11:00-12:00" <c:if test="${fn:contains(availability, 'tue-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
-										<td><input type="checkbox" name="availableTime" value="wed-11:00-12:00" <c:if test="${fn:contains(availability, 'wed-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
-										<td><input type="checkbox" name="availableTime" value="thu-11:00-12:00" <c:if test="${fn:contains(availability, 'thu-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
-										<td><input type="checkbox" name="availableTime" value="fri-11:00-12:00" <c:if test="${fn:contains(availability, 'fri-11:00-12:00')}">checked</c:if>>11:00--12:00</td>
-										
-									</tr>
-									<tr>
-										<td><input type="checkbox" name="availableTime" value="mon-13:00-14:00" <c:if test="${fn:contains(availability, 'mon-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
-										<td><input type="checkbox" name="availableTime" value="tue-13:00-14:00" <c:if test="${fn:contains(availability, 'tue-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
-										<td><input type="checkbox" name="availableTime" value="wed-13:00-14:00" <c:if test="${fn:contains(availability, 'wed-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
-										<td><input type="checkbox" name="availableTime" value="thu-13:00-14:00" <c:if test="${fn:contains(availability, 'thu-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
-										<td><input type="checkbox" name="availableTime" value="fri-13:00-14:00" <c:if test="${fn:contains(availability, 'fri-13:00-14:00')}">checked</c:if>>13:00--14:00</td>
-										
-									</tr>
-								</table>		
-
+						<c:set var="availability" value="${volunteer.availability}"/>
+							<table>
+										<tr>
+											<td class="col-md-2"><h4>Monday <input type="checkbox" name="mondayNull" <c:if test="${fn:contains(availability, '1non')}">checked</c:if> value = "non"> N/A</h4></td>
+											<td class="col-md-2"><h4>Tuesday <input type="checkbox" name="tuesdayNull" <c:if test="${fn:contains(availability, '2non')}">checked</c:if> value = "non"> N/A </h4></td>
+											<td class="col-md-2"><h4>Wednesday <input type="checkbox" name="wednesdayNull" <c:if test="${fn:contains(availability, '3non')}">checked</c:if> value = "non"> N/A</h4></td>
+											<td class="col-md-2"><h4>Thursday <input type="checkbox" name="thursdayNull" value = "non" <c:if test="${fn:contains(availability, '4non')}">checked</c:if>> N/A</h4>	</td>
+											<td class="col-md-2"><h4>Friday <input type="checkbox" name="fridayNull" value = "non" <c:if test="${fn:contains(availability, '5non')}">checked</c:if>> N/A</h4></td>
+										</tr>
+										<tr>
+											<td class="col-md-2"><select name="monFrom1" form="modify_volunteer">
+										<option value="0">...</option>
+										<option value="11" >08:00 AM</option>
+										<option value="12" >08:30 AM</option>
+										<option value="13" >09:00 AM</option>
+										<option value="14" >09:30 AM</option>
+										<option value="15" >10:00 AM</option>
+										<option value="16" >10:30 AM</option>
+										<option value="17" >11:00 AM</option>
+										<option value="18" >11:30 AM</option>
+										<option value="19" >13:00 PM</option>
+										<option value="110" >13:30 PM</option>
+										<option value="111" >14:00 PM</option>
+										<option value="112" >14:30 PM</option>
+										<option value="113" >15:00 PM</option>
+										<option value="114" >15:30 PM</option>
+										<option value="115" >16:00 PM</option>
+									</select> TO <select name="monTo1" form="modify_volunteer">
+										<option value="0">...</option>
+										<option value="11">08:00 AM</option>
+										<option value="12">08:30 AM</option>
+										<option value="13">09:00 AM</option>
+										<option value="14">09:30 AM</option>
+										<option value="15">10:00 AM</option>
+										<option value="16">10:30 AM</option>
+										<option value="17">11:00 AM</option>
+										<option value="18">11:30 AM</option>
+										<option value="19">13:00 PM</option>
+										<option value="110">13:30 PM</option>
+										<option value="111">14:00 PM</option>
+										<option value="112">14:30 PM</option>
+										<option value="113">15:00 PM</option>
+										<option value="114">15:30 PM</option>
+										<option value="115">16:00 PM</option>
+									</select>
+									<select name="monFrom2" form="modify_volunteer">
+										<option value="0">...</option>
+										<option value="11">08:00 AM</option>
+										<option value="12">08:30 AM</option>
+										<option value="13">09:00 AM</option>
+										<option value="14">09:30 AM</option>
+										<option value="15">10:00 AM</option>
+										<option value="16">10:30 AM</option>
+										<option value="17">11:00 AM</option>
+										<option value="18">11:30 AM</option>
+										<option value="19">13:00 PM</option>
+										<option value="110">13:30 PM</option>
+										<option value="111">14:00 PM</option>
+										<option value="112">14:30 PM</option>
+										<option value="113">15:00 PM</option>
+										<option value="114">15:30 PM</option>
+										<option value="115">16:00 PM</option>
+									</select> TO <select name="monTo2" form="modify_volunteer">
+									<option value="0"></option>
+										<option value="0">...</option>
+										<option value="11">08:00 AM</option>
+										<option value="12">08:30 AM</option>
+										<option value="13">09:00 AM</option>
+										<option value="14">09:30 AM</option>
+										<option value="15">10:00 AM</option>
+										<option value="16">10:30 AM</option>
+										<option value="17">11:00 AM</option>
+										<option value="18">11:30 AM</option>
+										<option value="19">13:00 PM</option>
+										<option value="110">13:30 PM</option>
+										<option value="111">14:00 PM</option>
+										<option value="112">14:30 PM</option>
+										<option value="113">15:00 PM</option>
+										<option value="114">15:30 PM</option>
+										<option value="115">16:00 PM</option>
+									</select>
+								</td>
+											<td>
+											<select name="tueFrom1" form="modify_volunteer">
+									<option value="0"></option>
+										<option value="21">08:00 AM</option>
+										<option value="22">08:30 AM</option>
+										<option value="23">09:00 AM</option>
+										<option value="24">09:30 AM</option>
+										<option value="25">10:00 AM</option>
+										<option value="26">10:30 AM</option>
+										<option value="27">11:00 AM</option>
+										<option value="28">11:30 AM</option>
+										<option value="29">13:00 PM</option>
+										<option value="210">13:30 PM</option>
+										<option value="211">14:00 PM</option>
+										<option value="212">14:30 PM</option>
+										<option value="213">15:00 PM</option>
+										<option value="214">15:30 PM</option>
+										<option value="215">16:00 PM</option>
+									</select> TO <select name="tueTo1" form="modify_volunteer">
+									<option value="0"></option>
+										<option value="21">08:00 AM</option>
+										<option value="22">08:30 AM</option>
+										<option value="23">09:00 AM</option>
+										<option value="24">09:30 AM</option>
+										<option value="25">10:00 AM</option>
+										<option value="26">10:30 AM</option>
+										<option value="27">11:00 AM</option>
+										<option value="28">11:30 AM</option>
+										<option value="29">13:00 PM</option>
+										<option value="210">13:30 PM</option>
+										<option value="211">14:00 PM</option>
+										<option value="212">14:30 PM</option>
+										<option value="213">15:00 PM</option>
+										<option value="214">15:30 PM</option>
+										<option value="215">16:00 PM</option>
+									</select>
+									<select name="tueFrom2" form="modify_volunteer">
+									<option value="0"></option>
+										<option value="21">08:00 AM</option>
+										<option value="22">08:30 AM</option>
+										<option value="23">09:00 AM</option>
+										<option value="24">09:30 AM</option>
+										<option value="25">10:00 AM</option>
+										<option value="26">10:30 AM</option>
+										<option value="27">11:00 AM</option>
+										<option value="28">11:30 AM</option>
+										<option value="29">13:00 PM</option>
+										<option value="210">13:30 PM</option>
+										<option value="211">14:00 PM</option>
+										<option value="212">14:30 PM</option>
+										<option value="213">15:00 PM</option>
+										<option value="214">15:30 PM</option>
+										<option value="215">16:00 PM</option>
+									</select> TO <select name="tueTo2" form="modify_volunteer">
+									<option value="0"></option>
+										<option value="21">08:00 AM</option>
+										<option value="22">08:30 AM</option>
+										<option value="23">09:00 AM</option>
+										<option value="24">09:30 AM</option>
+										<option value="25">10:00 AM</option>
+										<option value="26">10:30 AM</option>
+										<option value="27">11:00 AM</option>
+										<option value="28">11:30 AM</option>
+										<option value="29">13:00 PM</option>
+										<option value="210">13:30 PM</option>
+										<option value="211">14:00 PM</option>
+										<option value="212">14:30 PM</option>
+										<option value="213">15:00 PM</option>
+										<option value="214">15:30 PM</option>
+										<option value="215">16:00 PM</option>
+									</select>
+											</td>
+											<td>
+											<select name="wedFrom1" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="31">08:00 AM</option>
+											<option value="32">08:30 AM</option>
+											<option value="33">09:00 AM</option>
+											<option value="34">09:30 AM</option>
+											<option value="35">10:00 AM</option>
+											<option value="36">10:30 AM</option>
+											<option value="37">11:00 AM</option>
+											<option value="38">11:30 AM</option>
+											<option value="39">13:00 PM</option>
+											<option value="310">13:30 PM</option>
+											<option value="311">14:00 PM</option>
+											<option value="312">14:30 PM</option>
+											<option value="313">15:00 PM</option>
+											<option value="314">15:30 PM</option>
+											<option value="315">16:00 PM</option>
+										</select> TO <select name="wedTo1" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="31">08:00 AM</option>
+											<option value="32">08:30 AM</option>
+											<option value="33">09:00 AM</option>
+											<option value="34">09:30 AM</option>
+											<option value="35">10:00 AM</option>
+											<option value="36">10:30 AM</option>
+											<option value="37">11:00 AM</option>
+											<option value="38">11:30 AM</option>
+											<option value="39">13:00 PM</option>
+											<option value="310">13:30 PM</option>
+											<option value="311">14:00 PM</option>
+											<option value="312">14:30 PM</option>
+											<option value="313">15:00 PM</option>
+											<option value="314">15:30 PM</option>
+											<option value="315">16:00 PM</option>
+										</select>
+										<select name="wedFrom2" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="31">08:00 AM</option>
+											<option value="32">08:30 AM</option>
+											<option value="33">09:00 AM</option>
+											<option value="34">09:30 AM</option>
+											<option value="35">10:00 AM</option>
+											<option value="36">10:30 AM</option>
+											<option value="37">11:00 AM</option>
+											<option value="38">11:30 AM</option>
+											<option value="39">13:00 PM</option>
+											<option value="310">13:30 PM</option>
+											<option value="311">14:00 PM</option>
+											<option value="312">14:30 PM</option>
+											<option value="313">15:00 PM</option>
+											<option value="314">15:30 PM</option>
+											<option value="315">16:00 PM</option>
+										</select> TO <select name="wedTo2" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="31">08:00 AM</option>
+											<option value="32">08:30 AM</option>
+											<option value="33">09:00 AM</option>
+											<option value="34">09:30 AM</option>
+											<option value="35">10:00 AM</option>
+											<option value="36">10:30 AM</option>
+											<option value="37">11:00 AM</option>
+											<option value="38">11:30 AM</option>
+											<option value="39">13:00 PM</option>
+											<option value="310">13:30 PM</option>
+											<option value="311">14:00 PM</option>
+											<option value="312">14:30 PM</option>
+											<option value="313">15:00 PM</option>
+											<option value="314">15:30 PM</option>
+											<option value="315">16:00 PM</option>
+										</select>
+											</td>
+											<td>
+											<select name="thuFrom1" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="41">08:00 AM</option>
+											<option value="42">08:30 AM</option>
+											<option value="43">09:00 AM</option>
+											<option value="44">09:30 AM</option>
+											<option value="45">10:00 AM</option>
+											<option value="46">10:30 AM</option>
+											<option value="47">11:00 AM</option>
+											<option value="48">11:30 AM</option>
+											<option value="49">13:00 PM</option>
+											<option value="410">13:30 PM</option>
+											<option value="411">14:00 PM</option>
+											<option value="412">14:30 PM</option>
+											<option value="413">15:00 PM</option>
+											<option value="414">15:30 PM</option>
+											<option value="415">16:00 PM</option>
+										</select> TO <select name="thuTo1" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="41">08:00 AM</option>
+											<option value="42">08:30 AM</option>
+											<option value="43">09:00 AM</option>
+											<option value="44">09:30 AM</option>
+											<option value="45">10:00 AM</option>
+											<option value="46">10:30 AM</option>
+											<option value="47">11:00 AM</option>
+											<option value="48">11:30 AM</option>
+											<option value="49">13:00 PM</option>
+											<option value="410">13:30 PM</option>
+											<option value="411">14:00 PM</option>
+											<option value="412">14:30 PM</option>
+											<option value="413">15:00 PM</option>
+											<option value="414">15:30 PM</option>
+											<option value="415">16:00 PM</option>
+										</select>
+										<select name="thuFrom2" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="41">08:00 AM</option>
+											<option value="42">08:30 AM</option>
+											<option value="43">09:00 AM</option>
+											<option value="44">09:30 AM</option>
+											<option value="45">10:00 AM</option>
+											<option value="46">10:30 AM</option>
+											<option value="47">11:00 AM</option>
+											<option value="48">11:30 AM</option>
+											<option value="49">13:00 PM</option>
+											<option value="410">13:30 PM</option>
+											<option value="411">14:00 PM</option>
+											<option value="412">14:30 PM</option>
+											<option value="413">15:00 PM</option>
+											<option value="414">15:30 PM</option>
+											<option value="415">16:00 PM</option>
+										</select> TO <select name="thuTo2" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="41">08:00 AM</option>
+											<option value="42">08:30 AM</option>
+											<option value="43">09:00 AM</option>
+											<option value="44">09:30 AM</option>
+											<option value="45">10:00 AM</option>
+											<option value="46">10:30 AM</option>
+											<option value="47">11:00 AM</option>
+											<option value="48">11:30 AM</option>
+											<option value="49">13:00 PM</option>
+											<option value="410">13:30 PM</option>
+											<option value="411">14:00 PM</option>
+											<option value="412">14:30 PM</option>
+											<option value="413">15:00 PM</option>
+											<option value="414">15:30 PM</option>
+											<option value="415">16:00 PM</option>
+										</select>
+											</td>
+											<td>
+											<select name="friFrom1" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="51">08:00 AM</option>
+											<option value="52">08:30 AM</option>
+											<option value="53">09:00 AM</option>
+											<option value="54">09:30 AM</option>
+											<option value="55">10:00 AM</option>
+											<option value="56">10:30 AM</option>
+											<option value="57">11:00 AM</option>
+											<option value="58">11:30 AM</option>
+											<option value="59">13:00 PM</option>
+											<option value="510">13:30 PM</option>
+											<option value="511">14:00 PM</option>
+											<option value="512">14:30 PM</option>
+											<option value="513">15:00 PM</option>
+											<option value="514">15:30 PM</option>
+											<option value="515">16:00 PM</option>
+										</select> TO <select name="friTo1" form="modify_volunteer">
+										<option value="0"></option>
+										<option value="51">08:00 AM</option>
+											<option value="52">08:30 AM</option>
+											<option value="53">09:00 AM</option>
+											<option value="54">09:30 AM</option>
+											<option value="55">10:00 AM</option>
+											<option value="56">10:30 AM</option>
+											<option value="57">11:00 AM</option>
+											<option value="58">11:30 AM</option>
+											<option value="59">13:00 PM</option>
+											<option value="510">13:30 PM</option>
+											<option value="511">14:00 PM</option>
+											<option value="512">14:30 PM</option>
+											<option value="513">15:00 PM</option>
+											<option value="514">15:30 PM</option>
+											<option value="515">16:00 PM</option>
+										</select>
+										<select name="friFrom2" form="modify_volunteer">
+										<option value="0"></option>
+											<option value="51">08:00 AM</option>
+											<option value="52">08:30 AM</option>
+											<option value="53">09:00 AM</option>
+											<option value="54">09:30 AM</option>
+											<option value="55">10:00 AM</option>
+											<option value="56">10:30 AM</option>
+											<option value="57">11:00 AM</option>
+											<option value="58">11:30 AM</option>
+											<option value="59">13:00 PM</option>
+											<option value="510">13:30 PM</option>
+											<option value="511">14:00 PM</option>
+											<option value="512">14:30 PM</option>
+											<option value="513">15:00 PM</option>
+											<option value="514">15:30 PM</option>
+											<option value="515">16:00 PM</option>
+										</select> TO <select name="friTo2" form="modify_volunteer">
+										<option value="0"></option>
+										<option value="401">08:00 AM</option>
+											<option value="51">08:00 AM</option>
+											<option value="52">08:30 AM</option>
+											<option value="53">09:00 AM</option>
+											<option value="54">09:30 AM</option>
+											<option value="55">10:00 AM</option>
+											<option value="56">10:30 AM</option>
+											<option value="57">11:00 AM</option>
+											<option value="58">11:30 AM</option>
+											<option value="59">13:00 PM</option>
+											<option value="510">13:30 PM</option>
+											<option value="511">14:00 PM</option>
+											<option value="512">14:30 PM</option>
+											<option value="513">15:00 PM</option>
+											<option value="514">15:30 PM</option>
+											<option value="515">16:00 PM</option>
+										</select>
+											</td>
+										</tr>
+									</table>
+	
 
 					<h2> Comments </h2>
 					<div class="col-md-10">		
 						<input type="textarea" class="form-control" maxlength="50" name="notes" value="${volunteer.notes}"/>
 					</div>				
 
-						
-		
 						<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
 						<input class="btn btn-primary" type="submit" value="Save Change" />
 						<input id="volunteerId" name="volunteerId" type="hidden" value="${volunteer.volunteerId}"/>

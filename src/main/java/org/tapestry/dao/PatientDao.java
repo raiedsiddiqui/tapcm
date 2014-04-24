@@ -195,13 +195,22 @@ public class PatientDao {
 	*/
     public void createPatient(Patient p){
 		try{
-			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer, gender, notes) VALUES (?, ?, ?, ?, ?, ?)");
+			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
+					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			statement.setString(1, p.getFirstName());
 			statement.setString(2, p.getLastName());
 			statement.setString(3, p.getPreferredName());
 			statement.setInt(4, p.getVolunteer());
 			statement.setString(5, p.getGender());
 			statement.setString(6, p.getNotes());
+			statement.setInt(7, p.getPartner());
+			statement.setString(8, p.getAlerts());
+			
+			if (p.isMyoscarVerified())
+				statement.setInt(9, 1);
+			else
+				statement.setInt(9, 0);
+			statement.setString(10, p.getClinic());
 			statement.execute();
 		} catch (SQLException e){
 			System.out.println("Error: Could not create patient");

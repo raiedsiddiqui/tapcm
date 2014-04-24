@@ -244,10 +244,11 @@ public class SurveyResultDao
 	public String assignSurvey(SurveyResult sr) {
 		String resultId = null;
 		try {
-			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data) values (?,?,?)");
+			statement = con.prepareStatement("INSERT INTO survey_results (patient_ID, survey_ID, data, startDate) values (?,?,?,?)");
 			statement.setInt(1, sr.getPatientID());
 			statement.setInt(2, sr.getSurveyID());
 			statement.setBytes(3, sr.getResults());
+			statement.setString(4,sr.getStartDate());
 			statement.execute();
 			
 			 //Look up the id of the new survey result
