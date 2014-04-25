@@ -23,11 +23,6 @@
 		<div class="row-fluid">
 			<h2>Edit Patient</h2>
 		  	<form id="editPatient" method="post" action="<c:url value="/submit_edit_patient/${patient.patientID}"/>">
-				
-
-
-
-
 
 				<div class="row form-group">
   					<div class="col-md-6">

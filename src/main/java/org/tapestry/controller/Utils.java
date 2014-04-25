@@ -2,6 +2,7 @@ package org.tapestry.controller;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
+import org.springframework.ui.ModelMap;
 import org.tapestry.dao.NarrativeDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.objects.User;
@@ -221,5 +223,99 @@ public class Utils {
 		
 		return map;
 	}
+	
+	public static void getPosition(String dayOfWeek, String attribute, String[] alist,
+			boolean dayNull, ModelMap model)
+	{
+		List<String> list = new ArrayList<String>();	
+		String[] positions = new String[4];
+		
+		for (String str: alist){
+			if (str.startsWith(dayOfWeek))
+				list.add(str.substring(1));
+		}
+		
+		if (list.size() > 1)
+		{
+			positions = getPosition(list);
+			model.addAttribute(attribute, positions);
+		}
+		else
+			dayNull = true;
+	}
+	
+	public static String[] getPosition(List<String> list){	
+		String[] positions = new String[4];		
+		int size = list.size();
+		
+		positions[0] = list.get(0);		
+		String current, next;
+		int iCurrent, iNext;
+		
+				
+		mainloop:
+		for (int i = 0; i<size; i++){			
+			current = list.get(i);
+					
+			if ((i + 1) == size)//only one dropdown has values
+			{//value of end position which is displayed on dropdown 
+				int j = Integer.valueOf(list.get(i));
+				j++;
+				positions[1] = String.valueOf(j);
+				positions[2] = "null";
+				positions[3] = "null";
+			}
+			else// both dropdown have values
+			{
+				next = list.get(i+1);						
+				iCurrent = Integer.valueOf(current);
+				iNext = Integer.valueOf(next);
+					
+				//separate two group of data for two dropdown to find start position and end position
+				if ((iNext - iCurrent) > 1){	
+					//value of end position which is displayed on dropdown 
+					positions[1] = String.valueOf(iCurrent + 1);
+					positions[2] = list.get(i+1);				
+					//value of end position which is displayed on dropdown 
+					positions[3] = String.valueOf(Integer.valueOf(list.get(size-1)) +1 );
+					
+					break mainloop;
+				}
+			}
+		}
+		return positions;
+	}
+	
+	public static List<String> getAvailablePeriod(String from, String to, List<String> list){
+		StringBuffer sb;
+		int start, end;
+		String dayOfWeek;
+		
+		if ((from.length() == 1) || (to.length() == 1 ))//nothing selected 
+			return list;
+		else
+		{
+			//first letter in the string stands for the day of week
+			dayOfWeek = from.substring(0, 1);		
+			
+			from = from.substring(1);
+			to = to.substring(1);
+				
+			start = Integer.valueOf(from);
+			end = Integer.valueOf(to);
+				
+			//endTime must great than startTime
+			if (end > start){
+				for (int i = start; i <end; i++)
+				{
+					sb = new StringBuffer();		
+					sb = sb.append(dayOfWeek);
+					sb.append(String.valueOf(i));				
+					list.add(sb.toString());
+				}
+			}					
+			return list;
+		}
+	}	
 	
 }

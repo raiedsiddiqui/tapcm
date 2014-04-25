@@ -276,5 +276,20 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 				
 		return "/patient";
 	}
+	
+	@RequestMapping(value="/view_clients_admin", method=RequestMethod.GET)
+	public String viewPatientsFromAdmin(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		List<Patient> patients = getAllPatients();
+		
+		model.addAttribute("patients", patients);
+		return "redirect:/manage_patients";
+	}
+	
+	private List<Patient> getAllPatients(){
+		List<Patient> patients = new ArrayList<Patient>();
+		patients = patientDao.getAllPatients();
+		
+		return patients;
+	}
 
 }

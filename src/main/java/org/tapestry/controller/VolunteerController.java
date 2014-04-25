@@ -278,16 +278,46 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			
 			return "redirect:/view_volunteers";
 		}
-	}
-	
+	}	
 	
 	@RequestMapping(value="/modify_volunteer/{volunteerId}", method=RequestMethod.GET)
 	public String modifyVolunteer(SecurityContextHolderAwareRequestWrapper request, 
 			@PathVariable("volunteerId") int id, ModelMap model){
 		Volunteer volunteer = new Volunteer();
 		volunteer = volunteerDao.getVolunteerById(id);
-				
+		
+		String strAvailibilities = volunteer.getAvailability();
+		boolean mondayNull = false;
+		boolean tuesdayNull = false;
+		boolean wednesdayNull = false;
+		boolean thursdayNull = false;
+		boolean fridayNull = false;
+		
+		if (strAvailibilities.contains("1non"))
+			mondayNull = true;
+		if (strAvailibilities.contains("2non"))
+			tuesdayNull = true;
+		if (strAvailibilities.contains("3non"))
+			wednesdayNull = true;
+		if (strAvailibilities.contains("4non"))
+			thursdayNull = true;
+		if (strAvailibilities.contains("5non"))
+			fridayNull = true;
+		
+		String[] arrayAvailibilities = strAvailibilities.split(",");
+		
+		Utils.getPosition("1","monDropPosition",arrayAvailibilities,mondayNull, model);
+		Utils.getPosition("2","tueDropPosition",arrayAvailibilities,tuesdayNull, model);
+		Utils.getPosition("3","wedDropPosition",arrayAvailibilities,wednesdayNull, model);
+		Utils.getPosition("4","thuDropPosition",arrayAvailibilities,thursdayNull, model);
+		Utils.getPosition("5","friDropPosition",arrayAvailibilities,fridayNull, model);
+		
 		model.addAttribute("volunteer", volunteer);
+		model.addAttribute("mondayNull", mondayNull);
+		model.addAttribute("tuesdayNull", tuesdayNull);
+		model.addAttribute("wednesdayNull", wednesdayNull);
+		model.addAttribute("thursdayNull", thursdayNull);
+		model.addAttribute("fridayNull", fridayNull);
 				
 		return "/admin/modify_volunteer";
 	}
@@ -521,8 +551,13 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			to1 = request.getParameter("monTo1");
 			to2 = request.getParameter("monTo2");
 			
-			availability = this.getAvailablePeriod(from1, to1, availability);
-			availability = this.getAvailablePeriod(from2, to2, availability);
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("1non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);
+				availability = Utils.getAvailablePeriod(from2, to2, availability);
+			}
 		}
 		else
 			availability.add("1non");		
@@ -534,9 +569,14 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			from2 = request.getParameter("tueFrom2");
 			to1 = request.getParameter("tueTo1");
 			to2 = request.getParameter("tueTo2");		
-						
-			availability = this.getAvailablePeriod(from1, to1, availability);				
-			availability = this.getAvailablePeriod(from2, to2, availability);
+			
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("2non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);				
+				availability = Utils.getAvailablePeriod(from2, to2, availability);
+			}
 		}
 		else
 			availability.add("2non");
@@ -549,8 +589,13 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			to1 = request.getParameter("wedTo1");
 			to2 = request.getParameter("wedTo2");
 			
-			availability = this.getAvailablePeriod(from1, to1, availability);
-			availability = this.getAvailablePeriod(from2, to2, availability);		
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("3non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);
+				availability = Utils.getAvailablePeriod(from2, to2, availability);	
+			}
 		}
 		else
 			availability.add("3non");
@@ -563,8 +608,13 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			to1 = request.getParameter("thuTo1");
 			to2 = request.getParameter("thuTo2");
 			
-			availability = this.getAvailablePeriod(from1, to1, availability);
-			availability = this.getAvailablePeriod(from2, to2, availability);	
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("4non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);
+				availability = Utils.getAvailablePeriod(from2, to2, availability);	
+			}
 		}
 		else
 			availability.add("4non");
@@ -576,9 +626,14 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			from2 = request.getParameter("friFrom2");
 			to1 = request.getParameter("friTo1");
 			to2 = request.getParameter("friTo2");	
-						
-			availability = this.getAvailablePeriod(from1, to1, availability);
-			availability = this.getAvailablePeriod(from2, to2, availability);
+			
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("5non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);
+				availability = Utils.getAvailablePeriod(from2, to2, availability);
+			}
 		}
 		else
 			availability.add("5non");
@@ -589,34 +644,5 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		return strAvailableTime;
 	}
-	
-	private List<String> getAvailablePeriod(String from, String to, List<String> list){
-		StringBuffer sb;
-		int start, end;
-		String dayOfWeek;
-		
-		if(	(!from.equals(to)) && ((!"0".equals(from)) && (!"0".equals(to))))
-		{
-			//first letter in the string stands for the day of week
-			dayOfWeek = from.substring(0, 1);
-			from = from.substring(1);
-			to = to.substring(1);
-			
-			start = Integer.valueOf(from);
-			end = Integer.valueOf(to);
-			
-			//endTime must great than startTime
-			if (end > start){
-				for (int i = start; i <end; i++)
-				{
-					sb = new StringBuffer();		
-					sb = sb.append(dayOfWeek);
-					sb.append(String.valueOf(i));				
-					list.add(sb.toString());
-				}
-			}				
-		}			
-		return list;
-	}	
 
 }
