@@ -12,10 +12,14 @@
  -->		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
 
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
+		<!--<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>-->s
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>				
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.css" id="theme_base">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.date.css" id="theme_date">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.time.css" id="theme_time">
 
 		
 	
@@ -26,29 +30,22 @@
 		.bootstrap-datetimepicker-widget{
 			z-index:9999;
 		}
+
+		div.modal-dialog {
+			width:90%;
+			height:600px;
+		}
+
+		.picker--opened .picker__holder {
+			background: none;
+		}
+
+		.modal-content {
+			height: 100%;
+		}
 	</style>
 	
-	<script type="text/javascript">
-		$(function(){
-			$('#tp').datetimepicker({
-				pickDate: false,
-				pickSeconds: false
-			});
-			$('#dp').datetimepicker({
-				pickTime: false,
-				startDate: new Date()
-  			});
-  			
-  			$('#bookAppt').click(function(){
-		        var btn = $(this)
-		        btn.button('loading')
-		        setTimeout(function () {
-		            btn.button('reset')
-		        }, 3000)
-		    });
-		});
-		
-	</script>
+
 </head>
 
 <body>
@@ -64,6 +61,7 @@
 				<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book Appointment</a>
 			</div>
 		</div>
+
 
 
 			<c:if test="${not empty success}">
@@ -306,14 +304,18 @@
 				</select><br />
 				<label>Date:</label>		
 				<div id="dp" class="input-append">
-					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate">
+<!--  					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate">
+ --> 					<input class="datepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentDate">
+
 					<span class="add-on">
 						<i class="icon-calendar"></i>
 					</span>
 				</div>
 				<label>Time:</label>
 				<div id="tp" class="input-append">
-					<input data-format="hh:mm:00" type="text" name="appointmentTime">
+<!--  					<input data-format="hh:mm:00" type="text" name="appointmentTime">
+ --> 					<input data-format="HH:i:00" class="timepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentTime">
+
 				    <span class="add-on">
 				    	<i class="icon-time"></i>
 				    </span>
@@ -327,6 +329,58 @@
       </div>
     </div>
   </div>
+
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script>window.jQuery||document.write('<script src="tests/jquery.2.0.0.js"><\/script>')</script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.date.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.time.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/legacy.js"></script>
+
+
+	<script type="text/javascript">
+		$(function(){
+			// $('#tp').datetimepicker({
+			// 	pickDate: false,
+			// 	pickSeconds: false
+			// });
+			// $('#dp').datetimepicker({
+			// 	pickTime: false,
+			// 	startDate: new Date()
+  	// 		});
+  			
+  			$('#bookAppt').click(function(){
+		        var btn = $(this)
+		        btn.button('loading')
+		        setTimeout(function () {
+		            btn.button('reset')
+		        }, 3000)
+		    });
+
+
+		});
+
+		    $('.datepicker').pickadate({
+		    // Escape any “rule” characters with an exclamation mark (!).
+		    format: 'You selecte!d: dddd, dd mmm, yyyy',
+		    formatSubmit: 'yyyy/mm/dd',
+		    hiddenName: true
+		   	// hiddenPrefix: 'prefix__',
+		    // hiddenSuffix: '__suffix'
+			})
+		
+
+		$('.timepicker').pickatime({
+		    // Escape any “rule” characters with an exclamation mark (!).
+		    formatSubmit: 'HH:i:00',
+		   	hiddenName: true
+
+		    // hiddenPrefix: 'prefix__',
+		    // hiddenSuffix: '__suffix'
+		})
+		
+	</script>
+  
 </div>
 </body>
 </html>
