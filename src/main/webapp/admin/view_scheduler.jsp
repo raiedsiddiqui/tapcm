@@ -41,12 +41,16 @@
   			
 		});
 		
-		function getPatient(){
+		function validatePatient(){
 			var selectedPatient = document.getElementById("patient");
-			document.getElementById("sPatient").value =selectedPatient.options[selectedPatient.selectedIndex].value;
-			document.getElementById("showPatient").value = selectedPatient.options[selectedPatient.selectedIndex].value;
-
+			var pValue =selectedPatient.options[selectedPatient.selectedIndex].value;
+			
+			if (pValue == 0)
+			{
+				alert("Please select a patient who you would like to schedule an appointment for!");
+				return false;
 			}
+		}
 		
 	</script>
 	</head>
@@ -72,25 +76,24 @@
 		<c:if test="${not empty failedToCreateAppointment}">			
 			<div class="alert alert-error"><spring:message code="message_newAppointment_failed"/></div>
 		</c:if>		
+		
 	</div>
 	
 	<div><h4><a href="<c:url value="/manage_appointments"/>" >Appointments</a> > Scheduler</h4></div>
 	
 	<h3>Appointment Scheduler</h3>
 
-	<form  id="schedulerForm" method="post" action="<c:url value="/view_matchTime"/>">	
+	<form  id="schedulerForm" method="post" action="<c:url value="/view_matchTime"/>" onsubmit="return validatePatient()">	
 		<c:set var="v1" value="${volunteerOne }"/>
-		<c:set var="v2" value="${volunteerTwo }"/>
-		<c:if test="${showPatients}">			
-			<label><h4>Select Patient/Client: </h4></label>
+		<c:set var="v2" value="${volunteerTwo }"/>	
+		<label><h4>Select Patient/Client: </h4></label>
 		<select name="patient" form="schedulerForm" id="patient" >
 			<c:forEach items="${patients}" var="p">				
 				<option value="${p.patientID}" <c:if test="${p.patientID eq selectedPatient}">selected</c:if>>${p.displayName}</option>
 			</c:forEach>
 		</select>
-		</c:if>
 		
-		<table>
+		<table >
 			<tr>
 				<td>
 					<label><h4>Volunteer 1:</h4></label>
@@ -119,15 +122,14 @@
 
 	<table width="1200">
 	<tr>
-		<th width="150">Volunteer One</th>
+		<th width="120">Volunteer One</th>
 		<th width="100">Phone #</th>
 		<th width="200">Email</th>
-		<th width="150">Volunteer Two</th>
+		<th width="120">Volunteer Two</th>
 		<th width="100">Phone #</th>
 		<th width="200">Email</th>
-		<th width="150">Time Match</th>		
-		<td style="display:none;"></td>
-		<th>Action</th>
+		<th width="200">Time Match</th>			
+		<th width="150">Action</th>
 		
 	</tr>
 	
@@ -140,9 +142,8 @@
 						<td>${ml.pDisplayName}</td>						
 						<td>${ml.pPhone}</td>
 						<td>${ml.pEmail}</td>
-						<td>${ml.matchedTime}</td>		
-						<td><div id="patientId" name="patientId"></div></td>				
-						<td><a href="<c:url value="/add_appointment/${ml.vId}?vId=${ml.pId}&time=${ml.matchedTime}"/>">Book Appointment</a></td>
+						<td>${ml.matchedTime}</td>										
+						<td><a href="<c:url value="/add_appointment/${ml.vId}?vId=${ml.pId}&time=${ml.matchedTime}&patientId=${ml.patientId }"/>">Book Appointment</a></td>
 						
 					</tr>
 	</c:forEach>

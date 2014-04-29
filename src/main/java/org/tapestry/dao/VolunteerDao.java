@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -78,14 +79,12 @@ public class VolunteerDao {
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		
 		try{
-			stmt = con.prepareStatement("SELECT * FROM volunteers WHERE availability != '' ORDER BY firstname DESC ");			
-			rs = stmt.executeQuery();
-			
+			stmt = con.prepareStatement("SELECT * FROM volunteers ORDER BY firstname DESC ");			
+			rs = stmt.executeQuery();			
 			volunteers = getVolunteersByResultSet(rs, true);
 			
 			if (rs != null)
 				rs.close();
-			
 			
 		}catch (SQLException e){			
 			logger.error("Error: Could not retrieve volunteers");				
@@ -100,7 +99,16 @@ public class VolunteerDao {
     		}
     	}
 		
-		return volunteers;
+		//remove those volunteers whose availability have not been set up
+		List<Volunteer> vList = new ArrayList<Volunteer>();
+		String vAvailability;
+		
+		for(Volunteer v: volunteers){			
+			vAvailability = v.getAvailability();
+			if( (!Utils.isNullOrEmpty(vAvailability))&& (!vAvailability.equals("1non,2non,3non,4non,5non")))
+				vList.add(v);
+		}			
+		return vList;
 	}
 	
 	public List<Volunteer> getVolunteersByName(String partialName){
@@ -234,8 +242,8 @@ public class VolunteerDao {
 	public boolean addVolunteer(Volunteer volunteer){
 		boolean success = false;
 		//check if it is new record in DB
-		if(!isExist(volunteer)){
-			
+		if(!isExist(volunteer))
+		{			
 			try{
 				stmt = con.prepareStatement("INSERT INTO volunteers (firstname, lastname, street,"
 						+ "username, email, experience_level, city, province, home_phone, cell_phone,"
@@ -279,15 +287,11 @@ public class VolunteerDao {
 	    		}
 			}				
 		}
-		
-		
 		return success;
 	}
 	
-	public void updateVolunteer(Volunteer volunteer){
-		
+	public void updateVolunteer(Volunteer volunteer){		
 		try{
-
 			stmt = con.prepareStatement("UPDATE volunteers SET firstname=?,lastname=?, username=?, street=?,"
 					+ "email=?, experience_level=?, city=?, province=?, home_phone=?, cell_phone=?,"
 					+ "postal_code=?, country=?, emergency_contact=?, emergency_phone=?, appartment=?, "
@@ -329,7 +333,6 @@ public class VolunteerDao {
     			//Ignore
     		}
 		}
-		
 	}
 	
 	public void deleteVolunteerById(int id){		

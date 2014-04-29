@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Collections;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
@@ -594,7 +592,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			else
 			{
 				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);	
+				availability = Utils.getAvailablePeriod(from2, to2, availability);					
 			}
 		}
 		else

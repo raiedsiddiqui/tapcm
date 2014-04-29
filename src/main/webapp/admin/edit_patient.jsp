@@ -14,7 +14,21 @@
 		.row-fluid{
 			margin:10px;
 		}
+		
+		
 	</style>
+	
+	<script type="text/javascript">
+		function validateVolunteers(){
+			var selectedPatient = document.getElementById("volunteer1");
+			var vValue =selectedPatient.options[selectedPatient.selectedIndex].value;
+			
+			alert("volunteer1 is " + vValue);
+			
+			return false;
+		}
+	</script>
+	
 </head>
 	
 <body>	
@@ -22,7 +36,7 @@
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
 			<h2>Edit Patient</h2>
-		  	<form id="editPatient" method="post" action="<c:url value="/submit_edit_patient/${patient.patientID}"/>">
+		  	<form id="editPatient" method="post" action="<c:url value="/submit_edit_patient/${patient.patientID}"/>" onsubmit="return validateVolunteers()">
 
 				<div class="row form-group">
   					<div class="col-md-6">
@@ -37,31 +51,61 @@
 						<label>Preferred Name:</label>
 						<input type="text" name="preferredname" class="form-control" value="${patient.preferredName}"/>
 					</div>
-				</div>	
-
-				<div class="row form-group">	
-					<div class="col-md-6">
-						<label>Volunteer</label>
-						<select name="volunteer" form="newPatient" class="form-control">
-							<c:forEach items="${volunteers}" var="v">
-								<option value="${v.volunteerId}" <c:if test="${v.displayName eq patient.volunteerName}">selected</c:if>>${v.displayName}</option>
-							</c:forEach>
-						</select><br />
-					</div>
 					<div class="col-md-6">
 						<label>Gender</label>
-						<select name="gender" form="newPatient" class="form-control">
+						<select name="gender" form="editPatient" class="form-control">
 							<option value="M" <c:if test="${patient.gender eq 'M'}">selected</c:if>>Male</option>	
 							<option value="F" <c:if test="${patient.gender eq 'F'}">selected</c:if>>Female</option>
 							<option value="O" <c:if test="${patient.gender eq 'O'}">selected</c:if>>Other</option>
 						</select>
 					</div>
+				</div>	
+
+				<div class="row form-group">						
+					<div class="col-md-6">
+						<label>Volunteer1:</label>
+						<select name="volunteer1" form="editPatient" class="form-control">
+							<c:forEach items="${volunteers}" var="v">
+								<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq patient.volunteer}">selected</c:if>>${v.displayName}</option>
+							</c:forEach>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label>Volunteer2:</label>
+						<select name="volunteer2" form="editPatient" class="form-control">
+							<c:forEach items="${volunteers}" var="v">
+								<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq patient.partner}">selected</c:if>>${v.displayName}</option>
+							</c:forEach>
+						</select><br />
+					</div>
+					
 				</div>
+				<div class="row form-group">	
+					<label>MyOscar verified? </label>
+					<input type="radio" name="myoscar_verified" value="1" <c:if test="${patient.myoscarVerified eq 1}">checked</c:if>/>Yes
+					<input type="radio" name="myoscar_verified" value="0" <c:if test="${patient.myoscarVerified eq 0}">checked</c:if>/>No
+					<br/>
+					<label>Clinic:</label>
+					<select name="clinic" form="editPatient" class="form-control">
+						<option value="1" <c:if test="${patient.clinic eq 1}">selected</c:if>>West End Clinic</option>
+						<option value="2" <c:if test="${patient.clinic eq 2}">selected</c:if>>Stonechurch Family Health Center</option>
+					</select>
+				</div>
+				
+				<label>Availability:</label><br/>
+				<%@include file="edit_availabilities.jsp" %>
+				
 
 				<div class="row form-group">	
 					<div class="col-md-10">
 						<label>Notes</label>
 						<textarea name="notes" class="form-control">${patient.notes}s</textarea>
+					</div>
+				</div>	
+				<div class="row form-group">	
+					<div class="col-md-10">
+						<label>Alerts</label>
+						<textarea name="notes" class="form-control">${patient.alerts}s</textarea>
 					</div>
 				</div>	
 

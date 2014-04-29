@@ -3,6 +3,7 @@ package org.tapestry.controller;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.tapestry.dao.NarrativeDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.objects.User;
@@ -237,7 +239,7 @@ public class Utils {
 		
 		if (list.size() > 1)
 		{
-			positions = getPosition(list);
+			positions = getPosition(list);			
 			model.addAttribute(attribute, positions);
 		}
 		else
@@ -316,6 +318,178 @@ public class Utils {
 			}					
 			return list;
 		}
-	}	
+	}
+	
+	public static String getAvailableTime(SecurityContextHolderAwareRequestWrapper request)
+	{			
+		String strAvailableTime = "";
+		List<String> availability = new ArrayList<String>();
+		String mondayNull = request.getParameter("mondayNull");
+		String tuesdayNull = request.getParameter("tuesdayNull");
+		String wednesdayNull = request.getParameter("wednesdayNull");
+		String thursdayNull = request.getParameter("thursdayNull");
+		String fridayNull = request.getParameter("fridayNull");		
+		String from1, from2, to1, to2;		
+		
+		//get availability for Monday
+		if (!"non".equals(mondayNull))
+		{
+			from1 = request.getParameter("monFrom1");		
+			from2 = request.getParameter("monFrom2");
+			to1 = request.getParameter("monTo1");
+			to2 = request.getParameter("monTo2");
+			
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("1non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);
+				availability = Utils.getAvailablePeriod(from2, to2, availability);
+			}
+		}
+		else
+			availability.add("1non");		
+		
+		//get availability for Tuesday
+		if(!"non".equals(tuesdayNull))
+		{
+			from1 = request.getParameter("tueFrom1");
+			from2 = request.getParameter("tueFrom2");
+			to1 = request.getParameter("tueTo1");
+			to2 = request.getParameter("tueTo2");		
+			
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("2non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);				
+				availability = Utils.getAvailablePeriod(from2, to2, availability);
+			}
+		}
+		else
+			availability.add("2non");
+		
+		//get availability for Wednesday
+		if (!"non".equals(wednesdayNull))
+		{
+			from1 = request.getParameter("wedFrom1");
+			from2 = request.getParameter("wedFrom2");
+			to1 = request.getParameter("wedTo1");
+			to2 = request.getParameter("wedTo2");
+			
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("3non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);
+				availability = Utils.getAvailablePeriod(from2, to2, availability);	
+			}
+		}
+		else
+			availability.add("3non");
+		
+		//get availability for Thursday
+		if (!"non".equals(thursdayNull))
+		{
+			from1 = request.getParameter("thuFrom1");
+			from2 = request.getParameter("thuFrom2");
+			to1 = request.getParameter("thuTo1");
+			to2 = request.getParameter("thuTo2");
+			
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("4non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);
+				availability = Utils.getAvailablePeriod(from2, to2, availability);	
+			}
+		}
+		else
+			availability.add("4non");
+		
+		//get availability for Friday
+		if(!"non".equals(fridayNull))
+		{			
+			from1 = request.getParameter("friFrom1");
+			from2 = request.getParameter("friFrom2");
+			to1 = request.getParameter("friTo1");
+			to2 = request.getParameter("friTo2");	
+			
+			if ((from1.equals(from2))&&(from1.equals("0")))
+				availability.add("5non");	
+			else
+			{
+				availability = Utils.getAvailablePeriod(from1, to1, availability);
+				availability = Utils.getAvailablePeriod(from2, to2, availability);
+			}
+		}
+		else
+			availability.add("5non");
+	
+		//convert arrayList to string for matching data type in DB
+		if (availability != null)
+			strAvailableTime=StringUtils.collectionToCommaDelimitedString(availability);	
+		
+		return strAvailableTime;
+	}
+	
+	public static void saveAvailability(String availability, ModelMap model){
+		List<String> aList = new ArrayList<String>();		
+		List<String> lMonday = new ArrayList<String>();
+		List<String> lTuesday = new ArrayList<String>();
+		List<String> lWednesday = new ArrayList<String>();
+		List<String> lThursday = new ArrayList<String>();
+		List<String> lFriday = new ArrayList<String>();	
+			
+		Map<String, String> showAvailableTime = Utils.getAvailabilityMap();		
+		aList = Arrays.asList(availability.split(","));		
+	
+		for (String l : aList){			
+			if (l.startsWith("1"))
+				lMonday = getFormatedTimeList(l, showAvailableTime, lMonday);									
+			
+			if (l.startsWith("2"))
+				lTuesday = getFormatedTimeList(l, showAvailableTime, lTuesday);									
+
+			if (l.startsWith("3"))
+				lWednesday = getFormatedTimeList(l, showAvailableTime, lWednesday);					
+			
+			if (l.startsWith("4"))
+				lThursday = getFormatedTimeList(l, showAvailableTime, lThursday);	
+						
+			if (l.startsWith("5"))
+				lFriday = getFormatedTimeList(l, showAvailableTime, lFriday);							
+		}	
+		
+		if ((lMonday == null)||(lMonday.size() == 0))
+			lMonday.add("1non");	
+		if ((lTuesday == null)||(lTuesday.size() == 0))
+			lTuesday.add("2non");
+		if ((lWednesday == null)||(lWednesday.size() == 0))
+			lWednesday.add("3non");
+		if ((lThursday == null)||(lThursday.size() == 0))
+			lThursday.add("4non");
+		if ((lFriday == null)||(lFriday.size() == 0))
+			lFriday.add("5non");
+		
+		model.addAttribute("monAvailability", lMonday);		
+		model.addAttribute("tueAvailability", lTuesday);
+		model.addAttribute("wedAvailability", lWednesday);
+		model.addAttribute("thuAvailability", lThursday);
+		model.addAttribute("friAvailability", lFriday);		
+	}
+	
+	public static List<String> getFormatedTimeList(String str, Map<String, String> map, List<String> list){
+		String key;
+		key = str.substring(1);
+		
+		if (!key.equals("non"))
+		{
+			list.add(map.get(key));
+			Utils.sortList(list);
+		}	
+		
+		return list;
+	}
 	
 }

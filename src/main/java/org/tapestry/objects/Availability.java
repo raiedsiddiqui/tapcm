@@ -9,6 +9,8 @@ public class Availability {
 	String pDisplayName; //partner display name with experience level
 	String pPhone; //partner phone number
 	String pEmail; //partner Email
+	int patientId;
+	String patientName;
 	String matchedTime; //volunteer and partner matched availability
 	
 	public Availability(){
@@ -71,6 +73,22 @@ public class Availability {
 
 	public void setpId(int pId) {
 		this.pId = pId;
+	}
+	
+	public int getPatientId() {
+		return patientId;
+	}
+
+	public void setPatientId(int patientId) {
+		this.patientId = patientId;
+	}
+
+	public String getPatientName() {
+		return patientName;
+	}
+
+	public void setPatientName(String patientName) {
+		this.patientName = patientName;
 	}
 
 }

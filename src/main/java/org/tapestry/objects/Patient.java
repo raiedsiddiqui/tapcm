@@ -18,9 +18,23 @@ public class Patient{
 	private String homePhone;
 	private String availability;
 	private String alerts;
-	private boolean myoscarVerified;
+	private String myoscarVerified;
 	private int partner; // another volunteer(two volunteers should be assigned per visit)
+	private String partnerName;
+
+	/**
+	* Empty constructor
+	*/
+	public Patient(){
+	}
 	
+	public String getMyoscarVerified() {
+		return myoscarVerified;
+	}
+
+	public void setMyoscarVerified(String myoscarVerified) {
+		this.myoscarVerified = myoscarVerified;
+	}
 	
 	public String getAlerts() {
 		return alerts;
@@ -28,14 +42,6 @@ public class Patient{
 
 	public void setAlerts(String alerts) {
 		this.alerts = alerts;
-	}
-
-	public boolean isMyoscarVerified() {
-		return myoscarVerified;
-	}
-
-	public void setMyoscarVerified(boolean myoscarVerified) {
-		this.myoscarVerified = myoscarVerified;
 	}
 
 	public int getPartner() {
@@ -102,11 +108,7 @@ public class Patient{
 		this.homePhone = homePhone;
 	}
 
-	/**
-	* Empty constructor
-	*/
-	public Patient(){
-	}
+	
 
 	//Accessors
 	/**
@@ -245,5 +247,13 @@ public class Patient{
     public void setNotes(String notes){
     	this.notes = notes;
     }
+    
+    public String getPartnerName() {
+		return partnerName;
+	}
+
+	public void setPartnerName(String partnerName) {
+		this.partnerName = partnerName;
+	}
     
 }

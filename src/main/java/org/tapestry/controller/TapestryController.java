@@ -306,21 +306,6 @@ public class TapestryController{
 		
 		return "admin/manage_users";
 	}
-	
-	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
-	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
-		
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-		model.addAttribute("unread", unreadMessages);
-	//	ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
-		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();
-		
-		model.addAttribute("volunteers", volunteers);
-	    ArrayList<Patient> patientList = patientDao.getAllPatients();
-        model.addAttribute("patients", patientList);
-		return "admin/manage_patients";
-	}
 
 	@RequestMapping(value="/add_user", method=RequestMethod.POST)
 	public String addUser(SecurityContextHolderAwareRequestWrapper request){
@@ -393,118 +378,6 @@ public class TapestryController{
 		userDao.enableUserWithID(id);
 		return "redirect:/manage_users";
 	}
-
-	/*
-	@RequestMapping(value="/add_patient", method=RequestMethod.POST)
-	public String addPatient(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
-		//Add a new patient
-		Patient p = new Patient();
-		p.setFirstName(request.getParameter("firstname").trim());
-		p.setLastName(request.getParameter("lastname").trim());
-		if(request.getParameter("preferredname") != "") {
-			p.setPreferredName(request.getParameter("preferredname").trim());
-		}
-		int v = Integer.parseInt(request.getParameter("volunteer"));
-		p.setVolunteer(v);
-		p.setGender(request.getParameter("gender"));
-		p.setNotes(request.getParameter("notes"));
-		patientDao.createPatient(p);
-		
-		Patient newPatient = patientDao.getNewestPatient();
-		
-		//Auto assign all existing surveys
-		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
-   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
-   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
-   		
-   		for(SurveyTemplate st: surveyTemplates) {
-		List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
-		
-		SurveyFactory surveyFactory = new SurveyFactory();
-		PHRSurvey template = surveyFactory.getSurveyTemplate(st);
-			SurveyResult sr = new SurveyResult();
-            sr.setSurveyID(st.getSurveyID());
-            sr.setPatientID(newPatient.getPatientID());
-          //if requested survey that's already done
-    		if (specificSurveys.size() < template.getMaxInstances())
-    		{
-    			PHRSurvey blankSurvey = template;
-    			blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
-    			sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
-    			String documentId = surveyResultDao.assignSurvey(sr);
-    			blankSurvey.setDocumentId(documentId);
-    			surveys.addSurvey(blankSurvey);
-    			specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
-    		}
-    		else
-    		{
-    			return "redirect:/manage_patients";
-    		}
-		}
-		
-		return "redirect:/manage_patients";
-	}
-
-	@RequestMapping(value="/remove_patient/{patient_id}", method=RequestMethod.GET)
-	public String removePatient(@PathVariable("patient_id") int id){
-		patientDao.removePatientWithId(id);
-		return "redirect:/manage_patients";
-	}
-
-	@RequestMapping(value="/patient/{patient_id}", method=RequestMethod.GET)
-	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false)
-					String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, 
-					@RequestParam(value="appointmentId", required=false) Integer appointmentId, 
-					SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-				
-		Patient patient = patientDao.getPatientByID(id);
-		//Find the name of the current user
-		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		String loggedInUser = u.getName();
-		//Make sure that the user is actually responsible for the patient in question
-		int volunteerForPatient = patient.getVolunteer();
-		if (!(u.getUserID() == patient.getVolunteer())){
-			model.addAttribute("loggedIn", loggedInUser);
-			model.addAttribute("patientOwner", volunteerForPatient);
-			return "redirect:/403";
-		}
-		model.addAttribute("patient", patient);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
-		model.addAttribute("unread", unreadMessages);
-		ArrayList<SurveyResult> completedSurveyResultList = surveyResultDao.getCompletedSurveysByPatientID(id);
-		ArrayList<SurveyResult> incompleteSurveyResultList = surveyResultDao.getIncompleteSurveysByPatientID(id);
-		Collections.sort(completedSurveyResultList);
-		Collections.sort(incompleteSurveyResultList);
-		ArrayList<SurveyTemplate> surveyList = surveyTemplateDao.getAllSurveyTemplates();
-		
-//		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
-		//use volunteerId to replace userId		
-		int volunteerId= volunteerDao.getVolunteerIdByUsername(u.getUsername());
-		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
-		
-	
-		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
-		model.addAttribute("appointment", appointment);
-		model.addAttribute("patients", patientsForUser);
-		model.addAttribute("completedSurveys", completedSurveyResultList);
-		model.addAttribute("inProgressSurveys", incompleteSurveyResultList);
-		model.addAttribute("surveys", surveyList);
-		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
-		model.addAttribute("pictures", pics);
-		if(patient.getPreferredName() != null && patient.getPreferredName() != ""){
-			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getPreferredName(), u.getUserID(), patient.getPatientID());
-		} else {
-			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
-		}
-				
-		//save selected appointmentId in the session for other screen, like narrative
-		HttpSession  session = request.getSession();		
-		session.setAttribute("appointmentId", appointmentId);
-		session.setAttribute("patientId", id);
-				
-		return "/patient";
-	}
-	*/
 	
 	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
 	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
@@ -755,33 +628,6 @@ public class TapestryController{
 	public String removePicture(@PathVariable("id") int pictureID){
 		pictureDao.removePicture(pictureID);
 		return "redirect:/profile";
-	}
-	
-	@RequestMapping(value="/edit_patient/{id}", method=RequestMethod.GET)
-	public String editPatientForm(@PathVariable("id") int patientID, ModelMap model){
-		Patient p = patientDao.getPatientByID(patientID);
-		model.addAttribute("patient", p);		
-		
-//		ArrayList<User> volunteers = userDao.getAllActiveUsersWithRole("ROLE_USER");
-		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();	
-		
-		model.addAttribute("volunteers", volunteers);
-		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
-	}
-	
-	@RequestMapping(value="/submit_edit_patient/{id}", method=RequestMethod.POST)
-	public String modifyPatient(@PathVariable("id") int patientID, SecurityContextHolderAwareRequestWrapper request){
-		Patient p = new Patient();
-		p.setPatientID(patientID);
-		p.setFirstName(request.getParameter("firstname"));
-		p.setLastName(request.getParameter("lastname"));
-		p.setPreferredName(request.getParameter("preferredname"));
-		int v = Integer.parseInt(request.getParameter("volunteer"));
-		p.setVolunteer(v);
-		p.setGender(request.getParameter("gender"));
-		p.setNotes(request.getParameter("notes"));
-		patientDao.updatePatient(p);
-		return "redirect:/manage_patients";
 	}
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.GET)

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -219,8 +220,7 @@ public class AppointmentController{
 		model.addAttribute("patients",patients);
 		model.addAttribute("allvolunteers",allVolunteers);		
 		model.addAttribute("matcheList", matchList);
-		model.addAttribute("showPatients", false);
-
+	
 		return "/admin/view_scheduler";
 	}
 	
@@ -229,24 +229,22 @@ public class AppointmentController{
 	public String addAppointmentFromSecheduler(@PathVariable("volunteerId") int volunteerId, 
 			@RequestParam(value="vId", required=false) int partnerId, 			
 			@RequestParam(value="time", required=false) String time, 
+			@RequestParam(value="patientId", required=false) int patientId, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		
 		List<Patient> patients = getPatients();		
 		List<Volunteer> allVolunteers = getAllVolunteers();
 		
-		//format time 
-		StringBuffer sb = new StringBuffer();
-		sb.append(time.substring(4,9));
-		sb.append(":00");
+		//format time , remove day of week from string		
+		int pos = time.indexOf("--");	
+		time = time.substring(pos + 2);
 		
-		time = sb.toString();
-		//selectedPatient
 		model.addAttribute("patients",patients);
-		model.addAttribute("allvolunteers",allVolunteers);	
-		
+		model.addAttribute("allvolunteers",allVolunteers);			
 		model.addAttribute("selectedVolunteer",volunteerId);
 		model.addAttribute("selectedPartner",partnerId);
 		model.addAttribute("selectedTime", time);
+		model.addAttribute("selectedPatient", patientId);
 		
 
 		return "/admin/schedule_appointment";
@@ -264,6 +262,12 @@ public class AppointmentController{
 
 		Volunteer v1 = volunteerDao.getVolunteerById(Integer.parseInt(volunteerId1));
 		Volunteer v2 = volunteerDao.getVolunteerById(Integer.parseInt(volunteerId2));
+		
+		Patient p = patientDao.getPatientByID(Integer.parseInt(patientId));
+		
+		String pAvailability = p.getAvailability();
+		List<String> pList = new ArrayList<String>(Arrays.asList(pAvailability.split(",")));		
+		
 		//check if two volunteers are same persons
 		if (volunteerId1.equals(volunteerId2))
 			model.addAttribute("sameVolunteer",true);
@@ -271,7 +275,7 @@ public class AppointmentController{
 		{
 			String v1Level = v1.getExperienceLevel();
 			String v2Level = v2.getExperienceLevel();
-			
+				
 			// matching rule is Beginner can only be paired with Experienced
 			if(!isMatched(v1Level, v2Level))
 				model.addAttribute("misMatchedVolunteer",true);
@@ -279,52 +283,46 @@ public class AppointmentController{
 			{
 				String[] aVolunteer1, aVolunteer2;
 				Availability availability;
-				if (!Utils.isNullOrEmpty(v1.getAvailability()) )
+					
+				aVolunteer1= v1.getAvailability().split(",");							
+				aVolunteer2 = v2.getAvailability().split(",");				
+				List<Availability> matchList = new ArrayList<Availability>();
+								
+				for( String a1: aVolunteer1 )
 				{
-					aVolunteer1= v1.getAvailability().split(";");						
-					if (!Utils.isNullOrEmpty(v2.getAvailability()))
+					for(String a2 : aVolunteer2)
 					{
-						aVolunteer2 = v2.getAvailability().split(";");				
-						List<Availability> matchList = new ArrayList<Availability>();
-							
-						for( String a1: aVolunteer1 )
-						{
-							for(String a2 : aVolunteer2)
-							{
-								if (a1.equals(a2))
-								{//find matched available time for both volunteers
-									availability = new Availability();								
-									availability.setvDisplayName(v1.getDisplayName());
-						        	availability.setvPhone(v1.getHomePhone());
-						        	availability.setvEmail(v1.getEmail());
-						        	availability.setpDisplayName(v2.getDisplayName());
-						        	availability.setpPhone(v2.getHomePhone());
-						        	availability.setpEmail(v2.getEmail());
-						        	availability.setMatchedTime(a1);
-						        	availability.setvId(Integer.parseInt(volunteerId1));
-						        	availability.setpId(Integer.parseInt(volunteerId2));
-									matchList.add(availability);
-								}
-							}
-						}					
-						if (matchList.size() == 0)
-							model.addAttribute("noMatchTime",true);
-						else
-							model.addAttribute("matcheList",matchList);				 
+						if ( (!a1.contains("non")) && (a1.equals(a2)) && (pList.contains(a1)))
+						{//find matched available time for both volunteers	and selected patient
+							availability = new Availability();								
+							availability.setvDisplayName(v1.getDisplayName());
+							availability.setvPhone(v1.getHomePhone());
+							availability.setvEmail(v1.getEmail());
+							availability.setpDisplayName(v2.getDisplayName());
+							availability.setpPhone(v2.getHomePhone());
+							availability.setpEmail(v2.getEmail());				
+							availability.setMatchedTime(formateMatchTime(a1));
+							availability.setvId(Integer.parseInt(volunteerId1));
+							availability.setpId(Integer.parseInt(volunteerId2));
+							availability.setPatientId(Integer.parseInt(patientId));
+							availability.setPatientName(p.getDisplayName());
+							matchList.add(availability);
+						}
 					}
-					else
-						model.addAttribute("noAvailableTime", true);
-				}
-				else							
-					model.addAttribute("noAvailableTime", true);
+				}					
+				if (matchList.size() == 0)
+					model.addAttribute("noMatchTime",true);
+				else
+					model.addAttribute("matcheList",matchList);		
 			}			
 		}
+		
+		
 		model.addAttribute("allvolunteers", volunteers);
 		model.addAttribute("volunteerOne",v1);
 		model.addAttribute("volunteerTwo",v2);
 		model.addAttribute("patients", patients);
 		model.addAttribute("selectedPatient", patientId);
-		model.addAttribute("showPatients", true);
 		
 		return "/admin/view_scheduler";		
 	}
@@ -345,6 +343,8 @@ public class AppointmentController{
 		
 		String day = request.getParameter("appointmentDate");
 		String time = request.getParameter("appointmentTime");
+		//format time, remove AM/PM
+		time = time.substring(0,8);
 		
 		appointment.setDate(day);
 		appointment.setTime(time);		
@@ -447,14 +447,14 @@ public class AppointmentController{
 	private List<Patient> getPatients()
 	{
 		List<Patient> patients = new ArrayList<Patient>();
-		patients = patientDao.getAllPatients();
+		patients = patientDao.getAllPatientsWithAvailability();		
 		
 		return patients;
 	}
 	
 	private List<Volunteer> getAllVolunteers(){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
-		volunteers = volunteerDao.getVolunteersWithAvailability();
+		volunteers = volunteerDao.getVolunteersWithAvailability();		
 		
 		return volunteers;
 	}
@@ -466,50 +466,87 @@ public class AppointmentController{
 		Availability availability;
 		
 		for (Volunteer v1: list1)
-		{
-			availability1 = v1.getAvailability();
-			if (!Utils.isNullOrEmpty(availability1))
-			{				
-				aSet1 = availability1.split(";");		
-				
-				for (Volunteer v2: list2)
-				{
-					if (v1.getVolunteerId()!= v2.getVolunteerId())
-					{		
-						availability2 = v2.getAvailability();						
-						if ((!Utils.isNullOrEmpty(availability2)) && (isMatchVolunteer(v1, v2)))						
-						{
-							aSet2  = availability2.split(";");							
-							//find match availability					
-							for(int i = 0; i < aSet1.length; i++)
-							{								
-							    for(int j = 0; j <aSet2.length; j++)
-							    {
-							    	
-							        if(aSet1[i].toString().equals(aSet2[j].toString()) )		
-							        {								        	
-							        	availability = new Availability();
-							        	availability.setvDisplayName(v1.getDisplayName());
-							        	availability.setvPhone(v1.getHomePhone());
-							        	availability.setvEmail(v1.getEmail());
-							        	availability.setpDisplayName(v2.getDisplayName());
-							        	availability.setpPhone(v2.getHomePhone());
-							        	availability.setpEmail(v2.getEmail());
-							        	availability.setMatchedTime(aSet1[i].toString());
-							        	availability.setvId(v1.getVolunteerId());
-							        	availability.setpId(v2.getVolunteerId());
-							        	
-							        	aList.add(availability);	
-							        }
-							    }
+		{System.out.println(" v1 loop ==") ;
+			availability1 = v1.getAvailability();		
+			
+			aSet1 = availability1.split(",");	
+			System.out.println(Arrays.toString(aSet1));
+			for (Volunteer v2: list2)
+			{System.out.println(" v2 loop ==") ;
+				if (v1.getVolunteerId()!= v2.getVolunteerId())
+				{		
+					availability2 = v2.getAvailability();		
+					
+					if (isMatchVolunteer(v1, v2))						
+					{System.out.println("matched pairs") ;
+					
+						aSet2  = availability2.split(",");		
+						System.out.println(Arrays.toString(aSet2)) ;
+						//find match availability					
+						for(int i = 0; i < aSet1.length; i++)
+						{								
+							for(int j = 0; j <aSet2.length; j++)//
+							{  	//same time, no duplicated
+								if ((!aSet1[i].toString().contains("non")) 
+										&&  (aSet1[i].toString().equals(aSet2[j].toString()))
+										&&	(!isExist(aList, aSet1[i].toString(),v1)))								
+								{	
+									availability = new Availability();
+									availability.setvDisplayName(v1.getDisplayName());
+									availability.setvPhone(v1.getHomePhone());
+									availability.setvEmail(v1.getEmail());
+									availability.setpDisplayName(v2.getDisplayName());
+									availability.setpPhone(v2.getHomePhone());
+									availability.setpEmail(v2.getEmail());								  
+									availability.setMatchedTime(formateMatchTime(aSet1[i].toString()));
+									availability.setvId(v1.getVolunteerId());
+									availability.setpId(v2.getVolunteerId());
+								      	
+									aList.add(availability);	
+								}
 							}
 						}
-					}			
-				}
-			}
-		}		
+					}
+				}		
+			}			
+		}	
 		
 		return aList;
+	}
+	
+	//avoid duplicated element
+	private boolean isExist(List<Availability> list, String time, Volunteer v){
+		Availability a = new Availability();
+		boolean exist = false;
+		time = this.formateMatchTime(time);		
+		String vName = v.getDisplayName();
+		
+		for (int i =0; i<list.size(); i++){
+			a = list.get(i);
+			
+			if ((time.equals(a.getMatchedTime())) && ((vName.equals(a.getpDisplayName())) ||(vName.equals(a.getvDisplayName()))))
+				return true;
+		}
+		return exist;
+	}
+	
+	private String formateMatchTime(String time){
+		StringBuffer sb = new StringBuffer();
+		
+		Map<String, String> dayMap = new HashMap<String, String>();
+		dayMap.put("1", "Monday");
+		dayMap.put("2", "Tuesday");
+		dayMap.put("3", "Wednesday");
+		dayMap.put("4", "Thursday");
+		dayMap.put("5", "Friday");
+		
+		Map<String, String> timePeriodMap = Utils.getAvailabilityMap();
+		
+		sb.append(dayMap.get(time.substring(0,1)));
+		sb.append("--");
+		sb.append(timePeriodMap.get(time.substring(1)));
+		
+		return sb.toString();
 	}
 	
 	private boolean isMatchVolunteer(Volunteer vol1, Volunteer vol2){

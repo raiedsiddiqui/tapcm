@@ -2,6 +2,7 @@ package org.tapestry.dao;
 
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.Patient;
+import org.tapestry.objects.Volunteer;
 
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -9,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
 * PatientDAO class
@@ -17,7 +19,8 @@ import java.util.ArrayList;
 public class PatientDao {
 
     	private PreparedStatement statement;
-    	private Connection con;
+    	private Connection con;    		
+    	private ResultSet rs;
 
 	/**
 	* Constructor
@@ -83,56 +86,7 @@ public class PatientDao {
     	}
 	}
 
-	/**
-	* Creates a Patient object from a database query
-	* @param result The ResultSet from the database query
-	* @return The Patient object
-	*/
-	private Patient createFromSearch(ResultSet result){
-		Patient p = new Patient();
-		try{
-            		p.setPatientID(result.getInt("patient_ID"));
-            		p.setFirstName(result.getString("firstname"));
-            		p.setLastName(result.getString("lastname"));
-            		p.setPreferredName(result.getString("preferredname"));
-            		p.setGender(result.getString("gender"));
-            		p.setVolunteer(result.getInt("volunteer"));
-            		p.setNotes(result.getString("notes"));
-            		
-            		//Set volunteer name
-//            		statement = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-//           			statement.setInt(1, p.getVolunteer());
-            		//get volunteer from volunteers table instead of users
-            		            		
-            		statement = con.prepareStatement("SELECT firstname, lastname FROM volunteers WHERE volunteer_ID=?");
-            		statement.setInt(1, p.getVolunteer());
-            		
-           			ResultSet rs = statement.executeQuery();
-           			while(rs.next()){           				
-           				StringBuilder sb = new StringBuilder();
-               			if (!Utils.isNullOrEmpty(rs.getString("firstname"))){
-               				sb.append(rs.getString("firstname"));
-               				sb.append(" ");               				
-               			}
-               			
-               			if (rs.getString("lastname") != null){
-               				sb.append(rs.getString("lastname"));               				
-               			}
-               			
-               			if (!Utils.isNullOrEmpty(sb.toString()))
-               				p.setVolunteerName(sb.toString());
-               			else
-               				p.setVolunteerName("");
-               			
-           			}           			
-           			
-		} catch (SQLException e) {
-			System.out.println("Error: Failed to create Patient object");
-			e.printStackTrace();
-		}
-		return p;
-	}
-
+	
 	/**
 	* List all the patients in the database
 	* @return An ArrayList of Patient objects
@@ -158,6 +112,27 @@ public class PatientDao {
         			//Ignore
         		}
         	}
+    	}
+    	
+    	/**
+    	 * 
+    	 * @return a list of patients who have availability
+    	 */
+    	
+    	public List<Patient> getAllPatientsWithAvailability()
+    	{
+    		List<Patient> patients = getAllPatients();
+    		List<Patient> aList = new ArrayList<Patient>();
+    		String pAvailability;
+    		
+    		for( Patient p: patients){
+    			pAvailability = p.getAvailability();
+    			
+    			if( (!Utils.isNullOrEmpty(pAvailability))&& (!pAvailability.equals("1non,2non,3non,4non,5non")))
+    				aList.add(p);
+    		}
+    		
+    		return aList;    		
     	}
 
 	/**
@@ -194,34 +169,36 @@ public class PatientDao {
 	* @param p The Patient object to save
 	*/
     public void createPatient(Patient p){
-		try{
-			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
-					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-			statement.setString(1, p.getFirstName());
-			statement.setString(2, p.getLastName());
-			statement.setString(3, p.getPreferredName());
-			statement.setInt(4, p.getVolunteer());
-			statement.setString(5, p.getGender());
-			statement.setString(6, p.getNotes());
-			statement.setInt(7, p.getPartner());
-			statement.setString(8, p.getAlerts());
-			
-			if (p.isMyoscarVerified())
-				statement.setInt(9, 1);
-			else
-				statement.setInt(9, 0);
-			statement.setString(10, p.getClinic());
-			statement.execute();
-		} catch (SQLException e){
-			System.out.println("Error: Could not create patient");
-			e.printStackTrace();
-		} finally {
+    	//check if it is new record in DB
+    	if(!isExist(p)){
     		try{
-    			statement.close();
-    		} catch (Exception e) {
-    			//Ignore
-    		}
+    			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
+    					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, availability) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    			statement.setString(1, p.getFirstName());
+    			statement.setString(2, p.getLastName());
+    			statement.setString(3, p.getPreferredName());
+    			statement.setInt(4, p.getVolunteer());
+    			statement.setString(5, p.getGender());
+    			statement.setString(6, p.getNotes());
+    			statement.setInt(7, p.getPartner());
+    			statement.setString(8, p.getAlerts());
+    			statement.setString(9, p.getMyoscarVerified());
+    			statement.setString(10, p.getClinic());
+    			statement.setString(11, p.getAvailability());
+    			
+    			statement.execute();
+    		} catch (SQLException e){
+    			System.out.println("Error: Could not create patient");
+    			e.printStackTrace();
+    		} finally {
+        		try{
+        			statement.close();
+        		} catch (Exception e) {
+        			//Ignore
+        		}
+        	}
     	}
+		
     }
     
     /**
@@ -230,14 +207,21 @@ public class PatientDao {
      */
     public void updatePatient(Patient p){
     	try{
-    		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, preferredname=?, volunteer=?, gender=?, notes=? WHERE patient_ID=?");
+    		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, preferredname=?, volunteer=?, "
+    				+ "gender=?, notes=?, clinic=?, availability=?, myoscar_verified=?, alerts=?, volunteer2=? WHERE patient_ID=?");
     		statement.setString(1, p.getFirstName());
     		statement.setString(2, p.getLastName());
     		statement.setString(3, p.getPreferredName());
     		statement.setInt(4, p.getVolunteer());
     		statement.setString(5, p.getGender());
     		statement.setString(6, p.getNotes());
-    		statement.setInt(7, p.getPatientID());
+    		statement.setString(7, p.getClinic());
+    		statement.setString(8, p.getAvailability());
+    		statement.setString(9, p.getMyoscarVerified());
+    		statement.setString(10, p.getAlerts());
+    		statement.setInt(11,p.getPartner());
+    		statement.setInt(12, p.getPatientID());   		
+    		
     		statement.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not update patient");
@@ -270,6 +254,128 @@ public class PatientDao {
     			//Ignore
     		}
     	}
+	}
+	
+	/**
+	* Creates a Patient object from a database query
+	* @param result The ResultSet from the database query
+	* @return The Patient object
+	*/
+	private Patient createFromSearch(ResultSet result){
+		Patient p = new Patient();
+		try
+		{
+			p.setPatientID(result.getInt("patient_ID"));
+			p.setFirstName(result.getString("firstname"));
+			p.setLastName(result.getString("lastname"));
+			p.setPreferredName(result.getString("preferredname"));
+			p.setGender(result.getString("gender"));
+			p.setVolunteer(result.getInt("volunteer"));
+			p.setNotes(result.getString("notes"));
+			p.setAvailability(result.getString("availability"));
+			p.setAlerts(result.getString("alerts"));
+			p.setClinic(result.getString("clinic"));
+			p.setMyoscarVerified(result.getString("myoscar_verified"));     
+			p.setPartner(result.getInt("volunteer2"));
+			//Set volunteer name and partner name
+			setVolunteerDisplayName(p, "volunteer1");
+			setVolunteerDisplayName(p, "volunteer2");
+			
+		} catch (SQLException e) {
+			System.out.println("Error: Failed to create Patient object");
+			e.printStackTrace();
+		}
+		return p;
+	}
+	
+	/**
+	 * 
+	 * Set up volunteer's displayName in patient object 
+	 * @param p patient
+	 * @param who volunteer1 or volunteer2 in patient
+	 */
+
+	private void setVolunteerDisplayName(Patient p, String who){
+		try{
+			statement = con.prepareStatement("SELECT firstname, lastname FROM volunteers WHERE volunteer_ID=?");
+			if (who.equals("volunteer1"))
+				statement.setInt(1, p.getVolunteer());
+			else 
+				statement.setInt(1, p.getPartner());
+			ResultSet rs = statement.executeQuery();
+			while(rs.next()){           				
+				StringBuilder sb = new StringBuilder();
+	   			if (!Utils.isNullOrEmpty(rs.getString("firstname"))){
+	   				sb.append(rs.getString("firstname"));
+	   				sb.append(" ");               				
+	   			}
+	   			
+	   			if (rs.getString("lastname") != null){
+	   				sb.append(rs.getString("lastname"));               				
+	   			}
+	   			
+	   			if (who.equals("volunteer1")) 
+	   			{
+	   				if(!Utils.isNullOrEmpty(sb.toString()))
+	   	   				p.setVolunteerName(sb.toString());
+	   	   			else
+	   	   				p.setVolunteerName("");
+	   	   			
+	   			}
+				else
+				{
+					if(!Utils.isNullOrEmpty(sb.toString()))
+	   	   				p.setPartnerName(sb.toString());
+	   	   			else
+	   	   				p.setPartnerName("");
+				}
+			}
+		} catch (SQLException e) {
+			System.out.println("Error: Failed to create Patient object");
+			e.printStackTrace();
+		}
+	}
+	
+	/**	
+	 * Avoid duplicated record in DB
+	 * 
+	 */
+	
+	private boolean isExist(Patient patient){		
+		int count = 0;		
+		try{
+			statement = con.prepareStatement("SELECT COUNT(*) as c FROM patients WHERE UPPER(firstname) = UPPER(?) "
+					+ "AND UPPER(lastname) = UPPER(?) AND UPPER(email) = UPPER(?)");
+			statement.setString(1, patient.getFirstName());
+			statement.setString(2, patient.getLastName());
+			statement.setString(3, patient.getEmail());
+			
+			rs = statement.executeQuery();
+			rs.first();
+			
+			count = rs.getInt("c");
+			
+			if (rs != null)
+				rs.close();
+			
+		} catch (SQLException e){
+			System.out.println("Error: Could not count volunteers");
+			e.printStackTrace();
+			
+		} finally {
+    		try{//close statement
+    			if (statement != null)
+    				statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}	
+		
+		if (count > 0)
+			return true;
+		else 
+			return false;
+		
 	}
 
 }

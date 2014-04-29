@@ -153,6 +153,21 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		props.setProperty("mail.password", mailPassword);
    	}
    	
+   	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
+	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+		
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+		model.addAttribute("unread", unreadMessages);
+	
+		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
+		model.addAttribute("volunteers", volunteers);
+		
+	    ArrayList<Patient> patientList = patientDao.getAllPatients();
+        model.addAttribute("patients", patientList);
+		return "admin/manage_patients";
+	}
+   	
    	@RequestMapping(value="/add_patient", method=RequestMethod.POST)
 	public String addPatient(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
 		//Add a new patient
@@ -166,14 +181,15 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		int v2 = Integer.parseInt(request.getParameter("volunteer2"));
 		p.setVolunteer(v1);
 		p.setPartner(v2);		
-		if ("1".equals(request.getParameter("myoscar_verified")))
-			p.setMyoscarVerified(true);
-		else
-			p.setMyoscarVerified(false);
+		p.setMyoscarVerified(request.getParameter("myoscar_verified"));		
 		p.setGender(request.getParameter("gender"));
 		p.setNotes(request.getParameter("notes"));
 		p.setAlerts(request.getParameter("alerts"));
 		p.setClinic(request.getParameter("clinic"));
+		
+		String availableTime = Utils.getAvailableTime(request);		
+		p.setAvailability(availableTime);
+		
 		patientDao.createPatient(p);
 		
 		Patient newPatient = patientDao.getNewestPatient();
@@ -195,7 +211,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
             //set today as startDate
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         	String startDate = sdf.format(new Date());            
-            System.out.println("startDate is   " + startDate);
+            
             sr.setStartDate(startDate);
           //if requested survey that's already done
     		if (specificSurveys.size() < template.getMaxInstances())
@@ -216,6 +232,74 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		return "redirect:/manage_patients";
 	}
+   	
+   	@RequestMapping(value="/edit_patient/{id}", method=RequestMethod.GET)
+	public String editPatientForm(@PathVariable("id") int patientID, ModelMap model){   		
+		Patient p = patientDao.getPatientByID(patientID);		
+		model.addAttribute("patient", p);		
+		
+		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();			
+		model.addAttribute("volunteers", volunteers);
+		
+		String strAvailibilities = p.getAvailability();	
+		boolean mondayNull = false;
+		boolean tuesdayNull = false;
+		boolean wednesdayNull = false;
+		boolean thursdayNull = false;
+		boolean fridayNull = false;
+		
+		if (!Utils.isNullOrEmpty(strAvailibilities))
+		{
+			if (strAvailibilities.contains("1non"))
+				mondayNull = true;
+			if (strAvailibilities.contains("2non"))
+				tuesdayNull = true;
+			if (strAvailibilities.contains("3non"))
+				wednesdayNull = true;
+			if (strAvailibilities.contains("4non"))
+				thursdayNull = true;
+			if (strAvailibilities.contains("5non"))
+				fridayNull = true;
+			
+			String[] arrayAvailibilities = strAvailibilities.split(",");
+			
+			Utils.getPosition("1","monDropPosition",arrayAvailibilities,mondayNull, model);
+			Utils.getPosition("2","tueDropPosition",arrayAvailibilities,tuesdayNull, model);
+			Utils.getPosition("3","wedDropPosition",arrayAvailibilities,wednesdayNull, model);
+			Utils.getPosition("4","thuDropPosition",arrayAvailibilities,thursdayNull, model);
+			Utils.getPosition("5","friDropPosition",arrayAvailibilities,fridayNull, model);
+			
+			model.addAttribute("mondayNull", mondayNull);
+			model.addAttribute("tuesdayNull", tuesdayNull);
+			model.addAttribute("wednesdayNull", wednesdayNull);
+			model.addAttribute("thursdayNull", thursdayNull);
+			model.addAttribute("fridayNull", fridayNull);
+		}
+		
+		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
+	}
+   	@RequestMapping(value="/submit_edit_patient/{id}", method=RequestMethod.POST)
+	public String modifyPatient(@PathVariable("id") int patientID, SecurityContextHolderAwareRequestWrapper request){
+		Patient p = new Patient();
+		p.setPatientID(patientID);
+		p.setFirstName(request.getParameter("firstname"));
+		p.setLastName(request.getParameter("lastname"));
+		p.setPreferredName(request.getParameter("preferredname"));		
+		p.setVolunteer(Integer.valueOf(request.getParameter("volunteer1")));
+		p.setPartner(Integer.valueOf(request.getParameter("volunteer2")));
+		p.setGender(request.getParameter("gender"));
+		p.setNotes(request.getParameter("notes"));
+		p.setClinic(request.getParameter("clinic"));
+		p.setAlerts(request.getParameter("alerts"));
+		p.setMyoscarVerified(request.getParameter("myoscar_verified"));
+		
+		String strAvailableTime = Utils.getAvailableTime(request);
+		p.setAvailability(strAvailableTime);
+		
+		patientDao.updatePatient(p);
+		return "redirect:/manage_patients";
+	}
+   	
    	
    	@RequestMapping(value="/remove_patient/{patient_id}", method=RequestMethod.GET)
 	public String removePatient(@PathVariable("patient_id") int id){

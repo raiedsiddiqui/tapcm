@@ -26,7 +26,8 @@
 				<tr>
 					<th>Name</th>
 					<th>Preferred Name</th>
-					<th>Volunteer</th>
+					<th>Volunteer1</th>
+					<th>Volunteer2</th>
 					<th>Edit</th>
 					<!-- <th>Remove</th> -->
 				</tr>
@@ -35,6 +36,7 @@
                     <td>${p.firstName} ${p.lastName} (${p.gender})</td>
                     <td>${p.preferredName}</td>
                     <td>${p.volunteerName}</td>
+                    <td>${p.partnerName}</td>
                     <td><a href="<c:url value="/edit_patient/${p.patientID}"/>" class="btn btn-info">Edit</a></td>
                     <!-- Disabling the ability to delete patients as data relating to a patient should not be deleted -->
                     <!-- <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td> -->
@@ -81,7 +83,7 @@
 						<label>Volunteer1:</label>
 						<select name="volunteer1" form="newPatient" class="form-control">
 							<c:forEach items="${volunteers}" var="v">
-								<option value="${v.volunteerId}">${v.firstName}</option>
+								<option value="${v.volunteerId}">${v.displayName}</option>
 							</c:forEach>
 						</select>
 					</div>
@@ -89,7 +91,7 @@
 						<label>Volunteer2:</label>
 						<select name="volunteer2" form="newPatient" class="form-control">
 							<c:forEach items="${volunteers}" var="v">
-								<option value="${v.volunteerId}">${v.firstName}</option>
+								<option value="${v.volunteerId}">${v.displayName}</option>
 							</c:forEach>
 						</select>
 					</div>
@@ -104,6 +106,7 @@
 						<option value="2">Stonechurch Family Health Center</option>
 					</select>
 					<label>Availability:</label><br/>
+					<%@include file="add_availabilities.jsp" %>
 					<label>Notes</label>
 					<textarea name="notes" class="form-control"></textarea>
 					<label>Alerts</label>
