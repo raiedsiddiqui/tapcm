@@ -21,7 +21,7 @@
 		</style>	
 		<script type="text/javascript">
 		$(function(){
-			$('#tp').datetimepicker({
+			$('#dp').datetimepicker({
 				pickDate: false,
 				pickSeconds: false
 			});

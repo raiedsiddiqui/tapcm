@@ -268,9 +268,6 @@ public class ActivityDao {
     	return activities;
     }
     
-    
-    
-    
     public List<Activity> getAllActivitiesForVolunteer(int user){
     	try{
     		//filter out all logged in/out, or password changing... by setting patient = 0
@@ -284,7 +281,32 @@ public class ActivityDao {
 
     		return log;
     	} catch (SQLException e){
-    		System.out.println("Error: Could not retrieve activities log");
+    		System.out.println("Error: Could not retrieve activities log for volunteer");
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public List<Activity> getAllActivitiesForAdmin(){
+    	try{
+    		//filter out all logged in/out, or password changing... by setting patient = 0
+    		stmt = con.prepareStatement("SELECT * FROM activities WHERE patient = 0 ORDER BY event_timestamp"  );    		
+    		ResultSet result = stmt.executeQuery();
+    		
+    		List<Activity> log = new ArrayList<Activity>();
+    		log = getActivitiesByResultSet(result);
+
+    		return log;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve activities log for Admin");
     		e.printStackTrace();
     		return null;
     	} finally {
@@ -469,7 +491,7 @@ public class ActivityDao {
     			activity.setActivityId(rs.getInt("event_ID"));
     		
     			startTime = rs.getString("start_Time");    			
-    			endTime = rs.getString("end_Time");
+    			endTime = rs.getString("end_Time");  			
     			    			
     			//startTime and endTime are optional, could be 00:00  
     			String strStartTime = null;
@@ -505,8 +527,26 @@ public class ActivityDao {
     					activity.setTime(Utils.timeFormat(strStartTime) + " -");
     			}
     			
+    			//set volunteer
+    			int vId = rs.getInt("volunteer");
+    			activity.setVolunteer(String.valueOf(vId));
+    			stmt = con.prepareStatement("SELECT firstname, lastname FROM volunteers WHERE volunteer_ID = ? ORDER BY lastname DESC ");		
+    			stmt.setInt(1, vId);
+    			
+    			ResultSet resultSet;
+    			resultSet = stmt.executeQuery();
+    			
+    			while(resultSet.next())
+    			{
+    				StringBuffer sb = new StringBuffer();
+    				sb.append(resultSet.getString("firstname"));
+    				sb.append(" ");
+    				sb.append(resultSet.getString("lastname"));
+    				
+    				activity.setVolunteerName(sb.toString());      				
+    			}
+    			
     			activities.add(activity);
-        		
         	}
     	}catch (SQLException e){
 			e.printStackTrace();

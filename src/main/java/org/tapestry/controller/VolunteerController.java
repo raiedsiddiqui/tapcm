@@ -127,8 +127,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	@RequestMapping(value="/view_volunteers", method=RequestMethod.POST)
 	public String viewFilteredVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
-		
-		
+				
 		String name = request.getParameter("searchName");
 		if(!Utils.isNullOrEmpty(name)) {
 			volunteers = volunteerDao.getVolunteersByName(name);			

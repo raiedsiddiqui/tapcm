@@ -169,68 +169,87 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	}
    	
    	@RequestMapping(value="/add_patient", method=RequestMethod.POST)
-	public String addPatient(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
+	public String addPatient(SecurityContextHolderAwareRequestWrapper request, ModelMap model) 
+			throws JAXBException, DatatypeConfigurationException, Exception{
 		//Add a new patient
 		Patient p = new Patient();
-		p.setFirstName(request.getParameter("firstname").trim());
-		p.setLastName(request.getParameter("lastname").trim());
-		if(request.getParameter("preferredname") != "") {
-			p.setPreferredName(request.getParameter("preferredname").trim());
+		
+		int vId1 = Integer.parseInt(request.getParameter("volunteer1"));
+		int vId2 = Integer.parseInt(request.getParameter("volunteer2"));
+		Volunteer v1 = volunteerDao.getVolunteerById(vId1);
+		Volunteer v2 = volunteerDao.getVolunteerById(vId2);
+		
+		if (Utils.isMatchVolunteer(v1, v2))
+		{
+			p.setFirstName(request.getParameter("firstname").trim());
+			p.setLastName(request.getParameter("lastname").trim());
+			if(request.getParameter("preferredname") != "") {
+				p.setPreferredName(request.getParameter("preferredname").trim());
+			}		
+			p.setVolunteer(vId1);
+			p.setPartner(vId2);		
+			p.setMyoscarVerified(request.getParameter("myoscar_verified"));		
+			p.setGender(request.getParameter("gender"));
+			p.setNotes(request.getParameter("notes"));
+			p.setAlerts(request.getParameter("alerts"));
+			p.setClinic(request.getParameter("clinic"));
+			
+			String availableTime = Utils.getAvailableTime(request);		
+			p.setAvailability(availableTime);
+			
+			patientDao.createPatient(p);
+			
+			Patient newPatient = patientDao.getNewestPatient();
+			
+			//Auto assign all existing surveys
+			ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+	   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+	   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+	   		
+	   		for(SurveyTemplate st: surveyTemplates) {
+			List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
+			
+			SurveyFactory surveyFactory = new SurveyFactory();
+			PHRSurvey template = surveyFactory.getSurveyTemplate(st);
+				SurveyResult sr = new SurveyResult();
+	            sr.setSurveyID(st.getSurveyID());
+	            sr.setPatientID(newPatient.getPatientID());
+	            
+	            //set today as startDate
+	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	        	String startDate = sdf.format(new Date());            
+	            
+	            sr.setStartDate(startDate);
+	          //if requested survey that's already done
+	    		if (specificSurveys.size() < template.getMaxInstances())
+	    		{
+	    			PHRSurvey blankSurvey = template;
+	    			blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
+	    			sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
+	    			String documentId = surveyResultDao.assignSurvey(sr);
+	    			blankSurvey.setDocumentId(documentId);
+	    			surveys.addSurvey(blankSurvey);
+	    			specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
+	    		}
+	    		else
+	    		{
+	    			return "redirect:/manage_patients";
+	    		}
+			}
+	   		return "redirect:/manage_patients";
 		}
-		int v1 = Integer.parseInt(request.getParameter("volunteer1"));
-		int v2 = Integer.parseInt(request.getParameter("volunteer2"));
-		p.setVolunteer(v1);
-		p.setPartner(v2);		
-		p.setMyoscarVerified(request.getParameter("myoscar_verified"));		
-		p.setGender(request.getParameter("gender"));
-		p.setNotes(request.getParameter("notes"));
-		p.setAlerts(request.getParameter("alerts"));
-		p.setClinic(request.getParameter("clinic"));
-		
-		String availableTime = Utils.getAvailableTime(request);		
-		p.setAvailability(availableTime);
-		
-		patientDao.createPatient(p);
-		
-		Patient newPatient = patientDao.getNewestPatient();
-		
-		//Auto assign all existing surveys
-		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
-   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
-   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
-   		
-   		for(SurveyTemplate st: surveyTemplates) {
-		List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
-		
-		SurveyFactory surveyFactory = new SurveyFactory();
-		PHRSurvey template = surveyFactory.getSurveyTemplate(st);
-			SurveyResult sr = new SurveyResult();
-            sr.setSurveyID(st.getSurveyID());
-            sr.setPatientID(newPatient.getPatientID());
-            
-            //set today as startDate
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        	String startDate = sdf.format(new Date());            
-            
-            sr.setStartDate(startDate);
-          //if requested survey that's already done
-    		if (specificSurveys.size() < template.getMaxInstances())
-    		{
-    			PHRSurvey blankSurvey = template;
-    			blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
-    			sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
-    			String documentId = surveyResultDao.assignSurvey(sr);
-    			blankSurvey.setDocumentId(documentId);
-    			surveys.addSurvey(blankSurvey);
-    			specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
-    		}
-    		else
-    		{
-    			return "redirect:/manage_patients";
-    		}
+		else
+		{System.out.println("no matched volunteer pair");
+			
+			model.addAttribute("misMatchedVolunteer",true);
+			List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
+			model.addAttribute("volunteers", volunteers);
+			
+		    ArrayList<Patient> patientList = patientDao.getAllPatients();
+	        model.addAttribute("patients", patientList);
+	        
+			return "admin/manage_patients";
 		}
-		
-		return "redirect:/manage_patients";
 	}
    	
    	@RequestMapping(value="/edit_patient/{id}", method=RequestMethod.GET)

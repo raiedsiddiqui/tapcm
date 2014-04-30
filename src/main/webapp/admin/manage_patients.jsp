@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -20,6 +21,9 @@
 <body>	
 	<div class="content">
 		<%@include file="navbar.jsp" %>
+		<c:if test="${not empty misMatchedVolunteer}">			
+			<div class="alert alert-error"><spring:message code="message_volunteers_misMatchedVolunteer"/></div>
+		</c:if>	
 		<div class="row-fluid">
 			<h2>Patients</h2><a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add New</a>
 			<table class="table">

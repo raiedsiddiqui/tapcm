@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.tapestry.dao.NarrativeDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.objects.User;
+import org.tapestry.objects.Volunteer;
 import org.yaml.snakeyaml.Yaml;
 
 public class Utils {
@@ -490,6 +491,23 @@ public class Utils {
 		}	
 		
 		return list;
+	}
+	
+	public static boolean isMatchVolunteer(Volunteer v1, Volunteer v2){
+		String v1Type = v1.getExperienceLevel();
+		String v2Type = v2.getExperienceLevel();		
+		
+		boolean matched = false;		
+		
+		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type)){
+			matched = true;
+		}
+		else if ("Intermediate".equals(v1Type) && "Intermediate".equals(v2Type))
+		{
+			matched = true;
+		}
+		
+		return matched;
 	}
 	
 }

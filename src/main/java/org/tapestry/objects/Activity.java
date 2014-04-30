@@ -9,6 +9,7 @@ public class Activity{
 	private String endTime;	
 	private String volunteer;
 	private int appointment;
+	private String volunteerName;
 	
 	public Activity(){
 	}
@@ -77,4 +78,11 @@ public class Activity{
 		this.endTime = endTime;
 	}
 
+	public String getVolunteerName() {
+		return volunteerName;
+	}
+
+	public void setVolunteerName(String volunteerName) {
+		this.volunteerName = volunteerName;
+	}
 }

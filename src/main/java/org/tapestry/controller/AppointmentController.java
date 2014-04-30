@@ -466,20 +466,18 @@ public class AppointmentController{
 		Availability availability;
 		
 		for (Volunteer v1: list1)
-		{System.out.println(" v1 loop ==") ;
-			availability1 = v1.getAvailability();		
-			
+		{
+			availability1 = v1.getAvailability();				
 			aSet1 = availability1.split(",");	
-			System.out.println(Arrays.toString(aSet1));
+			
 			for (Volunteer v2: list2)
-			{System.out.println(" v2 loop ==") ;
+			{
 				if (v1.getVolunteerId()!= v2.getVolunteerId())
 				{		
 					availability2 = v2.getAvailability();		
 					
-					if (isMatchVolunteer(v1, v2))						
-					{System.out.println("matched pairs") ;
-					
+					if (Utils.isMatchVolunteer(v1, v2))						
+					{					
 						aSet2  = availability2.split(",");		
 						System.out.println(Arrays.toString(aSet2)) ;
 						//find match availability					
@@ -489,7 +487,7 @@ public class AppointmentController{
 							{  	//same time, no duplicated
 								if ((!aSet1[i].toString().contains("non")) 
 										&&  (aSet1[i].toString().equals(aSet2[j].toString()))
-										&&	(!isExist(aList, aSet1[i].toString(),v1)))								
+										&&	(!isExist(aList, aSet1[i].toString(), v1, v2)))								
 								{	
 									availability = new Availability();
 									availability.setvDisplayName(v1.getDisplayName());
@@ -515,16 +513,17 @@ public class AppointmentController{
 	}
 	
 	//avoid duplicated element
-	private boolean isExist(List<Availability> list, String time, Volunteer v){
+	private boolean isExist(List<Availability> list, String time, Volunteer v1, Volunteer v2){
 		Availability a = new Availability();
 		boolean exist = false;
-		time = this.formateMatchTime(time);		
-		String vName = v.getDisplayName();
+		time = formateMatchTime(time);		
+		String v1Name = v1.getDisplayName();
+		String v2Name = v2.getDisplayName();
 		
 		for (int i =0; i<list.size(); i++){
 			a = list.get(i);
 			
-			if ((time.equals(a.getMatchedTime())) && ((vName.equals(a.getpDisplayName())) ||(vName.equals(a.getvDisplayName()))))
+			if ((time.equals(a.getMatchedTime())) && ((v1Name.equals(a.getpDisplayName())) && (v2Name.equals(a.getvDisplayName())) ))
 				return true;
 		}
 		return exist;
@@ -548,23 +547,5 @@ public class AppointmentController{
 		
 		return sb.toString();
 	}
-	
-	private boolean isMatchVolunteer(Volunteer vol1, Volunteer vol2){
-		String v1Type = vol1.getExperienceLevel();
-		String v2Type = vol2.getExperienceLevel();		
-		
-		boolean matched = false;		
-		
-		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type)){
-			matched = true;
-		}
-		else if ("Intermediate".equals(v1Type) && "Intermediate".equals(v2Type))
-		{
-			matched = true;
-		}
-		
-		return matched;
-	}
-	
 	
 }
