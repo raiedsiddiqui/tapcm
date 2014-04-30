@@ -12,6 +12,7 @@
 
   <!-- FONTS -->
   <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
 
 
 	<style type="text/css">
@@ -29,6 +30,10 @@
 
 		tr:hover{
 			background-color:#D9EDF7;
+		}
+
+		.navbar {
+			width: 100%;
 		}
 	</style>
 	<script type="text/javascript">
@@ -60,9 +65,27 @@
 </head>
 <body>
 	<div id="headerholder">	
-		<img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-		<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
-		<img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/> 
+		<div class="row">
+			<div class="col-md-2">
+				<img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
+			</div>
+<!-- 		<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
+		<img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>  -->
+		<div class="col-md-10">
+		<div class="navbar">      
+			<ul class="nav navbar-nav">
+	    	
+	    		<li><a class="brand" href="<c:url value="/"/>">Appointments</a></li>
+	    		<li class="active"><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
+	    		<li><a href="<c:url value="/view_activityLogs"/>">Activity Logs</a></li>
+	    		<li><a href="<c:url value="#"/>">Narratives</a></li>
+				<li><a href="<c:url value="/logout"/>">Log Out</a></li>
+
+		    </ul>
+		 </div>	
+		</div>
+
+		</div>
 	</div>
 
 <!-- OLD NAVBAR-->	
@@ -91,16 +114,7 @@
 -->
 <!-- OLD NAVBAR-->	
 
-<div class="navbar">      
-	<ul class="nav navbar-nav">
-    	
-    	<li><a class="brand" href="<c:url value="/"/>">Appointments</a></li>
-    	<li class="active"><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
-    	<li><a href="<c:url value="/view_activityLogs"/>">Activity Logs</a></li>
-		<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 
-    </ul>
- </div>
 
 	
 	<!-- 	breadcrumb START-->	

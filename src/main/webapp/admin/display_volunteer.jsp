@@ -25,8 +25,12 @@
 
 </head>
 <body>
+<div class="content">
 <%@include file="navbar.jsp" %>
-<div><h4><a href="<c:url value="/view_volunteers"/>" >Volunteers</a> > ${volunteer.displayName}</h4></div>
+
+<div class="row-fluid">
+
+<div><h4><a href="<c:url value="/view_volunteers"/>" >Volunteers</a> ${volunteer.displayName}</h4></div>
 <div>
 <table>
 	<tr>
@@ -45,37 +49,93 @@
 
  
 
-<table width="970">
-	<tr>
-		<td width="500"><label>Username : ${volunteer.userName}</label></td>
-		<td><label>Address : ${volunteer.address}</label></td>
-	</tr>
-	<tr>
-		<td><label>Experience :</label><c:if test="${volunteer.experienceLevel eq 'E'}">Experienced</c:if>
-		<c:if test="${volunteer.experienceLevel eq 'B'}">Beginner</c:if><c:if test="${volunteer.experienceLevel eq 'I'}">Intermediate</c:if>
-		</td>
-		<td><label>City: ${volunteer.city}</label></td>
-	</tr>
-	<tr>
-		<td><label>Home Phone # : ${volunteer.homePhone} </label></td>
-		<td><label>Postal Code : ${volunteer.postalCode}</label></td>
-	</tr>
-	<tr>
-		<td><label>Cell Phone # : ${volunteer.cellPhone}</label></td>
-		<td><label>Emergency Contact : ${volunteer.emergencyContact}</label></td>
-	</tr>
-	<tr>
-		<td><label>Email : ${volunteer.email}</label></td>
-		<td><label>Emergency # : ${volunteer.emergencyPhone}</label></td>
-	</tr>
-</table>
+	<div class="row form-group">
+		<div class="col-md-2">
+	    	<label class="control-label">Username</label>
+	    </div>
+	    <div class="col-md-2">
+	      	<p class="form-control-static">${volunteer.userName}</p>
+	  	</div>
+	
+		<div class="col-md-2">
+			<label class="control-label">Address</label>
+		</div>
+		<div class="col-md-2">
+	  		<p class="form-control-static">${volunteer.address}</p>
+		</div>
+		<div class="col-md-2">
+	    	<label class="control-label">Experience :</label>
+	    </div>
+	    <div class="col-md-2">
+	      	<p class="form-control-static"><c:if test="${volunteer.experienceLevel eq 'E'}">Experienced</c:if>
+		<c:if test="${volunteer.experienceLevel eq 'B'}">Beginner</c:if><c:if test="${volunteer.experienceLevel eq 'I'}">Intermediate</c:if></p>
+	  	</div>
+  </div>
 
-<h2>Notes/Comments</h2><br/>
-<div>${volunteer.notes}</div><br/>
+	<div class="row form-group">
+		<div class="col-md-2">
+	    	<label class="control-label">City:</label>
+	    </div>
+	    <div class="col-md-2">
+	      	<p class="form-control-static">${volunteer.city}</p>
+	  	</div>
+	
+		<div class="col-md-2">
+			<label class="control-label">Postal Code :</label>
+		</div>
+		<div class="col-md-2">
+	  		<p class="form-control-static">${volunteer.postalCode}</p>
+		</div>
+		<div class="col-md-2">
+	    	<label class="control-label">Home Phone # :</label>
+	    </div>
+	    <div class="col-md-2">
+	      	<p class="form-control-static">${volunteer.homePhone}</p>
+	  	</div>
+  </div>
 
+
+	<div class="row form-group">
+		<div class="col-md-2">
+	    	<label class="control-label">Cell Phone #</label>
+	    </div>
+	    <div class="col-md-2">
+	      	<p class="form-control-static">${volunteer.cellPhone}</p>
+	  	</div>
+	
+		<div class="col-md-2">
+			<label class="control-label">Email : </label>
+		</div>
+		<div class="col-md-2">
+	  		<p class="form-control-static">${volunteer.email}</p>
+		</div>
+  </div>
+
+	<div class="row form-group">
+		<div class="col-md-2">
+	    	<label class="control-label">Emergency Contact :</label>
+	    </div>
+	    <div class="col-md-2">
+	      	<p class="form-control-static">${volunteer.emergencyContact}</p>
+	  	</div>
+	
+		<div class="col-md-2">
+			<label class="control-label">Emergency # : </label>
+		</div>
+		<div class="col-md-2">
+	  		<p class="form-control-static">${volunteer.emergencyPhone}</p>
+		</div>
+  </div>
+
+<h2>Notes/Comments</h2>
+<div class="row">
+	<div class="col-md-6">
+  		<p class="form-control-static">${volunteer.notes}</p>
+	</div>
+</div>
 <h2>Availability</h2>
 <div>
-	<table  width="1170" border="1">
+	<table width="100%" border="1">
 		<tr>
 			<td width ="200" valign="top">
 				<table>
@@ -158,112 +218,116 @@
 		
 	</table>
 </div>
-<h2>Upcoming Visits</h2>
-<table  width="970" border="1">
-	<tr>
-		
-		<th width="500">Visit Date</th>
-		
-		<th>Client</th>
-	</tr>
-	<c:forEach items="${upcomingVisits}" var="uVistits">
-	<tr >
-		<td>${uVistits.date}</td>
-		
-		<td>${uVistits.patient}</td>
-	</tr>
-	</c:forEach>
-</table>
-<h2>Completed Visits</h2>
-<table  width="970" border="1">
-	<tr>
-		<th width="300">Visit #</th>
-		<th width="300"> Visit Date</th>		
-		<th>Client</th>
-	</tr>
-	<c:forEach items="${completedVisits}" var="cVistits">
-	<tr >
-		<td>${cVistits.appointmentID}</td>
-		<td>${cVistits.date}</td>
-		
-		<td>${cVistits.patient}</td>
-	</tr>
-	</c:forEach>
-</table>
+	<h2>Upcoming Visits</h2>
+	<table  class="table table-stripe" width="970" border="1">
+		<tr>
+			
+			<th width="500">Visit Date</th>
+			
+			<th>Client</th>
+		</tr>
+		<c:forEach items="${upcomingVisits}" var="uVistits">
+		<tr >
+			<td>${uVistits.date}</td>
+			
+			<td>${uVistits.patient}</td>
+		</tr>
+		</c:forEach>
+	</table>
+	<h2>Completed Visits</h2>
+	<table  width="970" border="1">
+		<tr>
+			<th width="300">Visit #</th>
+			<th width="300"> Visit Date</th>		
+			<th>Client</th>
+		</tr>
+		<c:forEach items="${completedVisits}" var="cVistits">
+		<tr >
+			<td>${cVistits.appointmentID}</td>
+			<td>${cVistits.date}</td>
+			
+			<td>${cVistits.patient}</td>
+		</tr>
+		</c:forEach>
+	</table>
 
 <hr>
 
-<div class="row-fluid" id="displayActivityLogDiv" style="display:none";>
-			
-</div>
-<div class="row-fluid" id="displayMessageDiv" style="display:none";>
-			
+	<div class="row-fluid" id="displayActivityLogDiv" style="display:none";>
+				
+	</div>
+	<div class="row-fluid" id="displayMessageDiv" style="display:none";>
+				
+	</div>
 </div>
 
 <!-- Modal -->
-	<div id="displayActivityLog" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
-  		<div class="modal-header">
-    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    		<h3 id="modalHeader">Activity Log</h3>
-  		</div>
-  		<div class="modal-body">
-  		
-  			<table border="1">
-	  			<tr>
-					<th width="200">Date</th>
-					<th width="300">Time</th>
-					<th width="400">Description</th>
-				</tr>
-				<c:forEach items="${activityLogs}" var="al">
-				<tr>
-					<td>${al.date}</td>
-					<td>${al.time}</td>
-					<td>${al.description}</td>
-				</tr>
-				</c:forEach>
-  			</table>
-  		
-  		</div>
-  		<div class="modal-footer">
-    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			
-  		</div>
+<div class="modal fade" id="displayActivityLog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ 	<div class="modal-dialog">
+	    <div class="modal-content">
+	  		<div class="modal-header">
+	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+	    		<h3 id="modalHeader">Activity Log</h3>
+	  		</div>
+	  		<div class="modal-body">
+	  			<table border="1">
+		  			<tr>
+						<th width="200">Date</th>
+						<th width="300">Time</th>
+						<th width="400">Description</th>
+					</tr>
+					<c:forEach items="${activityLogs}" var="al">
+					<tr>
+						<td>${al.date}</td>
+						<td>${al.time}</td>
+						<td>${al.description}</td>
+					</tr>
+					</c:forEach>
+	  			</table>
+	  		
+	  		</div>
+	  		<div class="modal-footer">
+	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+				
+	  		</div>
+		</div>
 	</div>
-	
-	<div id="displayMessage" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
-  		<div class="modal-header">
-    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    		<h3 id="modalHeader">In Box</h3>
-  		</div>
-  		<div class="modal-body">
-  		
-  			<table class="table">
-						<tr>
-							<th>Sender</th>
-							<th>Subject</th>
-							<th>Date</th>
-							
-						</tr>
-						<c:forEach items="${messages}" var="m">
-						<c:choose>
-							<c:when test="${! m.read}"><tr onClick="document.location='<c:url value="/view_message/${m.messageID}"/>';" style="font-weight:bold;"></c:when>
-							<c:otherwise><tr onClick="document.location='<c:url value="/view_message/${m.messageID}"/>';"></c:otherwise>
-						</c:choose>
-							<td>${m.sender}</td>
-							<td>${m.subject}</td>
-							<td>${m.date}</td>
-							
-						</tr>
-						</c:forEach>
-					</table>
-  		
-  		</div>
-  		<div class="modal-footer">
-    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			
-  		</div>
+</div>	
+
+<div class="modal fade" id="displayMessage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+	    <div class="modal-content">
+	  		<div class="modal-header">
+	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+	    		<h3 id="modalHeader">In Box</h3>
+	  		</div>
+	  		<div class="modal-body">
+	  			<table class="table">
+					<tr>
+						<th>Sender</th>
+						<th>Subject</th>
+						<th>Date</th>
+					</tr>
+					<c:forEach items="${messages}" var="m">
+					<c:choose>
+						<c:when test="${! m.read}"><tr onClick="document.location='<c:url value="/view_message/${m.messageID}"/>';" style="font-weight:bold;"></c:when>
+						<c:otherwise><tr onClick="document.location='<c:url value="/view_message/${m.messageID}"/>';"></c:otherwise>
+					</c:choose>
+						<td>${m.sender}</td>
+						<td>${m.subject}</td>
+						<td>${m.date}</td>
+					</tr>
+					</c:forEach>
+				</table>
+	  		</div>
+	  		<div class="modal-footer">
+	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+	  		</div>
+		</div>
 	</div>
-	
+</div>
+
+</div>
 
 </body>
 </html>

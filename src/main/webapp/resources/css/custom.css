@@ -161,7 +161,7 @@ a {
 	padding: 18px 5px 23px !important;
 	font-size: 25px !important;
 	border-left: 2px solid gray;
-	font-family: 'Roboto Slab', serif;
+	font-family: 'Open Sans', 'sans-serif';
 }
 
 .navbar .brand {
@@ -191,7 +191,7 @@ a {
 	padding-left: 20px;
 	padding-right: 20px;
 	font-size: 35px; 
-	font-family: 'Krona One', sans-serif;
+	font-family:'Open Sans', 'sans-serif';
 
 }
 
@@ -373,8 +373,8 @@ div#visitandbook.span12.btn-group {
 }
 
 #crumbs ul li a {
-	height: 30px;
-	padding: 10px 10px 0 60px;
+	/*height: 30px;*/
+	padding: 13px 10px 0 60px;
 }
 
 div#crumbs {

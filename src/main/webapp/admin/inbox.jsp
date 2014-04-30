@@ -79,26 +79,42 @@
 				</c:choose>
 			</div>
 			
-			<div class="modal hide fade" id="modalSend">
+	<div class="modal fade" id="modalSend" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">
 				<div class="modal-header">
     				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
 					<h3>Message Volunteers</h3>
 				</div>
 				<div class="modal-body">
 					<form id="messageVolunteer" method="post" action="<c:url value="/send_message"/>">
-						<label>Subject:</label>
-						<input type="text" name="msgSubject" required/>
-						<label>Send to:</label>
-						<input type="checkbox" style="margin-bottom:10px;" value="true" name="isAnnouncement" onclick="document.getElementById('rec').disabled = !document.getElementById('rec').disabled;">Broadcast message</input><br/>
-						<select multiple id="rec" name="recipient" form="messageVolunteer">
+					<div class="row form-group">
+						<div class="col-md-12">
+							<label>Subject:</label>
+							<input type="text" name="msgSubject" class="form-control" required/>
+						</div>
+					</div>
+					<div class="row form-group">
+						<div class="col-md-12 ">
+							<div class="checkbox">
+							<label>Send to:</label>
+							<input  type="checkbox" style="margin-bottom:10px;" value="true" name="isAnnouncement" onclick="document.getElementById('rec').disabled = !document.getElementById('rec').disabled;">Broadcast message</input><br/>
+							</div>
+						<select multiple id="rec" name="recipient" form="messageVolunteer" class="form-control">
 							<c:forEach items="${volunteers}" var="v">
 							<option value="${v.volunteerId}">${v.firstName}</option>
 							</c:forEach>
 						</select><br />
-						<label>Message:</label>
-						<textarea name="msgBody"></textarea><br />
-					</form>
+					</div>
 				</div>
+				<div class="row form-group">
+					<div class="col-md-12">
+						<label>Message:</label>
+						<textarea class="form-control" name="msgBody"></textarea><br />		
+					</div>
+				</div>
+
+					</form>
 				<div class="modal-footer">
 					<input type="submit" form="messageVolunteer" class="btn btn-primary" value="Send" />
   				</div>
