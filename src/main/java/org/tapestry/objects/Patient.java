@@ -21,6 +21,9 @@ public class Patient{
 	private String myoscarVerified;
 	private int partner; // another volunteer(two volunteers should be assigned per visit)
 	private String partnerName;
+	private String myOscarAuthentication;
+	private String clinicName;
+	
 
 	/**
 	* Empty constructor
@@ -255,5 +258,20 @@ public class Patient{
 	public void setPartnerName(String partnerName) {
 		this.partnerName = partnerName;
 	}
+	
+	public String getMyOscarAuthentication() {
+		return myOscarAuthentication;
+	}
+
+	public void setMyOscarAuthentication(String myOscarAuthentication) {
+		this.myOscarAuthentication = myOscarAuthentication;
+	}
     
+	public String getClinicName() {
+		return clinicName;
+	}
+
+	public void setClinicName(String clinicName) {
+		this.clinicName = clinicName;
+	}
 }

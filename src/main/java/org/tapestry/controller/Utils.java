@@ -510,4 +510,14 @@ public class Utils {
 		return matched;
 	}
 	
+	public static String getClinicName(String code){
+		Map<String, String> clinics = new HashMap<String, String>();
+		
+		clinics.put("1", "West End Clinic");
+		clinics.put("2", "Stonechurch Family Health Center");
+		
+		return clinics.get(code);
+		
+	}
+	
 }

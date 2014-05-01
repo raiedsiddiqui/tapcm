@@ -31,17 +31,17 @@
 <body>
 <div class="content">
 		<%@include file="navbar.jsp" %>
-		<c:if test="${not empty volunteerCreated}">
-			<div class ="alert alert-info"><spring:message code="message_newVolunteer"/></div>
+		<c:if test="${not empty noSearchName}">
+			<div class ="alert alert-info"><spring:message code="message_noSearchName"/></div>
 		</c:if>
 		
 	<div class="row-fluid">
 			<h2>Clients </h2>
 			<div class="row-fluid">
-				<form action="<c:url value="/view_clients"/>" method="POST">
+				<form action="<c:url value="/view_clients_admin"/>" id="searchPatients" method="POST">
 					<fieldset>
 						<label>Name:</label>
-						<input type="text" name="searchName" value="${searchName}" required />
+						<input type="text" name="searchName" form="searchPatients" value="${searchName}" required />
 						<input class="btn btn-primary" type="submit" value="Search" />
 					</fieldset>
 				</form>
@@ -59,13 +59,14 @@
 					<th>Phone Number</th>
 					
 				</tr>
+				
 				<c:forEach items="${patients}" var="p">
 					<tr>
-						<td><a href="<c:url value="/display_client/${p.patientId}"/>">${p.displayName}</a></td>						
+						<td><a href="<c:url value="/display_client/${p.patientID}"/>">${p.displayName}</a></td>						
 						<td>${p.bod}</td>
 						<td>${p.age}</td>
 						<td>${p.gender}</td>
-						<td>${p.clinic}</td>
+						<td>${p.clinicName}</td>
 						<td>${p.mrp}</td>
 						<td>${p.city}</td>
 						<td>${p.homePhone}</td>

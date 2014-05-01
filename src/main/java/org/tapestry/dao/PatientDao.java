@@ -2,6 +2,7 @@ package org.tapestry.dao;
 
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.Patient;
+import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 
 import java.sql.PreparedStatement;
@@ -163,6 +164,32 @@ public class PatientDao {
         		}
         	}
     	}
+    	
+    	/**
+    	 * 
+    	 * get all patients with partialName in firstname or lastname
+    	 * @param partialName
+    	 * @return
+    	 */
+    	public List<Patient> getPatientssByPartialName(String partialName){
+    		try{
+    			statement = con.prepareStatement("SELECT * FROM patients WHERE UPPER(firstname) "
+    					+ "LIKE UPPER('%" + partialName + "%') OR UPPER(lastname) LIKE UPPER('%" + partialName + "%')");
+    			ResultSet result = statement.executeQuery();
+    			List<Patient> patients = new ArrayList<Patient>();
+    			
+    			while(result.next()){
+    				Patient p = createFromSearch(result);
+    				patients.add(p);
+    			}
+    			
+    			return patients;
+    		} catch (SQLException e){
+    			System.out.println("Error: Could not retrieve patients by partial name " + partialName);
+    			e.printStackTrace();
+    			return null;
+    		}
+    	}
 
 	/**
 	* Saves a patient in the database
@@ -269,13 +296,31 @@ public class PatientDao {
 			p.setFirstName(result.getString("firstname"));
 			p.setLastName(result.getString("lastname"));
 			p.setPreferredName(result.getString("preferredname"));
-			p.setGender(result.getString("gender"));
+			//set gender
+			String gender = result.getString("gender");
+			if ("M".equals(gender))
+				p.setGender("Male");
+			else if ("F".equals(gender))
+				p.setGender("Female");
+			else
+				p.setGender("Other");
+			//set clinic
+			String clinicCode = result.getString("clinic");
+			p.setClinic(clinicCode);
+			p.setClinicName(Utils.getClinicName(clinicCode));
+			
 			p.setVolunteer(result.getInt("volunteer"));
 			p.setNotes(result.getString("notes"));
 			p.setAvailability(result.getString("availability"));
-			p.setAlerts(result.getString("alerts"));
-			p.setClinic(result.getString("clinic"));
-			p.setMyoscarVerified(result.getString("myoscar_verified"));     
+			p.setAlerts(result.getString("alerts"));	
+			
+			String myOscarVerfied = result.getString("myoscar_verified");
+			p.setMyoscarVerified(myOscarVerfied);    
+			//set myoscar authentication for display in client's detail page
+			if ("1".equals(myOscarVerfied))
+				p.setMyOscarAuthentication("Authenticated");
+			else
+				p.setMyOscarAuthentication("Not Authenticated");
 			p.setPartner(result.getInt("volunteer2"));
 			//Set volunteer name and partner name
 			setVolunteerDisplayName(p, "volunteer1");

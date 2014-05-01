@@ -257,6 +257,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		Patient p = patientDao.getPatientByID(patientID);		
 		model.addAttribute("patient", p);		
 		
+		System.out.println("clinic is " + p.getClinic());
+		
 		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();			
 		model.addAttribute("volunteers", volunteers);
 		
@@ -385,7 +387,20 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		List<Patient> patients = getAllPatients();
 		
 		model.addAttribute("patients", patients);
-		return "redirect:/manage_patients";
+		return "/admin/view_clients";
+	}
+	
+	//display all patients by search name
+	@RequestMapping(value="/view_clients_admin", method=RequestMethod.POST)
+	public String viewPatientsBySelectedName(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		String name = request.getParameter("searchName");
+		List<Patient> patients = new ArrayList<Patient>();
+		
+		patients = patientDao.getPatientssByPartialName(name);			
+		model.addAttribute("searchName", name);	 
+		model.addAttribute("patients", patients);
+		
+		return "/admin/view_clients";		
 	}
 	
 	private List<Patient> getAllPatients(){
