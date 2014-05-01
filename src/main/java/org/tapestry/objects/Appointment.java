@@ -17,15 +17,9 @@ public class Appointment{
 	private boolean completed;
 	private boolean contactedAdmin;
 	private String partner;
+	private int partnerId;
 	
-	public String getPartner() {
-		return partner;
-	}
-
-	public void setPartner(String partner) {
-		this.partner = partner;
-	}
-
+	
 	/**
 	 * Empty constructor
 	 */
@@ -183,4 +177,21 @@ public class Appointment{
 	public void setContactedAdmin(boolean contactedAdmin){
 		this.contactedAdmin = contactedAdmin;
 	}
+	
+	public int getPartnerId() {
+		return partnerId;
+	}
+
+	public void setPartnerId(int partnerId) {
+		this.partnerId = partnerId;
+	}
+
+	public String getPartner() {
+		return partner;
+	}
+
+	public void setPartner(String partner) {
+		this.partner = partner;
+	}
+
 }

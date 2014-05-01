@@ -24,129 +24,89 @@
 
 <div class="row-fluid">
 
-<div><h4><a href="<c:url value="/view_clients_admin"/>" >Client</a> ${patient.displayName}</h4></div>
-<div>
+<div><h4><a href="<c:url value="/view_clients_admin"/>" >Client ></a> ${patient.displayName}</h4></div>
+
 <table>
 	<tr>
-		<td width="400">
+		<td colspan="2">
 			<h2>${patient.displayName}<a href="<c:url value="/edit_patient/${patient.patientID}"/>">Edit</a></h2>
-		</td>
-		
+		</td>		
 	</tr>
+	<tr>
+		<td>
+			<label>&nbsp Date of birth:</label>&nbsp ${patient.bod}
+		</td>
+		<td>
+			<label >&nbsp Gender:</label>&nbsp${patient.gender}
+		</td>
+	<tr>
+		<td>
+			<label >&nbsp Address :</label>&nbsp${patient.address}
+		</td>
+		<td>
+			<label>&nbsp MRP:</label>&nbsp${patient.mrp}
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label>&nbsp Phone #:</label>&nbsp${patient.homePhone}
+		</td>
+		<td>
+			<label >&nbsp Clinic :</label>&nbsp${patient.clinicName}
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<label>&nbsp Email :</label>&nbsp${patient.email}
+		</td>
+		<td>
+			<label>&nbsp MyOscar Verified :</label>&nbsp${patient.myOscarAuthentication}
+	</tr>
+	
 </table>
-</div> 
 
-	<div class="row form-group">
-		<div class="col-md-2">
-	    	<label class="control-label">Date of birth:</label>
-	    </div>
-	    <div class="col-md-2">
-	      	<p class="form-control-static">${patient.bod}</p>
-	  	</div>
-	
-		<div class="col-md-2">
-			<label class="control-label">Gender:</label>
-		</div>
-		<div class="col-md-2">
-	  		<p class="form-control-static">${patient.gender}</p>
-		</div>
-		<div class="col-md-2">
-	    	<label class="control-label">Address :</label>
-	    </div>
-	    <div class="col-md-2">
-	      	<p class="form-control-static">${patient.address}</p>
-	  	</div>
- 		<div class="col-md-2">
-	    	<label class="control-label">MRP:</label>
-	    </div>
-	    <div class="col-md-2">
-	      	<p class="form-control-static">${patient.mrp}</p>
-	  	</div>
-	
-		<div class="col-md-2">
-			<label class="control-label">Phone #:</label>
-		</div>
-		<div class="col-md-2">
-	  		<p class="form-control-static">${patient.homePhone}</p>
-		</div>
-		<div class="col-md-2">
-	    	<label class="control-label">Clinic :</label>
-	    </div>
-	    <div class="col-md-2">
-	      	<p class="form-control-static">${patient.clinic}</p>
-	  	</div>
-	  	
-	  	<div class="col-md-2">
-			<label class="control-label">Email :</label>
-		</div>
-		<div class="col-md-2">
-	  		<p class="form-control-static">${patient.email}</p>
-		</div>
-		<div class="col-md-2">
-	    	<label class="control-label">MyOscar Verified :</label>
-	    </div>
-	    <div class="col-md-2">
-	      	<p class="form-control-static">${patient.myOscarAuthentication}</p>
-	  	</div>
-  </div>
-
-
-	<div class="row form-group">
-		<table>
+		<table width="1020">
 			<tr>
-				<td><div class="col-md-2">
-				    	<label class="control-label">Alerts: </label>
-				    </div>
-				    <div class="col-md-2">
-				      	<p class="form-control-static">${patient.alerts}</p>
-				  	</div>
+				<td width="600">
+					<table>
+						<tr>
+							<td><label>&nbsp Alerts: </label></td>
+						</tr>
+						<tr>
+							<td>&nbsp ${patient.alerts}</td>
+						</tr>
+					</table>	
 				</td>
 				<td>
-					<div class="col-md-2">
-				    	<label class="control-label">Assigned Volunteers:</label>
-				    </div>
+					<table>
+						<tr>
+							<td><label>Assigned Volunteers:</label></td>
+						</tr>
+						<tr>
+							<td>
+								<select name="volunteer1"  id ="volunteer1">
+									<c:forEach items="${volunteers}" var="v">
+										<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq selectedVolunteer1}">selected</c:if>>${v.displayName}</option>
+									</c:forEach>						
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								 <select name="volunteer2"  id ="volunteer2">
+									<c:forEach items="${volunteers}" var="v">
+										<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq selectedVolunteer2}">selected</c:if>>${v.displayName}</option>
+									</c:forEach>						
+								</select>
+							</td>
+						</tr>
+					</table>
 				</td>
 			</tr>
 		</table>
-		<div class="col-md-2">
-	    	<label class="control-label">Cell Phone #</label>
-	    </div>
-	    <div class="col-md-2">
-	      	<p class="form-control-static">${volunteer.cellPhone}</p>
-	  	</div>
-	
-		<div class="col-md-2">
-			<label class="control-label">Email : </label>
-		</div>
-		<div class="col-md-2">
-	  		<p class="form-control-static">${volunteer.email}</p>
-		</div>
-  </div>
-
-	<div class="row form-group">
-		<div class="col-md-2">
-	    	<label class="control-label">Emergency Contact :</label>
-	    </div>
-	    <div class="col-md-2">
-	      	<p class="form-control-static">${volunteer.emergencyContact}</p>
-	  	</div>
-	
-		<div class="col-md-2">
-			<label class="control-label">Emergency # : </label>
-		</div>
-		<div class="col-md-2">
-	  		<p class="form-control-static">${volunteer.emergencyPhone}</p>
-		</div>
-  </div>
-
-<h2>Notes/Comments</h2>
-<div class="row">
-	<div class="col-md-6">
-  		<p class="form-control-static">${volunteer.notes}</p>
-	</div>
-</div>
+ 
 <h2>Availability</h2>
-<div>
+
 	<table width="100%" border="1">
 		<tr>
 			<td width ="200" valign="top">
@@ -229,20 +189,22 @@
 		</tr>
 		
 	</table>
-</div>
+
 	<h2>Upcoming Visits</h2>
 	<table  class="table table-stripe" width="970" border="1">
 		<tr>
 			
 			<th width="500">Visit Date</th>
 			
-			<th>Client</th>
+			<th>Assigned Volunteers</th>
+			
 		</tr>
 		<c:forEach items="${upcomingVisits}" var="uVistits">
+		
 		<tr >
-			<td>${uVistits.date}</td>
+			<td>${uVistits.date}</td>			
+			<td>${uVistits.volunteer},&nbsp &nbsp ${uVistits.partner}</td>
 			
-			<td>${uVistits.patient}</td>
 		</tr>
 		</c:forEach>
 	</table>
@@ -251,93 +213,43 @@
 		<tr>
 			<th width="300">Visit #</th>
 			<th width="300"> Visit Date</th>		
-			<th>Client</th>
+			<th>Assigned Volunteers</th>
+			<th>Report</th>
 		</tr>
 		<c:forEach items="${completedVisits}" var="cVistits">
 		<tr >
 			<td>${cVistits.appointmentID}</td>
-			<td>${cVistits.date}</td>
-			
-			<td>${cVistits.patient}</td>
+			<td>${cVistits.date}</td>			
+			<td>${cVistits.volunteer},&nbsp &nbsp ${cVistits.partner}</td>
+			<td><a href="">DOWNLOAD</a> </td>
 		</tr>
 		</c:forEach>
 	</table>
+	
+	<h2>Surveys <a href="">Assign Survey</a> </h2>
+	<table  width="970" border="1">
+		<tr>
+			<th width="200">Assigned Surveys</th>
+			<th width="250"> Date Started</th>		
+			<th width="250">Last Edited</th>
+			<th>Completed Status</th>
+		</tr>
+		<c:forEach items="${surveys}" var="s">
+		<tr >
+			<td>${s.surveyTitle}</td>
+			<td>${s.startDate}</td>
+			<td>${s.editDate}</td>
+			<td>${s.strCompleted}</td>
+		</tr>
+		</c:forEach>
+	</table>
+	
 
 <hr>
 
-	<div class="row-fluid" id="displayActivityLogDiv" style="display:none";>
-				
-	</div>
-	<div class="row-fluid" id="displayMessageDiv" style="display:none";>
-				
-	</div>
+	
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="displayActivityLog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
- 	<div class="modal-dialog">
-	    <div class="modal-content">
-	  		<div class="modal-header">
-	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-	    		<h3 id="modalHeader">Activity Log</h3>
-	  		</div>
-	  		<div class="modal-body">
-	  			<table border="1">
-		  			<tr>
-						<th width="200">Date</th>
-						<th width="300">Time</th>
-						<th width="400">Description</th>
-					</tr>
-					<c:forEach items="${activityLogs}" var="al">
-					<tr>
-						<td>${al.date}</td>
-						<td>${al.time}</td>
-						<td>${al.description}</td>
-					</tr>
-					</c:forEach>
-	  			</table>
-	  		
-	  		</div>
-	  		<div class="modal-footer">
-	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-				
-	  		</div>
-		</div>
-	</div>
-</div>	
-
-<div class="modal fade" id="displayMessage" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-	    <div class="modal-content">
-	  		<div class="modal-header">
-	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-	    		<h3 id="modalHeader">In Box</h3>
-	  		</div>
-	  		<div class="modal-body">
-	  			<table class="table">
-					<tr>
-						<th>Sender</th>
-						<th>Subject</th>
-						<th>Date</th>
-					</tr>
-					<c:forEach items="${messages}" var="m">
-					<c:choose>
-						<c:when test="${! m.read}"><tr onClick="document.location='<c:url value="/view_message/${m.messageID}"/>';" style="font-weight:bold;"></c:when>
-						<c:otherwise><tr onClick="document.location='<c:url value="/view_message/${m.messageID}"/>';"></c:otherwise>
-					</c:choose>
-						<td>${m.sender}</td>
-						<td>${m.subject}</td>
-						<td>${m.date}</td>
-					</tr>
-					</c:forEach>
-				</table>
-	  		</div>
-	  		<div class="modal-footer">
-	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-	  		</div>
-		</div>
-	</div>
-</div>
 
 </div>
 

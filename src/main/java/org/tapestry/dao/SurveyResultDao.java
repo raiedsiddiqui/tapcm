@@ -224,8 +224,13 @@ public class SurveyResultDao
    			r = statement.executeQuery();
    			r.first();
    			sr.setPatientName(r.getString("firstname") + " " + r.getString("lastname"));
-   			sr.setCompleted(result.getBoolean("completed"));
-            sr.setStartDate(result.getString("startDate"));
+   			boolean completed = result.getBoolean("completed");
+   			sr.setCompleted(completed);
+   			if (completed)
+   				sr.setStrCompleted("COMPLETED");
+   			else
+   				sr.setStrCompleted("INCOMPLETED");
+            sr.setStartDate(result.getString("startDate"));            
             sr.setEditDate(result.getString("editDate"));
             sr.setResults(result.getBytes("data"));
             

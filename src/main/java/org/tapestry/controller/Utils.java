@@ -510,14 +510,23 @@ public class Utils {
 		return matched;
 	}
 	
-	public static String getClinicName(String code){
+	/**
+	 * hardcode clinics in a map, when it grows, will store them in the DB.
+	 * @return
+	 */
+	public static Map<String, String> getClinics(){
 		Map<String, String> clinics = new HashMap<String, String>();
 		
-		clinics.put("1", "West End Clinic");
+		clinics.put("1", "McMaster Family Practice");
 		clinics.put("2", "Stonechurch Family Health Center");
 		
-		return clinics.get(code);
+		return clinics;		
+	}
+	
+	public static String getClinicName(String code){
+		Map<String, String> clinics = getClinics();
 		
+		return clinics.get(code);		
 	}
 	
 }

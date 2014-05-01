@@ -142,6 +142,7 @@ public class AppointmentController{
 		
 		Appointment a = new Appointment();
 		a.setVolunteerID(p.getVolunteer());
+		a.setPartnerId(p.getPartner());
 		a.setPatientID(p.getPatientID());
 		a.setDate(request.getParameter("appointmentDate"));
 		a.setTime(request.getParameter("appointmentTime"));

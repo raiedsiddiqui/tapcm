@@ -33,6 +33,7 @@ public class SurveyResult implements Comparable<SurveyResult> {
 	private int priority;
 	private String description;
 	private ArrayList<QuestionAnswerPair> questionAnswerPairs;
+	private String strCompleted;
 
 	public SurveyResult(){
 		//Default constructor
@@ -240,5 +241,14 @@ public class SurveyResult implements Comparable<SurveyResult> {
 	@Override
 	public int compareTo(SurveyResult o) throws ClassCastException {
 		return o.getPriority() - this.priority;
+	}
+	
+
+	public String getStrCompleted() {
+		return strCompleted;
+	}
+
+	public void setStrCompleted(String strCompleted) {
+		this.strCompleted = strCompleted;
 	}
 }

@@ -81,15 +81,18 @@
 					
 				</div>
 				<div class="row form-group">	
-					<label>MyOscar verified? </label>
-					<input type="radio" name="myoscar_verified" value="1" <c:if test="${patient.myoscarVerified eq 1}">checked</c:if>/>Yes
-					<input type="radio" name="myoscar_verified" value="0" <c:if test="${patient.myoscarVerified eq 0}">checked</c:if>/>No
-					<br/>
-					<label>Clinic:</label>
-					<select name="clinic" form="editPatient" class="form-control">
-						<option value="1" <c:if test="${patient.clinic eq 1}">selected</c:if>>West End Clinic</option>
-						<option value="2" <c:if test="${patient.clinic eq 2}">selected</c:if>>Stonechurch Family Health Center</option>
-					</select>
+					<div class="col-md-6">
+						<label>MyOscar verified? </label>
+						<input type="radio" name="myoscar_verified" value="1" <c:if test="${patient.myoscarVerified eq 1}">checked</c:if>/>Yes
+						<input type="radio" name="myoscar_verified" value="0" <c:if test="${patient.myoscarVerified eq 0}">checked</c:if>/>No
+					</div>
+					<div class="col-md-6">
+						<label>Clinic:</label>
+						<select name="clinic" form="editPatient" class="form-control">
+							<option value="1" <c:if test="${patient.clinic eq 1}">selected</c:if>>West End Clinic</option>
+							<option value="2" <c:if test="${patient.clinic eq 2}">selected</c:if>>Stonechurch Family Health Center</option>
+						</select>
+					</div>
 				</div>
 				
 				<label>Availability:</label><br/>
@@ -105,7 +108,7 @@
 				<div class="row form-group">	
 					<div class="col-md-10">
 						<label>Alerts</label>
-						<textarea name="notes" class="form-control">${patient.alerts}s</textarea>
+						<textarea name="alerts" class="form-control">${patient.alerts}s</textarea>
 					</div>
 				</div>	
 			

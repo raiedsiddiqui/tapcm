@@ -23,8 +23,8 @@ public class Patient{
 	private String partnerName;
 	private String myOscarAuthentication;
 	private String clinicName;
+	private String address;
 	
-
 	/**
 	* Empty constructor
 	*/
@@ -273,5 +273,13 @@ public class Patient{
 
 	public void setClinicName(String clinicName) {
 		this.clinicName = clinicName;
+	}
+	
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }

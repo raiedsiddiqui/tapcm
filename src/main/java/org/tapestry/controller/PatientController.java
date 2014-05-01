@@ -239,8 +239,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	   		return "redirect:/manage_patients";
 		}
 		else
-		{System.out.println("no matched volunteer pair");
-			
+		{			
 			model.addAttribute("misMatchedVolunteer",true);
 			List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
 			model.addAttribute("volunteers", volunteers);
@@ -401,6 +400,39 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("patients", patients);
 		
 		return "/admin/view_clients";		
+	}
+	
+	@RequestMapping(value="/display_client/{patient_id}",method=RequestMethod.GET)
+	public String displayPatientDetails(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper
+			request, ModelMap model){
+		Patient patient = patientDao.getPatientByID(id);		
+		model.addAttribute("patient", patient);
+		
+		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
+		model.addAttribute("volunteers", volunteers);
+		
+		String v1 = String.valueOf(patient.getVolunteer());
+		String v2 = String.valueOf(patient.getPartner());
+		
+		model.addAttribute("selectedVolunteer1", v1);
+		model.addAttribute("selectedVolunteer2", v2);
+		
+		if (!Utils.isNullOrEmpty(patient.getAvailability()))
+			Utils.saveAvailability(patient.getAvailability(),model);		
+		
+		List<Appointment> appointments = new ArrayList<Appointment>();
+		appointments = appointmentDao.getAllUpcommingAppointmentForPatient(id);
+				
+		model.addAttribute("upcomingVisits", appointments);
+		
+		appointments = new ArrayList<Appointment>();		
+		appointments = appointmentDao.getAllCompletedAppointmentsForPatient(id);
+		model.addAttribute("completedVisits", appointments);
+		
+		List<SurveyResult> surveys = surveyResultDao.getSurveysByPatientID(id);
+		model.addAttribute("surveys", surveys);
+		
+		return "/admin/display_client";
 	}
 	
 	private List<Patient> getAllPatients(){

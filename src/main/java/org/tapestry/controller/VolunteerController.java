@@ -180,7 +180,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		//set availability
 		if (!Utils.isNullOrEmpty(volunteer.getAvailability()))
-			saveAvailability(volunteer.getAvailability(),model);		
+			Utils.saveAvailability(volunteer.getAvailability(),model);		
 		
 		//get all completed appointments
 		List<Appointment> appointments = new ArrayList<Appointment>();		
