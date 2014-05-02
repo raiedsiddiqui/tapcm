@@ -126,8 +126,12 @@ public class AppointmentController{
    		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
    		ArrayList<Patient> allPatients = patientDao.getAllPatients();
    		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
+   		List<Appointment> allPastAppointments = appointmentDao.getAllPastAppointments();
+   		List<Appointment> allPendingAppointments = appointmentDao.getAllPendingAppointments();
    		
    		model.addAttribute("appointments", allAppointments);
+   		model.addAttribute("pastAppointments", allPastAppointments);   		
+   		model.addAttribute("pendingAppointments", allPendingAppointments);   		
    		model.addAttribute("patients", allPatients);
    		model.addAttribute("activities", allAppointmentActivities);
    		if(appointmentBooked != null)

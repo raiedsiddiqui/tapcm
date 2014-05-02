@@ -12,7 +12,7 @@
  -->		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
 
-		<!--<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>-->s
+		<!--<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>-->
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>				
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
@@ -226,8 +226,7 @@
 				    				</div>
 				    				</c:if>
 				    			</c:forEach>
-				    		</div>
-				    	<!-- </div> -->
+				    		</div>				    	
 				    </div>				
 				</div>
 			</c:forEach>
@@ -235,11 +234,48 @@
   </div>
 
 	<div class="tab-pane fade" id="pastappointments">
-		<p> PAST appointment DATA </p>
+	
+		<table>
+			<tr>
+				<th width = "200"> Client</th>
+				<th width = "300"> Volunteers</th>
+				<th width = "200"> Date</th>
+				<th width = "200"> Status</th>				
+			</tr>
+			<c:forEach items="${pastAppointments}" var="pa">
+				<tr>
+					<td> ${pa.patient}</td>
+					<td> ${pa.volunteer}, ${pa.partner}</td>
+					<td> ${pa.date}</td>					
+					<td>
+						<c:if test="${pa.completed eq true}">Completed</c:if>
+						<c:if test="${pa.completed eq false}">Incompleted</c:if>						
+					</td>					
+				</tr>								
+			</c:forEach>
+		
+		</table>
     </div>
 
     <div class="tab-pane fade" id="pendingapproval">
 		<p> Appointments Pending Approval </p>
+		<table>
+			<tr>
+				<th width = "200"> Client</th>
+				<th width = "300"> Volunteers</th>
+				<th width = "200"> Date</th>
+				
+			</tr>
+			<c:forEach items="${pendingAppointments}" var="pendingapt">
+				<tr>
+					<td> ${pendingapt.patient}</td>
+					<td> ${pendingapt.volunteer}, ${pa.partner}</td>
+					<td> ${pendingapt.date}</td>				
+									
+				</tr>								
+			</c:forEach>
+		
+		</table>
     </div>
 <!--       <div class="tab-pane fade" id="dropdown1">
         <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer blog stumptown. Pitchfork sustainable tofu synth chambray yr.</p>

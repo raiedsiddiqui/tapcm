@@ -53,36 +53,80 @@ public class AppointmentDao {
        		while(result.next()){       			
        			Appointment a = createFromSearch(result);   
        			
-       			if (a != null)
-       			{      			
-	       			statement = con.prepareStatement("SELECT firstname, lastname FROM volunteers WHERE volunteer_ID=?");
-	       			statement.setInt(1, result.getInt("volunteer"));
-	       			ResultSet rs = statement.executeQuery();
-	       			rs.first();	       			
-	       			
-	       			StringBuffer sb = new StringBuffer();
-	       			
-	       			while(rs.next()){
-	       				if (!Utils.isNullOrEmpty(rs.getString("firstname")))
-		       			{
-		       				sb.append(rs.getString("firstname"));
-		       				sb.append(" ");		       				
-		       			}
-	       				
-	       				if (!Utils.isNullOrEmpty(rs.getString("lastname")))
-		       			{
-		       				sb.append(rs.getString("lastname"));
-		       			}
-		       				
-	       				if (!Utils.isNullOrEmpty(sb.toString()))
-	       					a.setVolunteer(sb.toString());
-	       			}		       			
+       			if (a != null)    
 	       			allAppointments.add(a);       			
-       			}
+       			
         	}
        		return allAppointments;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve all appointments");
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    /**
+     * 
+     * @return all past appointments in a list
+     */
+    
+    public List<Appointment> getAllPastAppointments(){
+    	try{
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner "
+    				+ "FROM appointments WHERE date_time < CURDATE() ORDER BY date_time DESC");
+    		
+    		ResultSet result = statement.executeQuery();
+       		List<Appointment> allAppointments = new ArrayList<Appointment>();
+       		
+       		while(result.next()){       			
+       			Appointment a = createFromSearch(result);
+       			
+       			if (a != null)
+       				allAppointments.add(a);     
+        	}
+       		return allAppointments;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve all past appointments");
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    /**
+     * all awaiting approved appointments 
+     * @param patientId
+     * @return
+     */
+    public ArrayList<Appointment> getAllPendingAppointments(){
+    	try{
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner "
+    				+ "FROM appointments WHERE date_time>=CURDATE() AND completed=0 AND status='Awaiting Approval'"
+    				+ " ORDER BY date_time ASC");
+    		
+    		ResultSet result = statement.executeQuery();
+       		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
+       		while(result.next()){
+       			Appointment a = createFromSearch(result);
+       			if (a != null)
+       				allAppointments.add(a);
+        	}
+       		return allAppointments;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve all pending appointments " );
     		e.printStackTrace();
     		return null;
     	} finally {
