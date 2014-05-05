@@ -715,7 +715,7 @@ public class AppointmentDao {
     		if (r.first()){
     			String preferredName = r.getString("preferredName");
     			//add empty checking for preferedName
-    			if(preferredName != null && !(preferredName.equals(""))) {
+    			if(!Utils.isNullOrEmpty(preferredName)) {
 	    			a.setPatient(preferredName);	    			
     			} else {
     			

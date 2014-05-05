@@ -40,149 +40,10 @@ public class ActivityDao {
     	}
     }
     
-    public void logActivity(String description, int volunteer){
-    	try{
-    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer) VALUES (?, ?)");
-    		stmt.setString(1, description);
-    		stmt.setInt(2, volunteer);
-    		stmt.execute();
-    	} catch (SQLException e){
-    		System.out.println("Error: Could not record event");
-    		e.printStackTrace();
-    	} finally {
-    		try{
-    			stmt.close();
-    		} catch (Exception e) {
-    			//Ignore
-    		}
-    	}
-    }
-    
-    public void logActivity(String description, int volunteer, int patient){
-    	try{
-    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,patient) VALUES (?, ?, ?)");
-    		stmt.setString(1, description);
-    		stmt.setInt(2, volunteer);
-    		stmt.setInt(3, patient);
-    		stmt.execute();
-    	} catch (SQLException e){
-    		System.out.println("Error: Could not record event");
-    		e.printStackTrace();
-    	} finally {
-    		try{
-    			//close  statement
-    			if (stmt != null)
-    				stmt.close();  
-    			
-    		} catch (Exception e) {
-    			//Ignore
-    		}
-    	}
-    }
-    
-    public void logActivity(Activity activity){
-    	try{
-    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,"
-    				+ "event_timestamp,start_Time,end_Time, patient) VALUES (?, ?, ?, ?, ?, ?)");
-    		    		
-    		stmt.setString(1, activity.getDescription());
-    		stmt.setInt(2, Integer.parseInt(activity.getVolunteer()));   	
-    		stmt.setString(3, activity.getDate());
-    		stmt.setString(4, activity.getStartTime());
-    		stmt.setString(5, activity.getEndTime()); 
-    		stmt.setInt(6, 0);
-    		
-    		stmt.execute();
-    		
-    	} catch (SQLException e){
-    		System.out.println("Error: Could not record event");
-    		e.printStackTrace();
-    	} finally {
-    		try{
-    			//close  statement
-    			if (stmt != null)
-    				stmt.close();  
-    			
-    		} catch (Exception e) {
-    			//Ignore
-    		}
-    	}
-    }
-    
-    public void updateActivity( Activity activity){
-		try{
-			stmt = con.prepareStatement("UPDATE activities SET event_timestamp=?,description=?,"
-					+ "start_Time=?, end_Time=? WHERE event_ID=?");
-			
-			stmt.setString(1, activity.getDate());
-			stmt.setString(2, activity.getDescription());
-			stmt.setString(3, activity.getStartTime());
-			stmt.setString(4, activity.getEndTime());
-			stmt.setInt(5, activity.getActivityId());
-			
-			stmt.execute();
-		}catch (SQLException e){
-			logger.error("Error: updating activity is failed ");		
-			
-			e.printStackTrace();
-		}finally {
-    		try{
-    			//close resultSet and statement
-    			if (stmt != null)
-    				stmt.close();  
-    
-    		} catch (Exception e) {
-    			//Ignore
-    		}
-		}
-	}
-    
-    public void logActivity(String description, int volunteer, int patient, int appointment){
-    	try{
-    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,patient,appointment) VALUES (?, ?, ?, ?)");
-    		stmt.setString(1, description);
-    		stmt.setInt(2, volunteer);
-    		stmt.setInt(3, patient);
-    		stmt.setInt(4, appointment);
-    		stmt.execute();
-    	} catch (SQLException e){
-    		System.out.println("Error: Could not record event");
-    		e.printStackTrace();
-    	} finally {
-    		try{
-    			//close  statement
-    			if (stmt != null)
-    				stmt.close();  
-    		} catch (Exception e) {
-    			//Ignore
-    		}
-    	}
-    }
-    
-    public int countEntries(){
-    	try{
-    		stmt = con.prepareStatement("SELECT COUNT(event_ID) AS c FROM activities");
-    		ResultSet result = stmt.executeQuery();
-    		result.first();
-    		return result.getInt("c");
-    	} catch (SQLException e){
-    		System.out.println("Error: Could not count entries");
-    		e.printStackTrace();
-    		return 0;
-    	} finally {
-    		try{
-    			//close  statement    			
-    			if (stmt != null)
-    				stmt.close();  
-    		} catch (Exception e){
-    			//Ignore;
-    		}
-    	}
-    }
-    
     public ArrayList<Activity> getAllActivities(){
     	try{
-    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment FROM activities ORDER BY event_timestamp DESC");
+    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment "
+    				+ "FROM activities ORDER BY event_timestamp DESC");
     		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
@@ -364,6 +225,194 @@ public class ActivityDao {
     		}
     	}
     }
+    
+    public List<Activity> getDetailedLog(int patientId, int appointmentId){
+    	try{
+    		String sqlStatement = "SELECT event_timestamp, description FROM activities WHERE "
+    				+ "patient=? AND appointment=? ORDER BY event_timestamp DESC";
+    		
+    		stmt = con.prepareStatement(sqlStatement);
+    		
+    		stmt.setInt(1, patientId);
+    		stmt.setInt(2, appointmentId);
+    		
+    		ResultSet result = stmt.executeQuery();
+    		List<Activity> log = new ArrayList<Activity>();
+    		while (result.next()){
+    			Activity a = new Activity();
+    			a.setDate(result.getString("event_timestamp"));
+    			a.setDescription(result.getString("description"));
+    			a.setVolunteer(result.getString("volunteer"));
+    			a.setPatient(result.getString("patient"));
+    			a.setAppointment(result.getInt("appointment"));
+//    			stmt = con.prepareStatement("SELECT name FROM volunteers WHERE volunteer_ID=?");
+//    			stmt.setInt(1, result.getInt("volunteer"));
+//    			ResultSet r = stmt.executeQuery();
+//    			if(r.isBeforeFirst()) {
+//    				r.first();
+//	    			a.setVolunteer(r.getString("name"));
+//    			} else {
+//    				a.setVolunteer("");
+//    			}
+    			log.add(a);
+    		}
+    		return log;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve detailed activity log");
+    		e.printStackTrace();
+    		return null;
+    	}finally {
+    		try{
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e){
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void logActivity(String description, int volunteer){
+    	try{
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer) VALUES (?, ?)");
+    		stmt.setString(1, description);
+    		stmt.setInt(2, volunteer);
+    		stmt.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not record event");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			stmt.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void logActivity(String description, int volunteer, int patient){
+    	try{
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,patient) VALUES (?, ?, ?)");
+    		stmt.setString(1, description);
+    		stmt.setInt(2, volunteer);
+    		stmt.setInt(3, patient);
+    		stmt.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not record event");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			//close  statement
+    			if (stmt != null)
+    				stmt.close();  
+    			
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void logActivity(Activity activity){
+    	try{
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,"
+    				+ "event_timestamp,start_Time,end_Time, patient) VALUES (?, ?, ?, ?, ?, ?)");
+    		    		
+    		stmt.setString(1, activity.getDescription());
+    		stmt.setInt(2, Integer.parseInt(activity.getVolunteer()));   	
+    		stmt.setString(3, activity.getDate());
+    		stmt.setString(4, activity.getStartTime());
+    		stmt.setString(5, activity.getEndTime()); 
+    		stmt.setInt(6, 0);
+    		
+    		stmt.execute();
+    		
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not record event");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			//close  statement
+    			if (stmt != null)
+    				stmt.close();  
+    			
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void updateActivity( Activity activity){
+		try{
+			stmt = con.prepareStatement("UPDATE activities SET event_timestamp=?,description=?,"
+					+ "start_Time=?, end_Time=? WHERE event_ID=?");
+			
+			stmt.setString(1, activity.getDate());
+			stmt.setString(2, activity.getDescription());
+			stmt.setString(3, activity.getStartTime());
+			stmt.setString(4, activity.getEndTime());
+			stmt.setInt(5, activity.getActivityId());
+			
+			stmt.execute();
+		}catch (SQLException e){
+			logger.error("Error: updating activity is failed ");		
+			
+			e.printStackTrace();
+		}finally {
+    		try{
+    			//close resultSet and statement
+    			if (stmt != null)
+    				stmt.close();  
+    
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+		}
+	}
+    
+    public void logActivity(String description, int volunteer, int patient, int appointment){
+    	try{
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,patient,appointment) VALUES (?, ?, ?, ?)");
+    		stmt.setString(1, description);
+    		stmt.setInt(2, volunteer);
+    		stmt.setInt(3, patient);
+    		stmt.setInt(4, appointment);
+    		stmt.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not record event");
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			//close  statement
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public int countEntries(){
+    	try{
+    		stmt = con.prepareStatement("SELECT COUNT(event_ID) AS c FROM activities");
+    		ResultSet result = stmt.executeQuery();
+    		result.first();
+    		return result.getInt("c");
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not count entries");
+    		e.printStackTrace();
+    		return 0;
+    	} finally {
+    		try{
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e){
+    			//Ignore;
+    		}
+    	}
+    }
+    
+   
     
     /**
      * Returns a list of n items starting at start

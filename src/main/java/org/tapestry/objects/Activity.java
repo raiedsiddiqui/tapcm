@@ -10,6 +10,7 @@ public class Activity{
 	private String volunteer;
 	private int appointment;
 	private String volunteerName;
+	private String patient;
 	
 	public Activity(){
 	}
@@ -85,4 +86,13 @@ public class Activity{
 	public void setVolunteerName(String volunteerName) {
 		this.volunteerName = volunteerName;
 	}
+	
+	public String getPatient() {
+		return patient;
+	}
+
+	public void setPatient(String patient) {
+		this.patient = patient;
+	}
+
 }

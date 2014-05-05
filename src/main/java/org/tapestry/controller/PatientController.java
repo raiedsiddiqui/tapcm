@@ -158,13 +158,9 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-		model.addAttribute("unread", unreadMessages);
-	
-		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
-		model.addAttribute("volunteers", volunteers);
-		
-	    ArrayList<Patient> patientList = patientDao.getAllPatients();
-        model.addAttribute("patients", patientList);
+		model.addAttribute("unread", unreadMessages);		
+		loadPatientsAndVolunteers(model);
+
 		return "admin/manage_patients";
 	}
    	
@@ -236,17 +232,16 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	    			return "redirect:/manage_patients";
 	    		}
 			}
-	   		return "redirect:/manage_patients";
+	   		model.addAttribute("createPatientSuccessfully",true);
+	   		loadPatientsAndVolunteers(model);
+	   		
+	        return "admin/manage_patients";
 		}
 		else
 		{			
 			model.addAttribute("misMatchedVolunteer",true);
-			List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
-			model.addAttribute("volunteers", volunteers);
+			loadPatientsAndVolunteers(model);
 			
-		    ArrayList<Patient> patientList = patientDao.getAllPatients();
-	        model.addAttribute("patients", patientList);
-	        
 			return "admin/manage_patients";
 		}
 	}
@@ -255,8 +250,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	public String editPatientForm(@PathVariable("id") int patientID, ModelMap model){   		
 		Patient p = patientDao.getPatientByID(patientID);		
 		model.addAttribute("patient", p);		
-		
-		System.out.println("clinic is " + p.getClinic());
 		
 		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();			
 		model.addAttribute("volunteers", volunteers);
@@ -299,25 +292,39 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
 	}
    	@RequestMapping(value="/submit_edit_patient/{id}", method=RequestMethod.POST)
-	public String modifyPatient(@PathVariable("id") int patientID, SecurityContextHolderAwareRequestWrapper request){
-		Patient p = new Patient();
-		p.setPatientID(patientID);
-		p.setFirstName(request.getParameter("firstname"));
-		p.setLastName(request.getParameter("lastname"));
-		p.setPreferredName(request.getParameter("preferredname"));		
-		p.setVolunteer(Integer.valueOf(request.getParameter("volunteer1")));
-		p.setPartner(Integer.valueOf(request.getParameter("volunteer2")));
-		p.setGender(request.getParameter("gender"));
-		p.setNotes(request.getParameter("notes"));
-		p.setClinic(request.getParameter("clinic"));
-		p.setAlerts(request.getParameter("alerts"));
-		p.setMyoscarVerified(request.getParameter("myoscar_verified"));
+	public String modifyPatient(@PathVariable("id") int patientID, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+   		int vId1 = Integer.parseInt(request.getParameter("volunteer1"));
+		int vId2 = Integer.parseInt(request.getParameter("volunteer2"));
+		Volunteer v1 = volunteerDao.getVolunteerById(vId1);
+		Volunteer v2 = volunteerDao.getVolunteerById(vId2);
 		
-		String strAvailableTime = Utils.getAvailableTime(request);
-		p.setAvailability(strAvailableTime);
-		
-		patientDao.updatePatient(p);
-		return "redirect:/manage_patients";
+		if (Utils.isMatchVolunteer(v1, v2)){
+			Patient p = new Patient();
+			p.setPatientID(patientID);
+			p.setFirstName(request.getParameter("firstname"));
+			p.setLastName(request.getParameter("lastname"));
+			p.setPreferredName(request.getParameter("preferredname"));		
+			p.setVolunteer(vId1);
+			p.setPartner(vId2);
+			p.setGender(request.getParameter("gender"));
+			p.setNotes(request.getParameter("notes"));
+			p.setClinic(request.getParameter("clinic"));
+			p.setAlerts(request.getParameter("alerts"));
+			p.setMyoscarVerified(request.getParameter("myoscar_verified"));
+			
+			String strAvailableTime = Utils.getAvailableTime(request);
+			p.setAvailability(strAvailableTime);
+			
+			patientDao.updatePatient(p);
+			model.addAttribute("updatePatientSuccessfully",true);
+		}
+		else
+			model.addAttribute("misMatchedVolunteer",true);				
+
+        loadPatientsAndVolunteers(model);
+        
+		return "/admin/manage_patients";
 	}
    	
    	
@@ -440,6 +447,14 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		patients = patientDao.getAllPatients();
 		
 		return patients;
+	}
+	
+	private void loadPatientsAndVolunteers(ModelMap model){
+		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
+		model.addAttribute("volunteers", volunteers);
+		
+	    List<Patient> patientList = getAllPatients();
+        model.addAttribute("patients", patientList);
 	}
 
 }

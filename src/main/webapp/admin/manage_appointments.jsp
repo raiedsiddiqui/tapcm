@@ -244,7 +244,7 @@
 			</tr>
 			<c:forEach items="${pastAppointments}" var="pa">
 				<tr>
-					<td> ${pa.patient}</td>
+					<td> <a href="<c:url value="/display_appointment/${pa.appointmentID}"/>">${pa.patient}</a></td>
 					<td> ${pa.volunteer}, ${pa.partner}</td>
 					<td> ${pa.date}</td>					
 					<td>

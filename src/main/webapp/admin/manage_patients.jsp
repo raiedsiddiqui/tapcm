@@ -24,6 +24,12 @@
 		<c:if test="${not empty misMatchedVolunteer}">			
 			<div class="alert alert-error"><spring:message code="message_volunteers_misMatchedVolunteer"/></div>
 		</c:if>	
+		<c:if test="${not empty updatePatientSuccessfully}">			
+			<div class="alert alert-error"><spring:message code="message_patient_updateSuccessful"/></div>
+		</c:if>	
+		<c:if test="${not empty createPatientSuccessfully}">			
+			<div class="alert alert-error"><spring:message code="message_patient_createSuccessful"/></div>
+		</c:if>
 		<div class="row-fluid">
 			<h2>Patients</h2><a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add New</a>
 			<table class="table">

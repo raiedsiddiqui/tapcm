@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
-
 import javax.annotation.PostConstruct;
 
 import org.apache.log4j.Logger;
@@ -24,6 +23,7 @@ import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
+import org.tapestry.dao.NarrativeDao;
 import org.tapestry.dao.MessageDao;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
@@ -32,6 +32,7 @@ import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 import org.tapestry.objects.Availability;
+import org.tapestry.objects.Narrative;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.Properties;
@@ -57,6 +58,7 @@ public class AppointmentController{
 	private ActivityDao activityDao;
 	private VolunteerDao volunteerDao;
 	private MessageDao messageDao;
+	private NarrativeDao narrativeDao;
 	
    	//Mail-related settings;
    	private Properties props;
@@ -101,6 +103,7 @@ public class AppointmentController{
 		activityDao = new ActivityDao(DB, UN, PW);
 		volunteerDao = new VolunteerDao(DB, UN, PW);
 		messageDao = new MessageDao(DB, UN, PW);
+		narrativeDao = new NarrativeDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -139,6 +142,39 @@ public class AppointmentController{
    		return "admin/manage_appointments";
    	}
    	
+   	@RequestMapping(value="/display_appointment/{appointmentID}", method=RequestMethod.GET)
+   	public String displayAppointment(@PathVariable("appointmentID") int id, 
+   			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+   		
+   		Appointment appointment = appointmentDao.getAppointmentById(id);
+   		model.addAttribute("appointment", appointment);
+   		
+   		int patientId = appointment.getPatientID();
+   		Patient p = patientDao.getPatientByID(patientId);
+   		String alerts = p.getAlerts();
+   		
+   		if (!Utils.isNullOrEmpty(alerts))
+   			model.addAttribute("alerts", alerts);
+   		
+   		int volunteer1Id = appointment.getVolunteerID();
+   		int volunteer2Id = appointment.getPartnerId();
+   		int appointmentId = appointment.getAppointmentID();
+   		
+   		List<Narrative> v1Narratives = narrativeDao.getAllNarrativesByUser(volunteer1Id, patientId, appointmentId);
+   		model.addAttribute("narratives1", v1Narratives);
+   		
+   		List<Narrative> v2Narratives = narrativeDao.getAllNarrativesByUser(volunteer2Id, patientId, appointmentId); 
+   		model.addAttribute("narratives2", v2Narratives);   	
+   		
+   		List<Activity> activities = activityDao.getDetailedLog(patientId, appointmentId);   		   		   		   		
+   		model.addAttribute("activities", activities);
+   		   		
+		if (request.isUserInRole("ROLE_ADMIN"))
+			model.addAttribute("isCentralAdmin", true);   	
+		
+   		return "/admin/display_appointment";
+   	}
+   	
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
 	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		int patientId = Integer.parseInt(request.getParameter("patient"));
@@ -154,6 +190,8 @@ public class AppointmentController{
 		
 		if(request.isUserInRole("ROLE_USER")) {
 			//Email all the administrators with a notification
+			System.out.println("hi...");
+			
 			if (mailAddress != null){
 				try{
 					MimeMessage message = new MimeMessage(session);
@@ -366,6 +404,7 @@ public class AppointmentController{
 			
 			//send message to both volunteers
 			if (mailAddress != null){			
+				System.out.println("Email is not null...");
 				//content of message
 				StringBuffer sb = new StringBuffer();
 				sb.append(logginUser);
@@ -484,7 +523,7 @@ public class AppointmentController{
 					if (Utils.isMatchVolunteer(v1, v2))						
 					{					
 						aSet2  = availability2.split(",");		
-						System.out.println(Arrays.toString(aSet2)) ;
+						
 						//find match availability					
 						for(int i = 0; i < aSet1.length; i++)
 						{								

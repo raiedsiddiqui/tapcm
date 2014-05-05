@@ -495,14 +495,16 @@ public class Utils {
 	
 	public static boolean isMatchVolunteer(Volunteer v1, Volunteer v2){
 		String v1Type = v1.getExperienceLevel();
-		String v2Type = v2.getExperienceLevel();		
+		String v2Type = v2.getExperienceLevel();	
+		
+		System.out.println("v1111   " + v1Type);
 		
 		boolean matched = false;		
 		
-		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type)){
+		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type) || "E".equals(v1Type) || "E".equals(v2Type)){
 			matched = true;
 		}
-		else if ("Intermediate".equals(v1Type) && "Intermediate".equals(v2Type))
+		else if (( "Intermediate".equals(v1Type) && "Intermediate".equals(v2Type)) ||("I".equals(v1Type) && "I".equals(v2Type)))
 		{
 			matched = true;
 		}
