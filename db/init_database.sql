@@ -103,6 +103,7 @@ CREATE TABLE IF NOT EXISTS narratives (
     contents TEXT,
     edit_Date TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP, /*edit_Date represents the last edit date*/
     user_ID INT NOT NULL,
+    volunteer SMALLINT UNSIGNED NOT NULL,
     patient_ID SMALLINT UNSIGNED NOT NULL,
     appointment SMALLINT UNSIGNED NOT NULL,
     PRIMARY KEY (narrative_ID)

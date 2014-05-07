@@ -5,10 +5,13 @@ public class Narrative {
 	private int narrativeId;
 	private int userId;
 	private int patientId;	
+	private String patientName;
 	private int appointmentId;
 	private String title;
 	private String contents;
 	private String editDate;
+	private int volunteerId;
+	
 
 	/**
 	* Empty constructor
@@ -74,4 +77,22 @@ public class Narrative {
 	public void setEditDate(String editDate) {
 		this.editDate = editDate;
 	}
+	
+	public int getVolunteerId() {
+		return volunteerId;
+	}
+
+	public void setVolunteerId(int volunteerId) {
+		this.volunteerId = volunteerId;
+	}
+	
+
+	public String getPatientName() {
+		return patientName;
+	}
+
+	public void setPatientName(String patientName) {
+		this.patientName = patientName;
+	}
+
 }

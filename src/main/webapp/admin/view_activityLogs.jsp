@@ -30,6 +30,9 @@ function validateVolunteer(){
 				<c:if test="${not empty activityUpdate }">
 					<div class ="alert alert-info"><spring:message code="message_modifyActivity"/></div>
 				</c:if>
+				<c:if test="${not empty emptyActivityLogs}">
+					<div class ="alert alert-info"><spring:message code="message_emptyActivityLogs"/></div>
+				</c:if>
 				<div class="row-fluid">
 				<form id="searchVolunteerForActivity" action="<c:url value="/view_activitylogs_admin"/>" method="POST" onsubmit="return validateVolunteer()">
 					<fieldset>

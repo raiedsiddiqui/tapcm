@@ -111,7 +111,7 @@
 						<textarea name="alerts" class="form-control">${patient.alerts}s</textarea>
 					</div>
 				</div>	
-			
+				<a href="<c:url value="/manage_patients"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
 				<input type="submit" value="Save changes" class="btn btn-primary"/>
 			</form>
 		</div>

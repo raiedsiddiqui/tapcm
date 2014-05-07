@@ -497,8 +497,6 @@ public class Utils {
 		String v1Type = v1.getExperienceLevel();
 		String v2Type = v2.getExperienceLevel();	
 		
-		System.out.println("v1111   " + v1Type);
-		
 		boolean matched = false;		
 		
 		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type) || "E".equals(v1Type) || "E".equals(v2Type)){

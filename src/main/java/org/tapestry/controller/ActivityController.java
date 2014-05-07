@@ -49,9 +49,11 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 	@RequestMapping(value="/view_activitylogs_admin", method=RequestMethod.GET)
 	public String viewActivityLogByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		
-		List<Activity> activities = new ArrayList<Activity>();
-		activities = activityDao.getAllActivitiesForAdmin();
-		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();
+		List<Activity> activities = activityDao.getAllActivitiesForAdmin();
+		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
+		
+		if (activities.size() == 0 )  
+			model.addAttribute("emptyActivityLogs", true);			
 		
 		model.addAttribute("activityLogs", activities);	
 		model.addAttribute("volunteers", volunteers);	
@@ -67,7 +69,13 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		List<Activity> activities = new ArrayList<Activity>();
 		
 		if (!Utils.isNullOrEmpty(strVId))
+		{
 			activities = activityDao.getAllActivitiesForVolunteer(Integer.parseInt(strVId));		
+			
+			if (activities.size() == 0 )  
+				model.addAttribute("emptyActivityLogs", true);	
+			
+		}
 		
 		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();
 		

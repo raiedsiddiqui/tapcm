@@ -9,13 +9,54 @@
 <title>Details of Appointment</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />	
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.css" id="theme_base">
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.date.css" id="theme_date">
+		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.time.css" id="theme_time">
+		
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>				
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>	
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	
-	<script type="text/javascript">
+		<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+ 	   <script>window.jQuery||document.write('<script src="tests/jquery.2.0.0.js"><\/script>')</script>
+ 	   <script src="${pageContext.request.contextPath}/resources/lib/picker.js"></script>
+	    <script src="${pageContext.request.contextPath}/resources/lib/picker.date.js"></script>
+	    <script src="${pageContext.request.contextPath}/resources/lib/picker.time.js"></script>
+ 	   <script src="${pageContext.request.contextPath}/resources/lib/legacy.js"></script>	
+ 	   <script type="text/javascript">
+ 	  function showV1Narratives(){
+			document.getElementById("displayV1NarrativeDiv").style.display="block";
+		}
+		
+		function showV2Narratives(){
+			document.getElementById("displayV2NarrativeDiv").style.display="block";
+		}
 		
 	</script>
+ 	   
+	<style type="text/css">
+		.row-fluid{
+			margin:10px;
+		}
+		.bootstrap-datetimepicker-widget{
+			z-index:9999;
+		}
+
+		div.modal-dialog {
+			width:90%;
+			height:600px;
+		}
+
+		.picker--opened .picker__holder {
+			background: none;
+		}
+
+		.modal-content {
+			height: 100%;
+		}
+	</style>
 
 </head>
 <body>
@@ -54,10 +95,10 @@
 	</tr>
 	<tr>
 		<td>
-			<label >&nbsp Narrative :</label><a href="">View/Download</a>
+			<label >&nbsp Narrative :</label><a href="#narrative1" class="btn btn-primary" data-toggle="modal">View</a>
 		</td>
 		<td>
-			<label>&nbsp Narrative :</label><a href="">View/Download</a>
+			<label>&nbsp Narrative :</label><a href="#narrative2" class="btn btn-primary" data-toggle="modal">View</a>
 	</tr>
 </table>
 
@@ -84,6 +125,71 @@
 	</table>	
 </div>
 </div>
+<div class="row-fluid" id="displayV1NarrativeDiv" style="display:none">				
+</div>
+<div class="row-fluid" id="displayV2NarrativeDiv" style="display:none">				
+</div>
+
+<div class="modal fade" id="#narrative1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+	    <div class="modal-content">
+	  		<div class="modal-header">
+	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+	    		<h3 id="modalHeader">Narrative</h3>
+	  		</div>
+	  		<div class="modal-body">
+	  			<table border="1">
+		  			<tr>
+						<th width="200">Title</th>
+						<th width="300">Content</th>
+						<th width="400">Edit Date</th>
+					</tr>
+					<c:forEach items="${v1Narratives}" var="n">
+					<tr>
+						<td>${n.title}</td>
+						<td>${al.contents}</td>
+						<td>${al.editDate}</td>
+					</tr>
+					</c:forEach>
+	  			</table>
+	  		</div>
+	  		<div class="modal-footer">
+	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>				
+	  		</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="#narrative2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ <div class="modal-dialog">
+	    <div class="modal-content">
+	  		<div class="modal-header">
+	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+	    		<h3 id="modalHeader">Narrative</h3>
+	  		</div>
+	  		<div class="modal-body">
+	  			<table border="1">
+		  			<tr>
+						<th width="200">Title</th>
+						<th width="300">Content</th>
+						<th width="400">Edit Date</th>
+					</tr>
+					<c:forEach items="${v2Narratives}" var="n">
+					<tr>
+						<td>${n.title}</td>
+						<td>${al.contents}</td>
+						<td>${al.editDate}</td>
+					</tr>
+					</c:forEach>
+	  			</table>
+	  		</div>
+	  		<div class="modal-footer">
+	    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>				
+	  		</div>
+		</div>
+	</div>
+</div>
+
 
 </body>
 </html>
