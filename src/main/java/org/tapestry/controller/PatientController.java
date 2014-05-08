@@ -343,10 +343,14 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
 		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		String loggedInUser = u.getName();
+		
+		int vid = Utils.getVolunteerByLoginUser(request, userDao, volunteerDao);
+		
 		//Make sure that the user is actually responsible for the patient in question
 		int volunteerForPatient = patient.getVolunteer();
-		if (!(u.getUserID() == patient.getVolunteer())){
+		if (!(vid == patient.getVolunteer()))
+		{
+			String loggedInUser = u.getName();
 			model.addAttribute("loggedIn", loggedInUser);
 			model.addAttribute("patientOwner", volunteerForPatient);
 			return "redirect:/403";
@@ -360,7 +364,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		Collections.sort(incompleteSurveyResultList);
 		ArrayList<SurveyTemplate> surveyList = surveyTemplateDao.getAllSurveyTemplates();
 		
-//		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
 		//use volunteerId to replace userId		
 		int volunteerId= volunteerDao.getVolunteerIdByUsername(u.getUsername());
 		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		

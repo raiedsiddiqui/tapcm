@@ -160,12 +160,14 @@ public class AppointmentController{
    		int volunteer2Id = appointment.getPartnerId();
    		int appointmentId = appointment.getAppointmentID();
    		
-   		List<Narrative> v1Narratives = narrativeDao.getAllNarrativesByUser(volunteer1Id, patientId, appointmentId);
-   		model.addAttribute("narratives1", v1Narratives);
+   		List<Narrative> v1Narratives = narrativeDao.getAllNarrativesByVolunteer(volunteer1Id, patientId, appointmentId);
+   		if (v1Narratives.size() > 0)
+   			model.addAttribute("narratives1", v1Narratives);
    		
-   		List<Narrative> v2Narratives = narrativeDao.getAllNarrativesByUser(volunteer2Id, patientId, appointmentId); 
-   		model.addAttribute("narratives2", v2Narratives);   	
-   		
+   		List<Narrative> v2Narratives = narrativeDao.getAllNarrativesByVolunteer(volunteer2Id, patientId, appointmentId); 
+   		if (v2Narratives.size() > 0)
+   			model.addAttribute("narratives2", v2Narratives);   	
+   		   		
    		List<Activity> activities = activityDao.getDetailedLog(patientId, appointmentId);   		   		   		   		
    		model.addAttribute("activities", activities);
    		   		

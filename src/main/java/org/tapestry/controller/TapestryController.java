@@ -187,7 +187,7 @@ public class TapestryController{
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
 	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, @RequestParam(value="patientId", required=false) Integer patientId, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		if (request.isUserInRole("ROLE_USER")){
-			String username = request.getUserPrincipal().getName();
+			String username = request.getUserPrincipal().getName();					
 			User u = userDao.getUserByUsername(username);
 			
 			//get volunteer Id from login user
@@ -213,10 +213,13 @@ public class TapestryController{
 				session.setAttribute("patientId", patientId);
 				
 			} else {
-				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(u.getUserID());
+				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(volunteerId);
+				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(volunteerId);
+				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);
+				/*	approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(u.getUserID());
 				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(u.getUserID());
 				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(u.getUserID());
-				/*ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
+				ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
 				ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
 				model.addAttribute("appointments_today", appointmentsForToday);
 				model.addAttribute("appointments_all", allAppointments);*/

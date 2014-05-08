@@ -228,34 +228,27 @@ public class ActivityDao {
     
     public List<Activity> getDetailedLog(int patientId, int appointmentId){
     	try{
-    		String sqlStatement = "SELECT event_timestamp, description FROM activities WHERE "
-    				+ "patient=? AND appointment=? ORDER BY event_timestamp DESC";
+    		String sqlStatement = "SELECT * FROM activities WHERE patient=? AND appointment=? ORDER BY event_timestamp DESC";
     		
     		stmt = con.prepareStatement(sqlStatement);
     		
     		stmt.setInt(1, patientId);
     		stmt.setInt(2, appointmentId);
     		
-    		ResultSet result = stmt.executeQuery();
-    		List<Activity> log = new ArrayList<Activity>();
-    		while (result.next()){
-    			Activity a = new Activity();
-    			a.setDate(result.getString("event_timestamp"));
-    			a.setDescription(result.getString("description"));
-    			a.setVolunteer(result.getString("volunteer"));
-    			a.setPatient(result.getString("patient"));
-    			a.setAppointment(result.getInt("appointment"));
-//    			stmt = con.prepareStatement("SELECT name FROM volunteers WHERE volunteer_ID=?");
-//    			stmt.setInt(1, result.getInt("volunteer"));
-//    			ResultSet r = stmt.executeQuery();
-//    			if(r.isBeforeFirst()) {
-//    				r.first();
-//	    			a.setVolunteer(r.getString("name"));
-//    			} else {
-//    				a.setVolunteer("");
-//    			}
-    			log.add(a);
-    		}
+    		ResultSet result = stmt.executeQuery();    		
+    		
+    		List<Activity> log = this.getActivitiesByResultSet(result);
+//    		while (result.next()){
+//    			Activity a = new Activity();
+//    			a.setDate(result.getString("event_timestamp"));
+//    			a.setDescription(result.getString("description"));    			
+//    			    			
+//    			a.setVolunteer(String.valueOf(result.getInt("volunteer")));
+//    			a.setPatient(String.valueOf(patientId));
+//    			a.setAppointment(appointmentId);
+//
+//    			log.add(a);
+//    		}
     		return log;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve detailed activity log");

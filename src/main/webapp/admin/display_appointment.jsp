@@ -9,22 +9,10 @@
 <title>Details of Appointment</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />	
-		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.css" id="theme_base">
-		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.date.css" id="theme_date">
-		<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.time.css" id="theme_time">
-		
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>				
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>	
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-		<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
- 	   <script>window.jQuery||document.write('<script src="tests/jquery.2.0.0.js"><\/script>')</script>
- 	   <script src="${pageContext.request.contextPath}/resources/lib/picker.js"></script>
-	    <script src="${pageContext.request.contextPath}/resources/lib/picker.date.js"></script>
-	    <script src="${pageContext.request.contextPath}/resources/lib/picker.time.js"></script>
- 	   <script src="${pageContext.request.contextPath}/resources/lib/legacy.js"></script>	
+		
  	   <script type="text/javascript">
  	  function showV1Narratives(){
 			document.getElementById("displayV1NarrativeDiv").style.display="block";
@@ -95,10 +83,17 @@
 	</tr>
 	<tr>
 		<td>
-			<label >&nbsp Narrative :</label><a href="#narrative1" class="btn btn-primary" data-toggle="modal">View</a>
+			<label >&nbsp Narrative   </label>
+			<c:if test="${not empty narratives1}">
+				<a href="#narrative1" class="btn btn-primary" data-toggle="modal">View</a>
+			</c:if>			
 		</td>
 		<td>
-			<label>&nbsp Narrative :</label><a href="#narrative2" class="btn btn-primary" data-toggle="modal">View</a>
+			<label>&nbsp Narrative   </label>
+			<c:if test="${not empty narratives2}">
+				<a href="#narrative2" class="btn btn-primary" data-toggle="modal">View</a>
+			</c:if>	
+			
 	</tr>
 </table>
 
@@ -130,7 +125,7 @@
 <div class="row-fluid" id="displayV2NarrativeDiv" style="display:none">				
 </div>
 
-<div class="modal fade" id="#narrative1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="narrative1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
  <div class="modal-dialog">
 	    <div class="modal-content">
 	  		<div class="modal-header">
@@ -144,11 +139,11 @@
 						<th width="300">Content</th>
 						<th width="400">Edit Date</th>
 					</tr>
-					<c:forEach items="${v1Narratives}" var="n">
+					<c:forEach items="${narratives1}" var="n1">
 					<tr>
-						<td>${n.title}</td>
-						<td>${al.contents}</td>
-						<td>${al.editDate}</td>
+						<td>${n1.title}</td>
+						<td>${n1.contents}</td>
+						<td>${n1.editDate}</td>
 					</tr>
 					</c:forEach>
 	  			</table>
@@ -160,7 +155,7 @@
 	</div>
 </div>
 
-<div class="modal fade" id="#narrative2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade" id="narrative2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
  <div class="modal-dialog">
 	    <div class="modal-content">
 	  		<div class="modal-header">
@@ -174,11 +169,11 @@
 						<th width="300">Content</th>
 						<th width="400">Edit Date</th>
 					</tr>
-					<c:forEach items="${v2Narratives}" var="n">
+					<c:forEach items="${narratives2}" var="n2">
 					<tr>
-						<td>${n.title}</td>
-						<td>${al.contents}</td>
-						<td>${al.editDate}</td>
+						<td>${n2.title}</td>
+						<td>${n2.contents}</td>
+						<td>${n2.editDate}</td>
 					</tr>
 					</c:forEach>
 	  			</table>

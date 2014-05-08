@@ -108,6 +108,38 @@ public class NarrativeDao {
 		return narratives;
 	}
 	
+	public List<Narrative> getAllNarrativesByVolunteer(int volunteerId, int patientId, int appointmentId){
+		
+		List<Narrative> narratives = new ArrayList<Narrative>();
+		
+		try{
+			stmt = con.prepareStatement("SELECT * FROM narratives WHERE volunteer=? AND patient_ID=? AND appointment=? ORDER BY edit_Date DESC ");
+			stmt.setInt(1, volunteerId);
+			stmt.setInt(2, patientId);
+			stmt.setInt(3, appointmentId);
+			rs = stmt.executeQuery();
+			
+			narratives = getNarrativesByResultSet(rs);
+			
+			if (rs != null)
+				rs.close();
+			
+		}catch (SQLException e){			
+			logger.error("Error: Could not retrieve narratives");				
+			e.printStackTrace();			
+		}finally {
+    		try{
+    			//close statement  
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+				
+		return narratives;
+	}
+	
 	//get narrative for volunteer by patient, and appointment
 	public List<Narrative> getAllNarrativesByUser(int userId, int patientId, int appointmentId){
 		

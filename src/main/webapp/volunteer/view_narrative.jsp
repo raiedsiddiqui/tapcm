@@ -31,14 +31,14 @@
 								<th>Title</th>
 								<th>Edit Date</th>
 								<th>Client </th>
-								<th></th>
+							<!--  	<th></th>-->
 							</tr>
 							<c:forEach items="${narratives}" var="na">
 								<tr>
 									<td><a href="<c:url value="/modify_narrative/${na.narrativeId}"/>">${na.title}</a></td>									
 									<td>${na.editDate}</td>
 									<td>${na.patientName}</td>
-									<td><a href="<c:url value="/delete_narrative/${na.narrativeId}"/>" class="btn btn-danger">Delete</a></td>
+									<!--<td><a href="<c:url value="/delete_narrative/${na.narrativeId}"/>" class="btn btn-danger">Delete</a></td>-->
 								</tr>
 							</c:forEach>
 						</table>	
