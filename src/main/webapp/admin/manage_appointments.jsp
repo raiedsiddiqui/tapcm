@@ -57,7 +57,7 @@
 				<h2>Appointments</h2>
 			</div>
 			<div class="col-md-3">
-				<a href="<c:url value="/view_scheduler"/>" class="btn btn-primary">Scheduler</a>
+				<a href="<c:url value="/go_scheduler"/>" class="btn btn-primary">Scheduler</a>
 				<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book Appointment</a>
 			</div>
 		</div>

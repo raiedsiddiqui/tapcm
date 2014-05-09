@@ -61,6 +61,12 @@
 		<c:if test="${not empty noAvailableTime}">			
 			<div class="alert alert-error"><spring:message code="message_volunteer_noAvailable"/></div>
 		</c:if>		
+		<c:if test="${not empty noAvailableVolunteers}">			
+			<div class="alert alert-error"><spring:message code="message_volunteers_noPairsAvailable"/></div>
+		</c:if>
+		<c:if test="${not empty noFound}">			
+			<div class="alert alert-error"><spring:message code="message_empty_result"/></div>
+		</c:if>		
 		<c:if test="${not empty noMatchTime}">			
 			<div class="alert alert-error"><spring:message code="message_volunteers_noMatchTime"/></div>
 		</c:if>
@@ -82,7 +88,7 @@
 	<div><h4><a href="<c:url value="/manage_appointments"/>" >Appointments</a> > Scheduler</h4></div>
 	
 	<h3>Appointment Scheduler</h3>
-
+<!-- 
 	<form  id="schedulerForm" method="post" action="<c:url value="/view_matchTime"/>" onsubmit="return validatePatient()">	
 		<c:set var="v1" value="${volunteerOne }"/>
 		<c:set var="v2" value="${volunteerTwo }"/>	
@@ -119,7 +125,7 @@
 			</tr>
 		</table>		
 	</form>
-
+ -->
 	<table width="1200">
 	<tr>
 		<th width="120">Volunteer One</th>
@@ -128,7 +134,7 @@
 		<th width="120">Volunteer Two</th>
 		<th width="100">Phone #</th>
 		<th width="200">Email</th>
-		<th width="200">Time Match</th>			
+		<th width="200">Time</th>			
 		<th width="150">Action</th>
 		
 	</tr>
@@ -143,7 +149,7 @@
 						<td>${ml.pPhone}</td>
 						<td>${ml.pEmail}</td>
 						<td>${ml.matchedTime}</td>										
-						<td><a href="<c:url value="/add_appointment/${ml.vId}?vId=${ml.pId}&time=${ml.matchedTime}&patientId=${ml.patientId }"/>">Book Appointment</a></td>
+						<td><a href="<c:url value="/add_appointment/${ml.vId}?vId=${ml.pId}&time=${ml.matchedTime}"/>">Book Appointment</a></td>
 						
 					</tr>
 	</c:forEach>

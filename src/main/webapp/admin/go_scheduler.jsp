@@ -40,46 +40,21 @@
 	</head>
 <body>
 <div class="content">
-<%@include file="navbar.jsp" %>
-<div><h4><a href="<c:url value="/manage_appointments"/>" >Appointments</a> > Scheduler</h4></div>	
+	<%@include file="navbar.jsp" %>
+	<div><h4><a href="<c:url value="/manage_appointments"/>" >Appointments</a> > Scheduler</h4></div>	
 	<h3>Appointment Scheduler</h3>
- <form id="appt-form" method="post" action="<c:url value="/schedule_appointment"/>">
- 	<table>
- 		<tr>
- 			<td>
- 				<label>Patient:</label>
- 			</td>
- 			<td>
- 				<select name="patient" form="appt-form">
-					<c:forEach items="${patients}" var="p">							
-						<option value="${p.patientID}" <c:if test="${p.patientID eq selectedPatient}">selected</c:if>>${p.displayName}</option>
-					</c:forEach>
-				</select>
- 			</td>
- 		</tr>
- 		<tr>
- 			<td>
- 				<label>Volunteer:</label>
- 			</td>
- 			<td>
- 				<input data-format="hh:mm:00" type="text" name="volunteer" value="${selectedVolunteer}">	 				
- 			</td>
- 		</tr>
- 		<tr>
- 			<td>
- 				<label>Partner:</label>
- 			</td>
- 			<td>
- 				<input data-format="hh:mm:00" type="text" name="partner" value="${selectedPartner}">
- 			</td>
- 		</tr>
+ <form id="appt-form" method="post" action="<c:url value="/find_volunteers"/>">
+ 	<table> 		
  		<tr>
  			<td>
  				<label>Date:</label>		
  			</td>
  			<td>
- 				<div id="tp" class="input-append">
-					<input data-format="YYYY-MM-dd" type="text" name="appointmentDate" value="${selectedDate}">				   
+ 				<div id="dp" class="input-append">
+					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate" requred>
+					<span class="add-on">
+						<i class="icon-calendar"></i>
+					</span>
 				</div>
  			</td>
  		</tr>
@@ -88,15 +63,34 @@
  				<label>Time:</label>
  			</td>
  			<td>
- 				<div id="tp" class="input-append">
-					<input data-format="hh:mm:00" type="text" name="appointmentTime" value="${selectedTime}">				   
+ 				<div id="time" class="input-append">					
+					<select name="appointmentTime" form="appt-form" class="form-control">
+						<option value="0" >...</option>
+						<option value="1" >08:00 AM</option>
+						<option value="2" >08:30 AM</option>		
+						<option value="3" >09:00 AM</option>
+						<option value="4" >09:30 AM</option>					
+						<option value="5" >10:00 AM</option>
+						<option value="6" >10:30 AM</option>
+						<option value="7" >11:00 AM</option>
+						<option value="8" >11:30 AM</option>							
+						<option value="9" >13:00 PM</option>
+						<option value="10" >13:30 PM</option>
+						<option value="11" >14:00 PM</option>
+						<option value="12" >14:30 PM</option>							
+						<option value="13" >15:00 PM</option>
+						<option value="14" >15:30 PM</option>
+						<option value="15" >16:00 PM</option>											
+					</select>			   
 				</div>
  			</td>
- 		</tr> 		
- 		<tr> 			
- 			<td colspan="2">
- 			<a href="<c:url value="/manage_appointments"/>" class="btn btn-primary" data-toggle="modal">Cancel</a> 	
- 				<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book"  class="btn btn-primary">Book</button>
+ 		</tr>
+ 		<tr>
+ 			<td>
+ 				<a href="<c:url value="/manage_appointments"/>" class="btn btn-primary" >Cancel</a> 	
+ 			</td>
+ 			<td>
+ 				<button id="goButton" data-loading-text="Loading..." type="submit" value="Go..."  class="btn btn-primary">Go</button>
  				
  			</td>
  		</tr>

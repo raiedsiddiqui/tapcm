@@ -546,4 +546,82 @@ public class Utils {
 		return volunteerId;
 	}
 	
+	/**
+	 * get index of day of week by Date from calendar
+	 * @param day
+	 * @return
+	 */
+	public static int getDayOfWeekByDate(String day){
+		SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd");		
+		int dayOfWeek = 999;
+		try{
+			if (dateValidate(day)){
+				Date dDay = format.parse(day);
+				//EE meaning "day of week, short version"
+//				format=new SimpleDateFormat("EE"); 
+//				String dayOfWeek=format.format(dDay);
+				Calendar c = Calendar.getInstance();
+				c.setTime(dDay);
+				dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+			}
+			else
+			{
+				System.out.println("Invalid Date Formats!!!");
+			}
+		}
+		catch(Exception e)
+	    {
+	        System.out.println("Invalid Date Formats!!!");
+	    }		
+		return dayOfWeek;
+	}
+	
+	/**
+	 * validate input Date's format
+	 * @param d
+	 * @return
+	 */
+	public static boolean dateValidate(String d){
+		String dateArray[]= d.split("-");
+	    int year=Integer.parseInt(dateArray[0]);
+	    int month=Integer.parseInt(dateArray[1]);
+	    int day=Integer.parseInt(dateArray[2]);
+	   
+	    boolean leapYear=false;
+
+	    if((year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0))
+	    {
+	         leapYear=true;
+	    }
+
+	    if(year>2099 || year<1900)
+	        return false;
+
+	    if(month<13)
+	    {
+	        if(month==1||month==3||month==5||month==7||month==8||month==10||month==12)
+	        {
+	            if(day>31)
+	                return false;
+	        }
+	        else if(month==4||month==6||month==9||month==11)
+	        {
+	            if(day>30)
+	                return false;
+	        }
+	        else if(leapYear==true && month==2)
+	        {
+	            if(day>29)
+	              return false;
+	        }
+	        else if(leapYear==false && month==2)
+	        {
+	            if(day>28)
+	              return false;
+	        }
+	        return true;    
+	    }
+	    else return false;
+	 }
+	
 }

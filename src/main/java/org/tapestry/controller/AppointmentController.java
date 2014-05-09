@@ -6,6 +6,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.annotation.PostConstruct;
 
@@ -43,6 +46,7 @@ import javax.mail.Transport;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpSession;
 
 @Controller
 public class AppointmentController{
@@ -125,7 +129,8 @@ public class AppointmentController{
    	}
    	
    	@RequestMapping(value="/manage_appointments", method=RequestMethod.GET)
-   	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+   	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked, 
+   			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
    		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
    		ArrayList<Patient> allPatients = patientDao.getAllPatients();
    		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
@@ -192,8 +197,7 @@ public class AppointmentController{
 		
 		if(request.isUserInRole("ROLE_USER")) {
 			//Email all the administrators with a notification
-			System.out.println("hi...");
-			
+						
 			if (mailAddress != null){
 				try{
 					MimeMessage message = new MimeMessage(session);
@@ -254,6 +258,12 @@ public class AppointmentController{
 		return "/admin/view_appointments";
 	}
 	
+	@RequestMapping(value="/go_scheduler", method=RequestMethod.GET)
+	public String goScheduler( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		
+		return "/admin/go_scheduler";
+	}
+	
 	//display scheduler page
 	@RequestMapping(value="/view_scheduler", method=RequestMethod.GET)
 	public String viewScheduler( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
@@ -273,24 +283,32 @@ public class AppointmentController{
 	@RequestMapping(value="/add_appointment/{volunteerId}", method=RequestMethod.GET)
 	public String addAppointmentFromSecheduler(@PathVariable("volunteerId") int volunteerId, 
 			@RequestParam(value="vId", required=false) int partnerId, 			
-			@RequestParam(value="time", required=false) String time, 
-			@RequestParam(value="patientId", required=false) int patientId, 
+			@RequestParam(value="time", required=false) String time, 			
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		
 		List<Patient> patients = getPatients();		
-		List<Volunteer> allVolunteers = getAllVolunteers();
+	
+		//get volunteers's name		
+		String vName = volunteerDao.getVolunteerNameById(volunteerId);
+		String pName = volunteerDao.getVolunteerNameById(partnerId);
 		
 		//format time , remove day of week from string		
-		int pos = time.indexOf("--");	
-		time = time.substring(pos + 2);
+//		int pos = time.indexOf("--");	
+//		time = time.substring(pos + 2);
 		
-		model.addAttribute("patients",patients);
-		model.addAttribute("allvolunteers",allVolunteers);			
-		model.addAttribute("selectedVolunteer",volunteerId);
-		model.addAttribute("selectedPartner",partnerId);
+		String date = time.substring(0,10);		
+		time = time.substring(11);
+				
+		model.addAttribute("patients",patients);		
+		model.addAttribute("selectedVolunteer",vName);
+		model.addAttribute("selectedPartner",pName);
 		model.addAttribute("selectedTime", time);
-		model.addAttribute("selectedPatient", patientId);
+		model.addAttribute("selectedDate", date);
 		
+		//save volunteers id in the session
+		HttpSession  session = request.getSession();	
+		session.setAttribute("volunteerId", volunteerId);
+		session.setAttribute("partnerId", partnerId);		
 
 		return "/admin/schedule_appointment";
 	}
@@ -346,7 +364,7 @@ public class AppointmentController{
 							availability.setpDisplayName(v2.getDisplayName());
 							availability.setpPhone(v2.getHomePhone());
 							availability.setpEmail(v2.getEmail());				
-							availability.setMatchedTime(formateMatchTime(a1));
+							availability.setMatchedTime(formatMatchTime(a1));
 							availability.setvId(Integer.parseInt(volunteerId1));
 							availability.setpId(Integer.parseInt(volunteerId2));
 							availability.setPatientId(Integer.parseInt(patientId));
@@ -360,16 +378,46 @@ public class AppointmentController{
 				else
 					model.addAttribute("matcheList",matchList);		
 			}			
-		}
-		
-		
+		}		
 		model.addAttribute("allvolunteers", volunteers);
 		model.addAttribute("volunteerOne",v1);
 		model.addAttribute("volunteerTwo",v2);
 		model.addAttribute("patients", patients);
 		model.addAttribute("selectedPatient", patientId);
 		
-		return "/admin/view_scheduler";		
+		return "/admin/manage_appointments";		
+	}
+	
+	@RequestMapping(value="/find_volunteers", method=RequestMethod.POST)
+	public String getPairedVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		//get Date and time for appointment		
+		String day = request.getParameter("appointmentDate");
+		int dayOfWeek = Utils.getDayOfWeekByDate(day);
+		String time = request.getParameter("appointmentTime");				
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(String.valueOf(dayOfWeek -1));
+		sb.append(time);
+		String date_time = sb.toString();
+		
+		List<Volunteer> volunteers = getAllVolunteers();	
+		if (volunteers.size() == 0)
+			model.addAttribute("noAvailableTime",true);	
+		else
+		{
+			List<Volunteer> availableVolunteers = getAllMatchedVolunteers(volunteers, date_time);
+			if (availableVolunteers.size() == 0)
+				model.addAttribute("noAvailableVolunteers",true);	
+			else
+			{
+				List<Availability> matchList = getAllAvailablilities(availableVolunteers, date_time, day);
+				if (matchList.size() == 0)
+					model.addAttribute("noFound",true);	
+				else
+					model.addAttribute("matcheList",matchList);	
+			}
+		}		
+		return "/admin/view_scheduler";
 	}
 	
 	@RequestMapping(value="/schedule_appointment", method=RequestMethod.POST)
@@ -378,20 +426,26 @@ public class AppointmentController{
 		Appointment appointment = new Appointment();
 		
 		int patientId = Integer.parseInt(request.getParameter("patient"));
-		int volunteerId = Integer.parseInt(request.getParameter("volunteer"));
-		int partnerId = Integer.parseInt(request.getParameter("partner"));
+		
+		//retrieve volunteers id from session
+		HttpSession  session = request.getSession();			
+		Integer vId = (Integer)session.getAttribute("volunteerId");
+		int volunteerId = vId.intValue();
+		
+		Integer pId = (Integer)session.getAttribute("partnerId");
+		int partnerId = pId.intValue();
+		
 		appointment.setVolunteerID(volunteerId);
 		appointment.setPatientID(patientId);
 		appointment.setPartner(String.valueOf(partnerId));
 		
-		//get Date and time for appointment
-		
-		String day = request.getParameter("appointmentDate");
+		//get Date and time for appointment		
+		String date = request.getParameter("appointmentDate");
 		String time = request.getParameter("appointmentTime");
 		//format time, remove AM/PM
 		time = time.substring(0,8);
 		
-		appointment.setDate(day);
+		appointment.setDate(date);
 		appointment.setTime(time);		
 				
 		//save new appointment in DB and send message 
@@ -402,22 +456,22 @@ public class AppointmentController{
 			String pEmail = volunteerDao.getEmailByVolunteerId(partnerId);
 //			String vName = volunteerDao.getVolunteerNameById(volunteerId);
 //			String pName = volunteerDao.getVolunteerNameById(partnerId);
-			String logginUser = request.getUserPrincipal().getName();
-			
+			String logginUser = request.getUserPrincipal().getName();	
+						
 			//send message to both volunteers
 			if (mailAddress != null){			
 				System.out.println("Email is not null...");
 				//content of message
 				StringBuffer sb = new StringBuffer();
 				sb.append(logginUser);
-				sb.append(" has booked an appointment with ");
+				sb.append(" has booked an appointment for ");
 				sb.append(patient.getFirstName());
 				sb.append(" ");
 				sb.append(patient.getLastName());
-				sb.append( " for ");
+				sb.append( " at ");
 				sb.append(time);
 				sb.append(" on ");
-				sb.append(day);
+				sb.append(date);
 				sb.append(".\n");
 				sb.append("This appointment is awaiting confirmation.");
 				
@@ -437,13 +491,8 @@ public class AppointmentController{
 			model.addAttribute("failedToCreateAppointment",true);
 		}
 		
-//		List<Patient> patients = patientDao.getAllPatients();
-//		List<Volunteer> volunteers = volunteerDao.getVolunteersWithAvailability();
-//		model.addAttribute("patients",patients);
-//		model.addAttribute("allvolunteers",volunteers);
+		return "redirect:/manage_appointments";
 		
-//		return "/admin/view_scheduler";
-		return "redirect:/view_scheduler";
 	}
 	
 	
@@ -465,6 +514,8 @@ public class AppointmentController{
 		m.setSender(loggedInUser.getName());
 		m.setSenderID(loggedInUser.getUserID());
 		m.setText(msg);
+		m.setSubject("New Appointment");
+		messageDao.sendMessage(m);
 		
 		if (mailAddress != null){
 			try{
@@ -478,8 +529,6 @@ public class AppointmentController{
 				System.out.println("Sending...");
 				Transport.send(message);
 				System.out.println("Email sent notifying " + email);
-				
-				messageDao.sendMessage(m);
 				success = true;
 			} catch (MessagingException e) {
 				System.out.println("Error: Could not send email");
@@ -503,6 +552,50 @@ public class AppointmentController{
 		volunteers = volunteerDao.getVolunteersWithAvailability();		
 		
 		return volunteers;
+	}
+	
+	private List<Availability> getAllAvailablilities(List<Volunteer> list, String time, String day)
+	{		
+		Availability availability;
+		List<Availability> aList = new ArrayList<Availability>();
+		
+		for (Volunteer v: list)
+		{
+			for (Volunteer p: list)
+			{
+				if( (!(v.getVolunteerId()==p.getVolunteerId())) && 
+						(Utils.isMatchVolunteer(v, p)) && ((!isExist(aList,v, p))))
+				{
+					availability = new Availability();
+					availability.setvDisplayName(v.getDisplayName());
+					availability.setvPhone(v.getHomePhone());
+					availability.setvEmail(v.getEmail());
+					availability.setpDisplayName(p.getDisplayName());
+					availability.setpPhone(p.getHomePhone());
+					availability.setpEmail(p.getEmail());		
+					availability.setMatchedTime(formatdateTime(time, day));
+					availability.setvId(v.getVolunteerId());
+					availability.setpId(p.getVolunteerId());
+				      	
+					aList.add(availability);	
+				}
+			}
+		}
+		return aList;
+	}
+	
+	private List<Volunteer> getAllMatchedVolunteers(List<Volunteer> list, String time){		
+		List<Volunteer> vList = new ArrayList<Volunteer>();		
+		String availableTime;
+				
+		for (Volunteer v: list)
+		{	//get volunteer's available time
+			availableTime = v.getAvailability();
+			
+			if (availableTime.contains(time))
+				vList.add(v);
+		}
+		return vList;
 	}
 	
 	private List<Availability> getAllMatchedPairs(List<Volunteer> list1, List<Volunteer> list2){
@@ -542,7 +635,7 @@ public class AppointmentController{
 									availability.setpDisplayName(v2.getDisplayName());
 									availability.setpPhone(v2.getHomePhone());
 									availability.setpEmail(v2.getEmail());								  
-									availability.setMatchedTime(formateMatchTime(aSet1[i].toString()));
+									availability.setMatchedTime(formatMatchTime(aSet1[i].toString()));
 									availability.setvId(v1.getVolunteerId());
 									availability.setpId(v2.getVolunteerId());
 								      	
@@ -562,7 +655,7 @@ public class AppointmentController{
 	private boolean isExist(List<Availability> list, String time, Volunteer v1, Volunteer v2){
 		Availability a = new Availability();
 		boolean exist = false;
-		time = formateMatchTime(time);		
+		time = formatMatchTime(time);		
 		String v1Name = v1.getDisplayName();
 		String v2Name = v2.getDisplayName();
 		
@@ -575,7 +668,24 @@ public class AppointmentController{
 		return exist;
 	}
 	
-	private String formateMatchTime(String time){
+	//avoid duplicate element
+	private boolean isExist(List<Availability> list, Volunteer v1, Volunteer v2){
+		Availability a = new Availability();
+		boolean exist = false;
+		
+		String v1Name = v1.getDisplayName();
+		String v2Name = v2.getDisplayName();
+		
+		for (int i =0; i<list.size(); i++){
+			a = list.get(i);
+			
+			if ((v1Name.equals(a.getpDisplayName())) && (v2Name.equals(a.getvDisplayName())))			
+				return true;
+		}
+		return exist;
+	}
+	
+	private String formatMatchTime(String time){
 		StringBuffer sb = new StringBuffer();
 		
 		Map<String, String> dayMap = new HashMap<String, String>();
@@ -589,6 +699,17 @@ public class AppointmentController{
 		
 		sb.append(dayMap.get(time.substring(0,1)));
 		sb.append("--");
+		sb.append(timePeriodMap.get(time.substring(1)));
+		
+		return sb.toString();
+	}
+	
+	private String formatdateTime(String time, String day){			
+		Map<String, String> timePeriodMap = Utils.getAvailabilityMap();
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(day);
+		sb.append(" ");
 		sb.append(timePeriodMap.get(time.substring(1)));
 		
 		return sb.toString();
