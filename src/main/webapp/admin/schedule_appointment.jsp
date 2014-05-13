@@ -95,7 +95,7 @@
  		</tr> 		
  		<tr> 			
  			<td colspan="2">
- 			<a href="<c:url value="/manage_appointments"/>" class="btn btn-primary" data-toggle="modal">Cancel</a> 	
+ 			<a href="<c:url value="/go_scheduler"/>" class="btn btn-primary" data-toggle="modal">Cancel</a> 	
  				<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book"  class="btn btn-primary">Book</button>
  				
  			</td>

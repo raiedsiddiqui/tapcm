@@ -624,4 +624,30 @@ public class Utils {
 	    else return false;
 	 }
 	
+	//hard code plan definition by center admin
+	public static List<String> getPlanDefinition(){
+		List<String> plans = new ArrayList<String>();
+		
+		plans.add("");
+		plans.add("Review Consent");
+		plans.add("Shared MyOscar Info");
+		plans.add("Booked Next Visit");
+		plans.add("Left information about MyOcar for her/his to discuss with her/his daughter on her/his next visit");
+		plans.add("Left information about Meals on Wheels service");
+		
+		return plans;
+		
+	}
+	
+	public static Map<String, String> getPlanDefinitionMap(){
+		Map<String, String> plan = new HashMap<String, String>();
+		List<String> planDef = getPlanDefinition();
+		
+		for ( int i = 1; i <= planDef.size(); i++)
+			plan.put(String.valueOf(i), planDef.get(i-1));		
+		
+		return plan;
+		
+	}
+	
 }

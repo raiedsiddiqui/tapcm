@@ -157,7 +157,8 @@ public class SurveyController{
 		if(surveyResult.getStartDate() == null) {
 			surveyResultDao.updateStartDate(id);
 		}
-		
+		System.out.print("Volunteer or Admin?");
+		//user logs
 		if(p.getPreferredName() != null && p.getPreferredName() != "") {
 			activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getPreferredName(), u.getUserID());
 		} else {

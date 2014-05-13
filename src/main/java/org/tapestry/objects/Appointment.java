@@ -18,8 +18,11 @@ public class Appointment{
 	private boolean contactedAdmin;
 	private String partner;
 	private int partnerId;
+	private boolean hasNarrative;
+	private String alerts;
+	private String plans;
 	
-	
+
 	/**
 	 * Empty constructor
 	 */
@@ -192,6 +195,30 @@ public class Appointment{
 
 	public void setPartner(String partner) {
 		this.partner = partner;
+	}
+		
+	public boolean isHasNarrative() {
+		return hasNarrative;
+	}
+
+	public void setHasNarrative(boolean hasNarrative) {
+		this.hasNarrative = hasNarrative;
+	}
+
+	public String getAlerts() {
+		return alerts;
+	}
+
+	public void setAlerts(String alerts) {
+		this.alerts = alerts;
+	}
+
+	public String getPlans() {
+		return plans;
+	}
+
+	public void setPlans(String plans) {
+		this.plans = plans;
 	}
 
 }

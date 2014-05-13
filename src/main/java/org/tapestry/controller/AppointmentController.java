@@ -551,6 +551,8 @@ public class AppointmentController{
 	@RequestMapping(value="/open_plan/{appointmentId}", method=RequestMethod.GET)
 	public String openPlan(@PathVariable("appointmentId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		List<String> planDef = Utils.getPlanDefinition();
+		
 		HttpSession session = request.getSession();
 		session.setAttribute("appointmentId", id);
 		
@@ -561,9 +563,54 @@ public class AppointmentController{
 		
 		model.addAttribute("appointment", appt);
 		model.addAttribute("patient", patient);
-		return "/volunteer/add_plans";
+		model.addAttribute("plans", planDef);
+		return "/volunteer/add_plan";
 	}
 	
+	/**
+	 *  
+	 * @param id appointment Id
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/savePlans", method=RequestMethod.POST)
+	public String savePlans(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		
+		HttpSession session = request.getSession();
+		Integer appointmentId = (Integer)session.getAttribute("appointmentId");
+		int iAppointmentId = appointmentId.intValue();
+		
+		StringBuffer sb = new StringBuffer();		
+		sb.append(request.getParameter("plan1"));
+		sb.append(",");
+		sb.append(request.getParameter("plan2"));
+		sb.append(",");
+		sb.append(request.getParameter("plan3"));
+		sb.append(",");
+		sb.append(request.getParameter("plan4"));
+		sb.append(",");
+		sb.append(request.getParameter("plan5"));
+		if (!Utils.isNullOrEmpty(request.getParameter("planSpecify")))
+		{
+			sb.append(",");
+			sb.append(request.getParameter("planSpecify"));
+		}
+				
+		String plans = sb.toString();
+		
+		appointmentDao.addPlans(iAppointmentId, plans);
+		
+		Appointment appt = appointmentDao.getAppointmentById(iAppointmentId);
+		
+		int patientId = appt.getPatientID();
+		Patient patient = patientDao.getPatientByID(patientId);
+		
+		model.addAttribute("appointment", appt);
+		model.addAttribute("patient", patient);
+		
+		return "/volunteer/alerts_keyObservations_plan";
+	}
 	
 	private boolean isMatched(String level1, String level2){
 		boolean matched = false;

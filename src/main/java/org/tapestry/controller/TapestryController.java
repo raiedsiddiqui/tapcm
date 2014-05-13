@@ -197,14 +197,14 @@ public class TapestryController{
 //			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
 			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(u.getUserID());
-			ArrayList<Appointment> approvedAppointments = new ArrayList<Appointment>();
-			ArrayList<Appointment> pendingAppointments = new ArrayList<Appointment>();
-			ArrayList<Appointment> declinedAppointments = new ArrayList<Appointment>();
+			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
+			List<Appointment> pendingAppointments = new ArrayList<Appointment>();
+			List<Appointment> declinedAppointments = new ArrayList<Appointment>();
 			if(patientId != null) {
 				
-				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId);
-				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId);
-				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId);
+				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
+				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId, volunteerId);
+				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
 				Patient patient = patientDao.getPatientByID(patientId);
 				model.addAttribute("patient", patient);
 				
@@ -402,7 +402,7 @@ public class TapestryController{
 		
 		int patientId = appt.getPatientID();
 		Patient patient = patientDao.getPatientByID(patientId);
-		
+				
 		model.addAttribute("appointment", appt);
 		model.addAttribute("patient", patient);
 		return "/volunteer/alerts_keyObservations_plan";

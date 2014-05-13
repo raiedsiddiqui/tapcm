@@ -102,14 +102,18 @@
 	</div>
 <!-- 	breadcrumb END-->	
 
-<h2>My Appointments</h2>      
-<a href="<c:url value="/new_narrative"/>"><h2><button type="submit">Submit</button></h2></a> 
+<h2>My Appointments</h2>   
+	
+	<c:if test="${not appointment.hasNarrative}">
+		<a href="<c:url value="/new_narrative"/>"><h2><button type="submit">Narrrative</button></h2></a> 
+	</c:if>   
+
 
 <div class="row-fluid">
 	<a href="<c:url value="/open_alerts_keyObservations/${appointment.appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
 		<b>Alerts and Key Observations</b><br/>								
 	</a>
-	<a href="<c:url value="/open_plan/${appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+	<a href="<c:url value="/open_plan/${appointment.appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
 		<b>Plan</b><br/>								
 	</a>
 						</div>

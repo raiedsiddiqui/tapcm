@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS appointments (
 	hasNarrative BOOLEAN NOT NULL DEFAULT 0, /*The narrative has been completed of the appointment (0=incomplete)*/
 	alerts TEXT,
 	key_observations TEXT,
+	plan TEXT,
 	PRIMARY KEY(appointment_ID)
 );
 

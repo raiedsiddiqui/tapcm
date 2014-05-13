@@ -108,7 +108,8 @@
 		</div>
 		<br/>
 		<div>
-		<button id="newNarrativeButton" data-loading-text="Loading..." type="submit"  form="newNarrative" class="btn btn-primary">Finish</button>		
+		<a href="<c:url value="/complete_visit/{appointment.appointmentID}"/>" class="btn btn-primary" data-toggle="modal">Cancel</a> 	
+		<button id="newNarrativeButton" data-loading-text="Loading..." type="submit"  form="newNarrative" class="btn btn-primary">Save</button>		
 		</div>		
 	</div>
 

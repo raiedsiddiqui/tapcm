@@ -187,7 +187,7 @@ public class NarrativeController {
 		int appointmentId = 0;
 		
 		HttpSession  session = request.getSession();	
-		session.setAttribute("userDao", userDao);
+		session.setAttribute("userDao", userDao);		
 		
 		loggedInUserId = Utils.getLoggedInUserId(session, request);		
 		
@@ -212,8 +212,12 @@ public class NarrativeController {
 			narrative.setPatientId(patientId);
 			narrative.setAppointmentId(appointmentId);
 			
+			//add new narrative in narrative table in DB
 			narrativeDao.addNarrative(narrative);
-			session.setAttribute("narrativeMessage","C");			
+			//set complete narrative in Appointment table in DB
+			appointmentDao.completeNarrative(appointmentId);
+			
+//			session.setAttribute("narrativeMessage","C");			
 		}	
 		else
 		{			
