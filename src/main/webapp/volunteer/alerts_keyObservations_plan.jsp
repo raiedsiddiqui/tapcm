@@ -1,13 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ page import='java.util.Date' %>
-<%@ page import="java.text.SimpleDateFormat" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Tapestry Volunteer Add Alerts, KeyObservation for Appointment</title>
+<title>Tapestry Volunteer Appointment Alerts, KeyObservation and Plan</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
 		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
@@ -63,10 +62,12 @@
 		}
 		
 	</style>
-
+		
 </head>
 <body>
-<%@ include file="subNavi.jsp" %>
+<div id="headerholder">	
+<%@include file="subNavi.jsp" %>
+</div>
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
 		<ul>
@@ -83,34 +84,35 @@
 				</a>
 			</li>
 			<li><a href="">${appointment.date}</a></li>
-			<li><a href=""><b>Narrative</b></a></li>
+			<li><a href="">
+					<b>Completion</b>
+				</a>       </li>
 		</ul>
-</div>
-	<div class="content">
-		<div class="row-fluid">
-			<div class="span12">
-				<form id="newNarrative" action="<c:url value="/add_narrative"/>" method="POST">
-					<table width="900">						
-						<tr><%SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); String currentDate = sdf.format(new Date()); %>
-							<td><label>Title : </label><input id="narrativeTitle" name="narrativeTitle" type="text" required></td>
-							
-							<td><label>Edit Time : </label><input id="narrativeDate" name="narrativeDate" data-format="yyyy-MM-dd" type="text" value = "<%= currentDate %>" readonly ></td>
-						</tr>
-						<tr>
-							<td colspan ="2"><hr/></td>
-						</tr>
-						<tr>
-							<td colspan = "2"><textarea name="narrativeContent" rows="10" cols="100"></textarea></td>
-						</tr>				
-					</table>
-				</form>				
-			</div>
-		</div>
-		<br/>
-		<div>
-		<button id="newNarrativeButton" data-loading-text="Loading..." type="submit"  form="newNarrative" class="btn btn-primary">Finish</button>		
-		</div>		
+<!-- Message display 
+	<div id="visitandbook" class="span12 btn-group">
+			<c:if test="${not empty patient.notes}">
+				<a href="#modalNotes" class="btn btn-large btn-inverse lgbtn" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
+			</c:if>
+			<c:if test="${not empty appointment}">
+				<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Visit Complete</a>
+			</c:if>
+			<a href="" role="button" class="btn btn-primary pull-right lgbtn" >Submit</a>
+	</div>	
+	-->
 	</div>
+<!-- 	breadcrumb END-->	
+
+<h2>My Appointments</h2>      
+<a href="<c:url value="/new_narrative"/>"><h2><button type="submit">Submit</button></h2></a> 
+
+<div class="row-fluid">
+	<a href="<c:url value="/open_alerts_keyObservations/${appointment.appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+		<b>Alerts and Key Observations</b><br/>								
+	</a>
+	<a href="<c:url value="/open_plan/${appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+		<b>Plan</b><br/>								
+	</a>
+						</div>
 
 </body>
 </html>

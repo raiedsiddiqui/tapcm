@@ -15,9 +15,13 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.tapestry.dao.AppointmentDao;
+import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.NarrativeDao;
+import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Narrative;
+import org.tapestry.objects.Patient;
 import org.tapestry.controller.Utils;
 
 import java.util.Properties;
@@ -28,6 +32,8 @@ public class NarrativeController {
 	
 	private NarrativeDao narrativeDao = null;
 	private UserDao userDao = null;	
+	private AppointmentDao appointmentDao = null;
+	private PatientDao patientDao = null;
 	
 	@PostConstruct
 	public void readDatabaseConfig(){
@@ -39,7 +45,9 @@ public class NarrativeController {
 		String PW = props.getProperty("pwd");
 				
 		userDao = new UserDao(DB, UN, PW);
-		narrativeDao = new NarrativeDao(DB, UN, PW);		
+		narrativeDao = new NarrativeDao(DB, UN, PW);	
+		appointmentDao = new AppointmentDao(DB, UN, PW);
+		patientDao = new PatientDao(DB, UN, PW);
 		
 	}
 	
@@ -114,7 +122,16 @@ public class NarrativeController {
 	
 	@RequestMapping(value="/new_narrative", method=RequestMethod.GET)
 	public String newNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-
+		HttpSession session = request.getSession();
+		int appointmentId = getAppointmentId(session);
+		
+		Appointment appt = appointmentDao.getAppointmentById(appointmentId);
+		
+		int patientId = appt.getPatientID();
+		Patient patient = patientDao.getPatientByID(patientId);
+		
+		model.addAttribute("appointment", appt);
+		model.addAttribute("patient", patient);
 		return "/volunteer/new_narrative";
 	}
 	
@@ -204,7 +221,7 @@ public class NarrativeController {
 			logger.error("Please select a patient or appointment first===");
 		}		
 
-		return "redirect:/view_narratives";
+		return "redirect:/";
 	}
 	
 	@RequestMapping(value="/delete_narrative/{narrativeId}", method=RequestMethod.GET)

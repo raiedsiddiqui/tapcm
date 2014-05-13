@@ -459,8 +459,7 @@ public class AppointmentController{
 			String logginUser = request.getUserPrincipal().getName();	
 						
 			//send message to both volunteers
-			if (mailAddress != null){			
-				System.out.println("Email is not null...");
+			if (mailAddress != null){					
 				//content of message
 				StringBuffer sb = new StringBuffer();
 				sb.append(logginUser);
@@ -493,6 +492,76 @@ public class AppointmentController{
 		
 		return "redirect:/manage_appointments";
 		
+	}
+	
+	/**
+	 *  
+	 * @param id appointment Id
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/open_alerts_keyObservations/{appointmentId}", method=RequestMethod.GET)
+	public String openAlertsAndKeyObservations(@PathVariable("appointmentId") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		
+		HttpSession session = request.getSession();
+		session.setAttribute("appointmentId", id);
+		
+		Appointment appt = appointmentDao.getAppointmentById(id);
+		
+		int patientId = appt.getPatientID();
+		Patient patient = patientDao.getPatientByID(patientId);
+		
+		model.addAttribute("appointment", appt);
+		model.addAttribute("patient", patient);
+		
+		return "/volunteer/add_alerts_keyObservation";
+	}
+	
+	/**
+	 *  
+	 * @param id appointment Id
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/saveAlertsAndKeyObservations", method=RequestMethod.POST)
+	public String saveAlertsAndKeyObservations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		
+		HttpSession session = request.getSession();
+		Integer appointmentId = (Integer)session.getAttribute("appointmentId");
+		int iAppointmentId = appointmentId.intValue();
+		
+		String alerts = request.getParameter("alerts");
+		String keyObservations = request.getParameter("keyObservations");
+		
+		appointmentDao.addAlertsAndKeyObservations(iAppointmentId, alerts, keyObservations);
+		
+		return "/volunteer/alerts_keyObservations_plan";
+	}
+	
+	/**
+	 *  
+	 * @param id appointment Id
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/open_plan/{appointmentId}", method=RequestMethod.GET)
+	public String openPlan(@PathVariable("appointmentId") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		HttpSession session = request.getSession();
+		session.setAttribute("appointmentId", id);
+		
+		Appointment appt = appointmentDao.getAppointmentById(id);
+		
+		int patientId = appt.getPatientID();
+		Patient patient = patientDao.getPatientByID(patientId);
+		
+		model.addAttribute("appointment", appt);
+		model.addAttribute("patient", patient);
+		return "/volunteer/add_plans";
 	}
 	
 	

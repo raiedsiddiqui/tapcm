@@ -690,6 +690,29 @@ public class AppointmentDao {
     	return appointments;
     }
     
+    public boolean addAlertsAndKeyObservations(int id, String alerts, String keyObservations){
+    	try{
+    		statement = con.prepareStatement("UPDATE appointments SET alerts=?, key_observations=? WHERE appointment_ID=? ");
+    		statement.setString(1, alerts);
+    		statement.setString(2, keyObservations);
+    		statement.setInt(3, id);
+    		statement.execute();
+    		
+    		return true;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not add alerts and key observations");
+    		e.printStackTrace();
+    		return false;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    	
+    }
+    
     private Appointment createFromSearch(ResultSet result){
     	Appointment a = new Appointment();
     	try{

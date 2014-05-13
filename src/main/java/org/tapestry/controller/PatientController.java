@@ -367,8 +367,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		//use volunteerId to replace userId		
 		int volunteerId= volunteerDao.getVolunteerIdByUsername(u.getUsername());
 		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
-		
-	
+				
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
 		model.addAttribute("appointment", appointment);
 		model.addAttribute("patients", patientsForUser);

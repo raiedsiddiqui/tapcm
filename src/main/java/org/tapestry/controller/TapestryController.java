@@ -394,10 +394,18 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
-	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request) {
+	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
 		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
 		appointmentDao.completeAppointment(id, request.getParameter("comments"), contactedAdmin);
-		return "redirect:/";
+		//return "redirect:/";
+		Appointment appt = appointmentDao.getAppointmentById(id);
+		
+		int patientId = appt.getPatientID();
+		Patient patient = patientDao.getPatientByID(patientId);
+		
+		model.addAttribute("appointment", appt);
+		model.addAttribute("patient", patient);
+		return "/volunteer/alerts_keyObservations_plan";
 	}
 	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)

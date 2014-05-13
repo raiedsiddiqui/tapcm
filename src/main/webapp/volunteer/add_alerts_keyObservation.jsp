@@ -1,8 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<%@ page import='java.util.Date' %>
-<%@ page import="java.text.SimpleDateFormat" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -63,10 +62,13 @@
 		}
 		
 	</style>
-
+		
 </head>
 <body>
-<%@ include file="subNavi.jsp" %>
+
+<div id="headerholder">	
+<%@include file="subNavi.jsp" %>
+</div>
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
 		<ul>
@@ -83,34 +85,29 @@
 				</a>
 			</li>
 			<li><a href="">${appointment.date}</a></li>
-			<li><a href=""><b>Narrative</b></a></li>
+			<li><a href=""><b>Alerts and Key Observations</b></a></li>
 		</ul>
-</div>
-	<div class="content">
-		<div class="row-fluid">
-			<div class="span12">
-				<form id="newNarrative" action="<c:url value="/add_narrative"/>" method="POST">
-					<table width="900">						
-						<tr><%SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); String currentDate = sdf.format(new Date()); %>
-							<td><label>Title : </label><input id="narrativeTitle" name="narrativeTitle" type="text" required></td>
-							
-							<td><label>Edit Time : </label><input id="narrativeDate" name="narrativeDate" data-format="yyyy-MM-dd" type="text" value = "<%= currentDate %>" readonly ></td>
-						</tr>
-						<tr>
-							<td colspan ="2"><hr/></td>
-						</tr>
-						<tr>
-							<td colspan = "2"><textarea name="narrativeContent" rows="10" cols="100"></textarea></td>
-						</tr>				
-					</table>
-				</form>				
-			</div>
-		</div>
-		<br/>
-		<div>
-		<button id="newNarrativeButton" data-loading-text="Loading..." type="submit"  form="newNarrative" class="btn btn-primary">Finish</button>		
-		</div>		
+<!-- Message display 
+	<div id="visitandbook" class="span12 btn-group">
+			<c:if test="${not empty patient.notes}">
+				<a href="#modalNotes" class="btn btn-large btn-inverse lgbtn" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
+			</c:if>
+			<c:if test="${not empty appointment}">
+				<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Visit Complete</a>
+			</c:if>
+			<a href="" role="button" class="btn btn-primary pull-right lgbtn" >Submit</a>
+	</div>	
+	-->
 	</div>
+<!-- 	breadcrumb END-->	
+<form id="alertAndKeyObservationfrm" action="<c:url value="/saveAlertsAndKeyObservations"/>" method="post">
+<h2>Alerts                                                                     <button type="submit">Submit</button></h2><br/>
+<h3>Are there any alerts that the physcian should be aware of ? </h3><br/>
+<input type="textarea" class="form-control" rows="8" cols="100" name="alerts"/><br/>
+<h2>Key Observations</h2><br/>
+<h3>Please enter the key observations in the text box below</h3>	
+<input type="textarea" class="form-control" rows="8" cols="100" name="keyObservations"/><br/>
 
+</form>
 </body>
 </html>

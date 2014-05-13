@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS appointments (
 	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the appointment (0=incomplete)*/
 	contactedAdmin BOOLEAN NOT NULL DEFAULT 0, /*The status of the volunteer contacted the admin*/
 	hasNarrative BOOLEAN NOT NULL DEFAULT 0, /*The narrative has been completed of the appointment (0=incomplete)*/
+	alerts TEXT,
+	key_observations TEXT,
 	PRIMARY KEY(appointment_ID)
 );
 
