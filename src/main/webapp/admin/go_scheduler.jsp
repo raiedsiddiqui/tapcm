@@ -6,37 +6,25 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>Scheduler in Appointment</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-			<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-			<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-			<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-			<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>	
-			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
+	<title>Scheduler in Appointment</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+	<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+	<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>	
+	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
 
-		<style type="text/css">
-			.row-fluid{
-				margin:10px;
-			}
-		</style>	
-		<script type="text/javascript">
-		$(function(){
-			$('#dp').datetimepicker({
-				pickDate: false,
-				pickSeconds: false
-			});
-			  			
-  			$('#bookAppt').click(function(){
-		        var btn = $(this)
-		        btn.button('loading')
-		        setTimeout(function () {
-		            btn.button('reset')
-		        }, 3000)
-		    });
-  			
-		});
-		
-	</script>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.css" id="theme_base">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.date.css" id="theme_date">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.time.css" id="theme_time">
+
+	
+	<style type="text/css">
+		.row-fluid{
+			margin:10px;
+		}
+	</style>	
+
 	</head>
 <body>
 <div class="content">
@@ -51,7 +39,7 @@
  			</td>
  			<td>
  				<div id="dp" class="input-append">
-					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate" requred>
+					<input class="datepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentDate">
 					<span class="add-on">
 						<i class="icon-calendar"></i>
 					</span>
@@ -95,8 +83,39 @@
  			</td>
  		</tr>
  	</table> 
-				
+					
   </form>
+  
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script>window.jQuery||document.write('<script src="tests/jquery.2.0.0.js"><\/script>')</script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.date.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.time.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/legacy.js"></script>
+  		<script type="text/javascript">
+		$(function(){
+  			
+  			$('#bookAppt').click(function(){
+		        var btn = $(this)
+		        btn.button('loading')
+		        setTimeout(function () {
+		            btn.button('reset')
+		        }, 3000)
+		    });
+
+
+		});
+
+		    $('.datepicker').pickadate({
+			    // Escape any “rule” characters with an exclamation mark (!).
+			    format: 'You selecte!d: dddd, dd mmm, yyyy',
+			    formatSubmit: 'yyyy/mm/dd',
+			    hiddenName: true
+			   	// hiddenPrefix: 'prefix__',
+			    // hiddenSuffix: '__suffix'
+			})
+		
+	</script>
 </div>
 </body>
 </html>
