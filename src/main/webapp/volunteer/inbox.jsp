@@ -7,18 +7,7 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
-		<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
-		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
-	
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-
-		<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
-				<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
-
-		  		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'> 
+ 	<%@include file="volunteer_head.jsp" %>
 	<style type="text/css">
 		html,body{
 			height:100%;
@@ -40,7 +29,7 @@
 	
 <body>	
 <div id="headerholder">	
-<%@include file="subNavi.jsp" %>
+	<%@include file="subNavi.jsp" %>
 </div>
 
 <!-- 	breadcrumb START-->	

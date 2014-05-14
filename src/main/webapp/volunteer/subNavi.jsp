@@ -50,7 +50,7 @@
 </head>
 
 	<div id="headerholder">	
-		<div class="row">
+		<div class="row-fluid">
 			<div class="col-md-2">
 				<img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
 			</div>

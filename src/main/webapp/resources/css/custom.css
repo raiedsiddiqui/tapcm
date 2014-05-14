@@ -64,6 +64,7 @@ img {
 
 #logininput {
 	height: 50px;
+	width: 100%;
 	font-size: 34px;
 	font-family: 'Roboto Slab', serif;
 	-webkit-tap-highlight-color: rgba(0,0,0,0); 
@@ -351,7 +352,7 @@ div#visitandbook.span12.btn-group {
 	padding-right:10px;
 	margin-right:10px;
 	font-size: 20px !important;
-	height:25px;
+	height:35px;
 }
 
 .completevisitbtn {
@@ -372,8 +373,8 @@ div#visitandbook.span12.btn-group {
 }
 
 #crumbs ul li a {
-	/*height: 30px;*/
-	padding: 13px 10px 0 60px;
+	height: 40px;
+	padding: 8px 10px 0 60px;
 }
 
 div#crumbs {
@@ -425,11 +426,12 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 }
 
 .logoutbtn {
-	padding: 10px 40px 10px 40px;
+	padding: 0px 40px 0px 40px;
 	text-align: center;
 	margin-right:0px;
 	font-size: 40px !important;
-	height:25px;
+	height:auto;
 }
+
 
 
