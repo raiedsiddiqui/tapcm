@@ -6,14 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Tapestry</title>
-	<!--<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script> -->
-		  	<%@include file="volunteer_head.jsp" %>
-
-
+	<%@include file="volunteer_head.jsp" %>
 	<style type="text/css">
 		html,body{
 			height:100%;
@@ -37,7 +30,7 @@
 
 
 <div id="headerholder">	
- 	<%@include file="subNavi.jsp" %>
+ <%@include file="subNavi.jsp" %>
 </div>
 <div class="content">
 		<div class="row-fluid">
