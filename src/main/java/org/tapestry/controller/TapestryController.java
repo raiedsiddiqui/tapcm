@@ -384,6 +384,7 @@ public class TapestryController{
 	
 	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
 	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
+		
 		Appointment appointment = appointmentDao.getAppointmentById(id);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(appointment.getVolunteerID());
 		model.addAttribute("unread", unreadMessages);
@@ -395,8 +396,8 @@ public class TapestryController{
 	
 	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
 	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
-		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
-		appointmentDao.completeAppointment(id, request.getParameter("comments"), contactedAdmin);
+//		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
+//		appointmentDao.completeAppointment(id, request.getParameter("comments"), contactedAdmin);
 		//return "redirect:/";
 		Appointment appt = appointmentDao.getAppointmentById(id);
 		

@@ -151,6 +151,7 @@
 			<c:if test="${not empty patient.notes}">
 				<a href="#modalNotes" class="btn btn-large btn-inverse lgbtn" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 			</c:if>
+			<a href="<c:url value="/goMyOscarAuthenticate/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Authenticate MyOscar</a>
 			<c:if test="${not empty appointment}">
 				<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Visit Complete</a>
 			</c:if>

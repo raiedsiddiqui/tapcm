@@ -346,6 +346,7 @@ public class AppointmentDao {
     				+ "AND completed=0 AND status='Approved' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		statement.setInt(2, volunteerId);
+    		statement.setInt(3, volunteerId);
     		
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -413,6 +414,7 @@ public class AppointmentDao {
     				+ "AND completed=0 AND status='Awaiting Approval' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		statement.setInt(2, volunteerId);
+    		statement.setInt(3, volunteerId);
     		
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -480,6 +482,7 @@ public class AppointmentDao {
     				+ " AND completed=0 AND status='Declined' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		statement.setInt(2, volunteerId);
+    		statement.setInt(3, volunteerId);
     		
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -766,7 +769,7 @@ public class AppointmentDao {
     	Appointment apointment = null;
     	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
-    				+ " TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, hasNarrative FROM appointments"
+    				+ " TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative FROM appointments"
     				+ " WHERE volunteer=? AND date_time>=CURDATE() AND completed=0 ORDER BY date_time ASC");
     		statement.setInt(1, volunteerId);
     		

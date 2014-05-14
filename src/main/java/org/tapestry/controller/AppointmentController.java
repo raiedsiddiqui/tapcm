@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.tapestry.controller.utils.MisUtils;
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
@@ -501,6 +502,30 @@ public class AppointmentController{
 	 * @param model
 	 * @return
 	 */
+	@RequestMapping(value="/open_alerts_keyObservations_plan/{appointmentId}", method=RequestMethod.GET)
+	public String goAlertsAndKeyObservationsAndPlan(@PathVariable("appointmentId") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
+		HttpSession session = request.getSession();
+		session.setAttribute("appointmentId", id);
+		
+		Appointment appt = appointmentDao.getAppointmentById(id);
+		
+		int patientId = appt.getPatientID();
+		Patient patient = patientDao.getPatientByID(patientId);
+		
+		model.addAttribute("appointment", appt);
+		model.addAttribute("patient", patient);
+		
+		return "/volunteer/alerts_keyObservations_plan";
+	}
+	
+	/**
+	 *  
+	 * @param id appointment Id
+	 * @param request
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value="/open_alerts_keyObservations/{appointmentId}", method=RequestMethod.GET)
 	public String openAlertsAndKeyObservations(@PathVariable("appointmentId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
@@ -611,6 +636,42 @@ public class AppointmentController{
 		
 		return "/volunteer/alerts_keyObservations_plan";
 	}
+	
+	/**
+	 *  
+	 * @param id appointment Id
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/goMyOscarAuthenticate/{appointmentId}", method=RequestMethod.GET)
+	public String openMyOscarAuthenticate(@PathVariable("appointmentId") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		
+		HttpSession session = request.getSession();
+		session.setAttribute("appointmentId", id);
+		
+		Appointment appt = appointmentDao.getAppointmentById(id);
+		
+		int patientId = appt.getPatientID();
+		Patient patient = patientDao.getPatientByID(patientId);
+		
+		String vName = patient.getVolunteerName();
+		
+		int index = vName.indexOf(" ");
+		String firstName = vName.substring(0, index);
+		String lastName = vName.substring(index);
+		
+		String termsInfo = MisUtils.getMyOscarAuthenticationInfo();
+		
+		model.addAttribute("patient", patient);
+		model.addAttribute("vFirstName", firstName);
+		model.addAttribute("vLastName", lastName);
+		model.addAttribute("termsInfo", termsInfo);		
+		
+		return "/volunteer/client_myoscar_authentication";
+	}
+	
 	
 	private boolean isMatched(String level1, String level2){
 		boolean matched = false;

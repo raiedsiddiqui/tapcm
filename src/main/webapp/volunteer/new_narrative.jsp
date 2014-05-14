@@ -108,7 +108,7 @@
 		</div>
 		<br/>
 		<div>
-		<a href="<c:url value="/complete_visit/{appointment.appointmentID}"/>" class="btn btn-primary" data-toggle="modal">Cancel</a> 	
+		<a href="<c:url value="/open_alerts_keyObservations_plan/${appointment.appointmentID}"/>" class="btn btn-primary" >Cancel</a> 	
 		<button id="newNarrativeButton" data-loading-text="Loading..." type="submit"  form="newNarrative" class="btn btn-primary">Save</button>		
 		</div>		
 	</div>

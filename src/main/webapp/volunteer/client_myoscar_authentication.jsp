@@ -1,12 +1,12 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Tapestry Volunteer Add Plans for Appointment</title>
+<title>Tapestry Volunteer Appointment MyOscar Authentication</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
 		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
@@ -50,6 +50,8 @@
 			width:90%;
 			margin-right:10px;
 		}
+		textarea { height: auto; width:auto }
+		
 		.modal-backdrop{
 			z-index:0;
 		}
@@ -82,59 +84,68 @@
 					</c:otherwise>
 				</c:choose>
 				</a>
-			</li>
-			<li><a href="">${appointment.date}</a></li>
-			<li><a href=""><b>Plan</b></a></li>
+			</li>			
+			<li><a href="">	<b>Authenticate MyOscar</b>	</a> </li>
 		</ul>
-<!-- Message display 
-	<div id="visitandbook" class="span12 btn-group">
-			<c:if test="${not empty patient.notes}">
-				<a href="#modalNotes" class="btn btn-large btn-inverse lgbtn" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
-			</c:if>
-			<c:if test="${not empty appointment}">
-				<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Visit Complete</a>
-			</c:if>
-			<a href="" role="button" class="btn btn-primary pull-right lgbtn" >Submit</a>
-	</div>	
-	-->
+
 	</div>
-	
-	<form id="plansfrm" action="<c:url value="/savePlans"/>" method="post">
-<h2>                                                                  <button type="submit">Submit</button></h2><a href="<c:url value="/open_alerts_keyObservations_plan/${appointment.appointmentID}"/>" class="btn btn-primary" >Cancel</a><br/>
-<label>1 &nbsp &nbsp  </label>
-	<select name="plan1" form="plansfrm">
-		<c:forEach items="${plans}" var="p">							
-			<option value="${p}" >${p}</option>
-		</c:forEach>
-	</select><br/>
-<label>2 &nbsp &nbsp  </label>
-	<select name="plan2" form="plansfrm">
-		<c:forEach items="${plans}" var="p">							
-			<option value="${p}" >${p}</option>
-		</c:forEach>
-	</select><br/>
-<label>3  &nbsp &nbsp </label>
-	<select name="plan3" form="plansfrm">
-		<c:forEach items="${plans}" var="p">							
-			<option value="${p}" >${p}</option>
-		</c:forEach>
-	</select><br/>
-<label>4  &nbsp &nbsp </label>
-	<select name="plan4" form="plansfrm">
-		<c:forEach items="${plans}" var="p">							
-			<option value="${p}" >${p}</option>
-		</c:forEach>
-	</select><br/>
-<label>5  &nbsp &nbsp </label>
-	<select name="plan5" form="plansfrm">
-		<c:forEach items="${plans}" var="p">							
-			<option value="${p}" >${p}</option>
-		</c:forEach>
-	</select><br/>
-&nbsp &nbsp &nbsp	<label>Specify :   </label><br/>
-<label>6 &nbsp &nbsp  </label>
-<input type="textarea" class="form-control" rows="8" cols="50" name="planSpecify"/><br/>
-	
-</form>
+<!-- 	breadcrumb END-->	
+
+<h2>MyOscar Authentication</h2> 
+
+<table width = "1020">
+	<tr>
+		<input type="textarea" style="width: 1200px; height: 80px;" value="${termsInfo }">
+
+	</tr>
+	<tr>
+		<table>
+			<tr>
+				<td width="500"><label>e-signature</label></td>
+				<td width="520">
+					<table>
+						<tr>
+							<td><label><h3>Client: </h3></label></td>
+						</tr>
+						<tr>
+							<td><label>First Name:</label></td>
+						</tr>
+						<tr>
+							<td><input value="${patient.firstName}"/></td>
+						</tr>
+						<tr>
+							<td><label>Last Name:</label></td>
+						</tr>
+						<tr>
+							<td><input value="${patient.lastName}"/></td>
+						</tr>
+						<tr>
+							<td><label><h3>Volunteer: </h3></label></td>
+						</tr>
+						<tr>
+							<td><label>First Name:: </label></td>							
+						</tr>
+						<tr>
+							<td><input value="${vFirstName}"/></td>
+						</tr>
+						<tr>
+							<td><label>Last Name:</label></td>
+						</tr>
+						<tr>
+							<td><input value="${vLastName}"/></td>
+						</tr>
+						<tr>
+							<td>&nbsp</td>
+						</tr>
+						<tr>
+							<td><a href="" role="button" class="btn btn-primary pull-right lgbtn">Authenticate </a></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</tr>
+</table>
+  
 </body>
 </html>

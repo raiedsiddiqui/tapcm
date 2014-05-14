@@ -101,7 +101,7 @@
 	</div>
 <!-- 	breadcrumb END-->	
 <form id="alertAndKeyObservationfrm" action="<c:url value="/saveAlertsAndKeyObservations"/>" method="post">
-<h2>Alerts                                                                     <button type="submit">Submit</button></h2><br/>
+<h2>Alerts                                                                     <button type="submit">Submit</button></h2><a href="<c:url value="/open_alerts_keyObservations_plan/${appointment.appointmentID}"/>" class="btn btn-primary" >Cancel</a><br/>
 <h3>Are there any alerts that the physcian should be aware of ? </h3><br/>
 <input type="textarea" class="form-control" rows="8" cols="100" name="alerts"/><br/>
 <h2>Key Observations</h2><br/>
