@@ -27,3 +27,24 @@
 #adminheader {
 	padding-bottom: 10px;
 }
+
+div.modal-dialog {
+	width: 90%;
+	height: 640px;
+
+}
+
+.picker__wrap {
+	height: 0%;
+}
+.picker--opened .picker__frame {
+	top:0;
+}
+
+.navbar {
+	width:100%;
+}
+
+ul.nav.navbar-nav {
+	float:right;
+}
