@@ -102,9 +102,10 @@
 							</div>
 						<select multiple id="rec" name="recipient" form="messageVolunteer" class="form-control">
 							<c:forEach items="${volunteers}" var="v">
-							<option value="${v.volunteerId}">${v.firstName}</option>
+							<option value="${v.userID}">${v.name}</option>
 							</c:forEach>
 						</select><br />
+						<c:out value = "${v.size()}"/>
 					</div>
 				</div>
 				<div class="row form-group">

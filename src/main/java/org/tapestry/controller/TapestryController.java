@@ -426,11 +426,13 @@ public class TapestryController{
 	
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
 	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent,@RequestParam(value="failure", required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());	
 		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("messages", messages);
+
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
+		
 		if (messageSent != null)
 			model.addAttribute("success", messageSent);
 		if (messageFailed != null)
@@ -440,8 +442,7 @@ public class TapestryController{
 			model.addAttribute("administrators", administrators);
 			return "/volunteer/inbox";
 		} else {
-//			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
-			List<Volunteer> volunteers = volunteerDao.getAllVolunteers();
+			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");			
 			model.addAttribute("volunteers", volunteers);
 			return "/admin/inbox";
 		}
@@ -451,11 +452,13 @@ public class TapestryController{
 	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = messageDao.getMessageByID(id);
+		
 		if (!(m.getRecipient() == loggedInUser.getUserID()))
 			return "redirect:/403";
 		if (!(m.isRead()))
 			messageDao.markAsRead(id);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+
 		model.addAttribute("unread", unreadMessages);
 		model.addAttribute("message", m);
 		if (request.isUserInRole("ROLE_USER"))
@@ -468,6 +471,7 @@ public class TapestryController{
 	public String dismissAnnouncement(@PathVariable("announcement") int id, SecurityContextHolderAwareRequestWrapper request){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
 		Message m = messageDao.getMessageByID(id);
+		
 		if (!(m.getRecipient() == loggedInUser.getUserID()))
 			return "redirect:/403";
 		messageDao.markAsRead(id);
@@ -561,6 +565,7 @@ public class TapestryController{
 		//Reverse sender and recipient
 		User recipient = userDao.getUserByID(oldMsg.getSenderID());
 		int newRecipient = userDao.getUserByID(oldMsg.getRecipient()).getUserID();
+		
 		newMsg.setSenderID(newRecipient);
 		newMsg.setRecipient(oldMsg.getSenderID());
 		newMsg.setText(request.getParameter("msgBody"));
