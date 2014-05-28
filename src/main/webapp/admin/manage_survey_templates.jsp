@@ -27,6 +27,8 @@
 			<c:if test="${not empty failed}">
 				<div class="alert alert-error">Failed to delete survey template: survey results still exist that use the survey template</div>
 			</c:if>
+			<a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Assign Survey</a>
+			<a href="<c:url value="/assign_survey"/>"  class="btn btn-primary">Add new</a>
 			<table class="table">
 				<tr>
 					<th>Title</th>
@@ -45,7 +47,7 @@
 				</tr>
 				</c:forEach>
 			</table>
-			<a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Add new</a>
+		<!-- <a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Add new</a> -->
 		</div>
 	
 	<!-- OLD Modal 

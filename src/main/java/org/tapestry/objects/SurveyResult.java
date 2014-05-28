@@ -41,9 +41,9 @@ public class SurveyResult implements Comparable<SurveyResult> {
 	
 	public SurveyResult processMumpsResults(SurveyResult surveyResult) throws IOException, SAXException, ParserConfigurationException
 	{
-		ArrayList<QuestionAnswerPair> questionAnswerPairs = new ArrayList<QuestionAnswerPair>();
-		
+		ArrayList<QuestionAnswerPair> questionAnswerPairs = new ArrayList<QuestionAnswerPair>();		
 		Document doc = XmlUtils.toDocument(surveyResult.getResults());
+		
 		Node rootNode = doc.getFirstChild();
 
 		Node resultsNode = XmlUtils.getChildNode(rootNode, "Results");

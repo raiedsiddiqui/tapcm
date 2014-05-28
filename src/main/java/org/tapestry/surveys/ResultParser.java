@@ -8,6 +8,10 @@ import java.util.Map;
 import java.io.File;
 import java.io.StringReader;
 import java.util.Scanner;
+import java.util.List;
+import java.util.ArrayList;
+
+import org.tapestry.objects.DisplayedSurveyResult;
 
 public class ResultParser {
 
@@ -47,20 +51,86 @@ public class ResultParser {
                     //questionAnswerString += questionText.getTextContent().trim();
                 }
                 NodeList questionAnswerList = question.getElementsByTagName("QuestionAnswer");
-                if (questionAnswerList.getLength() > 0){
+                if (questionAnswerList.getLength() > 0){                	
                 	for (int j = 0; j < questionAnswerList.getLength(); j++){
                 		Element questionAnswer = (Element) questionAnswerList.item(j);
+                		                		
                 		questionAnswerString += questionAnswer.getTextContent().trim();
+                		
                 		if (questionAnswer.getNextSibling() != null)
                 			questionAnswerString += ", ";
                 	}
-                }
-                results.put(questionString, questionAnswerString);
+                }                               
+                results.put(questionString, questionAnswerString);     
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return results;
+    }
+    
+    /**
+     * Display bean for Survey Result
+     * ObserverNotes is appended in questionAnswer, and need to be extracted 
+     * @param results
+     * @return
+     */
+    public static List<DisplayedSurveyResult> getDisplayedSurveyResults(Map<String, String> results){
+    	List<DisplayedSurveyResult> resultList = new ArrayList<DisplayedSurveyResult>();
+    	DisplayedSurveyResult result;
+    	String answer = "";
+		String questionAnswer = "";
+		String observerNotes = "";
+		String key;
+		String title = getTitleOrDate(results, "title");
+		String date = getTitleOrDate(results, "date");
+		
+    	for (Map.Entry<String, String> entry: results.entrySet()){
+    		key = entry.getKey();    		
+    		result = new DisplayedSurveyResult();  		
+    	   	
+    		//set question key, answer and observer notes
+    		if (!key.equals("surveyId") && !key.equals("date") && !key.equals("title"))
+    		{
+    			answer = entry.getValue();
+    			String separator = "/observernote/";
+        		int index = answer.indexOf("/observernote/");
+        		int l = separator.length();
+        		        		
+        		if (index == -1)
+        			questionAnswer = answer;
+        		else
+        		{
+        			questionAnswer = answer.substring(0, index);
+            		observerNotes = answer.substring(index + l);
+        		}
+        		         	    
+        	    result.setQuestionId(key);
+        	    result.setQuestionAnswer(questionAnswer);
+        	    result.setObserverNotes(observerNotes);
+        	    
+        	    //set title
+        		result.setTitle(title);     		
+        		//set date    		
+        		result.setDate(date);
+        		
+        	    resultList.add(result);
+    		}
+    	}
+    	
+    	return resultList;
+    }
+    
+    private static String getTitleOrDate(Map<String, String> results, String type){    	
+    	String res = "";
+    	for (Map.Entry<String, String> entry: results.entrySet()){	
+			String key = entry.getKey();
+    		if (key.equals(type)){
+    			res = entry.getValue();    		
+    		}
+		}
+    	
+    	return res;
     }
     
     /**

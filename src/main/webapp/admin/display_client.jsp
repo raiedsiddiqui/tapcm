@@ -221,7 +221,7 @@
 			<td>${cVistits.appointmentID}</td>
 			<td>${cVistits.date}</td>			
 			<td>${cVistits.volunteer},&nbsp &nbsp ${cVistits.partner}</td>
-			<td><a href="">DOWNLOAD</a> </td>
+			<td><a href="<c:url value="/view_report/${patient.patientID}?appointmentId=${cVistits.appointmentID}"/>">DOWNLOAD</a> </td>
 		</tr>
 		</c:forEach>
 	</table>

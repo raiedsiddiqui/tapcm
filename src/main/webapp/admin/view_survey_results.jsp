@@ -31,21 +31,23 @@
   <img src="<c:url value="/resources/images/logo.png"/>" />
 	<div class="content">
 		<%@include file="navbar.jsp" %>
-		<div class="row-fluid">
-			<h2>Survey Results: ${results["title"]}</h2>
-			<h4>Completed on: ${results["date"]}</h4>
+		<div class="row-fluid">			
+			<h2>Survey Results: ${results[0].title}</h2>
+			<h4>Completed on: ${results[0].date}</h4>
 			<table class="table">
 				<tr>
 					<th>Question</th>
 					<th>Answer</th>
-				</tr>
-				<c:forEach items="${results}" var="entry">
-					<c:if test="${entry.key != 'title' && entry.key != 'date' && entry.key != 'surveyId'}">
+					<th>Observer Notes</th>
+				</tr>				
+				<c:forEach items="${results}" var="result">
+					
 					<tr>
-						<td>${entry.key}</td>
-						<td>${entry.value}</td>
+						<td>${result.questionId}</td>
+						<td>${result.questionAnswer}</td>
+						<td>${result.observerNotes}</td>
 					</tr>
-					</c:if>
+					
 				</c:forEach>
 			</table>
 			<a href="<c:url value="/export_csv/${id}"/>" class="btn btn-primary">Export as CSV</a>

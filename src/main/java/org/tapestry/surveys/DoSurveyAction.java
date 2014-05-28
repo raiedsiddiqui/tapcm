@@ -34,13 +34,13 @@ package org.tapestry.surveys;
 
 import java.util.ArrayList;
 import java.util.List;
+//import java.util.Arrays;
+import java.lang.Character;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.tapestry.objects.SurveyResult;
-import org.tapestry.objects.SurveyTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
@@ -49,6 +49,8 @@ import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
 import org.survey_component.data.answer.SurveyAnswer;
 import org.survey_component.data.answer.SurveyAnswerFactory;
+import org.tapestry.objects.SurveyResult;
+import org.tapestry.objects.SurveyTemplate;
 
 /**
  * Created on December 21, 2006, 10:47 AM
@@ -67,7 +69,9 @@ public class DoSurveyAction
 	{
 		ModelAndView m = new ModelAndView();
 		final String questionId = request.getParameter("questionid");
-		String direction = request.getParameter("direction");
+		String direction = request.getParameter("direction");		
+		String observerNotes = request.getParameter("observernote");	
+		
 		if (direction == null)
 			direction = "forward";
 
@@ -79,7 +83,7 @@ public class DoSurveyAction
 		}
 
 		String[] answerStrs = request.getParameterValues("answer");
-
+		
 		String nextQuestionId = questionId;
 		//if requested survey does not exist
 		if (currentSurvey == null)
@@ -101,7 +105,8 @@ public class DoSurveyAction
 
 		if (questionId == null)
 		{
-			//if just starting/continuing(frombefore) the survey, direct to last question
+			
+			//if just starting/continuing(from before) the survey, direct to last question
 			String lastQuestionId;
 
 			if (currentSurvey.getQuestions().size() == 0)
@@ -117,18 +122,23 @@ public class DoSurveyAction
 
 			if (currentSurvey.isComplete())
 			{ //if complete show first question
-				lastQuestionId = currentSurvey.getQuestions().get(0).getId();
+				lastQuestionId = currentSurvey.getQuestions().get(0).getId();				
+				m.addObject("hideObservernote", true);
 			}
 			else
 			{ //if not complete show next question
 				lastQuestionId = currentSurvey.getQuestions().get(currentSurvey.getQuestions().size() - 1).getId();
+				m.addObject("hideObservernote", false);
 			}
 
+			
 			m.addObject("survey", currentSurvey);
 			m.addObject("templateSurvey", templateSurvey);
 			m.addObject("questionid", lastQuestionId);
 			m.addObject("resultid", documentId);
+			
 			m.setViewName("/surveys/show_survey");
+			
 			return m;
 		}
 
@@ -136,14 +146,27 @@ public class DoSurveyAction
 
 		//if continuing survey (just submitted an answer)
 		if (questionId != null && direction.equalsIgnoreCase("forward"))
-		{
+		{		
 			if (currentSurvey.getQuestionById(questionId).getQuestionType().equals(SurveyQuestion.ANSWER_CHECK) && answerStrs == null)
 			{
 				answerStrs = new String[0];
 			}
 			if (answerStrs != null && (currentSurvey.getQuestionById(questionId).getQuestionType().equals(SurveyQuestion.ANSWER_CHECK) || !answerStrs[0].equals("")))
-			{
+			{						
 				SurveyQuestion question = currentSurvey.getQuestionById(questionId);
+				
+				//add observernotes 
+				if (answerStrs.length == 1)
+				{
+					String content = answerStrs[0];
+					String separator = " /observernote/ ";
+					StringBuffer sb = new StringBuffer();
+					sb.append(content);
+					sb.append(separator);
+					sb.append(observerNotes);
+					answerStrs[0] = sb.toString();						
+				}
+				
 				ArrayList<SurveyAnswer> answers = convertToSurveyAnswers(answerStrs, question);
 				boolean goodAnswerFormat = true;
 				if (answers == null)
@@ -216,6 +239,8 @@ public class DoSurveyAction
 									tempquestions.add(currentSurvey.getQuestions().get(currentQuestionIndex +1));
 									currentSurvey.getQuestions().remove(currentQuestionIndex + 1);  //goes through quesitons list and removes each question after it
 								}
+								
+								
 								question.setAnswers(answers);
 								saved = true;
 								//add new question
@@ -260,16 +285,16 @@ public class DoSurveyAction
 							m.addObject("questionid", questionId);
 							m.addObject("resultid", documentId);
 							m.addObject("message", "SURVEY FINISHED - Please click END SURVEY");
-							
+							m.addObject("hideObservernote", false);
 							m.setViewName("/surveys/show_survey");
 							return m;
-						} else {
+						} else {														
 							m.addObject("survey", currentSurvey);
 							m.addObject("templateSurvey", templateSurvey);
 							m.addObject("questionid", questionId);
 							m.addObject("resultid", documentId);
 							m.addObject("message", "End of Survey");
-
+							m.addObject("hideObservernote", false);
 							m.setViewName("/surveys/show_survey");
 							return m;
 						}
@@ -283,13 +308,13 @@ public class DoSurveyAction
 
 					//if answer fails validation
 				}
-				else {
+				else {					
 					m.addObject("survey", currentSurvey);
 					m.addObject("templateSurvey", templateSurvey);
 					m.addObject("questionid", questionId);
 					m.addObject("resultid", documentId);
 					m.addObject("message", question.getRestriction().getInstruction());
-
+					m.addObject("hideObservernote", false);
 					m.setViewName("/surveys/show_survey");
 					return m;
 				}
@@ -303,7 +328,13 @@ public class DoSurveyAction
 			int questionIndex = currentSurvey.getQuestionIndexbyId(questionId);
 			if (questionIndex > 0) nextQuestionId = currentSurvey.getQuestions().get(questionIndex - 1).getId();
 		}
-
+		
+		//backward to the description page(before the first qustion)
+		if ((questionId != null) && ("backward".equals(direction)) && (isFirstQuestionId(questionId)))
+			m.addObject("hideObservernote", true);
+		else
+			m.addObject("hideObservernote", false);
+		
 		m.addObject("survey", currentSurvey);
 		m.addObject("templateSurvey", templateSurvey);
 		m.addObject("questionid", nextQuestionId);
@@ -312,6 +343,17 @@ public class DoSurveyAction
 
 		m.setViewName("/surveys/show_survey");
 		return m;
+	}
+	
+	private static boolean isFirstQuestionId(String str){
+		boolean isFirst = false;
+		int length = str.length();
+		
+		//'1' is only digital in string
+		if ((str.charAt(length - 1) == '1') && Character.isLetter(str.charAt(length - 2)))
+			isFirst = true;
+		
+		return isFirst;
 	}
 
 	private static boolean addNextQuestion(String currentQuestionId, PHRSurvey currentSurvey, PHRSurvey templateSurvey) throws SurveyException
@@ -342,7 +384,7 @@ public class DoSurveyAction
 		{
 			SurveyAnswer answerObj = answerFactory.getSurveyAnswer(question.getQuestionType(), answer);
 			if (answerObj == null) return null;
-			else surveyAnswers.add(answerObj);
+			else surveyAnswers.add(answerObj);			
 		}
 		return surveyAnswers;
 	}

@@ -3,15 +3,10 @@ package org.tapestry.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.LinkedHashMap;
-
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -19,29 +14,35 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
+import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
-import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.SurveyResultDao;
-import org.tapestry.dao.ActivityDao;
+import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.objects.Appointment;
+import org.tapestry.objects.DisplayedSurveyResult;
 import org.tapestry.objects.Patient;
-import org.tapestry.objects.User;
-import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.SurveyResult;
+import org.tapestry.objects.SurveyTemplate;
+import org.tapestry.objects.User;
 import org.tapestry.surveys.DoSurveyAction;
-import org.tapestry.surveys.SurveyFactory;
 import org.tapestry.surveys.ResultParser;
+import org.tapestry.surveys.SurveyFactory;
 import org.yaml.snakeyaml.Yaml;
 
 @Controller
@@ -100,6 +101,7 @@ public class SurveyController{
 		model.addAttribute("surveys", surveyResultList);
 		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
 		model.addAttribute("survey_templates", surveyTemplateList);
+		
 		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResultList, surveyTemplateList);
 	    ArrayList<Patient> patientList = patientDao.getAllPatients();
         model.addAttribute("patients", patientList);
@@ -157,7 +159,7 @@ public class SurveyController{
 		if(surveyResult.getStartDate() == null) {
 			surveyResultDao.updateStartDate(id);
 		}
-		System.out.print("Volunteer or Admin?");
+		
 		//user logs
 		if(p.getPreferredName() != null && p.getPreferredName() != "") {
 			activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getPreferredName(), u.getUserID());
@@ -178,7 +180,8 @@ public class SurveyController{
 		PHRSurvey currentSurvey = userSurveys.getSurvey(Integer.toString(id));
 		try {
 			SurveyFactory surveyFactory = new SurveyFactory();
-			PHRSurvey templateSurvey = surveyFactory.getSurveyTemplate(surveyTemplate);
+			PHRSurvey templateSurvey = surveyFactory.getSurveyTemplate(surveyTemplate);	
+	
 			redirectAction = DoSurveyAction.execute(request, Integer.toString(id), currentSurvey, templateSurvey);
 		} catch (Exception e) {
 			System.out.println("Error: " + e);
@@ -188,6 +191,7 @@ public class SurveyController{
 		if (redirectAction == null){ //Assuming we've completed the survey
 			System.out.println("Something bad happened");
 		}
+		
    		if (request.isUserInRole("ROLE_USER") && redirectAction.getViewName() == "failed"){
    			redirectAction.setViewName("redirect:/");
    		} else if (request.isUserInRole("ROLE_ADMIN") && redirectAction.getViewName() == "failed") {
@@ -263,15 +267,20 @@ public class SurveyController{
    	
    	@RequestMapping(value="/view_survey_results/{resultID}", method=RequestMethod.GET)
    	public String viewSurveyResults(@PathVariable("resultID") int id, HttpServletRequest request, ModelMap model){
-   		SurveyResult r = surveyResultDao.getSurveyResultByID(id);
+   		SurveyResult r = surveyResultDao.getSurveyResultByID(id); 		
+   		
    		String xml;
    		try{
    			xml = new String(r.getResults(), "UTF-8");
    		} catch (Exception e) {
    			xml = "";
    		}
+   		
    		LinkedHashMap<String, String> res = ResultParser.getResults(xml);
-   		model.addAttribute("results", res);
+   		List<DisplayedSurveyResult> displayedResults = ResultParser.getDisplayedSurveyResults(res);
+   		   		
+//   		model.addAttribute("results", res);
+   		model.addAttribute("results", displayedResults);
    		model.addAttribute("id", id);
    		return "/admin/view_survey_results";
    	}
@@ -296,6 +305,7 @@ public class SurveyController{
    		} catch (Exception e) {
    			e.printStackTrace();
    		}
+   		
    		return res;
    	}
 }

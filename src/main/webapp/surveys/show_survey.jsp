@@ -21,6 +21,8 @@
 	//get question
 	SurveyQuestion question = survey.getQuestionById(questionId);
 	
+	
+	
 	boolean completed;
 	Object completedObject = request.getAttribute("survey_completed");
 	if (completedObject == null)
@@ -37,7 +39,7 @@
 		message = messageObject.toString();
 %>
 <head>
-	<title>Tapestry Admin</title>
+	<title>Tapestry Admin--------------Survey</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
@@ -73,6 +75,15 @@
 		}
 		
 	</style>
+	
+	<script type="text/javascript">
+			
+			function saveObserverNotes(){
+				document.forms['surveyQuestion'].observernote.value = document.getElementById("observerNote").value;			
+			}
+		</script>
+	
+	
 </head>
 
 <body>
@@ -103,11 +114,13 @@
 			<div class="squestion">
     			<div id="squestion2" > <!-- style="float: left;" -->
         			<!-- Look at the div with class="questionWidth" at the bottom to adjust question min-width) -->
+        			
         			<form action="/tapestry/show_survey/<%=documentId%>" name="surveyQuestion" id="surveyQuestion">
             			<input type="hidden" name="questionid" value="<%=question.getId()%>">
             			<input type="hidden" name="direction" value="forward">
             			<input id="saveclose" type="button" value="<%if (!survey.isComplete()) {%>End <%}%>Survey" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>?survey_completed=<%=completed%>'">
             			<input type="hidden" name="documentid" value="<%=documentId%>">
+            			<input type="hidden" name="observernote" value="" >
             			
             		
 					<b>${surveyTitle}</b><br/>
@@ -143,11 +156,22 @@
                 
                 		<%
 	           	 			String answer="";
-	           	 			if (question.getAnswer()!=null) answer=StringUtils.trimToEmpty(question.getAnswer().toString());
+	           	 			if (question.getAnswer()!=null) answer=StringUtils.trimToEmpty(question.getAnswer().toString());	           	 			
+	           	 			
+		           	 		String separator = "/observernote/";
+		           			String observernotes = "";
+			           		int ind = answer.indexOf(separator);
+			           		int l = separator.length();
+			           		
+			           		if (ind != -1)
+			           		{
+			           			observernotes = answer.substring(ind + l);
+			           			answer = answer.substring(0, ind);
+			           		}
 
                 			if (question.getQuestionType().equals(SurveyQuestion.ANSWER_NUMBER) ||
                 			question.getQuestionType().equals(SurveyQuestion.ANSWER_DECIMAL)) {                
-                		%>
+                		%><%=answer%>   <%=observernotes %>
                 			<input type="number" style="text-align: center;" id="answer" name="answer" value="<%=answer%>"<%if (survey.isComplete()) {%> readonly<%}%>> (Number)
                 
                 		<%} else if (question.getQuestionType().equals(SurveyQuestion.ANSWER_TEXT)) {%>
@@ -186,6 +210,14 @@
                 	<div id="answer-buttons">
                 		<input class="tleft" type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();"> 
                 		<input class="tright" type="submit" value="Next">
+                		<!--  input class="tright" type="button" value="Observer Notes">-->
+                		
+                		
+                		<c:if test="${not hideObservernote}">
+                			<a href="#modalObserverNotes" data-toggle="modal" class="btn btn-primary pull-right">Observer Notes</a>
+                		</c:if>
+                		
+                		
                 	</div>
 		        </form>
 		        <script type="text/javascript" language="JavaScript">
@@ -196,6 +228,30 @@
 		        </script>
 		        <!--Need the following div b/c IE is stupid (compensating for min-width absense)-->
 		        <div class="questionWidth"></div>
+		    </div>
+		    
+		    <div id="observer_note" >
+		    <div class="modal fade" id="modalObserverNotes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			  <div class="modal-dialog">
+	  			  <div class="modal-content">
+						<div class="modal-header">
+    						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+						<h3>Observer Note</h3>
+				 </div>
+				 <div class="modal-body">
+					<div class="col-md-12">
+						
+						<textarea class="form-control" id="observerNote" onload="this.focus()" value="<%=observernotes%>"<%if (survey.isComplete()) {%> readonly<%}%>>
+</textarea><br />		
+					</div>	
+				</div>				
+				<div class="modal-footer">
+					<input type="button"  class="btn btn-primary" data-dismiss="modal" value="Save"  onclick="saveObserverNotes();" />
+  				</div>
+			</div>
+		</div>
+	</div>
+		    
 		    </div>
 		</div>
 	</div>
