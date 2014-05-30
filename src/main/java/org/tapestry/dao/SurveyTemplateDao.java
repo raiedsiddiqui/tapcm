@@ -48,8 +48,13 @@ public class SurveyTemplateDao
             st.setContents(result.getBytes("contents"));
             st.setPriority(result.getInt("priority"));
             st.setDescription(result.getString("description"));
+            
+            //format date, remove time
+            String date = result.getString("last_modified");
+            date = date.substring(0, 10);
+            st.setCreatedDate(date);
 		} catch (SQLException e) {
-			System.out.println("Error: Failed to create Patient object");
+			System.out.println("Error: Failed to create Survey template object");
 			e.printStackTrace();
 		}
 		return st;
@@ -88,7 +93,7 @@ public class SurveyTemplateDao
 	public ArrayList<SurveyTemplate> getAllSurveyTemplates()
 	{
 		try {
-			statement = con.prepareStatement("SELECT * FROM surveys");
+			statement = con.prepareStatement("SELECT * FROM surveys ORDER BY priority DESC" );
 			ResultSet result = statement.executeQuery();
 			ArrayList<SurveyTemplate> allSurveyTemplates = new ArrayList<SurveyTemplate>();
 			while(result.next()){
@@ -108,6 +113,37 @@ public class SurveyTemplateDao
     		}
     	}
 	}
+	//getUsersByPartialName(name);
+	/**
+	 * Ordered by title ascending
+	 * @param itemsToReturn 
+	 * @param startIndex 
+	 */
+	public ArrayList<SurveyTemplate> getSurveyTemplatesByPartialTitle(String partialTitle)
+	{
+		try {
+			statement = con.prepareStatement("SELECT * FROM surveys WHERE UPPER(title) LIKE UPPER('%" + partialTitle + "%')");
+			
+			ResultSet result = statement.executeQuery();
+			ArrayList<SurveyTemplate> allSurveyTemplates = new ArrayList<SurveyTemplate>();
+			while(result.next()){
+				SurveyTemplate st = createFromSearch(result);
+				allSurveyTemplates.add(st);
+			}
+			return allSurveyTemplates;
+		} catch (SQLException e) {
+			System.out.println("Error: Could not retrieve survey template by partial title " + partialTitle);
+			e.printStackTrace();
+			return null;
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+	}
+	
 	
 	/**
 	 * Uploads a survey template to the database

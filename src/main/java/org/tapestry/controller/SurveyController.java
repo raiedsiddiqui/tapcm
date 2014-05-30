@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.servlet.http.HttpSession;
+import javax.servlet.ServletOutputStream;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -94,6 +96,59 @@ public class SurveyController{
 			model.addAttribute("failed", deleteFailed);
 		return "admin/manage_survey_templates";
 	}
+	
+	@RequestMapping(value="/manage_survey", method=RequestMethod.GET)
+	public String manageSurvey(@RequestParam(value="failed", required=false) String failed, Boolean deleteFailed,
+			ModelMap model, HttpServletRequest request){
+
+		List<SurveyTemplate>  surveyTemplateList = getSurveyTemplates(request);		
+		model.addAttribute("survey_templates", surveyTemplateList);
+		
+		if (deleteFailed != null)
+			model.addAttribute("failed", deleteFailed);
+		
+//		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResultList, surveyTemplateList);
+//	    ArrayList<Patient> patientList = patientDao.getAllPatients();
+//        model.addAttribute("patients", patientList);
+//        if(failed != null) {
+//        	model.addAttribute("failed", true);
+//        }
+		return "admin/manage_survey";
+	}
+	
+	private List<SurveyTemplate> getSurveyTemplates(HttpServletRequest request){
+		HttpSession session = request.getSession();		
+		List<SurveyTemplate> surveyTemplateList;
+		if (session.getAttribute("survey_template_list") == null)
+		{
+			surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
+			
+			//save in the session
+			if (surveyTemplateList != null && surveyTemplateList.size()>0)
+				session.setAttribute("survey_template_list", surveyTemplateList);
+		}
+		else
+			surveyTemplateList = (List<SurveyTemplate>)session.getAttribute("survey_template_list");
+		
+		return surveyTemplateList;
+	}
+	
+	@RequestMapping(value="/search_survey", method=RequestMethod.POST)
+	public String searchSurvey(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+		
+		String title = request.getParameter("searchTitle");		
+		List<SurveyTemplate>  surveyTemplateList = surveyTemplateDao.getSurveyTemplatesByPartialTitle(title);
+		
+		model.addAttribute("survey_templates", surveyTemplateList);
+	
+		if(failed != null) {
+			model.addAttribute("failed", true);
+		}		 
+		
+		model.addAttribute("searchTitle", title);
+		
+		return "admin/manage_survey";
+	}
    	
    	@RequestMapping(value="/manage_surveys", method=RequestMethod.GET)
 	public String manageSurveys(@RequestParam(value="failed", required=false) String failed, ModelMap model, HttpServletRequest request){
@@ -110,6 +165,40 @@ public class SurveyController{
         }
 		return "admin/manage_surveys";
 	}
+   	
+   	@RequestMapping(value="/assign_survey", method=RequestMethod.GET)
+	public String assignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) throws JAXBException, DatatypeConfigurationException, Exception{
+   		List<Patient> patients = getPatients(request);
+   		List<SurveyTemplate> surveyTemplates = getSurveyTemplates(request);
+		if(patients == null || surveyTemplates == null) {
+			return "redirect:/manage_surveys?failed=true";
+		}
+		else
+		{
+			 model.addAttribute("patients", patients);
+			 model.addAttribute("surveyTemplates", surveyTemplates);
+		}
+		
+
+		return "redirect:/manage_surveys";
+	}
+   	
+   	private List<Patient> getPatients(SecurityContextHolderAwareRequestWrapper request){
+   		HttpSession session = request.getSession();		
+		List<Patient> patients;
+		if (session.getAttribute("patient_list") == null)
+		{
+			patients = patientDao.getAllPatients();
+			
+			//save in the session
+			if (patients != null && patients.size()>0)
+				session.setAttribute("patient_list", patients);
+		}
+		else
+			patients = (List<Patient>)session.getAttribute("patient_list");
+		
+		return patients;
+   	}
    	
 	@RequestMapping(value="/assign_surveys", method=RequestMethod.POST)
 	public String assignSurveys(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
@@ -170,7 +259,7 @@ public class SurveyController{
 	}
    	
    	@RequestMapping(value="/show_survey/{resultID}", method=RequestMethod.GET)
-   	public ModelAndView showSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {
+   	public ModelAndView showSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {   		   		
    		ModelAndView redirectAction = null;
    		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
@@ -295,7 +384,8 @@ public class SurveyController{
    		} catch (Exception e) {
    			xml = "";
    		}
-   		String res = ResultParser.resultsAsCSV(ResultParser.getResults(xml));
+   		String res = ResultParser.resultsAsCSV(ResultParser.getResults(xml));   		
+   		
    		response.setContentType("text/csv");
    		response.setContentLength(res.length());
    		response.setHeader("Content-Disposition", "attachment; filename=\"result.csv\"");
@@ -307,5 +397,25 @@ public class SurveyController{
    		}
    		
    		return res;
+   	}
+   	
+   	@RequestMapping(value="/download_survey_template/{surveyID}", method=RequestMethod.GET)
+   	@ResponseBody
+   	public String downloadSurveyTemplate(@PathVariable("surveyID") int id, HttpServletResponse response){
+   		   		
+   		SurveyTemplate sTemplate = surveyTemplateDao.getSurveyTemplateByID(id);
+   		String fileName = sTemplate.getTitle();
+   		byte[] bContent = sTemplate.getContents();
+   		response.setContentType("text");
+   		response.setHeader("Content-Disposition", "attachment; filename=\""+ fileName + ".text\"");
+   	
+   		try{
+   			ServletOutputStream output = response.getOutputStream();
+   			output.write(bContent);   			
+   		} catch (Exception e) {
+   			e.printStackTrace();
+   		}
+   		
+   		return "admin/manage_survey";
    	}
 }

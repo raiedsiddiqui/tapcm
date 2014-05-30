@@ -45,7 +45,8 @@ public class AppointmentDao {
     public ArrayList<Appointment> getAllAppointments(){
     	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
-    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative FROM appointments ORDER BY date_time DESC");
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative "
+    				+ "FROM appointments ORDER BY date_time DESC");
     		
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -732,7 +733,7 @@ public class AppointmentDao {
     	Appointment apointment = null;
     	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
-    				+ " TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, hasNarrative FROM appointments"
+    				+ " TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative FROM appointments"
     				+ " WHERE volunteer=? AND completed=1 ORDER BY date_time ASC");
     		statement.setInt(1, volunteerId);
     		
@@ -801,6 +802,38 @@ public class AppointmentDao {
     	return appointments;
     }
     
+    public String getKeyObservationByAppointmentId(int id){
+    	try{
+    		statement = con.prepareStatement("SELECT key_observations FROM appointments"
+    				+ " WHERE appointment_ID=? ORDER BY date_time ASC");
+    		statement.setInt(1, id);
+    		
+    		ResultSet rs = statement.executeQuery();
+    		String keyObservations = null;
+    		
+    		while(rs.next()){
+    			keyObservations = rs.getString("key_observations");
+        	}
+       		
+       		//close result set
+       		if (rs != null)
+       			rs.close();
+       		
+       		return keyObservations;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve key_observation for appointment# is  " + id);
+    		e.printStackTrace();
+    		
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
     public boolean addAlertsAndKeyObservations(int id, String alerts, String keyObservations){
     	try{
     		statement = con.prepareStatement("UPDATE appointments SET alerts=?, key_observations=? WHERE appointment_ID=? ");
@@ -822,6 +855,37 @@ public class AppointmentDao {
     		}
     	}
     	
+    }
+    
+    public String getPlanByAppointmentId(int id){
+    	try{
+    		statement = con.prepareStatement("SELECT plan FROM appointments"
+    				+ " WHERE appointment_ID=? ORDER BY date_time ASC");
+    		statement.setInt(1, id);
+    		
+    		ResultSet rs = statement.executeQuery();
+    		String plan = null;
+    		
+    		while(rs.next()){
+    			plan = rs.getString("plan");
+        	}
+       		//close result set
+       		if (rs != null)
+       			rs.close();
+       		
+       		return plan;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve plan for appointment# is  " + id);
+    		e.printStackTrace();
+    		
+    		return null;
+    	} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
     }
     
     //addPlans(iAppointmentId, plans)

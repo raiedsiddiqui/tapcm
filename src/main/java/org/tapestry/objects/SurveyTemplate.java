@@ -14,6 +14,7 @@ public class SurveyTemplate {
 	private int priority;
 	private byte[] contents;
 	private String description;
+	private String createdDate;
 
 	public SurveyTemplate(){
 		//Default constructor
@@ -116,5 +117,13 @@ public class SurveyTemplate {
 	 */
 	public void setDescription(String desc){
 		this.description = desc;
+	}
+	
+	public String getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(String createdDate) {
+		this.createdDate = createdDate;
 	}
 }

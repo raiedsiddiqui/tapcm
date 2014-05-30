@@ -21,7 +21,7 @@ public class Appointment{
 	private boolean hasNarrative;
 	private String alerts;
 	private String plans;
-	
+	private String keyObservation;
 
 	/**
 	 * Empty constructor
@@ -221,4 +221,11 @@ public class Appointment{
 		this.plans = plans;
 	}
 
+	public String getKeyObservation() {
+		return keyObservation;
+	}
+
+	public void setKeyObservation(String keyObservation) {
+		this.keyObservation = keyObservation;
+	}
 }

@@ -39,7 +39,8 @@
 					<li <c:if test="${pageContext.request.requestURI.contains('manage_users')}">class="active"</c:if>><a href="<c:url value="/manage_users"/>">Manage Users</a></li>
 					<li <c:if test="${pageContext.request.requestURI.contains('manage_patients')}">class="active"</c:if>><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
 					<li <c:if test="${pageContext.request.requestURI.contains('manage_appointments')}">class="active"</c:if>><a href="<c:url value="/manage_appointments"/>">Manage Appointments <span class="glyphicon glyphicon-time"></span></a></li>
-					<li <c:if test="${pageContext.request.requestURI.contains('manage_survey_templates')}">class="active"</c:if>><a href="<c:url value="/manage_survey_templates"/>">Survey Management <span class="glyphicon glyphicon-list"></a></li>
+					<li <c:if test="${pageContext.request.requestURI.contains('manage_survey')}">class="active"</c:if>><a href="<c:url value="/manage_survey"/>">Survey Management <span class="glyphicon glyphicon-list"></a></li>
+					<li <c:if test="${pageContext.request.requestURI.contains('manage_survey_templates')}">class="active"</c:if>><a href="<c:url value="/manage_survey_templates"/>">Survey Management... <span class="glyphicon glyphicon-list"></a></li>
 					<li <c:if test="${pageContext.request.requestURI.contains('manage_surveys')}">class="active"</c:if>><a href="<c:url value="/manage_surveys"/>">Manage Surveys</a></li>
 					<li <c:if test="${pageContext.request.requestURI.contains('view_activitylogs_admin')}">class="active"</c:if>><a href="<c:url value="/view_activitylogs_admin"/>">Activity Log <span class="glyphicon glyphicon-pencil"></a></li>
 					<li <c:if test="${pageContext.request.requestURI.contains('inbox')}">class="active"</c:if>><a href="<c:url value="/inbox"/>">Messages <span class="glyphicon glyphicon-envelope"></span> <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a> </li>

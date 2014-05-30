@@ -160,7 +160,7 @@
 	           	 			
 		           	 		String separator = "/observernote/";
 		           			String observernotes = "";
-			           		int ind = answer.indexOf(separator);
+		           			int ind = answer.indexOf(separator);
 			           		int l = separator.length();
 			           		
 			           		if (ind != -1)
@@ -171,7 +171,7 @@
 
                 			if (question.getQuestionType().equals(SurveyQuestion.ANSWER_NUMBER) ||
                 			question.getQuestionType().equals(SurveyQuestion.ANSWER_DECIMAL)) {                
-                		%><%=answer%>   <%=observernotes %>
+                		%> 
                 			<input type="number" style="text-align: center;" id="answer" name="answer" value="<%=answer%>"<%if (survey.isComplete()) {%> readonly<%}%>> (Number)
                 
                 		<%} else if (question.getQuestionType().equals(SurveyQuestion.ANSWER_TEXT)) {%>
@@ -210,9 +210,6 @@
                 	<div id="answer-buttons">
                 		<input class="tleft" type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();"> 
                 		<input class="tright" type="submit" value="Next">
-                		<!--  input class="tright" type="button" value="Observer Notes">-->
-                		
-                		
                 		<c:if test="${not hideObservernote}">
                 			<a href="#modalObserverNotes" data-toggle="modal" class="btn btn-primary pull-right">Observer Notes</a>
                 		</c:if>
@@ -241,8 +238,7 @@
 				 <div class="modal-body">
 					<div class="col-md-12">
 						
-						<textarea class="form-control" id="observerNote" onload="this.focus()" value="<%=observernotes%>"<%if (survey.isComplete()) {%> readonly<%}%>>
-</textarea><br />		
+						<textarea class="form-control" id="observerNote"><%=observernotes%></textarea><br />		
 					</div>	
 				</div>				
 				<div class="modal-footer">

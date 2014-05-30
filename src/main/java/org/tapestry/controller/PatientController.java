@@ -32,29 +32,29 @@ import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
 import org.tapestry.dao.MessageDao;
-import org.tapestry.objects.Activity;
+//import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
-import org.tapestry.objects.Message;
+//import org.tapestry.objects.Message;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
-import org.tapestry.objects.Availability;
+//import org.tapestry.objects.Availability;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.SurveyFactory;
 import org.tapestry.objects.Picture;
 import org.yaml.snakeyaml.Yaml;
-import org.tapestry.surveys.DoSurveyAction;
-import org.tapestry.surveys.SurveyFactory;
-import org.tapestry.objects.SurveyResult;
-import org.tapestry.dao.ActivityDao;
-import org.tapestry.objects.SurveyTemplate;
-import org.survey_component.actions.SurveyAction;
-import org.survey_component.data.PHRSurvey;
-import org.survey_component.data.SurveyMap;
-import org.survey_component.data.SurveyQuestion;
-import org.survey_component.services.SurveyServiceIndivo;
+//import org.tapestry.surveys.DoSurveyAction;
+//import org.tapestry.surveys.SurveyFactory;
+//import org.tapestry.objects.SurveyResult;
+//import org.tapestry.dao.ActivityDao;
+//import org.tapestry.objects.SurveyTemplate;
+//import org.survey_component.actions.SurveyAction;
+//import org.survey_component.data.PHRSurvey;
+//import org.survey_component.data.SurveyMap;
+//import org.survey_component.data.SurveyQuestion;
+//import org.survey_component.services.SurveyServiceIndivo;
 
 import java.util.Properties;
 import java.util.Collections;
@@ -202,35 +202,36 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
 	   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
 	   		
-	   		for(SurveyTemplate st: surveyTemplates) {
-			List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
-			
-			SurveyFactory surveyFactory = new SurveyFactory();
-			PHRSurvey template = surveyFactory.getSurveyTemplate(st);
-				SurveyResult sr = new SurveyResult();
-	            sr.setSurveyID(st.getSurveyID());
-	            sr.setPatientID(newPatient.getPatientID());
-	            
-	            //set today as startDate
-	            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-	        	String startDate = sdf.format(new Date());            
-	            
-	            sr.setStartDate(startDate);
-	          //if requested survey that's already done
-	    		if (specificSurveys.size() < template.getMaxInstances())
-	    		{
-	    			PHRSurvey blankSurvey = template;
-	    			blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
-	    			sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
-	    			String documentId = surveyResultDao.assignSurvey(sr);
-	    			blankSurvey.setDocumentId(documentId);
-	    			surveys.addSurvey(blankSurvey);
-	    			specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
-	    		}
-	    		else
-	    		{
-	    			return "redirect:/manage_patients";
-	    		}
+	   		for(SurveyTemplate st: surveyTemplates) 
+	   		{
+				List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
+				
+				SurveyFactory surveyFactory = new SurveyFactory();
+				PHRSurvey template = surveyFactory.getSurveyTemplate(st);
+					SurveyResult sr = new SurveyResult();
+		            sr.setSurveyID(st.getSurveyID());
+		            sr.setPatientID(newPatient.getPatientID());
+		            
+		            //set today as startDate
+		            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		        	String startDate = sdf.format(new Date());            
+		            
+		            sr.setStartDate(startDate);
+		          //if requested survey that's already done
+		    		if (specificSurveys.size() < template.getMaxInstances())
+		    		{
+		    			PHRSurvey blankSurvey = template;
+		    			blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
+		    			sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
+		    			String documentId = surveyResultDao.assignSurvey(sr);
+		    			blankSurvey.setDocumentId(documentId);
+		    			surveys.addSurvey(blankSurvey);
+		    			specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
+		    		}
+		    		else
+		    		{
+		    			return "redirect:/manage_patients";
+		    		}
 			}
 	   		model.addAttribute("createPatientSuccessfully",true);
 	   		loadPatientsAndVolunteers(model);
@@ -348,7 +349,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		//Make sure that the user is actually responsible for the patient in question
 		int volunteerForPatient = patient.getVolunteer();
-		if (!(vid == patient.getVolunteer()))
+		if (!(vid == patient.getVolunteer()) && !(vid == patient.getPartner()))
 		{
 			String loggedInUser = u.getName();
 			model.addAttribute("loggedIn", loggedInUser);

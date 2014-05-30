@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>Tapestry Admin</title>
+	<title>Tapestry Admin/ Survey Management</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
@@ -21,20 +21,40 @@
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		
-		
-		<div class="row-fluid">
-			<h2>Survey Templates</h2>
+		<a href="#" >Survey Management</a> ><br/>
+		<table >
+			<tr>
+				<td>
+					<div class="row-fluid">
+						<form action="<c:url value="/search_survey"/>" method="post">
+							<fieldset>
+								<label>Title:</label>
+								<input type="text" name="searchTitle" value="${searchTitle}" required />
+								<input class="btn btn-primary" type="submit" value="Search" />
+							</fieldset>
+						</form>
+					</div>		
+				</td>
+				<td>
+					<a href="<c:url value="/assign_survey"/>"  class="btn btn-primary"> Assign Survey</a>
+					<a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Add Survey</a>
+				</td>
+			</tr>
+		</table>
+				
 			<c:if test="${not empty failed}">
 				<div class="alert alert-error">Failed to delete survey template: survey results still exist that use the survey template</div>
 			</c:if>
-			<a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Add new</a>
-			<a href="<c:url value="/assign_survey"/>"  class="btn btn-primary"> Assign Survey</a>
+			
+			
 			<table class="table">
 				<tr>
 					<th>Title</th>
 					<th>Description</th>
 					<th>Type</th>
 					<th>Priority</th>
+					<th>Date Added</th>
+					<th>Download</th>
 					<th>Remove</th>
 				</tr>
 				<c:forEach items="${survey_templates}" var="st">
@@ -43,48 +63,14 @@
 					<td>${st.description}</td>
 					<td>${st.type}</td>
 					<td>${st.priority}</td>
+					<td>${st.createdDate }</td>
+					<td><a href="<c:url value="/download_survey_template/${st.surveyID}"/>">Download</a></td>
 					<td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" class="btn btn-danger">Remove</a></td>
 				</tr>
 				</c:forEach>
 			</table>
 		<!-- <a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Add new</a> -->
 		</div>
-	
-	<!-- OLD Modal 
-	<div id="addSurvey" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
-  		<div class="modal-header">
-    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    		<h3 id="modalHeader">Add Survey</h3>
-  		</div>
-  		<div class="modal-body">
-  			<form id="uploadSurveyForm" action="upload_survey_template" method="post" enctype="multipart/form-data">
-				<fieldset>
-					<legend>Add new survey</legend>
-					<label>Title:</label>
-					<input type="text" name="title" required/>
-					<label>Description:</label>
-					<input type="text" name="desc"/>
-					<label>Type:</label>
-					<select name="type">
-						<option value="MUMPS">MUMPS</option>
-					</select>
-					<label>Priority: (Higher numbers will be above lower numbers on the patient page)</label>
-					<select name="priority">
-						<c:forEach begin="0" end="9" varStatus="loop">
-						<option value="${loop.index}">${loop.index}</option>
-						</c:forEach>
-					</select>
-					<label>File:</label>
-					<input type="hidden" name="MAX_FILE_SIZE" value="2000000">
-					<input type="file" accept="text/*" name="file" required/>
-				</fieldset>
-			</form>
-  		</div>
-  		<div class="modal-footer">
-    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			<input class="btn btn-primary" form="uploadSurveyForm" type="submit" value="Upload" />
-  		</div>
-	</div>-->
 
 <div class="modal fade" id="addSurvey" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -96,11 +82,11 @@
   		<div class="modal-body">
   			<form id="uploadSurveyForm" action="upload_survey_template" method="post" enctype="multipart/form-data">
 				<fieldset>
-					<legend>Add new survey</legend>
-					<label>Title:</label>
+					<legend>New survey</legend>
+					<label><h3>Title:</h3></label>
 					<input type="text" name="title" required/>
 					<label>Description:</label>
-					<input type="text" name="desc"/>
+					<input type="textarea" class="form-control" maxlength="50" name="desc"/>
 					<label>Type:</label>
 					<select name="type">
 						<option value="MUMPS">MUMPS</option>
@@ -119,7 +105,7 @@
   		</div>
   		<div class="modal-footer">
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			<input class="btn btn-primary" form="uploadSurveyForm" type="submit" value="Upload" />
+			<input class="btn btn-primary" form="uploadSurveyForm" type="submit" value="Add Survey" />
   		</div>
 	</div>
 	</div>
