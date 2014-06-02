@@ -2,8 +2,10 @@ package org.tapestry.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,11 +168,14 @@ public class SurveyController{
 		return "admin/manage_surveys";
 	}
    	
-   	@RequestMapping(value="/assign_survey", method=RequestMethod.GET)
-	public String assignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) throws JAXBException, DatatypeConfigurationException, Exception{
+   	@RequestMapping(value="/go_assign_survey", method=RequestMethod.GET)
+	public String goAssignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) throws JAXBException, DatatypeConfigurationException, Exception{
+   		
    		List<Patient> patients = getPatients(request);
    		List<SurveyTemplate> surveyTemplates = getSurveyTemplates(request);
+   		
 		if(patients == null || surveyTemplates == null) {
+			
 			return "redirect:/manage_surveys?failed=true";
 		}
 		else
@@ -178,9 +183,82 @@ public class SurveyController{
 			 model.addAttribute("patients", patients);
 			 model.addAttribute("surveyTemplates", surveyTemplates);
 		}
-		
 
-		return "redirect:/manage_surveys";
+		return "admin/assign_survey";
+	}
+   	
+   	@RequestMapping(value="/assign_selectedsurvey", method=RequestMethod.POST)
+	public String assignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) 
+			throws JAXBException, DatatypeConfigurationException, Exception{   		
+   		List<Patient> patients = getPatients(request);
+   		List<SurveyTemplate> sTemplates = getSurveyTemplates(request);
+   		
+   		String[] surveyTemplateIds = request.getParameterValues("surveyTemplates");
+   		String[] selectedPatientIds = request.getParameterValues("patientId");
+   		String assignToAll = request.getParameter("assignAllClinets");
+   		int[] patientIds;
+   		ArrayList<SurveyTemplate> selectSurveyTemplats = new ArrayList<SurveyTemplate>();
+   		
+   		//get survey template list 
+   		if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
+   			int surveyTemplateId;
+   			
+   			for (int i = 0; i < surveyTemplateIds.length; i ++){
+   				//Integer.parseInt(request.getParameter("patient"));   				
+   				surveyTemplateId = Integer.parseInt(surveyTemplateIds[i]);
+   				
+   				for (SurveyTemplate st: sTemplates){
+   	   				if (surveyTemplateId == st.getSurveyID())
+   	   				selectSurveyTemplats.add(st);
+   	   			}
+   			}   			
+   		}
+   		else
+   			model.addAttribute("no_survey_selected", true);
+   		
+   		if ("true".equalsIgnoreCase(assignToAll))
+   		{//for assign to all clients   			
+   			Patient patient;   			
+   			patientIds = new int[patients.size()];
+   			
+   			for(int i = 0; i < patients.size(); i++){
+   				patient = new Patient();
+   				patient = patients.get(i);
+   				patientIds[i] = patient.getPatientID();
+   			}
+   			
+   			try{
+   				//assign all selected surveys to all clients
+   				assignSurveysToClient(selectSurveyTemplats, patientIds, request);
+   				model.addAttribute("successful", true);
+   			}catch (Exception e){
+   				System.out.println("something wrong");
+   			}   			
+   		}
+   		else
+   		{//for selected patients
+   			//convert String[] to int[]   			
+   			if (selectedPatientIds == null || selectedPatientIds.length == 0)
+   				model.addAttribute("no_patient_selected", true);
+   			else
+   			{
+   				int[] iSelectedPatientIds = new int[selectedPatientIds.length];
+   	   			for (int j = 0; j < selectedPatientIds.length; j++){
+   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
+   				}
+   					
+   	   			try{   				
+   	   				assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request);
+   	   				model.addAttribute("successful", true);
+   	   			}catch (Exception e){
+   	   				System.out.println("something wrong");
+   	   			}  
+   			}   			
+   		}  		
+   		model.addAttribute("patients", patients);
+		model.addAttribute("surveyTemplates", sTemplates);
+   		
+		return "admin/assign_survey";
 	}
    	
    	private List<Patient> getPatients(SecurityContextHolderAwareRequestWrapper request){
@@ -200,6 +278,62 @@ public class SurveyController{
 		return patients;
    	}
    	
+   	//void duplicating survey in result sheet
+   	private boolean isExistInSurveyResultList(ArrayList<SurveyResult> surveyResults, int surveyTemplateId, int patientId){
+   		boolean exist = false;
+   		int sId = 0;
+   		int pId = 0;
+   		for (SurveyResult sr : surveyResults){
+   			sId = sr.getSurveyID();
+   			pId = sr.getPatientID();
+   			
+   			if (surveyTemplateId == sId && patientId == pId)
+   				exist = true;
+   		}
+   		return exist;
+   	}
+   	
+   	private void assignSurveysToClient(ArrayList<SurveyTemplate> surveyTemplates, int[] patientIds, 
+   			SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
+		
+		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+		
+   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+   		SurveyResult sr;
+   		
+   		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+   		String startDate = sdf.format(new Date());   
+ 	
+   		for(SurveyTemplate st: surveyTemplates) 
+   		{
+			List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
+			
+			SurveyFactory surveyFactory = new SurveyFactory();
+			PHRSurvey template = surveyFactory.getSurveyTemplate(st);
+			sr = new SurveyResult();
+				
+			for (int i = 0; i < patientIds.length; i++){
+				sr.setPatientID(patientIds[i]);
+				sr.setSurveyID(st.getSurveyID());
+	            	
+				//set today as startDate
+				sr.setStartDate(startDate);	            	
+				//if requested survey that's already done
+				if (specificSurveys.size() < template.getMaxInstances() && 
+						!isExistInSurveyResultList(surveyResults,st.getSurveyID(), patientIds[i]))
+				{		    		
+					PHRSurvey blankSurvey = template;
+					blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
+					sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
+					String documentId = surveyResultDao.assignSurvey(sr);
+					blankSurvey.setDocumentId(documentId);
+					surveys.addSurvey(blankSurvey);
+					specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
+		    	}
+			}   			
+		}
+   	}
+	
 	@RequestMapping(value="/assign_surveys", method=RequestMethod.POST)
 	public String assignSurveys(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
 		String[] patients = request.getParameterValues("patients[]");
