@@ -192,71 +192,82 @@ public class SurveyController{
 			throws JAXBException, DatatypeConfigurationException, Exception{   		
    		List<Patient> patients = getPatients(request);
    		List<SurveyTemplate> sTemplates = getSurveyTemplates(request);
-   		
-   		String[] surveyTemplateIds = request.getParameterValues("surveyTemplates");
-   		String[] selectedPatientIds = request.getParameterValues("patientId");
-   		String assignToAll = request.getParameter("assignAllClinets");
-   		int[] patientIds;
-   		ArrayList<SurveyTemplate> selectSurveyTemplats = new ArrayList<SurveyTemplate>();
-   		
-   		//get survey template list 
-   		if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
-   			int surveyTemplateId;
+ 		
+   		if (request.getParameter("searchPatient") != null && request.getParameter("searchPatientName") !=null )//search patient by name
+   		{
+   			String name = request.getParameter("searchPatientName");   			
    			
-   			for (int i = 0; i < surveyTemplateIds.length; i ++){
-   				//Integer.parseInt(request.getParameter("patient"));   				
-   				surveyTemplateId = Integer.parseInt(surveyTemplateIds[i]);
-   				
-   				for (SurveyTemplate st: sTemplates){
-   	   				if (surveyTemplateId == st.getSurveyID())
-   	   				selectSurveyTemplats.add(st);
+   			patients = patientDao.getPatientssByPartialName(name);			
+   			model.addAttribute("searchPatientName", name);	 
+   			
+   		}
+   		else if(request.getParameter("assignSurvey") != null)//assign selected surveys to selected patients
+   		{   	   		
+   	   		String[] surveyTemplateIds = request.getParameterValues("surveyTemplates");
+   	   		String[] selectedPatientIds = request.getParameterValues("patientId");
+   	   		String assignToAll = request.getParameter("assignAllClinets");
+   	   		int[] patientIds;
+   	   		ArrayList<SurveyTemplate> selectSurveyTemplats = new ArrayList<SurveyTemplate>();
+   	   		
+   	   		//get survey template list 
+   	   		if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
+   	   			int surveyTemplateId;
+   	   			
+   	   			for (int i = 0; i < surveyTemplateIds.length; i ++){
+   	   				//Integer.parseInt(request.getParameter("patient"));   				
+   	   				surveyTemplateId = Integer.parseInt(surveyTemplateIds[i]);
+   	   				
+   	   				for (SurveyTemplate st: sTemplates){
+   	   	   				if (surveyTemplateId == st.getSurveyID())
+   	   	   				selectSurveyTemplats.add(st);
+   	   	   			}
+   	   			}   			
+   	   		}
+   	   		else
+   	   			model.addAttribute("no_survey_selected", true);
+   	   		
+   	   		if ("true".equalsIgnoreCase(assignToAll))
+   	   		{//for assign to all clients   			
+   	   			Patient patient;   			
+   	   			patientIds = new int[patients.size()];
+   	   			
+   	   			for(int i = 0; i < patients.size(); i++){
+   	   				patient = new Patient();
+   	   				patient = patients.get(i);
+   	   				patientIds[i] = patient.getPatientID();
    	   			}
-   			}   			
-   		}
-   		else
-   			model.addAttribute("no_survey_selected", true);
-   		
-   		if ("true".equalsIgnoreCase(assignToAll))
-   		{//for assign to all clients   			
-   			Patient patient;   			
-   			patientIds = new int[patients.size()];
-   			
-   			for(int i = 0; i < patients.size(); i++){
-   				patient = new Patient();
-   				patient = patients.get(i);
-   				patientIds[i] = patient.getPatientID();
-   			}
-   			
-   			try{
-   				//assign all selected surveys to all clients
-   				assignSurveysToClient(selectSurveyTemplats, patientIds, request);
-   				model.addAttribute("successful", true);
-   			}catch (Exception e){
-   				System.out.println("something wrong");
-   			}   			
-   		}
-   		else
-   		{//for selected patients
-   			//convert String[] to int[]   			
-   			if (selectedPatientIds == null || selectedPatientIds.length == 0)
-   				model.addAttribute("no_patient_selected", true);
-   			else
-   			{
-   				int[] iSelectedPatientIds = new int[selectedPatientIds.length];
-   	   			for (int j = 0; j < selectedPatientIds.length; j++){
-   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
-   				}
-   					
-   	   			try{   				
-   	   				assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request);
+   	   			
+   	   			try{
+   	   				//assign all selected surveys to all clients
+   	   				assignSurveysToClient(selectSurveyTemplats, patientIds, request);
    	   				model.addAttribute("successful", true);
    	   			}catch (Exception e){
    	   				System.out.println("something wrong");
-   	   			}  
-   			}   			
-   		}  		
+   	   			}   			
+   	   		}
+   	   		else
+   	   		{//for selected patients
+   	   			//convert String[] to int[]   			
+   	   			if (selectedPatientIds == null || selectedPatientIds.length == 0)
+   	   				model.addAttribute("no_patient_selected", true);
+   	   			else
+   	   			{
+   	   				int[] iSelectedPatientIds = new int[selectedPatientIds.length];
+   	   	   			for (int j = 0; j < selectedPatientIds.length; j++){
+   	   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
+   	   				}
+   	   					
+   	   	   			try{   				
+   	   	   				assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request);
+   	   	   				model.addAttribute("successful", true);
+   	   	   			}catch (Exception e){
+   	   	   				System.out.println("something wrong");
+   	   	   			}  
+   	   			}   			
+   	   		} 
+   		}
+   		model.addAttribute("surveyTemplates", sTemplates);
    		model.addAttribute("patients", patients);
-		model.addAttribute("surveyTemplates", sTemplates);
    		
 		return "admin/assign_survey";
 	}

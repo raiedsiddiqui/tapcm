@@ -14,14 +14,37 @@
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
+			
+			.right
+			{
+			position:absolute;
+			right:0px;
+			
+			}
 		}
 	</style>
+	
+	<script type="text/javascript">
+		function disablePatientCheckbox()
+		{
+			var inputs = document.getElementsByTagName("input");
+			var elements = document.forms[0].elements;	
+			var assignToAll = document.getElementById("toAll");
+			
+			for (var i = 0; i < inputs.length; i++) 
+			{  
+				  if (inputs[i].type == "checkbox" && inputs[i].name != "assignAllClinets")	
+					inputs[i].disabled = assignToAll.checked;
+			}
+		}
+		
+	</script>
 </head>
 
 <body>
 	<div class="content">
 		<%@include file="navbar.jsp" %>
-		<a href="#" >Survey Management</a> > Assign Survey<br/>
+		<a href="<c:url value="/manage_survey"/>" >Survey Management</a> > Assign Survey<br/>
 		<c:if test="${not empty no_survey_selected}">
 			<div class ="alert alert-info"><spring:message code="message_noSurveySelected"/></div>
 		</c:if>
@@ -40,23 +63,29 @@
 				</c:forEach>
 			</select><br/>
 			<label>Select Client : </label><br/>
-			<input type="checkbox" name="assignAllClinets" style="margin-bottom:10px;" value="true" >Assign to All clients</input><br/>
-			<table>			
+			
+			<input type="checkbox" name="assignAllClinets" id="toAll" style="margin-bottom:10px;" onclick="disablePatientCheckbox()" value="true" >Assign to All clients</input><br/>
+			<div class="right">					
+				<input type="text" name="searchPatientName" value="${searchPatientName}" />
+				<input class="btn btn-primary" type="submit" name="searchPatient" value="Search" />				
+			</div>
+			<div style="height:106px; overflow:auto">
+			<table border="1" cellspacing="0" cellpadding = "0">			
 				<tr>
 					<th width="5%"></th>
-					<th width="20%">Name </th>
-					<th width="15%">DOB </th>
+					<th width="15%">Name </th>
+					<th width="10%">DOB </th>
 					<th width="5%">Age </th>
 					<th width="5%">Gender </th>
 					<th width="20%">Clinic </th>
-					<th width="10%">MRP </th>
+					<th width="15%">MRP </th>
 					<th width="10%">City </th>
-					<th width="10%">Phone Number</th>
+					<th width="15%">Phone Number</th>
 				</tr>
 				
 					<c:forEach items="${patients}" var="p">
 						<tr>
-							<td style="text-align:center;"><input type="checkbox" name="patientId" value="${p.patientID}" /></td>
+							<td style="text-align:center;"><input type="checkbox" id ="patientId" name="patientId" value="${p.patientID}" /></td>
 							<td>${p.firstName} ${p.lastName} </td>
 							<td>${p.bod}</td>
 							<td>${p.age}</td>
@@ -69,7 +98,11 @@
 					</c:forEach>	
 						
 			</table>
-			<input type="submit" class="btn btn-primary" value="Assign" />
+			</div>
+			<br/><br/>
+			<div class="right">
+				<input type="submit" class="btn btn-primary" name="assignSurvey" value="Assign" />
+			</div>		 
 		</form>
 		
 	</div>

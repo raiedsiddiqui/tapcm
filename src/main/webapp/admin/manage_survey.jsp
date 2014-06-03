@@ -14,6 +14,12 @@
 		.row-fluid{
 			margin:10px;
 		}
+		.right
+			{
+			position:absolute;
+			right:0px;
+			
+			}
 	</style>
 </head>
 
@@ -21,7 +27,7 @@
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		
-		<a href="#" >Survey Management</a> ><br/>
+		<a href="<c:url value="/manage_survey"/>" >Survey Management</a> ><br/>
 		<table >
 			<tr>
 				<td>
@@ -35,6 +41,7 @@
 						</form>
 					</div>		
 				</td>
+				<td class="right">
 					<a href="<c:url value="/go_assign_survey"/>"  class="btn btn-primary"> Assign Survey</a>
 					<a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Add Survey</a>
 				</td>
@@ -104,7 +111,7 @@
   		</div>
   		<div class="modal-footer">
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			<input class="btn btn-primary" form="uploadSurveyForm" type="submit" value="Add Survey" />
+			<input class="right"" form="uploadSurveyForm" type="submit" value="Add Survey" />
   		</div>
 	</div>
 	</div>
