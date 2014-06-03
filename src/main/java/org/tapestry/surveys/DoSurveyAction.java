@@ -104,8 +104,7 @@ public class DoSurveyAction
 		//if starting/continuing survey, clear session
 
 		if (questionId == null)
-		{
-			
+		{			
 			//if just starting/continuing(from before) the survey, direct to last question
 			String lastQuestionId;
 
@@ -128,10 +127,12 @@ public class DoSurveyAction
 			else
 			{ //if not complete show next question
 				lastQuestionId = currentSurvey.getQuestions().get(currentSurvey.getQuestions().size() - 1).getId();
-				m.addObject("hideObservernote", false);
-			}
-
-			
+				
+				if (isFirstQuestionId(lastQuestionId, '0'))
+					m.addObject("hideObservernote", true);
+				else
+					m.addObject("hideObservernote", false);				
+			}		
 			m.addObject("survey", currentSurvey);
 			m.addObject("templateSurvey", templateSurvey);
 			m.addObject("questionid", lastQuestionId);
@@ -155,6 +156,8 @@ public class DoSurveyAction
 			{						
 				SurveyQuestion question = currentSurvey.getQuestionById(questionId);
 				
+				ArrayList<SurveyAnswer> answersWithoutObserverNotes = convertToSurveyAnswers(answerStrs, question);
+				
 				//add observernotes 
 				if (answerStrs.length == 1)
 				{
@@ -173,9 +176,10 @@ public class DoSurveyAction
 				{
 					goodAnswerFormat = false;
 				}
+				
 				//check each answer for validation
 				// if answer passes validation
-				if (goodAnswerFormat && question.validateAnswers(answers))
+				if (goodAnswerFormat && question.validateAnswers(answersWithoutObserverNotes))				
 				{
 					boolean moreQuestions;
 					//see if the user went back (if current question the last question in user's question profile)
@@ -229,7 +233,7 @@ public class DoSurveyAction
 								// }
 
 								//remove all future answers
-
+								System.out.println("user hit back and changed an answer");
 								logger.debug("user hit back and changed an answer");
 								//clear all questions following it
 								int currentSurveySize = currentSurvey.getQuestions().size(); //stores number of questions
@@ -276,7 +280,7 @@ public class DoSurveyAction
 					//finished survey
 					if (!moreQuestions)
 					{
-						if (!currentSurvey.isComplete()){
+						if (!currentSurvey.isComplete()){							
 							SurveyAction.updateSurveyResult(currentSurvey);
 							
 							m.addObject("survey_completed", true);
@@ -288,7 +292,7 @@ public class DoSurveyAction
 							m.addObject("hideObservernote", false);
 							m.setViewName("/surveys/show_survey");
 							return m;
-						} else {														
+						} else {									
 							m.addObject("survey", currentSurvey);
 							m.addObject("templateSurvey", templateSurvey);
 							m.addObject("questionid", questionId);
@@ -313,7 +317,9 @@ public class DoSurveyAction
 					m.addObject("templateSurvey", templateSurvey);
 					m.addObject("questionid", questionId);
 					m.addObject("resultid", documentId);
-					m.addObject("message", question.getRestriction().getInstruction());
+					
+					if (question.getRestriction() != null && question.getRestriction().getInstruction() != null)
+						m.addObject("message", question.getRestriction().getInstruction());
 					m.addObject("hideObservernote", false);
 					m.setViewName("/surveys/show_survey");
 					return m;
@@ -322,7 +328,7 @@ public class DoSurveyAction
 				//if answer not specified, and hit forward
 			}
 			else errMsg = "You must supply an answer";
-		}
+		}//end of forward action
 		else if (direction.equalsIgnoreCase("backward"))
 		{
 			int questionIndex = currentSurvey.getQuestionIndexbyId(questionId);
@@ -330,7 +336,7 @@ public class DoSurveyAction
 		}
 		
 		//backward to the description page(before the first qustion)
-		if ((questionId != null) && ("backward".equals(direction)) && (isFirstQuestionId(questionId)))
+		if ((questionId != null) && ("backward".equals(direction)) && (isFirstQuestionId(questionId, '0')))
 			m.addObject("hideObservernote", true);
 		else
 			m.addObject("hideObservernote", false);
@@ -345,12 +351,12 @@ public class DoSurveyAction
 		return m;
 	}
 	
-	private static boolean isFirstQuestionId(String str){
+	private static boolean isFirstQuestionId(String str, char c){
 		boolean isFirst = false;
 		int length = str.length();
 		
-		//'1' is only digital in string
-		if ((str.charAt(length - 1) == '1') && Character.isLetter(str.charAt(length - 2)))
+		//'1' is only digital in string for backward direction, and '0' for forward direction
+		if ((str.charAt(length - 1) == c) && Character.isLetter(str.charAt(length - 2)))
 			isFirst = true;
 		
 		return isFirst;
@@ -383,6 +389,7 @@ public class DoSurveyAction
 		for (String answer : answers)
 		{
 			SurveyAnswer answerObj = answerFactory.getSurveyAnswer(question.getQuestionType(), answer);
+			
 			if (answerObj == null) return null;
 			else surveyAnswers.add(answerObj);			
 		}

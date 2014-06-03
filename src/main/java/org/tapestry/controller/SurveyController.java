@@ -108,33 +108,10 @@ public class SurveyController{
 		
 		if (deleteFailed != null)
 			model.addAttribute("failed", deleteFailed);
-		
-//		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResultList, surveyTemplateList);
-//	    ArrayList<Patient> patientList = patientDao.getAllPatients();
-//        model.addAttribute("patients", patientList);
-//        if(failed != null) {
-//        	model.addAttribute("failed", true);
-//        }
+
 		return "admin/manage_survey";
-	}
-	
-	private List<SurveyTemplate> getSurveyTemplates(HttpServletRequest request){
-		HttpSession session = request.getSession();		
-		List<SurveyTemplate> surveyTemplateList;
-		if (session.getAttribute("survey_template_list") == null)
-		{
-			surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
-			
-			//save in the session
-			if (surveyTemplateList != null && surveyTemplateList.size()>0)
-				session.setAttribute("survey_template_list", surveyTemplateList);
-		}
-		else
-			surveyTemplateList = (List<SurveyTemplate>)session.getAttribute("survey_template_list");
-		
-		return surveyTemplateList;
-	}
-	
+	}	
+
 	@RequestMapping(value="/search_survey", method=RequestMethod.POST)
 	public String searchSurvey(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
 		
@@ -221,50 +198,50 @@ public class SurveyController{
    	   	   				if (surveyTemplateId == st.getSurveyID())
    	   	   				selectSurveyTemplats.add(st);
    	   	   			}
-   	   			}   			
+   	   			}   
+   	   			
+	   	   		if ("true".equalsIgnoreCase(assignToAll))
+	   	   		{//for assign to all clients   			
+	   	   			Patient patient;   			
+	   	   			patientIds = new int[patients.size()];
+	   	   			
+	   	   			for(int i = 0; i < patients.size(); i++){
+	   	   				patient = new Patient();
+	   	   				patient = patients.get(i);
+	   	   				patientIds[i] = patient.getPatientID();
+	   	   			}
+	   	   			
+	   	   			try{
+	   	   				//assign all selected surveys to all clients
+	   	   				assignSurveysToClient(selectSurveyTemplats, patientIds, request);
+	   	   				model.addAttribute("successful", true);
+	   	   			}catch (Exception e){
+	   	   				System.out.println("something wrong");
+	   	   			}   			
+	   	   		}
+	   	   		else
+	   	   		{//for selected patients
+	   	   			//convert String[] to int[]   			
+	   	   			if (selectedPatientIds == null || selectedPatientIds.length == 0)
+	   	   				model.addAttribute("no_patient_selected", true);
+	   	   			else
+	   	   			{
+	   	   				int[] iSelectedPatientIds = new int[selectedPatientIds.length];
+	   	   	   			for (int j = 0; j < selectedPatientIds.length; j++){
+	   	   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
+	   	   				}
+	   	   					
+	   	   	   			try{   				
+	   	   	   				assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request);
+	   	   	   				model.addAttribute("successful", true);
+	   	   	   			}catch (Exception e){
+	   	   	   				System.out.println("something wrong");
+	   	   	   			}  
+	   	   			}   			
+	   	   		} 
    	   		}
-   	   		else
+   	   		else//no survey template has been selected
    	   			model.addAttribute("no_survey_selected", true);
-   	   		
-   	   		if ("true".equalsIgnoreCase(assignToAll))
-   	   		{//for assign to all clients   			
-   	   			Patient patient;   			
-   	   			patientIds = new int[patients.size()];
-   	   			
-   	   			for(int i = 0; i < patients.size(); i++){
-   	   				patient = new Patient();
-   	   				patient = patients.get(i);
-   	   				patientIds[i] = patient.getPatientID();
-   	   			}
-   	   			
-   	   			try{
-   	   				//assign all selected surveys to all clients
-   	   				assignSurveysToClient(selectSurveyTemplats, patientIds, request);
-   	   				model.addAttribute("successful", true);
-   	   			}catch (Exception e){
-   	   				System.out.println("something wrong");
-   	   			}   			
-   	   		}
-   	   		else
-   	   		{//for selected patients
-   	   			//convert String[] to int[]   			
-   	   			if (selectedPatientIds == null || selectedPatientIds.length == 0)
-   	   				model.addAttribute("no_patient_selected", true);
-   	   			else
-   	   			{
-   	   				int[] iSelectedPatientIds = new int[selectedPatientIds.length];
-   	   	   			for (int j = 0; j < selectedPatientIds.length; j++){
-   	   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
-   	   				}
-   	   					
-   	   	   			try{   				
-   	   	   				assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request);
-   	   	   				model.addAttribute("successful", true);
-   	   	   			}catch (Exception e){
-   	   	   				System.out.println("something wrong");
-   	   	   			}  
-   	   			}   			
-   	   		} 
    		}
    		model.addAttribute("surveyTemplates", sTemplates);
    		model.addAttribute("patients", patients);
@@ -272,79 +249,7 @@ public class SurveyController{
 		return "admin/assign_survey";
 	}
    	
-   	private List<Patient> getPatients(SecurityContextHolderAwareRequestWrapper request){
-   		HttpSession session = request.getSession();		
-		List<Patient> patients;
-		if (session.getAttribute("patient_list") == null)
-		{
-			patients = patientDao.getAllPatients();
-			
-			//save in the session
-			if (patients != null && patients.size()>0)
-				session.setAttribute("patient_list", patients);
-		}
-		else
-			patients = (List<Patient>)session.getAttribute("patient_list");
-		
-		return patients;
-   	}
-   	
-   	//void duplicating survey in result sheet
-   	private boolean isExistInSurveyResultList(ArrayList<SurveyResult> surveyResults, int surveyTemplateId, int patientId){
-   		boolean exist = false;
-   		int sId = 0;
-   		int pId = 0;
-   		for (SurveyResult sr : surveyResults){
-   			sId = sr.getSurveyID();
-   			pId = sr.getPatientID();
-   			
-   			if (surveyTemplateId == sId && patientId == pId)
-   				exist = true;
-   		}
-   		return exist;
-   	}
-   	
-   	private void assignSurveysToClient(ArrayList<SurveyTemplate> surveyTemplates, int[] patientIds, 
-   			SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
-		
-		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
-		
-   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
-   		SurveyResult sr;
-   		
-   		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-   		String startDate = sdf.format(new Date());   
- 	
-   		for(SurveyTemplate st: surveyTemplates) 
-   		{
-			List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
-			
-			SurveyFactory surveyFactory = new SurveyFactory();
-			PHRSurvey template = surveyFactory.getSurveyTemplate(st);
-			sr = new SurveyResult();
-				
-			for (int i = 0; i < patientIds.length; i++){
-				sr.setPatientID(patientIds[i]);
-				sr.setSurveyID(st.getSurveyID());
-	            	
-				//set today as startDate
-				sr.setStartDate(startDate);	            	
-				//if requested survey that's already done
-				if (specificSurveys.size() < template.getMaxInstances() && 
-						!isExistInSurveyResultList(surveyResults,st.getSurveyID(), patientIds[i]))
-				{		    		
-					PHRSurvey blankSurvey = template;
-					blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
-					sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
-					String documentId = surveyResultDao.assignSurvey(sr);
-					blankSurvey.setDocumentId(documentId);
-					surveys.addSurvey(blankSurvey);
-					specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
-		    	}
-			}   			
-		}
-   	}
-	
+
 	@RequestMapping(value="/assign_surveys", method=RequestMethod.POST)
 	public String assignSurveys(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
 		String[] patients = request.getParameterValues("patients[]");
@@ -563,4 +468,96 @@ public class SurveyController{
    		
    		return "admin/manage_survey";
    	}
+   	
+	private List<SurveyTemplate> getSurveyTemplates(HttpServletRequest request){
+		HttpSession session = request.getSession();		
+		List<SurveyTemplate> surveyTemplateList;
+		if (session.getAttribute("survey_template_list") == null)
+		{
+			surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
+			
+			//save in the session
+			if (surveyTemplateList != null && surveyTemplateList.size()>0)
+				session.setAttribute("survey_template_list", surveyTemplateList);
+		}
+		else
+			surveyTemplateList = (List<SurveyTemplate>)session.getAttribute("survey_template_list");
+		
+		return surveyTemplateList;
+	}
+	
+   	private List<Patient> getPatients(SecurityContextHolderAwareRequestWrapper request){
+   		HttpSession session = request.getSession();		
+		List<Patient> patients;
+		if (session.getAttribute("patient_list") == null)
+		{
+			patients = patientDao.getAllPatients();
+			
+			//save in the session
+			if (patients != null && patients.size()>0)
+				session.setAttribute("patient_list", patients);
+		}
+		else
+			patients = (List<Patient>)session.getAttribute("patient_list");
+		
+		return patients;
+   	}
+   	
+   	//void duplicating survey in result sheet
+   	private boolean isExistInSurveyResultList(ArrayList<SurveyResult> surveyResults, int surveyTemplateId, int patientId){
+   		boolean exist = false;
+   		int sId = 0;
+   		int pId = 0;
+   		for (SurveyResult sr : surveyResults){
+   			sId = sr.getSurveyID();
+   			pId = sr.getPatientID();
+   			
+   			if (surveyTemplateId == sId && patientId == pId)
+   				exist = true;
+   		}
+   		return exist;
+   	}
+   	
+   	private void assignSurveysToClient(ArrayList<SurveyTemplate> surveyTemplates, int[] patientIds, 
+   			SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
+		
+		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+		
+   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+   		SurveyResult sr;
+   		
+   		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+   		String startDate = sdf.format(new Date());   
+ 	
+   		for(SurveyTemplate st: surveyTemplates) 
+   		{
+			List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
+			
+			SurveyFactory surveyFactory = new SurveyFactory();
+			PHRSurvey template = surveyFactory.getSurveyTemplate(st);
+			sr = new SurveyResult();
+				
+			for (int i = 0; i < patientIds.length; i++){
+				sr.setPatientID(patientIds[i]);
+				sr.setSurveyID(st.getSurveyID());
+	            	
+				//set today as startDate
+				sr.setStartDate(startDate);	            	
+				//if requested survey that's already done
+				if (specificSurveys.size() < template.getMaxInstances() && 
+						!isExistInSurveyResultList(surveyResults,st.getSurveyID(), patientIds[i]))
+				{		    		
+					PHRSurvey blankSurvey = template;
+					blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
+					sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
+					String documentId = surveyResultDao.assignSurvey(sr);
+					blankSurvey.setDocumentId(documentId);
+					surveys.addSurvey(blankSurvey);
+					specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
+		    	}
+			}   			
+		}
+   	}
+	
+	
 }
