@@ -399,7 +399,7 @@
 		    $('.datepicker').pickadate({
 		    // Escape any “rule” characters with an exclamation mark (!).
 		    format: 'You selecte!d: dddd, dd mmm, yyyy',
-		    formatSubmit: 'yyyy/mm/dd',
+		    formatSubmit: 'yyyy-mm-dd',
 		    hiddenName: true
 		   	// hiddenPrefix: 'prefix__',
 		    // hiddenSuffix: '__suffix'

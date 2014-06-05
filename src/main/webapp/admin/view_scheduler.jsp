@@ -134,7 +134,7 @@
 		<th width="120">Volunteer Two</th>
 		<th width="100">Phone #</th>
 		<th width="200">Email</th>
-		<th width="200">Time</th>			
+		<th width="200">Date/Time</th>			
 		<th width="150">Action</th>
 		
 	</tr>

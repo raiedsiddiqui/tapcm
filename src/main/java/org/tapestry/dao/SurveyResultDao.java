@@ -6,8 +6,10 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.tapestry.objects.SurveyResult;
+
 
 /**
  * SurveyTemplateDAO
@@ -196,6 +198,34 @@ public class SurveyResultDao
     		}
     	}
 	}
+	
+	public List<SurveyResult> getSurveyResultByPatientAndSurveyId(int patientId, int surveyId){
+		try {
+			statement = con.prepareStatement("SELECT * FROM survey_results WHERE survey_ID=? AND patient_ID=? AND completed=1");
+			statement.setInt(1, surveyId);
+			statement.setInt(1, patientId);
+			
+			ResultSet result = statement.executeQuery();
+			List<SurveyResult> allSurveyResults = new ArrayList<SurveyResult>();
+			
+			while(result.next()){
+				SurveyResult sr = createFromSearch(result);
+				allSurveyResults.add(sr);
+			}
+			return allSurveyResults;
+		} catch (SQLException e) {
+			System.out.println("Error: could not retrieve all survey results by survey Id #" + surveyId + " and patient Id#" + patientId);
+			e.printStackTrace();
+			return null;
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+	}
+	
 
 	/**
 	* Creates a Survey Template object from a database query

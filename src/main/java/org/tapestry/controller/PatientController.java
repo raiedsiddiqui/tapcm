@@ -72,7 +72,7 @@ import javax.servlet.http.HttpSession;
 @Controller
 public class PatientController {
 protected static Logger logger = Logger.getLogger(AppointmentController.class);
-	
+
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
 	private Yaml yaml;

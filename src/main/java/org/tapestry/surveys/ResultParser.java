@@ -13,6 +13,8 @@ import java.util.ArrayList;
 
 import org.tapestry.objects.DisplayedSurveyResult;
 
+
+
 public class ResultParser {
 
     private static Document loadXMLFromString(String xml) throws Exception {
@@ -21,9 +23,39 @@ public class ResultParser {
         InputSource is = new InputSource(new StringReader(xml));
         return builder.parse(is);
     }
+    
+    public static List<String> getSurveyQuestions(String surveyData){
+    	List<String> questionTexts = new ArrayList<String>();
+    	String qText = "";
+    	
+    	try{
+            Document doc = loadXMLFromString(surveyData);
+            doc.getDocumentElement().normalize();
+
+            NodeList questions = doc.getElementsByTagName("IndivoSurveyQuestion");
+            for (int i = 0; i < questions.getLength(); i++){
+                Element question = (Element) questions.item(i);
+
+                NodeList questionTextList = question.getElementsByTagName("QuestionText");
+                if (questionTextList.getLength() > 0){
+                    Element questionText = (Element) questionTextList.item(0);
+                    qText = questionText.getTextContent().trim();
+                    
+                    questionTexts.add(qText);
+                }
+                
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+       
+    	 return questionTexts;
+    	
+    }
 
     public static LinkedHashMap<String, String> getResults(String surveyData) {
         LinkedHashMap<String, String> results = new LinkedHashMap<String, String>();
+       
         try{
             Document doc = loadXMLFromString(surveyData);
             doc.getDocumentElement().normalize();
@@ -48,6 +80,7 @@ public class ResultParser {
                 NodeList questionTextList = question.getElementsByTagName("QuestionText");
                 if (questionTextList.getLength() > 0){
                     Element questionText = (Element) questionTextList.item(0);
+                   
                     //questionAnswerString += questionText.getTextContent().trim();
                 }
                 NodeList questionAnswerList = question.getElementsByTagName("QuestionAnswer");
@@ -66,6 +99,7 @@ public class ResultParser {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
         return results;
     }
     

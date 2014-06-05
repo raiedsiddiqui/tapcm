@@ -47,6 +47,7 @@ import javax.mail.Transport;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -393,6 +394,9 @@ public class AppointmentController{
 	public String getPairedVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		//get Date and time for appointment		
 		String day = request.getParameter("appointmentDate");
+		//when date pick up from calendar, format is different, need to change from yyyy/mm/dd to yyyy-MM-dd
+		day = day.replace("/", "-");
+		
 		int dayOfWeek = Utils.getDayOfWeekByDate(day);
 		String time = request.getParameter("appointmentTime");				
 		
