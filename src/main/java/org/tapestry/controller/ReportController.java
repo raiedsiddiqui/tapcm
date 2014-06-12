@@ -41,6 +41,7 @@ import org.tapestry.objects.Appointment;
 import org.tapestry.surveys.ResultParser;
 import org.yaml.snakeyaml.Yaml;
 import org.tapestry.objects.Report;
+import org.tapestry.report.AlertsInReport;;
 
 
 @Controller
@@ -134,6 +135,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		Patient patient = patientDao.getPatientByID(id);
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
 		Report report = new Report();
+		AlertsInReport alerts = new AlertsInReport();
 		
 		//Plan and Key Observations
 		String keyObservation = appointmentDao.getKeyObservationByAppointmentId(appointmentId);
@@ -159,15 +161,19 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		List<SurveyResult> surveyResultList = surveyResultDao.getCompletedSurveysByPatientID(id);
 		SurveyResult healthGoalsSurvey = new SurveyResult();
 		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
+		SurveyResult nutritionSurvey = new SurveyResult();
 		
 		for(SurveyResult survey: surveyResultList){
 			int surveyId = survey.getSurveyID();
 			
-			if (surveyId == 10)
+			if (surveyId == 10)//Goal Setting survey
 				healthGoalsSurvey = survey;
 			
-			if (surveyId == 11)
+			if (surveyId == 11)//Daily life activity survey
 				dailyLifeActivitySurvey = survey;
+			
+			if (surveyId == 7)//Nutrition
+				nutritionSurvey = survey;
 		}
 		
 		String xml;
@@ -204,10 +210,85 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		qList = new ArrayList<String>();
    		qList = getQuestionList(mDailyLifeActivitySurvey);
    		
+   		//last question in Daily life activity survey is about falling stuff
+   		List<String> lAlert = new ArrayList<String>();
+   		String fallingQA = qList.get(qList.size() -1);
+   		if (fallingQA.contains("yes")||fallingQA.contains("fall"))
+   			lAlert.add(AlertsInReport.getDailyActiveityAlertMsg());
+   		
+   		   		
    		sMap = new TreeMap<String, String>();
    		sMap = getSurveyContentMap(questionTextList, qList);
    		
    		report.setDailyActivities(sMap);   		
+   		
+   		//Nutrition survey
+   		
+   		
+   		try{
+   			xml = new String(nutritionSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mNutritionSurvey = ResultParser.getResults(xml);
+   		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = getQuestionList(mNutritionSurvey);  
+		String ans ="";
+		int scores = 0;
+		int iAns = 0;
+		
+		
+		for (int i=0; i< qList.size(); i++){
+			ans = qList.get(i);
+			//get score for high nutrition risk alert in nutrition
+			if (!Utils.isNullOrEmpty(ans) && !ans.contains("-"))
+			{
+				iAns = Integer.parseInt(ans.trim());
+				scores = scores + iAns;
+			}			
+		}
+		//high nutrition risk alert
+		Map<String, String> nAlert = new TreeMap<String, String>();
+		if (scores < 50)
+			lAlert.add(AlertsInReport.getNutritionAlertMsg1());
+				
+		//weight alert-- the first question in nutrition survey
+		ans = qList.get(1);
+		ans = ans.trim();		
+		
+		if (!Utils.isNullOrEmpty(ans)) {
+			if (ans.equals("2"))				
+				lAlert.add(AlertsInReport.getNutritionAlertMsg2a());			
+			else if (ans.equals("3"))
+				lAlert.add(AlertsInReport.getNutritionAlertMsg2b());
+			else if (ans.equals("6"))
+				lAlert.add(AlertsInReport.getNutritionAlertMsg2c());
+		}
+		
+		//meal alert -- forth question in nutrition survey
+		ans = qList.get(4);
+		ans = ans.trim();
+		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
+			lAlert.add(AlertsInReport.getNutritionAlertMsg3());
+		
+		//Appetitive alert --- sixth question in nutrition survey
+		ans = qList.get(6);
+		ans = ans.trim();
+		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
+			lAlert.add(AlertsInReport.getNutritionAlertMsg4());
+		
+		//cough, choke and pain alert --- ninth question in nutrition survey
+		ans = qList.get(11);
+		ans = ans.trim();
+		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
+			lAlert.add(AlertsInReport.getNutritionAlertMsg5());	
+		//set alerts in report bean
+		if (nAlert != null && nAlert.size()>0)	
+			report.setAlerts(lAlert);
+		else
+			report.setAlerts(null);
 		
 		//get volunteer information
 		String volunteer = appointment.getVolunteer();

@@ -5,6 +5,8 @@
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.tapestry.surveys.DoSurveyAction"%>
 <%@page import="org.tapestry.surveys.SurveyFactory"%>
+<%@page import="org.tapestry.surveys.TapestrySurveyMap"%>
+<%@page import="org.tapestry.surveys.TapestryPHRSurvey"%>
 <%@page import="org.survey_component.data.*"%>
 <%@page import="org.survey_component.data.answer.SurveyAnswerString"%>
 <%@page import="java.util.regex.*"%>
@@ -15,9 +17,10 @@
 	//find the survey
 	String documentId = request.getAttribute("resultid").toString();
 			
-	SurveyMap surveys = DoSurveyAction.getSurveyMap(request);
-	PHRSurvey survey = (PHRSurvey) request.getAttribute("survey");
-			
+//	SurveyMap surveys = DoSurveyAction.getSurveyMap(request);
+//	PHRSurvey survey = (PHRSurvey) request.getAttribute("survey");
+	TapestrySurveyMap surveys = DoSurveyAction.getSurveyMap(request);
+	TapestryPHRSurvey survey = (TapestryPHRSurvey) request.getAttribute("survey");	
 	//get question
 	SurveyQuestion question = survey.getQuestionById(questionId);
 	

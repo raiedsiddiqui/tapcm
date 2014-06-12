@@ -10,7 +10,8 @@ public class Report {
 	private Map<String, String> healthGoals;
 	private Map<String, String> dailyActivities;
 	private Map<String, String> volunteerInformations;
-
+	private List<String> additionalInfos;
+	
 	public Report(){}
 
 	public List<String> getAlerts() {
@@ -61,5 +62,12 @@ public class Report {
 		this.volunteerInformations = volunteerInformations;
 	}
 	
+	public List<String> getAdditionalInfos() {
+		return additionalInfos;
+	}
+
+	public void setAdditionalInfos(List<String> additionalInfos) {
+		this.additionalInfos = additionalInfos;
+	}
 	
 }

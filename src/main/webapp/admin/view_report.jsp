@@ -28,7 +28,17 @@
 			}
 		table{
 			border:1px solid black;
-			width:1200px;
+			width:1000px;
+		}
+		
+		td
+		{		 
+		   border-bottom:1pt solid black;
+		}
+		
+		th
+		{
+		    border: 1px solid black;
 		}
 	</style>
 </head>
@@ -52,8 +62,13 @@
 			<h2 align="center"><span>PATIENT GOAL(S)</span></h2><br>
 			Wait for GAS app
 			<h2 align="center"><span>ALERTS: Consider Case Review with IP-TEAM</span></h2><br>
-			<hr/>
-			wait for calculator from survey question/answer...<br/>
+			<table>
+				<c:forEach items="${report.alerts}" var="a">
+					<tr>
+						<td ><h3>${a}</h3></td>						
+					</tr>
+				</c:forEach>
+			</table>
 			
 			<h2 align="center"><span>KEY OBSERVATIONS </span></h2><br>
 			<div class="col-md-10">		
@@ -93,7 +108,7 @@
 				</c:forEach>
 		</table>
 		<h2 align="center"><span>VOLUNTEER INFORMATION & NOTES </span></h2><br>	
-		<table>
+		<table border="1">
 			<c:forEach items="${report.volunteerInformations}" var="v">					
 					<tr>
 						<td valign = "top" width="30"> ${v.key}</td>

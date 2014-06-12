@@ -6,24 +6,25 @@ import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyException;
 import org.survey_component.source.SurveyParseException;
 import org.tapestry.objects.SurveyTemplate;
+import org.tapestry.surveys.TapestryPHRSurvey;
 
 public class SurveyFactory {
 	//DO NOT MAKE THIS PUBLIC!!!!!
-	private static Hashtable<String, PHRSurvey> loadedSurveys = new Hashtable<String, PHRSurvey>();
+	private static Hashtable<String, TapestryPHRSurvey> loadedSurveys = new Hashtable<String, TapestryPHRSurvey>();
 	
-	public PHRSurvey getSurveyTemplate(SurveyTemplate surveyTemplate) throws SurveyException
+	public TapestryPHRSurvey getSurveyTemplate(SurveyTemplate surveyTemplate) throws SurveyException
 	{
 		//check if it's loaded, if not, try to load
 		ensureLoaded(surveyTemplate);
-		return loadedSurveys.get(Integer.toString(surveyTemplate.getSurveyID())).cloneSurvey(); //write-protecting to the template survey
+		return (TapestryPHRSurvey)loadedSurveys.get(Integer.toString(surveyTemplate.getSurveyID())).cloneSurvey(); //write-protecting to the template survey
 	}
 	
 	//optimized
-	public PHRSurvey getSurveyTemplateNoQuestions(SurveyTemplate surveyTemplate) throws SurveyException
+	public TapestryPHRSurvey getSurveyTemplateNoQuestions(SurveyTemplate surveyTemplate) throws SurveyException
 	{
 		//check if it's loaded, if not, try to load
 		ensureLoaded(surveyTemplate);
-		return loadedSurveys.get(Integer.toString(surveyTemplate.getSurveyID())).cloneSurveyNoQuestions(); //write-protecting to the template survey
+		return (TapestryPHRSurvey)loadedSurveys.get(Integer.toString(surveyTemplate.getSurveyID())).cloneSurveyNoQuestions(); //write-protecting to the template survey
 	}
 		
 	private void ensureLoaded(SurveyTemplate surveyTemplate) throws SurveyException
@@ -35,7 +36,7 @@ public class SurveyFactory {
 
 		if (!loadedSurveys.containsKey(Integer.toString(surveyTemplate.getSurveyID())))
 		{
-			PHRSurvey loadedSurvey = SurveyActionMumps.loadSurveySource(surveyTemplate);
+			TapestryPHRSurvey loadedSurvey = SurveyActionMumps.loadSurveySource(surveyTemplate);
 			if (loadedSurvey == null) throw new SurveyException("Requested survey '" + surveyTemplate.getSurveyID() + "' cannot be found");
 			loadedSurveys.put(Integer.toString(surveyTemplate.getSurveyID()), loadedSurvey);
 		}
@@ -43,7 +44,7 @@ public class SurveyFactory {
 		
 	public void reloadSurveyTemplate(SurveyTemplate surveyTemplate) throws SurveyParseException
 	{
-		PHRSurvey loadedSurvey = SurveyActionMumps.loadSurveySource(surveyTemplate);
+		TapestryPHRSurvey loadedSurvey = SurveyActionMumps.loadSurveySource(surveyTemplate);
 		if (loadedSurvey == null) throw new SurveyParseException("Specified survey '" + surveyTemplate.getSurveyID() + "' cannot be found");
 		loadedSurveys.put(Integer.toString(surveyTemplate.getSurveyID()), loadedSurvey);
 	}

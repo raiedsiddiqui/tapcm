@@ -43,6 +43,8 @@ import org.tapestry.objects.Volunteer;
 //import org.tapestry.objects.Availability;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.SurveyFactory;
+import org.tapestry.surveys.TapestrySurveyMap;
+import org.tapestry.surveys.TapestryPHRSurvey;
 import org.tapestry.objects.Picture;
 import org.yaml.snakeyaml.Yaml;
 //import org.tapestry.surveys.DoSurveyAction;
@@ -200,14 +202,14 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			//Auto assign all existing surveys
 			ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 	   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
-	   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+	   		TapestrySurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
 	   		
 	   		for(SurveyTemplate st: surveyTemplates) 
 	   		{
-				List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
+				List<TapestryPHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
 				
 				SurveyFactory surveyFactory = new SurveyFactory();
-				PHRSurvey template = surveyFactory.getSurveyTemplate(st);
+				TapestryPHRSurvey template = surveyFactory.getSurveyTemplate(st);
 					SurveyResult sr = new SurveyResult();
 		            sr.setSurveyID(st.getSurveyID());
 		            sr.setPatientID(newPatient.getPatientID());
@@ -220,7 +222,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		          //if requested survey that's already done
 		    		if (specificSurveys.size() < template.getMaxInstances())
 		    		{
-		    			PHRSurvey blankSurvey = template;
+		    			TapestryPHRSurvey blankSurvey = template;
 		    			blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
 		    			sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
 		    			String documentId = surveyResultDao.assignSurvey(sr);

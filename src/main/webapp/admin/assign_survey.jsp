@@ -62,8 +62,7 @@
 					<option value="${st.surveyID}">${st.title}</option>
 				</c:forEach>
 			</select><br/>
-			<label>Select Client : </label><br/>
-			
+			<label>Select Client : </label><br/>			
 			<input type="checkbox" name="assignAllClinets" id="toAll" style="margin-bottom:10px;" onclick="disablePatientCheckbox()" value="true" >Assign to All clients</input><br/>
 			<div class="right">					
 				<input type="text" name="searchPatientName" value="${searchPatientName}" />
@@ -81,8 +80,7 @@
 					<th width="15%">MRP </th>
 					<th width="10%">City </th>
 					<th width="15%">Phone Number</th>
-				</tr>
-				
+				</tr>				
 					<c:forEach items="${patients}" var="p">
 						<tr>
 							<td style="text-align:center;"><input type="checkbox" id ="patientId" name="patientId" value="${p.patientID}" /></td>
@@ -95,16 +93,14 @@
 							<td>${p.city}</td>
 							<td>${p.homePhone}</td>
 						</tr>	
-					</c:forEach>	
-						
+					</c:forEach>							
 			</table>
 			</div>
 			<br/><br/>
 			<div class="right">
 				<input type="submit" class="btn btn-primary" name="assignSurvey" value="Assign" />
 			</div>		 
-		</form>
-		
+		</form>		
 	</div>
 
 </body>

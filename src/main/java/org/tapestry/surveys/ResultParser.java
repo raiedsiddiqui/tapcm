@@ -130,9 +130,12 @@ public class ResultParser {
     			String separator = "/observernote/";
         		int index = answer.indexOf("/observernote/");
         		int l = separator.length();
-        		        		
+        		
         		if (index == -1)
+        		{
         			questionAnswer = answer;
+        			observerNotes = "";
+        		}
         		else
         		{
         			questionAnswer = answer.substring(0, index);

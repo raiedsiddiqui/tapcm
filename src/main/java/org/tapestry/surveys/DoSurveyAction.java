@@ -44,13 +44,18 @@ import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
+import org.survey_component.data.SurveyDirectionStatement;
 import org.survey_component.data.SurveyException;
 import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
 import org.survey_component.data.answer.SurveyAnswer;
 import org.survey_component.data.answer.SurveyAnswerFactory;
+import org.survey_component.logic.LogicFactory;
+import org.survey_component.source.SurveyParseException;
+import org.tapestry.controller.Utils;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
+import org.tapestry.surveys.TapestryPHRSurvey;
 
 /**
  * Created on December 21, 2006, 10:47 AM
@@ -65,7 +70,7 @@ public class DoSurveyAction
 	/** 
 	 * @return the next url to go to, excluding contextPath
 	 */
-	public static ModelAndView execute(HttpServletRequest request, String documentId, PHRSurvey currentSurvey, PHRSurvey templateSurvey) throws Exception
+	public static ModelAndView execute(HttpServletRequest request, String documentId, TapestryPHRSurvey currentSurvey, PHRSurvey templateSurvey) throws Exception
 	{
 		ModelAndView m = new ModelAndView();
 		final String questionId = request.getParameter("questionid");
@@ -92,19 +97,15 @@ public class DoSurveyAction
 			m.setViewName("failed");
 			return m;
 		}
-
 		//if requested survey is completed
 		if (currentSurvey.isComplete())
-		{
 			logger.error("trying to complete already completed survey?");
-		}
-
+		
 		boolean saved = false;
 
 		//if starting/continuing survey, clear session
-
 		if (questionId == null)
-		{			
+		{		
 			//if just starting/continuing(from before) the survey, direct to last question
 			String lastQuestionId;
 
@@ -120,14 +121,14 @@ public class DoSurveyAction
 			}
 
 			if (currentSurvey.isComplete())
-			{ //if complete show first question
+			{ //if complete show first question				
 				lastQuestionId = currentSurvey.getQuestions().get(0).getId();				
 				m.addObject("hideObservernote", true);
 			}
 			else
 			{ //if not complete show next question
 				lastQuestionId = currentSurvey.getQuestions().get(currentSurvey.getQuestions().size() - 1).getId();
-				
+				//logic for displaying Observer Notes button
 				if (isFirstQuestionId(lastQuestionId, '0'))
 					m.addObject("hideObservernote", true);
 				else
@@ -141,45 +142,51 @@ public class DoSurveyAction
 			m.setViewName("/surveys/show_survey");
 			
 			return m;
-		}
+		}//end of questionId == null;
 
 		String errMsg = null;
 
 		//if continuing survey (just submitted an answer)
 		if (questionId != null && direction.equalsIgnoreCase("forward"))
-		{		
+		{				
 			if (currentSurvey.getQuestionById(questionId).getQuestionType().equals(SurveyQuestion.ANSWER_CHECK) && answerStrs == null)
-			{
 				answerStrs = new String[0];
-			}
+			
 			if (answerStrs != null && (currentSurvey.getQuestionById(questionId).getQuestionType().equals(SurveyQuestion.ANSWER_CHECK) || !answerStrs[0].equals("")))
 			{						
-				SurveyQuestion question = currentSurvey.getQuestionById(questionId);
+				SurveyQuestion question = currentSurvey.getQuestionById(questionId);	
+				SurveyQuestion questionWithoutObserverNotes = currentSurvey.getQuestionById(questionId);
 				
-				ArrayList<SurveyAnswer> answersWithoutObserverNotes = convertToSurveyAnswers(answerStrs, question);
-				
-				//add observernotes 
-				if (answerStrs.length == 1)
+				//keep answers without obserbernotes for validation
+				ArrayList<SurveyAnswer> answersWithoutObserverNotes = convertToSurveyAnswers(answerStrs, questionWithoutObserverNotes);
+							
+				//add observernotes into answer when there is no condition or non-number type input
+				List<SurveyDirectionStatement> logicStatements = question.getNextQuestionLogic();
+				String type = question.getQuestionType();				
+
+				if (!Utils.isNullOrEmpty(type) && (!type.equalsIgnoreCase("number")) && (logicStatements.size() <= 1))				
 				{
-					String content = answerStrs[0];
-					String separator = " /observernote/ ";
-					StringBuffer sb = new StringBuffer();
-					sb.append(content);
-					sb.append(separator);
-					sb.append(observerNotes);
-					answerStrs[0] = sb.toString();						
+					if (answerStrs.length == 1)
+					{
+						String content = answerStrs[0];
+						String separator = "/observernote/ ";
+						StringBuffer sb = new StringBuffer();
+						sb.append(content);
+						sb.append(separator);
+						sb.append(observerNotes);
+						answerStrs[0] = sb.toString();	
+					}
 				}
 				
-				ArrayList<SurveyAnswer> answers = convertToSurveyAnswers(answerStrs, question);
+				ArrayList<SurveyAnswer> answers = convertToSurveyAnswers(answerStrs, question);		
+				
 				boolean goodAnswerFormat = true;
 				if (answers == null)
-				{
 					goodAnswerFormat = false;
-				}
 				
 				//check each answer for validation
-				// if answer passes validation
-				if (goodAnswerFormat && question.validateAnswers(answersWithoutObserverNotes))				
+				// if answer passes validation				
+				if (goodAnswerFormat && question.validateAnswers(answersWithoutObserverNotes))	
 				{
 					boolean moreQuestions;
 					//see if the user went back (if current question the last question in user's question profile)
@@ -195,78 +202,37 @@ public class DoSurveyAction
 						}
 						else
 						{
+							ArrayList<SurveyQuestion> tempquestions = new ArrayList<SurveyQuestion>(); //Create a temp array list to transfer answered questions
 
-							// //CUSTOM CODE START
-							// //x=index+2
-							// int tcurrentQuestionIndex = currentSurvey.getQuestions().indexOf(question); //gets the current question index
-							// SurveyQuestion tmpgetnextQuestionId = currentSurvey.getQuestions().get(tcurrentQuestionIndex+1); //ID of next question in list
-							// //String tmpgetnextQuestionId2 = currentSurvey.getQuestions().get(tcurrentQuestionIndex).getId();
-							// //String tmpgetnextQuestionId3 = currentSurvey.getQuestions().get(tcurrentQuestionIndex-1).getId();
-							// //String ttnextQuestionId = currentSurvey.getQuestions().get(tcurrentQuestionIndex + 1).getId();
-							// SurveyQuestion tnextQuestionId;
-							
-							// String tmpnextQuestionId = currentSurvey.getNextQuestionId(questionId);
-							// logger.debug("going to question id: " + tmpnextQuestionId);
-							// tnextQuestionId = currentSurvey.getQuestionById(tmpnextQuestionId);
-							
-							// if (tmpgetnextQuestionId.equals(tnextQuestionId))
-							// {
-							// 	question.setAnswers(answers);
-							// 	saved = true;
-							// 	moreQuestions = true;
-							// }
+							//remove all future answers								
+							logger.debug("user hit back and changed an answer");
+							//clear all questions following it
+							int currentSurveySize = currentSurvey.getQuestions().size(); //stores number of questions
+							int currentQuestionIndex = currentSurvey.getQuestions().indexOf(question); //gets the current question index
+																					
+							for (int i = currentQuestionIndex +1; i < currentSurveySize; i++)
+							{
+								tempquestions.add(currentSurvey.getQuestions().get(currentQuestionIndex +1));
+								currentSurvey.getQuestions().remove(currentQuestionIndex + 1);  //goes through quesitons list and removes each question after it
+							}							
+							//save answers modified/input by user into question
+							question.setAnswers(answers);								
+							saved = true;
+							//add new question
+							moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);
 
-							//if new index == x 
-							//then dont delete future answers
-							//else
-							//remove all questions after it
+							//check if old index and new index contain same questions in the same list
+							int sizeofcurrentquestionslist = currentSurvey.getQuestions().size(); //Size of new getQuestions aftre removing future questions
 
-							//CUSTOM CODE END
-							//else 
-							//{
-								//make copy of existing list
-								ArrayList<SurveyQuestion> tempquestions = new ArrayList<SurveyQuestion>(); //Create a temp array list to transfer answered questions
-
-								// for (int x=0;x<currentSurvey.getQuestions().size()-1;x++)  //Loop through getQuestions list
-								// {
-								// 	tempquestions.add(currentSurvey.getQuestions().get(x)); //add each element to the temp lit from getQuestions
-								// }
-
-								//remove all future answers
-								System.out.println("user hit back and changed an answer");
-								logger.debug("user hit back and changed an answer");
-								//clear all questions following it
-								int currentSurveySize = currentSurvey.getQuestions().size(); //stores number of questions
-								int currentQuestionIndex = currentSurvey.getQuestions().indexOf(question); //gets the current question index
-								for (int i = currentQuestionIndex +1; i < currentSurveySize; i++)
-								{
-									tempquestions.add(currentSurvey.getQuestions().get(currentQuestionIndex +1));
-									currentSurvey.getQuestions().remove(currentQuestionIndex + 1);  //goes through quesitons list and removes each question after it
-								}
-								
-								
-								question.setAnswers(answers);
-								saved = true;
-								//add new question
+							if (currentSurvey.getQuestions().get(sizeofcurrentquestionslist-1).getId().equals(tempquestions.get(0).getId()))
+							{
+								currentSurvey.getQuestions().remove(sizeofcurrentquestionslist-1);
+								for (int y=0;y<tempquestions.size();y++) 
+									currentSurvey.getQuestions().add(tempquestions.get(y));
 								moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);
-
-								//check if old index and new index contain same questions in the same list
-								int sizeofcurrentquestionslist = currentSurvey.getQuestions().size(); //Size of new getQuestions aftre removing future questions
-
-								if (currentSurvey.getQuestions().get(sizeofcurrentquestionslist-1).getId().equals(tempquestions.get(0).getId()))
-								{
-									currentSurvey.getQuestions().remove(sizeofcurrentquestionslist-1);
-									for (int y=0;y<tempquestions.size();y++) 
-									{
-										currentSurvey.getQuestions().add(tempquestions.get(y));
-									}
-									moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);
-								}
-								
+							}								
 								//if same then replace temp list with new list
 								//if not then add the one new item.
-
-							
 						}
 						//if user didn't go back, and requesting the next question
 					}
@@ -292,7 +258,8 @@ public class DoSurveyAction
 							m.addObject("hideObservernote", false);
 							m.setViewName("/surveys/show_survey");
 							return m;
-						} else {									
+						} 
+						else {									
 							m.addObject("survey", currentSurvey);
 							m.addObject("templateSurvey", templateSurvey);
 							m.addObject("questionid", questionId);
@@ -308,11 +275,12 @@ public class DoSurveyAction
 					logger.debug("Next question id: " + nextQuestionId);
 
 					//save to indivo
-					if (saved && questionIndex % SAVE_INTERVAL == 0 && !currentSurvey.isComplete()) SurveyAction.updateSurveyResult(currentSurvey);
+					if (saved && questionIndex % SAVE_INTERVAL == 0 && !currentSurvey.isComplete()) 
+						SurveyAction.updateSurveyResult(currentSurvey);
 
 					//if answer fails validation
-				}
-				else {					
+				}// end of validation answers
+				else {						
 					m.addObject("survey", currentSurvey);
 					m.addObject("templateSurvey", templateSurvey);
 					m.addObject("questionid", questionId);
@@ -324,10 +292,10 @@ public class DoSurveyAction
 					m.setViewName("/surveys/show_survey");
 					return m;
 				}
-
 				//if answer not specified, and hit forward
 			}
-			else errMsg = "You must supply an answer";
+			else 
+				errMsg = "You must supply an answer";
 		}//end of forward action
 		else if (direction.equalsIgnoreCase("backward"))
 		{
@@ -362,7 +330,7 @@ public class DoSurveyAction
 		return isFirst;
 	}
 
-	private static boolean addNextQuestion(String currentQuestionId, PHRSurvey currentSurvey, PHRSurvey templateSurvey) throws SurveyException
+	private static boolean addNextQuestion(String currentQuestionId, TapestryPHRSurvey currentSurvey, PHRSurvey templateSurvey) throws SurveyException
 	{
 		SurveyQuestion nextQuestion;
 		if (currentQuestionId == null)
@@ -374,6 +342,7 @@ public class DoSurveyAction
 		{
 			String nextQuestionId = currentSurvey.getNextQuestionId(currentQuestionId);
 			if (nextQuestionId == null) return false;
+			
 			logger.debug("going to question id: " + nextQuestionId);
 			nextQuestion = templateSurvey.getQuestionById(nextQuestionId);
 
@@ -382,49 +351,52 @@ public class DoSurveyAction
 		return true;
 	}
 
-	private static ArrayList<SurveyAnswer> convertToSurveyAnswers(String[] answers, SurveyQuestion question)
+	private static ArrayList<SurveyAnswer> convertToSurveyAnswers(String[] answers, SurveyQuestion question) throws SurveyParseException
 	{
 		ArrayList<SurveyAnswer> surveyAnswers = new ArrayList<SurveyAnswer>();
 		SurveyAnswerFactory answerFactory = new SurveyAnswerFactory();
+		SurveyAnswer answerObj;
 		for (String answer : answers)
 		{
-			SurveyAnswer answerObj = answerFactory.getSurveyAnswer(question.getQuestionType(), answer);
+			answerObj = answerFactory.getSurveyAnswer(question.getQuestionType(), answer);			
 			
-			if (answerObj == null) return null;
-			else surveyAnswers.add(answerObj);			
+			if (answerObj == null) 
+				return null;				
+			else
+				surveyAnswers.add(answerObj);		
 		}
 		return surveyAnswers;
 	}
 	
-	public static SurveyMap getSurveyMapAndStoreInSession(HttpServletRequest request, ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates)
+	public static TapestrySurveyMap getSurveyMapAndStoreInSession(HttpServletRequest request, ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates)
 	{
-		SurveyMap userSurveys = (SurveyMap) request.getSession().getAttribute("session_survey_list");
+		TapestrySurveyMap userSurveys = (TapestrySurveyMap) request.getSession().getAttribute("session_survey_list");
 
 		//if survey list not in the session, retrieve from server
 		if (userSurveys == null)
 		{
-			userSurveys = new SurveyMap(getSurveyResultsList(surveyResults, surveyTemplates));
+			userSurveys = new TapestrySurveyMap(getSurveyResultsList(surveyResults, surveyTemplates));
 			request.getSession().setAttribute("session_survey_list", userSurveys);
 		}
 
 		return(userSurveys);
 	}
 	
-	public static SurveyMap getSurveyMap(HttpServletRequest request) {
-		SurveyMap userSurveys = (SurveyMap) request.getSession().getAttribute("session_survey_list");
+	public static TapestrySurveyMap getSurveyMap(HttpServletRequest request) {
+		TapestrySurveyMap userSurveys = (TapestrySurveyMap) request.getSession().getAttribute("session_survey_list");
 		return userSurveys;
 	}
 	
-	public static List<PHRSurvey> getSurveyResultsList(ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates)
+	public static List<TapestryPHRSurvey> getSurveyResultsList(ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates)
 	{
-		List<PHRSurvey> results = new ArrayList<PHRSurvey>();
+		List<TapestryPHRSurvey> results = new ArrayList<TapestryPHRSurvey>();
 
 		for (SurveyResult tempResult : surveyResults)
 		{
 			try
 			{
 				tempResult.processMumpsResults(tempResult);
-				PHRSurvey temp = SurveyActionMumps.toPhrSurvey(surveyTemplates, tempResult);
+				TapestryPHRSurvey temp = SurveyActionMumps.toPhrSurvey(surveyTemplates, tempResult);
 				results.add(temp);
 			}
 			catch (Exception e)

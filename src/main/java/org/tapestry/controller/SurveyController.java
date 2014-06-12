@@ -48,6 +48,8 @@ import org.tapestry.objects.User;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.ResultParser;
 import org.tapestry.surveys.SurveyFactory;
+import org.tapestry.surveys.TapestrySurveyMap;
+import org.tapestry.surveys.TapestryPHRSurvey;
 import org.yaml.snakeyaml.Yaml;
 
 @Controller
@@ -249,7 +251,7 @@ public class SurveyController{
    		
 		return "admin/assign_survey";
 	}
-   	
+   
 
 	@RequestMapping(value="/assign_surveys", method=RequestMethod.POST)
 	public String assignSurveys(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
@@ -259,13 +261,13 @@ public class SurveyController{
 		}
 		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
    		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
-   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+   		TapestrySurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
    		int surveyId = Integer.parseInt(request.getParameter("surveyID"));
 		SurveyTemplate st = surveyTemplateDao.getSurveyTemplateByID(surveyId);
-		List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(surveyId));
+		List<TapestryPHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(surveyId));
 		
 		SurveyFactory surveyFactory = new SurveyFactory();
-		PHRSurvey template = surveyFactory.getSurveyTemplate(st);
+		PHRSurvey template = (TapestryPHRSurvey)surveyFactory.getSurveyTemplate(st);
 		for(int i=0; i < patients.length; i++) {
 			SurveyResult sr = new SurveyResult();
             sr.setSurveyID(surveyId);
@@ -273,7 +275,7 @@ public class SurveyController{
           //if requested survey that's already done
     		if (specificSurveys.size() < template.getMaxInstances())
     		{
-    			PHRSurvey blankSurvey = template;
+    			TapestryPHRSurvey blankSurvey = (TapestryPHRSurvey)template;
     			blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
     			sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
     			String documentId = surveyResultDao.assignSurvey(sr);
@@ -316,12 +318,16 @@ public class SurveyController{
 		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		SurveyTemplate surveyTemplate = surveyTemplateDao.getSurveyTemplateByID(surveyResult.getSurveyID());
-		SurveyMap userSurveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
-		PHRSurvey currentSurvey = userSurveys.getSurvey(Integer.toString(id));
+		
+		//all survey results stored in map
+		
+		TapestrySurveyMap userSurveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);			
+		TapestryPHRSurvey currentSurvey = userSurveys.getSurvey(Integer.toString(id));
+				
 		try {
 			SurveyFactory surveyFactory = new SurveyFactory();
 			PHRSurvey templateSurvey = surveyFactory.getSurveyTemplate(surveyTemplate);	
-	
+			
 			redirectAction = DoSurveyAction.execute(request, Integer.toString(id), currentSurvey, templateSurvey);
 		} catch (Exception e) {
 			System.out.println("Error: " + e);
@@ -347,7 +353,7 @@ public class SurveyController{
    		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
 		
-		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+		TapestrySurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
 		PHRSurvey currentSurvey = surveys.getSurvey(Integer.toString(id));
 		
 		//For activity logging purposes
@@ -524,7 +530,7 @@ public class SurveyController{
 		
 		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		
-   		SurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+   		TapestrySurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
    		SurveyResult sr;
    		
    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -532,10 +538,10 @@ public class SurveyController{
  	
    		for(SurveyTemplate st: surveyTemplates) 
    		{
-			List<PHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
+			List<TapestryPHRSurvey> specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID()));
 			
 			SurveyFactory surveyFactory = new SurveyFactory();
-			PHRSurvey template = surveyFactory.getSurveyTemplate(st);
+			TapestryPHRSurvey template = surveyFactory.getSurveyTemplate(st);
 			sr = new SurveyResult();
 				
 			for (int i = 0; i < patientIds.length; i++){
@@ -548,7 +554,7 @@ public class SurveyController{
 				if (specificSurveys.size() < template.getMaxInstances() && 
 						!isExistInSurveyResultList(surveyResults,st.getSurveyID(), patientIds[i]))
 				{		    		
-					PHRSurvey blankSurvey = template;
+					TapestryPHRSurvey blankSurvey = template;
 					blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
 					sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
 					String documentId = surveyResultDao.assignSurvey(sr);

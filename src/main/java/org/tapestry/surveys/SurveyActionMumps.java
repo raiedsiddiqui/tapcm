@@ -14,9 +14,10 @@ import org.survey_component.source.SurveySourceMumps;
 import org.survey_component.source.SurveyParseException;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
+import org.tapestry.surveys.TapestryPHRSurvey;
 
 public class SurveyActionMumps {
-	public static PHRSurvey loadSurveySource(SurveyTemplate surveyTemplate) throws SurveyParseException
+	public static TapestryPHRSurvey loadSurveySource(SurveyTemplate surveyTemplate) throws SurveyParseException
 	{
 		try
 		{
@@ -24,7 +25,7 @@ public class SurveyActionMumps {
 
 			Long templateId = Long.parseLong(Integer.toString(surveyTemplate.getSurveyID()));
 
-			return(SurveySourceMumps.loadSurveySource(bais, templateId));
+			return (TapestrySurveySourceMumps.loadSurveySource(bais, templateId));
 		}
 		catch (Exception e)
 		{
@@ -32,7 +33,7 @@ public class SurveyActionMumps {
 		}
 	}
 	
-	public static PHRSurvey toPhrSurvey(ArrayList<SurveyTemplate> surveyTemplates, SurveyResult surveyResult) throws SurveyException
+	public static TapestryPHRSurvey toPhrSurvey(ArrayList<SurveyTemplate> surveyTemplates, SurveyResult surveyResult) throws SurveyException
 	{
 		SurveyTemplate st = new SurveyTemplate();
 		for (SurveyTemplate tempTemplate : surveyTemplates)
@@ -43,7 +44,7 @@ public class SurveyActionMumps {
 		}
 		
 		SurveyFactory surveyFactory = new SurveyFactory();
-		PHRSurvey phrSurveyResult = surveyFactory.getSurveyTemplateNoQuestions(st);
+		TapestryPHRSurvey phrSurveyResult = (TapestryPHRSurvey)surveyFactory.getSurveyTemplateNoQuestions(st);
 
 		phrSurveyResult.setDocumentId(Integer.toString(surveyResult.getResultID()));
 		phrSurveyResult.setSurveyId(Integer.toString(surveyResult.getSurveyID()));
