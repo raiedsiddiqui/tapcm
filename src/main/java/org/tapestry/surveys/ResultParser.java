@@ -55,7 +55,12 @@ public class ResultParser {
 
     public static LinkedHashMap<String, String> getResults(String surveyData) {
         LinkedHashMap<String, String> results = new LinkedHashMap<String, String>();
-       
+        
+        String questionTextWithObserverNotes="";        
+        String separator = "/observernote/";
+        String observerNote= "";
+        int ind = 0;
+             
         try{
             Document doc = loadXMLFromString(surveyData);
             doc.getDocumentElement().normalize();
@@ -70,6 +75,7 @@ public class ResultParser {
                 Element question = (Element) questions.item(i);
                 String questionString = "";
                 String questionAnswerString = "";
+              
                 NodeList questionIDList = question.getElementsByTagName("QuestionId");
                 if (questionIDList.getLength() > 0){
                     Element questionID = (Element) questionIDList.item(0);
@@ -77,23 +83,36 @@ public class ResultParser {
                         continue;
                     questionString += questionID.getTextContent().trim();
                 }
+                
                 NodeList questionTextList = question.getElementsByTagName("QuestionText");
                 if (questionTextList.getLength() > 0){
-                    Element questionText = (Element) questionTextList.item(0);
-                   
-                    //questionAnswerString += questionText.getTextContent().trim();
+                    Element questionText = (Element) questionTextList.item(0);                    
+                    questionTextWithObserverNotes += questionText.getTextContent().trim();   
                 }
+                
+                ind = questionTextWithObserverNotes.lastIndexOf(separator);                
+                if (ind != (-1))
+                {
+                	observerNote = questionTextWithObserverNotes.substring(ind);                	
+                	results.put(questionString, observerNote);
+                }
+                
                 NodeList questionAnswerList = question.getElementsByTagName("QuestionAnswer");
+                
                 if (questionAnswerList.getLength() > 0){                	
                 	for (int j = 0; j < questionAnswerList.getLength(); j++){
-                		Element questionAnswer = (Element) questionAnswerList.item(j);
-                		                		
+                		Element questionAnswer = (Element) questionAnswerList.item(j);                		                		
                 		questionAnswerString += questionAnswer.getTextContent().trim();
                 		
                 		if (questionAnswer.getNextSibling() != null)
                 			questionAnswerString += ", ";
                 	}
-                }                               
+                }  
+                
+                //append observernote to question answer               
+                if (results.get(questionString) != null)               
+                	questionAnswerString += results.get(questionString).toString();
+                
                 results.put(questionString, questionAnswerString);     
             }
         } catch (Exception e) {
@@ -122,13 +141,15 @@ public class ResultParser {
     	for (Map.Entry<String, String> entry: results.entrySet()){
     		key = entry.getKey();    		
     		result = new DisplayedSurveyResult();  		
-    	   	
+    	  
     		//set question key, answer and observer notes
-    		if (!key.equals("surveyId") && !key.equals("date") && !key.equals("title"))
+    		if (!key.contains("surveyId") && !key.equals("date") && !key.equals("title"))
     		{
-    			answer = entry.getValue();
+    			answer = entry.getValue();    		
+    			
+    			//seperate observer note from answer
     			String separator = "/observernote/";
-        		int index = answer.indexOf("/observernote/");
+        		int index = answer.indexOf(separator);
         		int l = separator.length();
         		
         		if (index == -1)
@@ -140,21 +161,16 @@ public class ResultParser {
         		{
         			questionAnswer = answer.substring(0, index);
             		observerNotes = answer.substring(index + l);
-        		}
-        		         	    
+        		}        		         	    
         	    result.setQuestionId(key);
         	    result.setQuestionAnswer(questionAnswer);
-        	    result.setObserverNotes(observerNotes);
-        	    
-        	    //set title
-        		result.setTitle(title);     		
-        		//set date    		
+        	    result.setObserverNotes(observerNotes);        	   
+        		result.setTitle(title); 
         		result.setDate(date);
         		
         	    resultList.add(result);
     		}
-    	}
-    	
+    	}    	
     	return resultList;
     }
     
@@ -178,8 +194,12 @@ public class ResultParser {
      */
     private static String joinResults(LinkedHashMap<String, String> results, String join){
 		String ret = "";
-		for (Map.Entry<String, String> r : results.entrySet()){
+		String separator = "/observernote/";
+		for (Map.Entry<String, String> r : results.entrySet())
+		{
 			ret += r.getKey() + join + r.getValue() + "\n";
+			//remove seperator from string
+			ret = ret.replaceAll(separator, "");
 		}
 		return ret;
 	}

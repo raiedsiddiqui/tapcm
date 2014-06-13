@@ -158,25 +158,39 @@ public class DoSurveyAction
 				SurveyQuestion questionWithoutObserverNotes = currentSurvey.getQuestionById(questionId);
 				
 				//keep answers without obserbernotes for validation
-				ArrayList<SurveyAnswer> answersWithoutObserverNotes = convertToSurveyAnswers(answerStrs, questionWithoutObserverNotes);
-							
-				//add observernotes into answer when there is no condition or non-number type input
-				List<SurveyDirectionStatement> logicStatements = question.getNextQuestionLogic();
-				String type = question.getQuestionType();				
-
-				if (!Utils.isNullOrEmpty(type) && (!type.equalsIgnoreCase("number")) && (logicStatements.size() <= 1))				
+//				ArrayList<SurveyAnswer> answersWithoutObserverNotes = convertToSurveyAnswers(answerStrs, questionWithoutObserverNotes);
+//							
+//				//add observernotes into answer when there is no condition or non-number type input
+//				List<SurveyDirectionStatement> logicStatements = question.getNextQuestionLogic();
+//				String type = question.getQuestionType();				
+				
+				String questionText = question.getQuestionText();
+				
+				if (!Utils.isNullOrEmpty(questionText))
 				{
-					if (answerStrs.length == 1)
-					{
-						String content = answerStrs[0];
-						String separator = "/observernote/ ";
-						StringBuffer sb = new StringBuffer();
-						sb.append(content);
-						sb.append(separator);
-						sb.append(observerNotes);
-						answerStrs[0] = sb.toString();	
-					}
+					String separator = "/observernote/ ";
+					StringBuffer sb = new StringBuffer();
+					sb.append(questionText);
+					sb.append(separator);
+					sb.append(observerNotes);
+					
+					questionText = sb.toString();
+					question.setQuestionText(questionText);
 				}
+
+//				if (!Utils.isNullOrEmpty(type) && (!type.equalsIgnoreCase("number")) && (logicStatements.size() <= 1))				
+//				{
+//					if (answerStrs.length == 1)
+//					{
+//						String content = answerStrs[0];
+//						String separator = "/observernote/ ";
+//						StringBuffer sb = new StringBuffer();
+//						sb.append(content);
+//						sb.append(separator);
+//						sb.append(observerNotes);
+//						answerStrs[0] = sb.toString();	
+//					}
+//				}
 				
 				ArrayList<SurveyAnswer> answers = convertToSurveyAnswers(answerStrs, question);		
 				
@@ -186,7 +200,8 @@ public class DoSurveyAction
 				
 				//check each answer for validation
 				// if answer passes validation				
-				if (goodAnswerFormat && question.validateAnswers(answersWithoutObserverNotes))	
+	//			if (goodAnswerFormat && question.validateAnswers(answersWithoutObserverNotes))	
+				if (goodAnswerFormat && question.validateAnswers(answers))	
 				{
 					boolean moreQuestions;
 					//see if the user went back (if current question the last question in user's question profile)
