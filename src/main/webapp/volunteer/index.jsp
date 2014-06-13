@@ -33,36 +33,44 @@
 		}
 	</style>
 	
-	<script type="text/javascript">
-		$(function(){
-			$('#tp').datetimepicker({
-				pickDate: false,
-				pickSeconds: false
-			});
+<script type="text/javascript">
+	// 	$(function(){
+	// 		$('#tp').datetimepicker({
+	// 			pickDate: false,
+	// 			pickSeconds: false
+	// 		});
 			
-			$('#dp').datetimepicker({
-				pickTime: false,
-				startDate: new Date()
-  			});
+	// 		$('#dp').datetimepicker({
+	// 			pickTime: false,
+	// 			startDate: new Date()
+ //  			});
   			
- 			$('#bookAppt').click(function(){
-		        var btn = $(this)
-		        btn.button('loading')
-		        setTimeout(function () {
-		            btn.button('reset')
-		        }, 3000)
-		    });
-		});
+ // 			$('#bookAppt').click(function(){
+	// 	        var btn = $(this)
+	// 	        btn.button('loading')
+	// 	        setTimeout(function () {
+	// 	            btn.button('reset')
+	// 	        }, 3000)
+	// 	    });
+	// 	});
+
+
+	function activenav() {
+		var x = document.getElementById("navhome");
+		x.style.backgroundColor="lightgray";
+	}
+
+
 	</script>
 </head>
 	
-<body>	
+<body onload="activenav()">	
 
 <%@include file="subNavi.jsp" %>
 
 
 <!-- 	breadcrumb START-->	
-	<div id="crumbs"> 
+<!-- 	<div id="crumbs"> 
 		<ul>
 			<li><a href="<c:url value="/client"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
 			<c:if test="${not empty patient}">
@@ -81,11 +89,11 @@
 		</ul>
 
 
-	</div>
+	</div> -->
 
-	<div id="visitandbook" class="span12 btn-group">
+<!-- 	<div id="visitandbook" class="span12 btn-group">
 		<a href="#bookAppointment" role="button" class="btn btn-primary pull-right" data-toggle="modal">Book appointment</a>
-	</div>
+	</div> -->
 <!-- 	breadcrumb END-->	
 	
 	<div class="content">
@@ -116,6 +124,12 @@
 			<div class="alert alert-info">The appointment was successfully booked</div>
 		</c:if>
 		<div class="row-fluid">
+			<button> <a href="<c:url value="/view_activityLogs"/>">Activity Log</a></button>
+			<button> <a href="<c:url value="/view_narratives"/>">Narratives</a></button>
+
+		</div>
+
+		<div class="row-fluid">
 			<div class="span12">
 				<c:choose>
 					<c:when test="${not empty patient}">
@@ -132,55 +146,51 @@
 				</ul>-->
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">
-						<div class="sheading"><h4>Approved Appointments:</h4></div>
-						<table class="table">
+<!-- 						<div class="sheading"><h4>Approved Appointments:</h4></div>
+ -->						<table class="table">
 							<c:forEach items="${approved_appointments}" var="aa">
 								<div class="pname">
-									<div class="app-date"> ${aa.date} </div>
-									<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${aa.patientID}?appointmentId=${aa.appointmentID}"/>'">${aa.patient} <span class="tright"> ${aa.time}</button>
+<!-- 									<div class="app-date"> ${aa.date} </div>
+ -->									<button type="button" class="cbutton" onclick="location.href='<c:url value="/patient/${aa.patientID}?appointmentId=${aa.appointmentID}"/>'">${aa.patient} <span class="app-date">${aa.date}</span> <span class="tright"> ${aa.time}</button>
 								</div>
 							</c:forEach>
 						</table>
-						<div class="sheading">
-							<h4> Pending/Declined Appointments </h4>
-						</div>
-						<div class="accordion-group">
-							<div class="accordion-heading">
-						    	<a class="accordion-toggle" data-toggle="collapse" href="#collapsePending">
-						        	Pending Appointments
-						      	</a>
-						    </div>
-						    
-						    <div id="collapsePending" class="accordion-body collapse">
-				    			<div class="accordion-inner">
-				    				<c:forEach items="${pending_appointments}" var="pa">
-										<div class="pname">
-											<div class="app-date"> ${pa.date} </div>
-											<button type="button" class="pendingappt btn-lg btn-block cbutton">${pa.patient} <span class="tright"> ${pa.time}</button>
-										</div>
-									</c:forEach>
-								</div>
+
+
+			      		<h4 class="panel-title">
+			        		Pending Completion
+			      		</h4>
+						<c:forEach items="${pending_appointments}" var="pa">
+							<div class="pname">
+								<button type="button" class="pendingappt btn-lg btn-block cbutton">${pa.patient} <span class="app-date">${pa.date}</span> <span class="tright"> ${pa.time}</button>
 							</div>
-						</div>
+						</c:forEach>
+
+
 						
-						<div class="accordion-group2">
-							<div class="accordion-heading">
-						    	<a class="accordion-toggle" data-toggle="collapse" href="#collapseDeclined">
+						<div class="panel-group" id="accordion"> 
+						  <div class="panel panel-default">
+						    <div class="panel-heading">
+						      <h4 class="panel-title">
+								<a class="accordion-toggle" data-toggle="collapse" href="#collapseDeclined">
 						        	Declined Appointments
 						      	</a>
-						    </div>
-						    
-						    <div id="collapseDeclined" class="accordion-body collapse">
-				    			<div class="accordion-inner">
+						      </h4>
+    						</div>
+						  
+					        <div id="collapseOne" class="panel-collapse collapse">
+	  							<div class="panel-body">
 				    				<c:forEach items="${declined_appointments}" var="da">
 										<div class="pname">
-											<div class="app-date"> ${da.date} </div>
+										<div class="app-date"> ${da.date} </div>
 											<button type="button" class="inactiveclr btn-lg btn-block cbutton">${da.patient} <span class="tright"> ${da.time}</button>
 										</div>
 									</c:forEach>
 								</div>
 							</div>
 						</div>
+					</div>
+
 						    
 <!-- 					<div class="tab-pane active" id="today">	
 					<c:choose>
@@ -338,7 +348,7 @@
 
 
 
-<div class="modal fade" id="bookAppointment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="bookAppointment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -355,18 +365,18 @@
 					</c:forEach>
 				</select><br />
 				<label>Date:</label>		
-				<div id="dp" class="input-append">
+				<div id="dp" class="input-append"> -->
 <!--  					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate">
- --> 					<input class="datepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentDate">
+ --> <!-- 					<input class="datepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentDate">
 
 					<span class="add-on">
 						<i class="icon-calendar"></i>
 					</span>
 				</div>
 				<label>Time:</label>
-				<div id="tp" class="input-append">
+				<div id="tp" class="input-append"> -->
 <!--  					<input data-format="hh:mm:00" type="text" name="appointmentTime">
- --> 					<input data-format="HH:i:00" class="timepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentTime">
+ --> 					<!-- <input data-format="HH:i:00" class="timepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentTime">
 
 				    <span class="add-on">
 				    	<i class="icon-time"></i>
@@ -380,59 +390,10 @@
         <button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
       </div>
     </div>
-  </div>
-
-	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script>window.jQuery||document.write('<script src="tests/jquery.2.0.0.js"><\/script>')</script>
-    <script src="${pageContext.request.contextPath}/resources/lib/picker.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/lib/picker.date.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/lib/picker.time.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/lib/legacy.js"></script>
+  </div> 
 
 
-	<script type="text/javascript">
-		$(function(){
-			// $('#tp').datetimepicker({
-			// 	pickDate: false,
-			// 	pickSeconds: false
-			// });
-			// $('#dp').datetimepicker({
-			// 	pickTime: false,
-			// 	startDate: new Date()
-  	// 		});
-  			
-  			$('#bookAppt').click(function(){
-		        var btn = $(this)
-		        btn.button('loading')
-		        setTimeout(function () {
-		            btn.button('reset')
-		        }, 3000)
-		    });
-
-
-		});
-
-		    $('.datepicker').pickadate({
-		    // Escape any “rule” characters with an exclamation mark (!).
-		    format: 'You selecte!d: dddd, dd mmm, yyyy',
-		    formatSubmit: 'yyyy/mm/dd',
-		    hiddenName: true
-		   	// hiddenPrefix: 'prefix__',
-		    // hiddenSuffix: '__suffix'
-			})
-		
-
-		$('.timepicker').pickatime({
-		    // Escape any “rule” characters with an exclamation mark (!).
-		    formatSubmit: 'HH:i:00',
-		   	hiddenName: true
-
-		    // hiddenPrefix: 'prefix__',
-		    // hiddenSuffix: '__suffix'
-		})
-		
-	</script>
   
-</div>
+</div>-->
 </body>
 </html>
