@@ -59,7 +59,7 @@
 		<div class="navbar">      
 			<ul id="mainnavbar" class="nav navbar-nav">	
 	    		<li id="navhome"><a class="brand" href="<c:url value="/"/>">Home</a></li>
-	    		<li id="navclient"><a href="<c:url value="/client"/>">MyClients</a></li>    	
+	    		<li id="navclient"><a href="<c:url value="/client"/>">Clients</a></li>    	
 	    		<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 	    		<li><a href="#bookAppointment" data-toggle="modal">Book Appointment</a></li>    	
 

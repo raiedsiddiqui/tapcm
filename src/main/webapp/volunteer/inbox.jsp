@@ -33,11 +33,11 @@
 </div>
 
 <!-- 	breadcrumb START-->	
-	<div id="crumbs"> 
+<!-- 	<div id="crumbs"> 
 		<ul>
 			<li><a href="<c:url value="/client"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
 		</ul>	
-	</div>
+	</div> -->
 <!-- 	breadcrumb END-->	
 	<div class="content">
 		</div>
@@ -84,7 +84,7 @@
 					</c:otherwise>
 				</c:choose>
 			</div>
-			<div class="modal hide fade" id="modalSend">
+<!-- 			<div class="modal hide fade" id="modalSend">
 				<div class="modal-header">
     				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
 					<h3>Message Administrator</h3>
@@ -108,8 +108,65 @@
   				</div>
 			</div>
 		</div>
-	</div>
+	</div> -->
 
+
+
+
+
+
+<div class="modal fade" id="modalSend" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+		<h3>Message Administrator</h3>
+      </div>
+      <div class="modal-body">
+        
+		<form id="messageAdministrator" method="post" action="<c:url value="/send_message"/>">
+
+			<div class="row-fluid">
+				<div class="col-md-3">
+					<label>Send to:</label>
+				</div>
+
+				<div class="col-md-9">
+					<select multiple id="rec" name="recipient" form="messageAdministrator">
+						<c:forEach items="${administrators}" var="a">
+						<option value="${a.userID}">${a.name}</option>
+						</c:forEach>
+					</select><br />
+				</div>
+			</div>
+
+			<div class="row-fluid">
+				<div class="col-md-3">
+					<label>Subject:</label>
+				</div>
+				<div class="col-md-9">
+					<input type="text" name="msgSubject" required/>
+				</div>
+			</div>
+
+			<div class="row-fluid">
+				<div class="col-md-3">
+					<label>Message:</label>
+				</div>
+
+				<div class="col-md-9">
+					<textarea name="msgBody"></textarea><br />
+				</div>
+			</div>
+		</form>
+
+      </div>
+      <div class="modal-footer">
+        <input type="submit" form="messageAdministrator" class="btn btn-primary" value="Send" />
+      </div>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
