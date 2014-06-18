@@ -173,7 +173,7 @@
 						<div class="row-fluid">
 							<div class="span12 survey-list inactiveclr" style="height:50px; margin-bottom:10px;">
 								<b>${cs.surveyTitle}</b><br/>
-								${cs.description}
+					<!-- 		${cs.description} -->	
 							</div>
 <!-- 						</div>
  -->					</c:forEach>

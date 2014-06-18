@@ -90,8 +90,9 @@ public class FileController extends MultiActionController{
 	}
    	
    	@RequestMapping(value="/delete_survey_template/{surveyID}", method=RequestMethod.GET)
-   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model){
-   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResultsBySurveyId(id);
+   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model){   		
+   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResultsBySurveyId(id);  		
+   		
    		if(surveyResults.isEmpty()) {
    			surveyTemplateDao.deleteSurveyTemplate(id);
    			return "redirect:/manage_survey_templates";

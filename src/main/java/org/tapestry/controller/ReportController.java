@@ -51,16 +51,12 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
 	private Yaml yaml;
-	
-//	private UserDao userDao;
+
 	private PatientDao patientDao;
 	private AppointmentDao appointmentDao;
-//	private ActivityDao activityDao;
-	private VolunteerDao volunteerDao;
+	
 	private SurveyResultDao surveyResultDao;
-	private SurveyTemplateDao surveyTemplateDao;
-//	private MessageDao messageDao;
-//	private NarrativeDao narrativeDao;
+	
 	
    	//Mail-related settings;
    	private Properties props;
@@ -99,15 +95,10 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			System.out.println("Error reading from config file");
 			System.out.println(e.toString());
 		}
-//		userDao = new UserDao(DB, UN, PW);
+
 		patientDao = new PatientDao(DB, UN, PW);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
-//		activityDao = new ActivityDao(DB, UN, PW);
-		volunteerDao = new VolunteerDao(DB, UN, PW);
 		surveyResultDao = new SurveyResultDao(DB, UN, PW);
-		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
-//		messageDao = new MessageDao(DB, UN, PW);
-//		narrativeDao = new NarrativeDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -134,8 +125,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			ModelMap model, HttpServletRequest request){
 		Patient patient = patientDao.getPatientByID(id);
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
-		Report report = new Report();
-		AlertsInReport alerts = new AlertsInReport();
+		Report report = new Report();		
 		
 		//Plan and Key Observations
 		String keyObservation = appointmentDao.getKeyObservationByAppointmentId(appointmentId);
@@ -162,6 +152,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		SurveyResult healthGoalsSurvey = new SurveyResult();
 		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
 		SurveyResult nutritionSurvey = new SurveyResult();
+		SurveyResult rAPASurvey = new SurveyResult();
+		SurveyResult mobilitySurvey = new SurveyResult();
 		
 		for(SurveyResult survey: surveyResultList){
 			int surveyId = survey.getSurveyID();
@@ -174,10 +166,16 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			
 			if (surveyId == 7)//Nutrition
 				nutritionSurvey = survey;
+			
+			if (surveyId == 12)//RAPA survey
+				rAPASurvey = survey;
+			
+			if (surveyId == 16)//Mobility survey
+				mobilitySurvey = survey;
 		}
 		
 		String xml;
-		
+		//Healthy Goals
    		try{
    			xml = new String(healthGoalsSurvey.getResults(), "UTF-8");
    		} catch (Exception e) {
@@ -222,9 +220,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		
    		report.setDailyActivities(sMap);   		
    		
-   		//Nutrition survey
-   		
-   		
+   		//Nutrition survey   		
    		try{
    			xml = new String(nutritionSurvey.getResults(), "UTF-8");
    		} catch (Exception e) {
@@ -290,6 +286,58 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		else
 			report.setAlerts(null);
 		
+		//RAPA survey
+		try{
+   			xml = new String(rAPASurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mRAPASurvey = ResultParser.getResults(xml);
+   		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = getQuestionList(mRAPASurvey);  
+		
+		int rAPAScore = 0;
+		Integer[] answerArray = new Integer[6];
+		//set answer into an array
+		for(int i = 0; i < qList.size() - 2; i++)
+			answerArray[i] = Integer.valueOf(qList.get(i));	
+		
+		Integer[] otherAnswers = removeFirstElementInArray(answerArray);
+		
+		if ((answerArray[0].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+			rAPAScore = 2;
+		
+		otherAnswers = removeFirstElementInArray(otherAnswers);
+		
+		if ((answerArray[1].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+			rAPAScore = 3;
+		
+		otherAnswers = removeFirstElementInArray(otherAnswers);
+		
+		if ((answerArray[2].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+			rAPAScore = 4;
+		
+		otherAnswers = removeFirstElementInArray(otherAnswers);
+		
+		if ((answerArray[3].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+			rAPAScore = 5;
+		
+		otherAnswers = removeFirstElementInArray(otherAnswers);
+		
+		if ((answerArray[4].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+			rAPAScore = 6;		
+	
+		if (answerArray[5].intValue() == 1) 
+			rAPAScore = 7;
+		
+		if (rAPAScore < 6)
+			lAlert.add(AlertsInReport.getPhysicalActivityAlertMsg());
+		
+		report.setAlerts(lAlert);
+		//end of alert
+		
 		//get volunteer information
 		String volunteer = appointment.getVolunteer();
 		String partner = appointment.getPartner();
@@ -316,6 +364,29 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		model.addAttribute("report", report);
 		return "/admin/view_report";
+	}
+	
+	private boolean isAllOtherAnswersNo(Integer[] answers){
+		boolean allNo = true;
+		for(Integer a: answers){
+			if (a.equals(1))
+			{
+				allNo = false;
+				break;
+			}
+		}
+		
+		return allNo;
+	}
+	
+	private Integer[] removeFirstElementInArray(Integer[] array){		
+		final Integer[] EMPTY_Integer_ARRAY = new Integer[0];
+		//convert array to ArrayList
+		List<Integer> list = new ArrayList<Integer>(Arrays.asList(array));
+		//remove first element from list
+		list.remove(0);	
+		
+		return list.toArray(EMPTY_Integer_ARRAY);
 	}
 	
 	private Map<String, String> getSurveyContentMap(List<String> questionTextList, List<String> questionAnswerList){

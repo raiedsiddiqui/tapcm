@@ -32,7 +32,6 @@ import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
-
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
@@ -147,10 +146,11 @@ public class SurveyController{
         }
 		return "admin/manage_surveys";
 	}
-   	
-   	@RequestMapping(value="/go_assign_survey", method=RequestMethod.GET)
-	public String goAssignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) throws JAXBException, DatatypeConfigurationException, Exception{
-   		
+      	
+   	@RequestMapping(value="/go_assign_survey/{patientId}", method=RequestMethod.GET)
+	public String goAssignSurvey(@PathVariable("patientId") int id, SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model){
+   		System.out.println("in---");
    		List<Patient> patients = getPatients(request);
    		List<SurveyTemplate> surveyTemplates = getSurveyTemplates(request);
    		
@@ -162,9 +162,14 @@ public class SurveyController{
 		{
 			 model.addAttribute("patients", patients);
 			 model.addAttribute("surveyTemplates", surveyTemplates);
+			 
+			 System.out.println("out inloop---");
 		}
 
-		return "admin/assign_survey";
+		System.out.println("out---");
+		
+		return "redirect:/manage_survey";
+//		return "admin/assign_survey";
 	}
    	
    	@RequestMapping(value="/assign_selectedsurvey", method=RequestMethod.POST)

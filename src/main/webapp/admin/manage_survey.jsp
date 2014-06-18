@@ -42,7 +42,7 @@
 					</div>		
 				</td>
 				<td class="right">
-					<a href="<c:url value="/go_assign_survey"/>"  class="btn btn-primary"> Assign Survey</a>
+					<a href="<c:url value="/go_assign_survey/0"/>"  class="btn btn-primary"> Assign Survey</a>
 					<a href="#addSurvey" data-toggle="modal" class="btn btn-primary">Add Survey</a>
 				</td>
 			</tr>
