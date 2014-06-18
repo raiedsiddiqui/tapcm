@@ -54,6 +54,34 @@ img {
 	margin-top: 4%;
 
 }
+
+#homebtn {
+	width: 100%;
+	font-size: 30px;
+	height: 50px;
+	background-color: #4a307b;
+	color: white;
+	font-family: 'Open Sans', serif;
+	-webkit-tap-highlight-color: rgba(0,0,0,0); 
+	border:0;
+	margin-bottom: 5px;
+	margin-top: 4%;
+
+}
+#homebtn a {
+	color: white;
+}
+
+#rec {
+	width: 100%;
+}
+
+#mainnavbar a {
+	color:white;
+	font-size:25px;
+	font-family: 'Open Sans';
+	border-right:1px solid white;
+}
 @media (min-width: 960px) {
 
 
@@ -103,8 +131,8 @@ div.area {
 
 .content {
 	clear: both !important;
-	/*padding-left: 1%;*/
-	padding-right: 1%;
+	/*padding-left: 1%;
+	padding-right: 1%;*/
 }
 
 .navbar-inner {
@@ -121,7 +149,7 @@ a {
 
 .pname {
 	margin-bottom: 8px;
-	width: 90%;
+	width: 100%;
 }
 
 .patientinfo {
@@ -176,9 +204,9 @@ a {
 
 .navbar .nav > li > a
 {
-	padding: 18px 5px 23px !important;
+	padding: 18px 9px 23px !important;
 	font-size: 25px !important;
-	border-left: 2px solid white;
+	border-left: 1px solid white;
 	font-family: 'Open Sans', 'sans-serif';
 	color: white !important;
 }
@@ -280,7 +308,7 @@ background-image: -webkit-gradient(linear, left bottom, right top, from(rgba(106
 .app-date {
 	font-family: 'Open Sans', serif; 
 	font-size: 30px;
-	padding-left:200px;
+	padding-left:25%;
 }
 
 .modal {
@@ -429,10 +457,9 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 }
 
 .pendingappt {
-	background-image: linear-gradient(to bottom,rgb(237, 181, 13),#B1AD18) !important;
-	background-image: -webkit-gradient(linear, left bottom, right top, from(rgb(237, 181, 13)), to(#B1AD18)) !important;
+	background-color: #e4a1a1;
 	text-align: left;
-	color:white;
+	color:black;
 	padding-top:5px;
 
 }

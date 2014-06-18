@@ -57,7 +57,7 @@
 
 	function activenav() {
 		var x = document.getElementById("navhome");
-		x.style.backgroundColor="lightgray";
+		x.style.backgroundColor="rgb(100, 100, 100)";
 	}
 
 
@@ -124,9 +124,14 @@
 			<div class="alert alert-info">The appointment was successfully booked</div>
 		</c:if>
 		<div class="row-fluid">
-			<button> <a href="<c:url value="/view_activityLogs"/>">Activity Log</a></button>
-			<button> <a href="<c:url value="/view_narratives"/>">Narratives</a></button>
+			<div class="col-md-6">
+				<button id="homebtn"> <span class="glyphicon glyphicon-pencil"></span> <a href="<c:url value="/view_activityLogs"/>">Activity Log</a></button>
+			</div>
 
+			<div class="col-md-6">
+				<button id="homebtn"> <a href="<c:url value="/view_narratives"/>">Narratives</a></button>
+			</div>
+			
 		</div>
 
 		<div class="row-fluid">
