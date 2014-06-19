@@ -14,14 +14,12 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.tapestry.dao.UserDao;
 import org.tapestry.dao.ActivityDao;
+import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
-
-import org.tapestry.controller.Utils;
 
 @Controller
 public class ActivityController {

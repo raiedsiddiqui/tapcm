@@ -34,8 +34,6 @@ package org.tapestry.surveys;
 
 import java.util.ArrayList;
 import java.util.List;
-//import java.util.Arrays;
-import java.lang.Character;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -44,18 +42,14 @@ import org.apache.log4j.Logger;
 import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
-import org.survey_component.data.SurveyDirectionStatement;
 import org.survey_component.data.SurveyException;
-import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
 import org.survey_component.data.answer.SurveyAnswer;
 import org.survey_component.data.answer.SurveyAnswerFactory;
-import org.survey_component.logic.LogicFactory;
 import org.survey_component.source.SurveyParseException;
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
-import org.tapestry.surveys.TapestryPHRSurvey;
 
 /**
  * Created on December 21, 2006, 10:47 AM

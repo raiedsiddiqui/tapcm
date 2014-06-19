@@ -1,23 +1,22 @@
 package org.tapestry.dao;
 
-import java.sql.PreparedStatement;
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
-import java.io.IOException;
-import org.springframework.core.io.ClassPathResource;
-import java.io.IOException;
 import java.util.Map;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.math.BigInteger;
-import org.yaml.snakeyaml.Yaml;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.multipart.MultipartFile;
 import org.tapestry.objects.Picture;
+import org.yaml.snakeyaml.Yaml;
 
 public class PictureDao {
 	private PreparedStatement statement;

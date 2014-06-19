@@ -3,18 +3,16 @@ package org.tapestry.surveys;
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
+import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.QuestionAnswerPair;
 import org.survey_component.data.SurveyException;
 import org.survey_component.data.SurveyQuestion;
 import org.survey_component.data.answer.SurveyAnswer;
 import org.survey_component.data.answer.SurveyAnswerString;
 import org.survey_component.services.SurveyServiceIndivo;
-import org.survey_component.data.PHRSurvey;
-import org.survey_component.source.SurveySourceMumps;
 import org.survey_component.source.SurveyParseException;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
-import org.tapestry.surveys.TapestryPHRSurvey;
 
 public class SurveyActionMumps {
 	public static TapestryPHRSurvey loadSurveySource(SurveyTemplate surveyTemplate) throws SurveyParseException

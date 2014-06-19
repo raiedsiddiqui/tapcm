@@ -2,11 +2,9 @@ package org.tapestry.surveys;
 
 import java.util.Hashtable;
 
-import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyException;
 import org.survey_component.source.SurveyParseException;
 import org.tapestry.objects.SurveyTemplate;
-import org.tapestry.surveys.TapestryPHRSurvey;
 
 public class SurveyFactory {
 	//DO NOT MAKE THIS PUBLIC!!!!!

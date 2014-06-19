@@ -1,14 +1,20 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.List;
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.servlet.http.HttpSession;
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
@@ -20,56 +26,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.survey_component.actions.SurveyAction;
-import org.survey_component.data.PHRSurvey;
-import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
+import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.PictureDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
-import org.tapestry.dao.MessageDao;
 //import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 //import org.tapestry.objects.Message;
 import org.tapestry.objects.Patient;
+import org.tapestry.objects.Picture;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
-//import org.tapestry.objects.Availability;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.SurveyFactory;
-import org.tapestry.surveys.TapestrySurveyMap;
 import org.tapestry.surveys.TapestryPHRSurvey;
-import org.tapestry.objects.Picture;
+import org.tapestry.surveys.TapestrySurveyMap;
 import org.yaml.snakeyaml.Yaml;
-//import org.tapestry.surveys.DoSurveyAction;
-//import org.tapestry.surveys.SurveyFactory;
-//import org.tapestry.objects.SurveyResult;
-//import org.tapestry.dao.ActivityDao;
-//import org.tapestry.objects.SurveyTemplate;
-//import org.survey_component.actions.SurveyAction;
-//import org.survey_component.data.PHRSurvey;
-//import org.survey_component.data.SurveyMap;
-//import org.survey_component.data.SurveyQuestion;
-//import org.survey_component.services.SurveyServiceIndivo;
-
-import java.util.Properties;
-import java.util.Collections;
-
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Transport;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.servlet.http.HttpSession;
 
 @Controller
 public class PatientController {
@@ -192,8 +172,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			p.setAlerts(request.getParameter("alerts"));
 			p.setClinic(request.getParameter("clinic"));
 			
-			String availableTime = Utils.getAvailableTime(request);		
-			p.setAvailability(availableTime);
+//			String availableTime = Utils.getAvailableTime(request);		
+//			p.setAvailability(availableTime);
 			
 			patientDao.createPatient(p);
 			
@@ -256,7 +236,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();			
 		model.addAttribute("volunteers", volunteers);
-		
+		/*
+		//client's availability is removed    
 		String strAvailibilities = p.getAvailability();	
 		boolean mondayNull = false;
 		boolean tuesdayNull = false;
@@ -291,6 +272,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			model.addAttribute("thursdayNull", thursdayNull);
 			model.addAttribute("fridayNull", fridayNull);
 		}
+		*/
 		
 		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
 	}
@@ -316,8 +298,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			p.setAlerts(request.getParameter("alerts"));
 			p.setMyoscarVerified(request.getParameter("myoscar_verified"));
 			
-			String strAvailableTime = Utils.getAvailableTime(request);
-			p.setAvailability(strAvailableTime);
+//			String strAvailableTime = Utils.getAvailableTime(request);
+//			p.setAvailability(strAvailableTime);
 			
 			patientDao.updatePatient(p);
 			model.addAttribute("updatePatientSuccessfully",true);
@@ -429,8 +411,9 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("selectedVolunteer1", v1);
 		model.addAttribute("selectedVolunteer2", v2);
 		
-		if (!Utils.isNullOrEmpty(patient.getAvailability()))
-			Utils.saveAvailability(patient.getAvailability(),model);		
+		//remove client's availability 
+//		if (!Utils.isNullOrEmpty(patient.getAvailability()))
+//			Utils.saveAvailability(patient.getAvailability(),model);		
 		
 		List<Appointment> appointments = new ArrayList<Appointment>();
 		appointments = appointmentDao.getAllUpcommingAppointmentForPatient(id);

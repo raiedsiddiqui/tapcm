@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
@@ -15,27 +16,24 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.util.StringUtils;
+import org.tapestry.dao.ActivityDao;
+import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
-import org.tapestry.dao.AppointmentDao;
-import org.tapestry.dao.ActivityDao;
+import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
-import org.tapestry.objects.Activity;
-import org.tapestry.controller.Utils;
-
-import java.util.Properties;
 
 @Controller
 public class VolunteerController {

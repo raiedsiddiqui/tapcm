@@ -10,13 +10,11 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyAnswerChoice;
 import org.survey_component.data.SurveyDirectionStatement;
 import org.survey_component.data.SurveyQuestion;
 import org.survey_component.source.SurveyParseException;
 import org.survey_component.source.SurveySourceMumps;
-import org.tapestry.surveys.TapestryPHRSurvey;
 
 public class TapestrySurveySourceMumps extends SurveySourceMumps {
 	protected static Logger logger = Logger.getLogger(TapestrySurveySourceMumps.class);

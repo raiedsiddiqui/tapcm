@@ -2,14 +2,12 @@ package org.tapestry.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.Properties;
-import java.util.Iterator;
+import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 import javax.mail.PasswordAuthentication;
@@ -31,17 +29,14 @@ import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
 //import org.tapestry.dao.UserDao;
 import org.tapestry.dao.SurveyResultDao;
-import org.tapestry.dao.SurveyTemplateDao;
-import org.tapestry.dao.VolunteerDao;
-import org.tapestry.objects.Patient;
-import org.tapestry.objects.SurveyResult;
-import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.Appointment;
+import org.tapestry.objects.Patient;
+import org.tapestry.objects.Report;
+import org.tapestry.objects.SurveyResult;
+import org.tapestry.report.AlertsInReport;
 //import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.ResultParser;
 import org.yaml.snakeyaml.Yaml;
-import org.tapestry.objects.Report;
-import org.tapestry.report.AlertsInReport;;
 
 
 @Controller

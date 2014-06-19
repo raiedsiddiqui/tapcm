@@ -104,7 +104,7 @@
 				</td>
 			</tr>
 		</table>
- 
+ <!-- 
 <h2>Availability</h2>
 
 	<table width="100%" border="1">
@@ -189,7 +189,7 @@
 		</tr>
 		
 	</table>
-
+ -->
 	<h2>Upcoming Visits</h2>
 	<table  class="table table-stripe" width="970" border="1">
 		<tr>

@@ -3,14 +3,19 @@ package org.tapestry.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.Map;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
@@ -24,31 +29,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.tapestry.controller.utils.MisUtils;
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
+import org.tapestry.dao.MessageDao;
+import org.tapestry.dao.NarrativeDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
-import org.tapestry.dao.NarrativeDao;
-import org.tapestry.dao.MessageDao;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
+import org.tapestry.objects.Availability;
 import org.tapestry.objects.Message;
+import org.tapestry.objects.Narrative;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
-import org.tapestry.objects.Availability;
-import org.tapestry.objects.Narrative;
 import org.yaml.snakeyaml.Yaml;
-
-import java.util.Properties;
-
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Transport;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @Controller
 public class AppointmentController{

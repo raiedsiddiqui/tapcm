@@ -1,16 +1,15 @@
 package org.tapestry.dao;
 
-import org.tapestry.controller.Utils;
-import org.tapestry.objects.User;
-
-import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.tapestry.controller.Utils;
+import org.tapestry.objects.User;
 
 /**
 * UserDAO class
