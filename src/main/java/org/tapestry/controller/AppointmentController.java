@@ -132,12 +132,16 @@ public class AppointmentController{
    		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
    		List<Appointment> allPastAppointments = appointmentDao.getAllPastAppointments();
    		List<Appointment> allPendingAppointments = appointmentDao.getAllPendingAppointments();
+   		Map<String, String> typeMap = Utils.getAppointmentType();
+   		
+   		System.out.println("size of map is === "+ typeMap.size());
    		
    		model.addAttribute("appointments", allAppointments);
    		model.addAttribute("pastAppointments", allPastAppointments);   		
    		model.addAttribute("pendingAppointments", allPendingAppointments);   		
    		model.addAttribute("patients", allPatients);
    		model.addAttribute("activities", allAppointmentActivities);
+   		model.addAttribute("types", typeMap);
    		if(appointmentBooked != null)
    			model.addAttribute("success", appointmentBooked);
    		return "admin/manage_appointments";
@@ -181,9 +185,13 @@ public class AppointmentController{
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
 	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		int patientId = Integer.parseInt(request.getParameter("patient"));
-		Patient p = patientDao.getPatientByID(patientId);			
+		String type = request.getParameter("appointmentType");
 		
+		System.out.println("Type is === " + type);
+		Patient p = patientDao.getPatientByID(patientId);
 		Appointment a = new Appointment();
+		
+		a.setType(type);
 		a.setVolunteerID(p.getVolunteer());
 		a.setPartnerId(p.getPartner());
 		a.setPatientID(p.getPatientID());
@@ -417,6 +425,14 @@ public class AppointmentController{
 			}
 		}		
 		return "/admin/view_scheduler";
+	}
+	
+	private boolean isFirstVisit(int patientId){
+		boolean isFirst = false;
+//		appointmentDao.get
+		
+		return isFirst;
+		
 	}
 	
 	@RequestMapping(value="/schedule_appointment", method=RequestMethod.POST)

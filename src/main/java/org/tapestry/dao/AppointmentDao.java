@@ -650,7 +650,8 @@ public class AppointmentDao {
     public boolean createAppointment(Appointment a){
     	boolean success = false;
     	try{
-    		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time, partner, status) values (?,?,?,?,?)");
+    		statement = con.prepareStatement("INSERT INTO appointments (volunteer, patient, date_time, partner, status, type)"
+    				+ " values (?,?,?,?,?, ?)");
     		statement.setInt(1, a.getVolunteerID());
     		statement.setInt(2, a.getPatientID());
     		statement.setString(3, a.getDate() + " " + a.getTime());
@@ -660,6 +661,8 @@ public class AppointmentDao {
     		else 
     			statement.setString(4, null);
     		statement.setString(5, "Awaiting Approval");
+    		statement.setString(6, a.getType());
+    		
     		statement.execute();
     		
     		success = true;
@@ -975,6 +978,7 @@ public class AppointmentDao {
     		a.setCompleted(result.getBoolean("completed"));
     		a.setContactedAdmin(result.getBoolean("contactedAdmin"));
     		a.setHasNarrative(result.getBoolean("hasNarrative"));
+    		a.setType(result.getString("type"));
     		
     		return a;
     	} catch (SQLException e){

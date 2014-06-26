@@ -34,8 +34,22 @@
 			for (var i = 0; i < inputs.length; i++) 
 			{  
 				  if (inputs[i].type == "checkbox" && inputs[i].name != "assignAllClinets")	
-					inputs[i].disabled = assignToAll.checked;
+					  inputs[i].disabled = assignToAll.checked;					
 			}
+			
+			if (assignToAll.checked)
+			{
+				document.getElementById("searchPatient").disabled = true; 
+				document.getElementById('searchPatientName').disabled = true;
+			//	document.getElementById('searchPatientName').readOnly = true;
+			}				
+			else
+			{
+				document.getElementById("searchPatient").disabled = false;
+				document.getElementById('searchPatientName').disabled = false;
+		//		document.getElementById('searchPatientName').readOnly = false;
+			}
+				
 		}
 		
 	</script>
@@ -68,8 +82,8 @@
 					<label>Select Client : </label><br/>			
 					<input type="checkbox" name="assignAllClinets" id="toAll" style="margin-bottom:10px;" onclick="disablePatientCheckbox()" value="true" >Assign to All clients</input><br/>
 					<div class="right">					
-						<input type="text" name="searchPatientName" value="${searchPatientName}" />
-						<input class="btn btn-primary" type="submit" name="searchPatient" value="Search" />				
+						<input type="text" id = "searchPatientName" name="searchPatientName" value="${searchPatientName}" />
+						<input class="btn btn-primary" type="submit" id = "searchPatient" name="searchPatient" value="Search" />				
 					</div>
 					<div style="height:106px; overflow:auto">
 						<table border="1" cellspacing="0" cellpadding = "0">			

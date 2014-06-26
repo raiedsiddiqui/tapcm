@@ -22,6 +22,7 @@ public class Appointment{
 	private String alerts;
 	private String plans;
 	private String keyObservation;
+	private String type;
 
 	/**
 	 * Empty constructor
@@ -227,5 +228,14 @@ public class Appointment{
 
 	public void setKeyObservation(String keyObservation) {
 		this.keyObservation = keyObservation;
+	}
+	
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 }
