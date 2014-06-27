@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -530,6 +531,26 @@ public class Utils {
 		
 		return clinics.get(code);		
 	}
+	
+	/**
+	 * 
+	 * hardcode appointment's type
+	 */
+	public static Map<String, String> getAppointmentType(){
+		Map<String, String> tMap = new TreeMap<String, String>();
+		
+		tMap.put("1", "First Visit");
+		tMap.put("2", "First Follow-up Visit");
+		tMap.put("3", "Second Follow-up Visit");
+		tMap.put("4", "Third Follow-up Visit");
+		tMap.put("5", "Forth Follow-up Visit");
+		tMap.put("6", "Fifth Follow-up Visit");
+		tMap.put("7", "Sixth Follow-up Visit");
+		
+		return tMap;
+	}
+	
+	
 	
 	public static int getVolunteerByLoginUser(SecurityContextHolderAwareRequestWrapper request, UserDao uDao, VolunteerDao vDao){
 		int volunteerId=0;

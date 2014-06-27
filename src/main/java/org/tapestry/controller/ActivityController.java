@@ -85,12 +85,12 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 	}
 	
 	@RequestMapping(value="/view_activityLogs", method=RequestMethod.GET)
-	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		HttpSession  session = request.getSession();		
 		int volunteerId = getVolunteerIdFromLoginUser(request);	
 		List<Activity> activities = new ArrayList<Activity>();
 		activities = activityDao.getAllActivitiesForVolunteer(volunteerId, true);
-		
+				
 		//check if there is message should be displayed
 		if (session.getAttribute("ActivityMessage") != null)
 		{

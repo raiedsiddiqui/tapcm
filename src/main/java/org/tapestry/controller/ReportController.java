@@ -37,6 +37,7 @@ import org.tapestry.report.AlertsInReport;
 //import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.ResultParser;
 import org.yaml.snakeyaml.Yaml;
+import org.tapestry.myoscar.utils.*;
 
 
 @Controller
@@ -356,6 +357,19 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			vMap.put(" C", " ");
 		
 		report.setVolunteerInformations(vMap);
+		
+		//testing on myoscar web service
+//		MyOscarHelper myHelper = new MyOscarHelper();
+		
+		
+		System.out.println("calling myoscar---" + MyOscarHelper.exists("https://127.0.0.1:8091/myoscar_server"));
+//		System.out.println("calling myoscar by other way ---" + MyOscarHelper.existsByOtherWay("https://127.0.0.1:8091/myoscar_server"));
+		
+//		try {
+//			myHelper.example();
+//		}catch (Exception e){
+//			System.out.println("Some exception occured when try to call myoscar to get patient's info   " + e.getMessage());
+//		}
 		
 		model.addAttribute("report", report);
 		return "/admin/view_report";

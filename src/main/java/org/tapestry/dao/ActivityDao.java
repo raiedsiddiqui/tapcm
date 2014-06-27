@@ -482,7 +482,8 @@ public class ActivityDao {
     	Activity activity = new Activity();
     	
     	try{
-    		String sql = "SELECT event_ID, event_timestamp, description, start_Time, end_Time, volunteer FROM activities WHERE event_ID = ?";
+    		String sql = "SELECT event_ID, event_timestamp, description, start_Time, end_Time, volunteer"
+    				+ " FROM activities WHERE event_ID = ?";
     		stmt = con.prepareStatement(sql);
     		stmt.setInt(1, activityId);
     		
