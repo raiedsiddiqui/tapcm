@@ -1,18 +1,16 @@
 package org.tapestry.dao;
 
-import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
-import org.tapestry.objects.Activity;
-
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.tapestry.controller.Utils;
+import org.tapestry.objects.Activity;
 
 /**
  * ActivityDAO
@@ -484,7 +482,8 @@ public class ActivityDao {
     	Activity activity = new Activity();
     	
     	try{
-    		String sql = "SELECT event_ID, event_timestamp, description, start_Time, end_Time FROM activities WHERE event_ID = ?";
+    		String sql = "SELECT event_ID, event_timestamp, description, start_Time, end_Time, volunteer"
+    				+ " FROM activities WHERE event_ID = ?";
     		stmt = con.prepareStatement(sql);
     		stmt.setInt(1, activityId);
     		
@@ -569,7 +568,7 @@ public class ActivityDao {
     					activity.setTime(Utils.timeFormat(strStartTime) + " -");
     			}
     			
-    			//set volunteer
+    			//set volunteer    
     			int vId = rs.getInt("volunteer");
     			activity.setVolunteer(String.valueOf(vId));
     			stmt = con.prepareStatement("SELECT firstname, lastname FROM volunteers WHERE volunteer_ID = ? ORDER BY lastname DESC ");		

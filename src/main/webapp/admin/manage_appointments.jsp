@@ -356,6 +356,12 @@
 				    	<i class="icon-time"></i>
 				    </span>
 				</div>
+				<label>type:</label>
+				<select name="appointmentType" form="appt-form">
+					<c:forEach items="${types}" var="t">
+						<option value="${t.key}">${t.value}</option>
+					</c:forEach>
+				</select><br />
   			</form>
 
       </div>

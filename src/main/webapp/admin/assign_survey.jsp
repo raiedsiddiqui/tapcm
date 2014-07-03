@@ -34,8 +34,22 @@
 			for (var i = 0; i < inputs.length; i++) 
 			{  
 				  if (inputs[i].type == "checkbox" && inputs[i].name != "assignAllClinets")	
-					inputs[i].disabled = assignToAll.checked;
+					  inputs[i].disabled = assignToAll.checked;					
 			}
+			
+			if (assignToAll.checked)
+			{
+				document.getElementById("searchPatient").disabled = true; 
+				document.getElementById('searchPatientName').disabled = true;
+			//	document.getElementById('searchPatientName').readOnly = true;
+			}				
+			else
+			{
+				document.getElementById("searchPatient").disabled = false;
+				document.getElementById('searchPatientName').disabled = false;
+		//		document.getElementById('searchPatientName').readOnly = false;
+			}
+				
 		}
 		
 	</script>
@@ -62,39 +76,44 @@
 					<option value="${st.surveyID}">${st.title}</option>
 				</c:forEach>
 			</select><br/>
-			<label>Select Client : </label><br/>			
-			<input type="checkbox" name="assignAllClinets" id="toAll" style="margin-bottom:10px;" onclick="disablePatientCheckbox()" value="true" >Assign to All clients</input><br/>
-			<div class="right">					
-				<input type="text" name="searchPatientName" value="${searchPatientName}" />
-				<input class="btn btn-primary" type="submit" name="searchPatient" value="Search" />				
-			</div>
-			<div style="height:106px; overflow:auto">
-			<table border="1" cellspacing="0" cellpadding = "0">			
-				<tr>
-					<th width="5%"></th>
-					<th width="15%">Name </th>
-					<th width="10%">DOB </th>
-					<th width="5%">Age </th>
-					<th width="5%">Gender </th>
-					<th width="20%">Clinic </th>
-					<th width="15%">MRP </th>
-					<th width="10%">City </th>
-					<th width="15%">Phone Number</th>
-				</tr>				
-					<c:forEach items="${patients}" var="p">
-						<tr>
-							<td style="text-align:center;"><input type="checkbox" id ="patientId" name="patientId" value="${p.patientID}" /></td>
-							<td>${p.firstName} ${p.lastName} </td>
-							<td>${p.bod}</td>
-							<td>${p.age}</td>
-							<td>${p.gender}</td>
-							<td>${p.clinicName}</td>
-							<td>${p.mrp}</td>
-							<td>${p.city}</td>
-							<td>${p.homePhone}</td>
-						</tr>	
-					</c:forEach>							
-			</table>
+			<input type ="hidden" value="${patient}" name = "patient" />
+			<div id="clients">			
+				<c:if test="${empty hideClients}">   									
+					<label>Select Client : </label><br/>			
+					<input type="checkbox" name="assignAllClinets" id="toAll" style="margin-bottom:10px;" onclick="disablePatientCheckbox()" value="true" >Assign to All clients</input><br/>
+					<div class="right">					
+						<input type="text" id = "searchPatientName" name="searchPatientName" value="${searchPatientName}" />
+						<input class="btn btn-primary" type="submit" id = "searchPatient" name="searchPatient" value="Search" />				
+					</div>
+					<div style="height:106px; overflow:auto">
+						<table border="1" cellspacing="0" cellpadding = "0">			
+							<tr>
+								<th width="5%"></th>
+								<th width="15%">Name </th>
+								<th width="10%">DOB </th>
+								<th width="5%">Age </th>
+								<th width="5%">Gender </th>
+								<th width="20%">Clinic </th>
+								<th width="15%">MRP </th>
+								<th width="10%">City </th>
+								<th width="15%">Phone Number</th>
+							</tr>				
+								<c:forEach items="${patients}" var="p">
+									<tr>
+										<td style="text-align:center;"><input type="checkbox" id ="patientId" name="patientId" value="${p.patientID}" /></td>
+										<td>${p.firstName} ${p.lastName} </td>
+										<td>${p.bod}</td>
+										<td>${p.age}</td>
+										<td>${p.gender}</td>
+										<td>${p.clinicName}</td>
+										<td>${p.mrp}</td>
+										<td>${p.city}</td>
+										<td>${p.homePhone}</td>
+									</tr>	
+								</c:forEach>							
+						</table>
+					</div>
+				</c:if>
 			</div>
 			<br/><br/>
 			<div class="right">

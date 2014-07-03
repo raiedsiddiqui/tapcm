@@ -104,7 +104,7 @@
 				</td>
 			</tr>
 		</table>
- 
+ <!-- 
 <h2>Availability</h2>
 
 	<table width="100%" border="1">
@@ -189,7 +189,7 @@
 		</tr>
 		
 	</table>
-
+ -->
 	<h2>Upcoming Visits</h2>
 	<table  class="table table-stripe" width="970" border="1">
 		<tr>
@@ -226,7 +226,7 @@
 		</c:forEach>
 	</table>
 	
-	<h2>Surveys <a href="">Assign Survey</a> </h2>
+	<h2>Surveys <a href="<c:url value="/go_assign_survey/${patient.patientID}"/>">Assign Survey</a> </h2>
 	<table  width="970" border="1">
 		<tr>
 			<th width="200">Assigned Surveys</th>

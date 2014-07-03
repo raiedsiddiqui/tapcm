@@ -14,14 +14,12 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.tapestry.dao.UserDao;
 import org.tapestry.dao.ActivityDao;
+import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
-
-import org.tapestry.controller.Utils;
 
 @Controller
 public class ActivityController {
@@ -87,12 +85,12 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 	}
 	
 	@RequestMapping(value="/view_activityLogs", method=RequestMethod.GET)
-	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		HttpSession  session = request.getSession();		
 		int volunteerId = getVolunteerIdFromLoginUser(request);	
 		List<Activity> activities = new ArrayList<Activity>();
 		activities = activityDao.getAllActivitiesForVolunteer(volunteerId, true);
-		
+				
 		//check if there is message should be displayed
 		if (session.getAttribute("ActivityMessage") != null)
 		{

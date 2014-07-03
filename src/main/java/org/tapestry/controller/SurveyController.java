@@ -4,19 +4,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.servlet.http.HttpSession;
-import javax.servlet.ServletOutputStream;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -30,9 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
-import org.survey_component.data.SurveyMap;
 import org.survey_component.data.SurveyQuestion;
-
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
@@ -48,8 +45,8 @@ import org.tapestry.objects.User;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.ResultParser;
 import org.tapestry.surveys.SurveyFactory;
-import org.tapestry.surveys.TapestrySurveyMap;
 import org.tapestry.surveys.TapestryPHRSurvey;
+import org.tapestry.surveys.TapestrySurveyMap;
 import org.yaml.snakeyaml.Yaml;
 
 @Controller
@@ -148,107 +145,124 @@ public class SurveyController{
 		return "admin/manage_surveys";
 	}
    	
-   	@RequestMapping(value="/go_assign_survey", method=RequestMethod.GET)
-	public String goAssignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) throws JAXBException, DatatypeConfigurationException, Exception{
+   	@RequestMapping(value="/go_assign_survey/{patientId}", method=RequestMethod.GET)
+	public String goAssignSurvey(@PathVariable("patientId") int id, SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model){
    		
-   		List<Patient> patients = getPatients(request);
    		List<SurveyTemplate> surveyTemplates = getSurveyTemplates(request);
+   		//Assign Survey in Survey Mangement, it will load all patients in the table with checkbox for later selection
+   		if (id == 0)
+   		{
+   			List<Patient> patients = getPatients(request);
+   			
+   			if(patients == null || surveyTemplates == null)
+   				return "redirect:/manage_surveys?failed=true";
+   			else
+   			{
+   				model.addAttribute("patients", patients);
+   				model.addAttribute("surveyTemplates", surveyTemplates);
+   			}
+   		}//Assign Survey in Client/details, assign surveys for selected patient
+   		else
+   		{
+   			model.addAttribute("patient", id);
+   			
+   			if (surveyTemplates == null)
+   				return "redirect:/manage_surveys?failed=true";
+   			else
+   			{
+   				model.addAttribute("surveyTemplates", surveyTemplates);
+   				model.addAttribute("hideClients", true);
+   			}
+   		}
    		
-		if(patients == null || surveyTemplates == null) {
-			
-			return "redirect:/manage_surveys?failed=true";
-		}
-		else
-		{
-			 model.addAttribute("patients", patients);
-			 model.addAttribute("surveyTemplates", surveyTemplates);
-		}
-
-		return "admin/assign_survey";
-	}
+		return "/admin/assign_survey";
+	} 
    	
    	@RequestMapping(value="/assign_selectedsurvey", method=RequestMethod.POST)
 	public String assignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) 
-			throws JAXBException, DatatypeConfigurationException, Exception{   		
-   		List<Patient> patients = getPatients(request);
+			throws JAXBException, DatatypeConfigurationException, Exception{      		
    		List<SurveyTemplate> sTemplates = getSurveyTemplates(request);
- 		
-   		if (request.getParameter("searchPatient") != null && request.getParameter("searchPatientName") !=null )//search patient by name
-   		{
-   			String name = request.getParameter("searchPatientName");   			
-   			
-   			patients = patientDao.getPatientssByPartialName(name);			
-   			model.addAttribute("searchPatientName", name);	 
-   			
-   		}
-   		else if(request.getParameter("assignSurvey") != null)//assign selected surveys to selected patients
-   		{   	   		
-   	   		String[] surveyTemplateIds = request.getParameterValues("surveyTemplates");
-   	   		String[] selectedPatientIds = request.getParameterValues("patientId");
-   	   		String assignToAll = request.getParameter("assignAllClinets");
-   	   		int[] patientIds;
-   	   		ArrayList<SurveyTemplate> selectSurveyTemplats = new ArrayList<SurveyTemplate>();
-   	   		
-   	   		//get survey template list 
-   	   		if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
-   	   			int surveyTemplateId;
-   	   			
-   	   			for (int i = 0; i < surveyTemplateIds.length; i ++){
-   	   				//Integer.parseInt(request.getParameter("patient"));   				
-   	   				surveyTemplateId = Integer.parseInt(surveyTemplateIds[i]);
-   	   				
-   	   				for (SurveyTemplate st: sTemplates){
-   	   	   				if (surveyTemplateId == st.getSurveyID())
-   	   	   				selectSurveyTemplats.add(st);
-   	   	   			}
-   	   			}   
-   	   			
-	   	   		if ("true".equalsIgnoreCase(assignToAll))
-	   	   		{//for assign to all clients   			
-	   	   			Patient patient;   			
-	   	   			patientIds = new int[patients.size()];
-	   	   			
-	   	   			for(int i = 0; i < patients.size(); i++){
-	   	   				patient = new Patient();
-	   	   				patient = patients.get(i);
-	   	   				patientIds[i] = patient.getPatientID();
-	   	   			}
-	   	   			
-	   	   			try{
-	   	   				//assign all selected surveys to all clients
-	   	   				assignSurveysToClient(selectSurveyTemplats, patientIds, request);
-	   	   				model.addAttribute("successful", true);
-	   	   			}catch (Exception e){
-	   	   				System.out.println("something wrong");
-	   	   			}   			
-	   	   		}
-	   	   		else
-	   	   		{//for selected patients
-	   	   			//convert String[] to int[]   			
-	   	   			if (selectedPatientIds == null || selectedPatientIds.length == 0)
-	   	   				model.addAttribute("no_patient_selected", true);
-	   	   			else
-	   	   			{
-	   	   				int[] iSelectedPatientIds = new int[selectedPatientIds.length];
-	   	   	   			for (int j = 0; j < selectedPatientIds.length; j++){
-	   	   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
-	   	   				}
-	   	   					
-	   	   	   			try{   				
-	   	   	   				assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request);
-	   	   	   				model.addAttribute("successful", true);
-	   	   	   			}catch (Exception e){
-	   	   	   				System.out.println("something wrong");
-	   	   	   			}  
-	   	   			}   			
-	   	   		} 
-   	   		}
-   	   		else//no survey template has been selected
-   	   			model.addAttribute("no_survey_selected", true);
-   		}
-   		model.addAttribute("surveyTemplates", sTemplates);
-   		model.addAttribute("patients", patients);
+   		List<Patient> patients = getPatients(request);   	
+   		ArrayList<SurveyTemplate> selectSurveyTemplats = new ArrayList<SurveyTemplate>();
+   		String[] surveyTemplateIds = request.getParameterValues("surveyTemplates"); 
+   		int[] patientIds;
    		
+   		//if user selects Client/Details/Assign Survey, patient id would store in hidden field called patient   		
+   		String hPatient = request.getParameter("patient");
+   		if (!Utils.isNullOrEmpty(hPatient))
+   		{      			
+   			if(request.getParameter("assignSurvey") != null)//assign selected surveys to selected patients
+   	   		{   
+   				if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
+
+   					addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);   
+   					
+   	   	   			patientIds = new int[] {Integer.valueOf(hPatient)};
+   	   	   			
+   	   	   			assignSurveysToClient(selectSurveyTemplats, patientIds, request, model);   		   	   		 
+   	   	   		}
+   	   	   		else//no survey template has been selected
+   	   	   		{
+   	   	   			model.addAttribute("no_survey_selected", true);   	
+   	   	   			return "admin/assign_survey";
+   	   	   		}
+   				return "redirect:/display_client/" + hPatient;  
+   	   		}
+   		}
+   		else//user select SurveyManagement/Assign Survey
+   		{ 		
+	   		if (request.getParameter("searchPatient") != null && 
+	   				request.getParameter("searchPatientName") !=null )//search patient by name
+	   		{
+	   			String name = request.getParameter("searchPatientName");   			
+	   			
+	   			patients = patientDao.getPatientssByPartialName(name);			
+	   			model.addAttribute("searchPatientName", name);	 
+	   			
+	   		}
+	   		else if(request.getParameter("assignSurvey") != null)//assign selected surveys to selected patients
+	   		{    	   		
+	   	   		String[] selectedPatientIds = request.getParameterValues("patientId");
+	   	   		String assignToAll = request.getParameter("assignAllClinets");	   	   		   	   		
+	   	   		
+	   	   		//get survey template list 
+	   	   		if (surveyTemplateIds != null && surveyTemplateIds.length > 0)
+	   	   		{
+	   	   			addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);   
+	   	   			
+		   	   		if ("true".equalsIgnoreCase(assignToAll))
+		   	   		{//for assign to all clients   			
+		   	   			Patient patient;   			
+		   	   			patientIds = new int[patients.size()];
+		   	   			
+		   	   			for(int i = 0; i < patients.size(); i++){
+		   	   				patient = new Patient();
+		   	   				patient = patients.get(i);
+		   	   				patientIds[i] = patient.getPatientID();
+		   	   			}		   	   			
+		   	   			assignSurveysToClient(selectSurveyTemplats, patientIds, request, model);			
+		   	   		}
+		   	   		else
+		   	   		{//for selected patients, convert String[] to int[]   			
+		   	   			if (selectedPatientIds == null || selectedPatientIds.length == 0)
+		   	   				model.addAttribute("no_patient_selected", true);
+		   	   			else
+		   	   			{
+		   	   				int[] iSelectedPatientIds = new int[selectedPatientIds.length];
+		   	   	   			for (int j = 0; j < selectedPatientIds.length; j++){
+		   	   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
+		   	   				}
+		   	   	   			assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request, model);
+		   	   			}   			
+		   	   		} 
+	   	   		}
+	   	   		else//no survey template has been selected
+	   	   			model.addAttribute("no_survey_selected", true);
+	   		}
+	   		model.addAttribute("surveyTemplates", sTemplates);
+	   		model.addAttribute("patients", patients);
+   		}
 		return "admin/assign_survey";
 	}
    
@@ -319,8 +333,7 @@ public class SurveyController{
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		SurveyTemplate surveyTemplate = surveyTemplateDao.getSurveyTemplateByID(surveyResult.getSurveyID());
 		
-		//all survey results stored in map
-		
+		//all survey results stored in map		
 		TapestrySurveyMap userSurveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);			
 		TapestryPHRSurvey currentSurvey = userSurveys.getSurvey(Integer.toString(id));
 				
@@ -424,8 +437,7 @@ public class SurveyController{
    		
    		LinkedHashMap<String, String> res = ResultParser.getResults(xml);
    		List<DisplayedSurveyResult> displayedResults = ResultParser.getDisplayedSurveyResults(res);
-   		   		
-//   		model.addAttribute("results", res);
+
    		model.addAttribute("results", displayedResults);
    		model.addAttribute("id", id);
    		return "/admin/view_survey_results";
@@ -564,6 +576,32 @@ public class SurveyController{
 		    	}
 			}   			
 		}
+   	}
+   	
+  	private void addSurveyTemplate(String[] surveyId,List<SurveyTemplate> allSurveyTemplates, 
+   			ArrayList<SurveyTemplate> selectedSurveyTemplates){
+   		int surveyTemplateId;
+   		for (int i = 0; i < surveyId.length; i ++)
+   		{  						
+   			surveyTemplateId = Integer.parseInt(surveyId[i]);
+  				
+  			for (SurveyTemplate st: allSurveyTemplates){
+  				if (surveyTemplateId == st.getSurveyID())
+  					selectedSurveyTemplates.add(st);
+  	   		}
+   		}
+   	}
+   	
+   	private void assignSurveysToClient(ArrayList<SurveyTemplate> selectSurveyTemplats, int[] patientIds,
+   			SecurityContextHolderAwareRequestWrapper request,ModelMap model) 
+   					throws JAXBException, DatatypeConfigurationException, Exception{
+   		try
+   		{   				
+   			assignSurveysToClient(selectSurveyTemplats, patientIds, request);
+   			model.addAttribute("successful", true);
+  		}catch (Exception e){
+  			System.out.println("something wrong");
+  		} 
    	}
 	
 	

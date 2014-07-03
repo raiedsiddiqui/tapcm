@@ -1,17 +1,20 @@
 package org.tapestry.surveys;
 
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-import org.xml.sax.InputSource;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.io.File;
 import java.io.StringReader;
-import java.util.Scanner;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.tapestry.objects.DisplayedSurveyResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 
 

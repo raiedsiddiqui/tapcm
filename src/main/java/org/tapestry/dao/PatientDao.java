@@ -1,17 +1,15 @@
 package org.tapestry.dao;
 
-import org.tapestry.controller.Utils;
-import org.tapestry.objects.Patient;
-import org.tapestry.objects.User;
-import org.tapestry.objects.Volunteer;
-
-import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.tapestry.controller.Utils;
+import org.tapestry.objects.Patient;
 
 /**
 * PatientDAO class
@@ -199,8 +197,10 @@ public class PatientDao {
     	//check if it is new record in DB
     	if(!isExist(p)){
     		try{
-    			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
-    					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, availability) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+//    			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
+//    					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, availability) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+       			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
+    					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     			statement.setString(1, p.getFirstName());
     			statement.setString(2, p.getLastName());
     			statement.setString(3, p.getPreferredName());
@@ -211,7 +211,7 @@ public class PatientDao {
     			statement.setString(8, p.getAlerts());
     			statement.setString(9, p.getMyoscarVerified());
     			statement.setString(10, p.getClinic());
-    			statement.setString(11, p.getAvailability());
+ //   			statement.setString(11, p.getAvailability());
     			
     			statement.execute();
     		} catch (SQLException e){
@@ -234,8 +234,10 @@ public class PatientDao {
      */
     public void updatePatient(Patient p){
     	try{
+ //   		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, preferredname=?, volunteer=?, "
+ //   				+ "gender=?, notes=?, clinic=?, availability=?, myoscar_verified=?, alerts=?, volunteer2=? WHERE patient_ID=?");
     		statement = con.prepareStatement("UPDATE patients SET firstname=?, lastname=?, preferredname=?, volunteer=?, "
-    				+ "gender=?, notes=?, clinic=?, availability=?, myoscar_verified=?, alerts=?, volunteer2=? WHERE patient_ID=?");
+    				+ "gender=?, notes=?, clinic=?, myoscar_verified=?, alerts=?, volunteer2=? WHERE patient_ID=?");
     		statement.setString(1, p.getFirstName());
     		statement.setString(2, p.getLastName());
     		statement.setString(3, p.getPreferredName());
@@ -243,11 +245,11 @@ public class PatientDao {
     		statement.setString(5, p.getGender());
     		statement.setString(6, p.getNotes());
     		statement.setString(7, p.getClinic());
-    		statement.setString(8, p.getAvailability());
-    		statement.setString(9, p.getMyoscarVerified());
-    		statement.setString(10, p.getAlerts());
-    		statement.setInt(11,p.getPartner());
-    		statement.setInt(12, p.getPatientID());   		
+ //   		statement.setString(8, p.getAvailability());
+    		statement.setString(8, p.getMyoscarVerified());
+    		statement.setString(9, p.getAlerts());
+    		statement.setInt(10,p.getPartner());
+    		statement.setInt(11, p.getPatientID());   		
     		
     		statement.execute();
     	} catch (SQLException e){
@@ -311,7 +313,7 @@ public class PatientDao {
 			
 			p.setVolunteer(result.getInt("volunteer"));
 			p.setNotes(result.getString("notes"));
-			p.setAvailability(result.getString("availability"));
+//			p.setAvailability(result.getString("availability"));
 			p.setAlerts(result.getString("alerts"));	
 			
 			String myOscarVerfied = result.getString("myoscar_verified");

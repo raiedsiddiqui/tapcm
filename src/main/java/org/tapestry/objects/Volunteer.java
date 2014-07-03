@@ -1,6 +1,5 @@
 package org.tapestry.objects;
 
-import java.util.Map;
 
 public class Volunteer {
 	private int volunteerId;

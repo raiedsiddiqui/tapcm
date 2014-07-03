@@ -7,10 +7,8 @@ import org.apache.log4j.Logger;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyDirectionStatement;
 import org.survey_component.data.SurveyQuestion;
-import org.survey_component.data.answer.SurveyAnswer;
 import org.survey_component.logic.LogicFactory;
 import org.survey_component.source.SurveyParseException;
-import org.tapestry.controller.Utils;
 
 public class TapestryPHRSurvey extends PHRSurvey {
 

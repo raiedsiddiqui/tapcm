@@ -95,9 +95,9 @@
 					</div>
 				</div>
 				
-				<label>Availability:</label><br/>
-				<%@include file="edit_availabilities.jsp" %>
-				
+	<!--  			<label>Availability:</label><br/>
+				<%@include file="edit_availabilities.jsp" %> 
+			-->	
 
 				<div class="row form-group">	
 					<div class="col-md-10">

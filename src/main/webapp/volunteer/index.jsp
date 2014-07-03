@@ -125,7 +125,11 @@
 		</c:if>
 		<div class="row-fluid">
 			<div class="col-md-6">
+			
 				<button id="homebtn"> <span class="glyphicon glyphicon-pencil"></span> <a href="<c:url value="/view_activityLogs"/>">Activity Log</a></button>
+			
+<!-- 			<a href="<c:url value="/view_activityLogs"/>" class="btn btn-primary">Activity Log</a>
+-->
 			</div>
 
 			<div class="col-md-6">

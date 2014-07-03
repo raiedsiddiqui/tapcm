@@ -1,9 +1,10 @@
 package org.tapestry.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpSession;
@@ -16,15 +17,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.tapestry.dao.AppointmentDao;
+import org.tapestry.dao.NarrativeDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
-import org.tapestry.dao.NarrativeDao;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Narrative;
 import org.tapestry.objects.Patient;
-import org.tapestry.controller.Utils;
-
-import java.util.Properties;
 
 @Controller
 public class NarrativeController {

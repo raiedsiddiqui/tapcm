@@ -48,13 +48,22 @@
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
 		<H2>Patient Information</H2><br>
+		<table>
+			<tr>
+				<td><label>Patient:</label> ${patient.firstName} ${patient.lastName}</td>
+				<td><label>Address:</label> </td>			
+			</tr>
+			<tr>
+				<td><label>MRP:</label></td>
+				<td><label>Date of visit:</label> ${appointment.date }</td>				
+			</tr>
+			<tr>
+				<td><label>Time: </label> ${appointment.time }</td>
+				<td><label>Visit: </label> ${appointment.type }</td>				
+			</tr>
+		</table>
 		
-			Patient: ${patient.firstName} ${patient.lastName}
-			Address:
-			MrP:
-			Date of Visit: ${appointment.date }
-			Time: ${appointment.time }
-			Visit:
+			
 			
 			<hr/>
 			

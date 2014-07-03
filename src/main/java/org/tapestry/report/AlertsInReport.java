@@ -1,53 +1,6 @@
 package org.tapestry.report;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.servlet.http.HttpSession;
-import javax.servlet.ServletOutputStream;
-
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
-import org.survey_component.actions.SurveyAction;
-import org.survey_component.data.PHRSurvey;
-import org.survey_component.data.SurveyMap;
-import org.survey_component.data.SurveyQuestion;
-import org.tapestry.dao.ActivityDao;
-import org.tapestry.dao.AppointmentDao;
-import org.tapestry.dao.PatientDao;
-import org.tapestry.dao.SurveyResultDao;
-import org.tapestry.dao.SurveyTemplateDao;
-import org.tapestry.dao.UserDao;
-import org.tapestry.objects.Appointment;
-import org.tapestry.objects.DisplayedSurveyResult;
-import org.tapestry.objects.Patient;
-import org.tapestry.objects.SurveyResult;
-import org.tapestry.objects.SurveyTemplate;
-import org.tapestry.objects.User;
-import org.tapestry.surveys.DoSurveyAction;
-import org.tapestry.surveys.ResultParser;
-import org.tapestry.surveys.SurveyFactory;
-import org.yaml.snakeyaml.Yaml;
 
 public class AlertsInReport {	
 	private boolean hasSocialAlert;

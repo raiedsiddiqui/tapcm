@@ -115,8 +115,10 @@
 						<option value="1">West End Clinic</option>
 						<option value="2">Stonechurch Family Health Center</option>
 					</select>
+					<!-- 
 					<label>Availability:</label><br/>
-					<%@include file="add_availabilities.jsp" %>
+					<%@include file="add_availabilities.jsp" %>   
+					-->
 					<label>Notes</label>
 					<textarea name="notes" class="form-control"></textarea>
 					<label>Alerts</label>

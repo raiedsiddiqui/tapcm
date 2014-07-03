@@ -1,66 +1,46 @@
 package org.tapestry.controller;
 
-import org.springframework.stereotype.Controller;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.PostConstruct;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
-
-import org.tapestry.dao.SurveyTemplateDao;
-import org.tapestry.dao.UserDao;
-import org.tapestry.dao.PatientDao;
+import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
-import org.tapestry.dao.SurveyResultDao;
+import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.PictureDao;
-import org.tapestry.objects.SurveyResult;
-import org.tapestry.dao.ActivityDao;
-import org.tapestry.objects.SurveyTemplate;
-import org.tapestry.objects.User;
-import org.tapestry.objects.Patient;
+import org.tapestry.dao.SurveyResultDao;
+import org.tapestry.dao.SurveyTemplateDao;
+import org.tapestry.dao.UserDao;
+import org.tapestry.dao.VolunteerDao;
+import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
-import org.tapestry.objects.Activity;
+import org.tapestry.objects.Patient;
 import org.tapestry.objects.Picture;
-import org.tapestry.surveys.DoSurveyAction;
-import org.tapestry.surveys.SurveyFactory;
-import org.tapestry.dao.VolunteerDao;
-import org.tapestry.objects.Volunteer;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.log4j.Logger;
+import org.tapestry.objects.User;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.IOException;
-import java.util.Map;
-
-import org.springframework.core.io.ClassPathResource;
-import org.survey_component.actions.SurveyAction;
-import org.survey_component.data.PHRSurvey;
-import org.survey_component.data.SurveyMap;
-import org.survey_component.data.SurveyQuestion;
-import org.survey_component.services.SurveyServiceIndivo;
-
-import javax.annotation.PostConstruct;
-
-import java.util.Properties;
-
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Transport;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpSession;
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-
-import java.util.Collections;
 
 
 /**

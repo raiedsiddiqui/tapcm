@@ -3,11 +3,8 @@ package org.tapestry.surveys;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
-
-
-import org.tapestry.surveys.TapestryPHRSurvey;
+import java.util.Set;
 
 public class TapestrySurveyMap extends LinkedHashMap<String, TapestryPHRSurvey> {
 	
