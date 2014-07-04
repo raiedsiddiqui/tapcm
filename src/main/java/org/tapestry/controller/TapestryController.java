@@ -181,22 +181,31 @@ public class TapestryController{
 			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
 			List<Appointment> pendingAppointments = new ArrayList<Appointment>();
 			List<Appointment> declinedAppointments = new ArrayList<Appointment>();
-			if(patientId != null) {
-				
+			if(patientId != null) {				
 				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
 				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId, volunteerId);
 				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
+				System.out.println("patient id is === "+ patientId);
+				System.out.println("volunteerId id is === "+ volunteerId);
+				if (declinedAppointments != null)
+					System.out.println("size of decline appointment is === "+ declinedAppointments.size());
+				
 				Patient patient = patientDao.getPatientByID(patientId);
 				model.addAttribute("patient", patient);
 				
 				//set patientId in the session for other screen, like narratives 
 				HttpSession  session = request.getSession();		
-				session.setAttribute("patientId", patientId);
-				
-			} else {
+				session.setAttribute("patientId", patientId);				
+			} 
+			else 
+			{
 				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(volunteerId);
 				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(volunteerId);
 				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);
+				
+				System.out.println("volunteerId id is === "+ volunteerId);
+				System.out.println("size of decline appointment is === "+ declinedAppointments.size());
+				
 				/*	approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(u.getUserID());
 				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(u.getUserID());
 				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(u.getUserID());

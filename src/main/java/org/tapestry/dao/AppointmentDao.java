@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import org.apache.log4j.Logger;
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.Appointment;
@@ -45,8 +46,8 @@ public class AppointmentDao {
     public ArrayList<Appointment> getAllAppointments(){
     	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
-    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative, type"
-    				+ "FROM appointments ORDER BY date_time DESC");
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative, "
+    				+ "type FROM appointments ORDER BY date_time DESC");
     		
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -80,8 +81,8 @@ public class AppointmentDao {
     public List<Appointment> getAllPastAppointments(){
     	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
-    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative, type"
-    				+ "FROM appointments WHERE date_time < CURDATE() ORDER BY date_time DESC");
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative, "
+    				+ "type FROM appointments WHERE date_time < CURDATE() ORDER BY date_time DESC");
     		
     		ResultSet result = statement.executeQuery();
        		List<Appointment> allAppointments = new ArrayList<Appointment>();
@@ -113,11 +114,10 @@ public class AppointmentDao {
      */
     public ArrayList<Appointment> getAllPendingAppointments(){
     	try{
-    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
-    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative, type"
-    				+ "FROM appointments WHERE date_time>=CURDATE() AND completed=0 AND status='Awaiting Approval'"
-    				+ " ORDER BY date_time ASC");
-    		
+    		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date,"
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative, "
+    				+ "type FROM appointments WHERE date_time>=CURDATE() AND completed=0 AND status='Awaiting Approval' "
+    				+ "ORDER BY date_time ASC");
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();
        		while(result.next()){
@@ -492,9 +492,9 @@ public class AppointmentDao {
     public List<Appointment> getAllDeclinedAppointmentsForPatient(int patientId, int volunteerId){
     	try{
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
-    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative, type"
-    				+ "FROM appointments WHERE patient=? AND (volunteer=? OR partner=?) AND date_time>=CURDATE()"
-    				+ " AND completed=0 AND status='Declined' ORDER BY date_time ASC");
+    				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner, hasNarrative,type "
+    				+ "FROM appointments WHERE patient=? AND (volunteer=? OR partner=?) AND date_time>=CURDATE() AND completed=0 "
+    				+ "AND status='Declined' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		statement.setInt(2, volunteerId);
     		statement.setInt(3, volunteerId);
@@ -679,7 +679,7 @@ public class AppointmentDao {
     		else 
     			statement.setString(4, null);
     		statement.setString(5, "Awaiting Approval");
-    		statement.setString(6, a.getType());
+    		statement.setInt(6, a.getType());
     		
     		statement.execute();
     		
@@ -999,14 +999,14 @@ public class AppointmentDao {
     		a.setContactedAdmin(result.getBoolean("contactedAdmin"));
     		a.setHasNarrative(result.getBoolean("hasNarrative"));
     		
-    		String type = result.getString("type");
-    		if (!Utils.isNullOrEmpty(type))
-    		{
-    			if (type.equals("1"))
-    				a.setType("First Visit");
-    			else if (type.equals("2"))
-    				a.setType("Follow-up");
-    		}
+    		int type = result.getInt("type");
+    		a.setType(type);
+    		
+    		if (type == 0)
+    			a.setStrType("First Visit");
+    		else
+    			a.setStrType("Follow up Visit");
+    		
     		return a;
     	} catch (SQLException e){
     		System.out.println("Error: Could not create Appointment object");

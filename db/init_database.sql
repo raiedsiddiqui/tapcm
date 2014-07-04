@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS appointments (
 	alerts TEXT,
 	key_observations TEXT,
 	plan TEXT,	
-	type VARCHAR(50),
+	type SMALLINT UNSIGNED NOT NULL,
 	PRIMARY KEY(appointment_ID)
 );
 

@@ -4,9 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.Date;
+import java.text.ParseException;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
@@ -125,25 +131,27 @@ public class AppointmentController{
    	}
    	
    	@RequestMapping(value="/manage_appointments", method=RequestMethod.GET)
-   	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked, 
+   	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked,
+   			@RequestParam(value="noMachedTime", required=false) String noMatchedMsg,
    			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
    		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
    		ArrayList<Patient> allPatients = patientDao.getAllPatients();
    		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
    		List<Appointment> allPastAppointments = appointmentDao.getAllPastAppointments();
    		List<Appointment> allPendingAppointments = appointmentDao.getAllPendingAppointments();
-   		Map<String, String> typeMap = Utils.getAppointmentType();
-   		
-   		System.out.println("size of map is === "+ typeMap.size());
-   		
+   
    		model.addAttribute("appointments", allAppointments);
    		model.addAttribute("pastAppointments", allPastAppointments);   		
    		model.addAttribute("pendingAppointments", allPendingAppointments);   		
    		model.addAttribute("patients", allPatients);
-   		model.addAttribute("activities", allAppointmentActivities);
-   		model.addAttribute("types", typeMap);
+   		model.addAttribute("activities", allAppointmentActivities); 
+   		
    		if(appointmentBooked != null)
    			model.addAttribute("success", appointmentBooked);
+   		
+   		if (noMatchedMsg != null)
+   			model.addAttribute("noMachedTime", noMatchedMsg); 
+   		
    		return "admin/manage_appointments";
    	}
    	
@@ -184,54 +192,161 @@ public class AppointmentController{
    	
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
 	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		int patientId = Integer.parseInt(request.getParameter("patient"));
-		String type = request.getParameter("appointmentType");
 		
-		System.out.println("Type is === " + type);
+		int patientId = Integer.parseInt(request.getParameter("patient"));	
+		String noMatchedMsg="";			
 		Patient p = patientDao.getPatientByID(patientId);
 		Appointment a = new Appointment();
+				
+		//check if selected time matches both volunteer's availability
+		Volunteer volunteer1 = volunteerDao.getVolunteerById(p.getVolunteer());
+		Volunteer volunteer2 = volunteerDao.getVolunteerById(p.getPartner());
+		String vAvailability = volunteer1.getAvailability();
+		String pAvailability = volunteer2.getAvailability();
 		
-		a.setType(type);
-		a.setVolunteerID(p.getVolunteer());
-		a.setPartnerId(p.getPartner());
-		a.setPatientID(p.getPatientID());
-		a.setDate(request.getParameter("appointmentDate"));
-		a.setTime(request.getParameter("appointmentTime"));
-		appointmentDao.createAppointment(a);
+		String date = request.getParameter("appointmentDate");	
+		//format the date from yyyy/MM/dd to yyyy-MM-dd
+		if (date.contains("/"))
+			date = date.replace("/", "-");
 		
-		if(request.isUserInRole("ROLE_USER")) {
-			//Email all the administrators with a notification
+		int dayOfWeek = Utils.getDayOfWeekByDate(date);
+		StringBuffer sb = new StringBuffer();
+		sb.append(String.valueOf(dayOfWeek - 1));
+		String time = request.getParameter("appointmentTime");
+		Map<String, String> m = Utils.getAvailabilityMap();
+		
+		Iterator iterator = m.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry mapEntry = (Map.Entry) iterator.next();
+			
+			if (mapEntry.getValue().toString().contains(time))
+				sb.append(mapEntry.getKey());
+		}
+		String availability = sb.toString();		
+		
+		if ((isAvailableForVolunteer(availability, vAvailability)) && (isAvailableForVolunteer(availability, pAvailability)))
+		{	//both volunteers are avilable, go to create an appointment for patient and send message to admin and volunteers
+			a.setVolunteerID(p.getVolunteer());
+			a.setPartnerId(p.getPartner());
+			a.setPatientID(p.getPatientID());
+			a.setDate(date);
+			a.setTime(time);
+		
+			if (isFirstVisit(patientId))
+				a.setType(0);//first visit
+			else
+				a.setType(1);//follow up
+			
+			//save new appointment in DB and send message 
+			if (appointmentDao.createAppointment(a))
+			{			
+				String logginUser = request.getUserPrincipal().getName();	
+				User user = userDao.getUserByUsername(logginUser);	
+				int volunteer1Id = p.getVolunteer();
+				int volunteer2Id = p.getPartner();
+				int userId = user.getUserID();
+//				String volunteer1Email = volunteer1.getEmail();
+//				String volunteer2Email = volunteer2.getEmail();
+										
+				//send message to both volunteers
+				if (mailAddress != null){					
+					//content of message
+					sb = new StringBuffer();
+					sb.append(logginUser);
+					sb.append(" has booked an appointment for ");
+					sb.append(p.getFirstName());
+					sb.append(" ");
+					sb.append(p.getLastName());
+					sb.append( " at ");
+					sb.append(time);
+					sb.append(" on ");
+					sb.append(date);
+					sb.append(".\n");
+					sb.append("This appointment is awaiting confirmation.");
+					
+					String msg = sb.toString();
+					
+					if (request.isUserInRole("ROLE_ADMIN"))//login as admin/volunteer coordinator
+					{
+				//		String adminEmail= user.getEmail();
+//						if (!Utils.isNullOrEmpty(adminEmail) && !Utils.isNullOrEmpty(volunteer1Email) && !Utils.isNullOrEmpty(volunteer2Email))
+//						{
+							sendMessageToInbox(msg, userId, volunteer1Id);//send message to volunteer1 
+							sendMessageToInbox(msg, userId, volunteer2Id);//send message to volunteer2
+							sendMessageToInbox(msg, userId, userId);//send message to admin self
+	//					}
 						
-			if (mailAddress != null){
-				try{
-					MimeMessage message = new MimeMessage(session);
-					message.setFrom(new InternetAddress(mailAddress));
-					for (User admin : userDao.getAllUsersWithRole("ROLE_ADMIN")){
-						message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(admin.getEmail()));
 					}
-					message.setSubject("Tapestry: New appointment booked");
-					String msg = p.getVolunteerName() + " has booked an appointment with " + p.getFirstName() + " " + p.getLastName();
-					msg += " for " + a.getTime() + " on " + a.getDate() + ".\n";
-					msg += "This appointment is awaiting confirmation.";
-					message.setText(msg);
-					System.out.println(msg);
-					System.out.println("Sending...");
-					Transport.send(message);
-					System.out.println("Email sent to administrators");
-				} catch (MessagingException e) {
-					System.out.println("Error: Could not send email");
-					System.out.println(e.toString());
+					else //login as volunteer
+					{
+						sendMessageToInbox(msg, volunteer1Id, volunteer1Id);//send message to volunteer his/her self
+						sendMessageToInbox(msg, volunteer1Id, volunteer2Id);//send message to another volunteer
+	//					sendMessageToInbox(msg, volunteer1Id, userId);//send message to admin 
+					}
+						
 				}
-			} else {
-				System.out.println("Email address not set");
+				else {
+					System.out.println("Email address not set");
+					logger.error("Email address not set");
+				}
+				if (request.isUserInRole("ROLE_ADMIN"))
+					return "redirect:/manage_appointments?success=true";
+				else
+					return "redirect:/";				
+			}
+			else
+			{
+				if (request.isUserInRole("ROLE_ADMIN"))
+					return "redirect:/manage_appointments?success=false";
+				else
+					return "redirect:/";	
+			}
+		}		
+		else if (!(isAvailableForVolunteer(availability, vAvailability)))
+		{
+			sb = new StringBuffer();
+			
+			if (!Utils.isNullOrEmpty(volunteer1.getDisplayName()))
+				sb.append(volunteer1.getDisplayName());
+			else
+			{
+				sb.append(volunteer1.getFirstName());
+				sb.append(" ");
+				sb.append(volunteer1.getLastName());
 			}
 			
-			return "redirect:/?booked=true";
-		} else {
-			return "redirect:/manage_appointments?success=true";
+			sb.append(" is not available at that time, please check volunteer's availability.");
+			noMatchedMsg = sb.toString();
+			
+			if (request.isUserInRole("ROLE_ADMIN"))
+				return "redirect:/manage_appointments?noMachedTime=" + noMatchedMsg;
+			else
+				return "redirect:/";	
+			
 		}
-	}
-	
+		else
+		{
+			sb = new StringBuffer();
+			
+			if (!Utils.isNullOrEmpty(volunteer2.getDisplayName()))
+				sb.append(volunteer2.getDisplayName());
+			else
+			{
+				sb.append(volunteer2.getFirstName());
+				sb.append(" ");
+				sb.append(volunteer2.getLastName());
+			}
+			
+			sb.append(" is not available at that time, please check volunteer's availability.");
+			noMatchedMsg = sb.toString();
+			
+			if (request.isUserInRole("ROLE_ADMIN"))
+				return "redirect:/manage_appointments?noMachedTime=" + noMatchedMsg;
+			else
+				return "redirect:/";	
+			
+		}	
+	}	
 	
 	@RequestMapping(value="/delete_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String deleteAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
@@ -295,11 +410,7 @@ public class AppointmentController{
 		//get volunteers's name		
 		String vName = volunteerDao.getVolunteerNameById(volunteerId);
 		String pName = volunteerDao.getVolunteerNameById(partnerId);
-		
-		//format time , remove day of week from string		
-//		int pos = time.indexOf("--");	
-//		time = time.substring(pos + 2);
-		
+			
 		String date = time.substring(0,10);		
 		time = time.substring(11);
 				
@@ -428,9 +539,11 @@ public class AppointmentController{
 	}
 	
 	private boolean isFirstVisit(int patientId){
-		boolean isFirst = false;
-//		appointmentDao.get
+		boolean isFirst = true;
+		List<Appointment> appointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId);	
 		
+		if ((appointments != null)&& (appointments.size()>0))
+			isFirst = false;
 		return isFirst;
 		
 	}
@@ -462,21 +575,24 @@ public class AppointmentController{
 		
 		appointment.setDate(date);
 		appointment.setTime(time);		
+		
+		if (isFirstVisit(patientId))
+			appointment.setType(0);//first visit
+		else
+			appointment.setType(1);//follow up
 				
 		//save new appointment in DB and send message 
 		if (appointmentDao.createAppointment(appointment))
 		{
-			Patient patient = patientDao.getPatientByID(patientId);
-			String vEmail = volunteerDao.getEmailByVolunteerId(volunteerId);
-			String pEmail = volunteerDao.getEmailByVolunteerId(partnerId);
-//			String vName = volunteerDao.getVolunteerNameById(volunteerId);
-//			String pName = volunteerDao.getVolunteerNameById(partnerId);
+			Patient patient = patientDao.getPatientByID(patientId);	
 			String logginUser = request.getUserPrincipal().getName();	
+			User user = userDao.getUserByUsername(logginUser);
+			int userId = user.getUserID();
 						
 			//send message to both volunteers
-			if (mailAddress != null){					
-				//content of message
+			if (mailAddress != null){		
 				StringBuffer sb = new StringBuffer();
+				
 				sb.append(logginUser);
 				sb.append(" has booked an appointment for ");
 				sb.append(patient.getFirstName());
@@ -491,8 +607,9 @@ public class AppointmentController{
 				
 				String msg = sb.toString();
 				
-				sendMessage(vEmail, msg, request);
-				sendMessage(pEmail, msg, request);
+				sendMessageToInbox(msg, userId, volunteerId); //send message to volunteer
+				sendMessageToInbox(msg, userId, partnerId); //send message to volunteer
+				sendMessageToInbox(msg, userId, userId); //send message to admin her/his self					
 			}
 			else {
 				System.out.println("Email address not set");
@@ -503,10 +620,8 @@ public class AppointmentController{
 		else
 		{
 			model.addAttribute("failedToCreateAppointment",true);
-		}
-		
-		return "redirect:/manage_appointments";
-		
+		}		
+		return "redirect:/manage_appointments";		
 	}
 	
 	/**
@@ -697,13 +812,21 @@ public class AppointmentController{
 		return matched;
 	}
 	
+	//this is a temporary method for sending message only into Inbox
+	private void sendMessageToInbox(String msg, int sender, int recipient){	
+			Message m = new Message();
+			m.setRecipient(recipient);
+			m.setSenderID(sender);
+			m.setText(msg);
+			m.setSubject("New Appointment");
+			messageDao.sendMessage(m);
+	}
 	
-	private boolean sendMessage(String email,String msg, SecurityContextHolderAwareRequestWrapper request){
-		boolean success = false;
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+	//send message into Inbox and email account too
+	private void sendMessage(String email,String msg, int sender, int recipient){
 		Message m = new Message();
-		m.setSender(loggedInUser.getName());
-		m.setSenderID(loggedInUser.getUserID());
+		m.setRecipient(recipient);
+		m.setSenderID(sender);
 		m.setText(msg);
 		m.setSubject("New Appointment");
 		messageDao.sendMessage(m);
@@ -720,20 +843,19 @@ public class AppointmentController{
 				System.out.println("Sending...");
 				Transport.send(message);
 				System.out.println("Email sent notifying " + email);
-				success = true;
+				
 			} catch (MessagingException e) {
 				System.out.println("Error: Could not send email");
 				System.out.println(e.toString());
 			}
 		}
-	
-		return success;
 	}
+	
 	
 	private List<Patient> getPatients()
 	{
 		List<Patient> patients = new ArrayList<Patient>();
-		patients = patientDao.getAllPatientsWithAvailability();		
+		patients = patientDao.getAllPatients();		
 		
 		return patients;
 	}
@@ -904,6 +1026,17 @@ public class AppointmentController{
 		sb.append(timePeriodMap.get(time.substring(1)));
 		
 		return sb.toString();
+	}
+	
+	private boolean isAvailableForVolunteer(String appointmentTime, String volunteerAvailability){
+		boolean available = false;
+		String[] availabilityArray = volunteerAvailability.split(",");
+		
+		for(String s: availabilityArray){
+			if (appointmentTime.equals(s))
+				return true;
+		}
+		return available;
 	}
 	
 }

@@ -1,8 +1,10 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,6 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
-import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,22 +23,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-//import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
-//import org.tapestry.dao.MessageDao;
-//import org.tapestry.dao.NarrativeDao;
 import org.tapestry.dao.PatientDao;
-//import org.tapestry.dao.UserDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Report;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.report.AlertsInReport;
-//import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.ResultParser;
 import org.yaml.snakeyaml.Yaml;
 import org.tapestry.myoscar.utils.*;
+import org.oscarehr.myoscar_server.ws.PersonTransfer3;
 
 
 @Controller
@@ -49,15 +46,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private Yaml yaml;
 
 	private PatientDao patientDao;
-	private AppointmentDao appointmentDao;
-	
+	private AppointmentDao appointmentDao;	
 	private SurveyResultDao surveyResultDao;
-	
-	
-   	//Mail-related settings;
-   	private Properties props;
-   	private String mailAddress = "";
-   	private Session session;
 	
 	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
@@ -67,12 +57,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		String DB = "";
    		String UN = "";
    		String PW = "";
-   		String mailHost = "";
-   		String mailUser = "";
-   		String mailPassword = "";
-   		String mailPort = "";
-   		String useTLS = "";
-   		String useAuth = "";
 		try{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
 			yaml = new Yaml();
@@ -80,13 +64,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			DB = config.get("url");
 			UN = config.get("username");
 			PW = config.get("password");
-			mailHost = config.get("mailHost");
-			mailUser = config.get("mailUser");
-			mailPassword = config.get("mailPassword");
-			mailAddress = config.get("mailFrom");
-			mailPort = config.get("mailPort");
-			useTLS = config.get("mailUsesTLS");
-			useAuth = config.get("mailRequiresAuth");
+
 		} catch (IOException e) {
 			System.out.println("Error reading from config file");
 			System.out.println(e.toString());
@@ -95,24 +73,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		patientDao = new PatientDao(DB, UN, PW);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
 		surveyResultDao = new SurveyResultDao(DB, UN, PW);
-		
-		//Mail-related settings
-		final String username = mailUser;
-		final String password = mailPassword;
-		props = System.getProperties();
-		session = Session.getDefaultInstance(props, 
-				 new javax.mail.Authenticator() {
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username, password);
-					}
-		  		});
-		props.setProperty("mail.smtp.host", mailHost);
-		props.setProperty("mail.smtp.socketFactory.port", mailPort);
-		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		props.setProperty("mail.smtp.auth", useAuth);
-		props.setProperty("mail.smtp.starttls.enable", useTLS);
-		props.setProperty("mail.user", mailUser);
-		props.setProperty("mail.password", mailPassword);
    	}
  	
 	@RequestMapping(value="/view_report/{patientID}", method=RequestMethod.GET)
@@ -120,6 +80,44 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			@RequestParam(value="appointmentId", required=true) int appointmentId, 	
 			ModelMap model, HttpServletRequest request){
 		Patient patient = patientDao.getPatientByID(id);
+		//call web service to get patient info from myoscar
+		String userName = "carolchou.test";
+		try{
+			PersonTransfer3 personInMyoscar = ClientManager.getClientByUsername(userName);
+			StringBuffer sb = new StringBuffer();
+			if (personInMyoscar.getStreetAddress1() != null)
+				sb.append(personInMyoscar.getStreetAddress1());
+			String city = personInMyoscar.getCity();
+			if (city != null)
+			{
+				sb.append(", ");
+				sb.append(city);
+				patient.setCity(city);
+			}
+			
+			if (personInMyoscar.getProvince() != null)
+			{
+				sb.append(", ");
+				sb.append(personInMyoscar.getProvince());
+			}
+			
+			patient.setAddress(sb.toString());
+			
+			if (personInMyoscar.getBirthDate() != null)
+			{
+				Calendar birthday = personInMyoscar.getBirthDate();
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");	
+				System.out.println("Patient's DOB is ===" + sdf.format(birthday.getTime()));
+				patient.setBod(sdf.format(birthday.getTime()));
+			}
+			
+		} catch (Exception e){
+			System.err.println("Have some problems when calling myoscar web service");
+			
+		}
+		
+		
+		
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
 		Report report = new Report();		
 		
@@ -358,17 +356,14 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		report.setVolunteerInformations(vMap);
 		
-		//testing on myoscar web service
+//		//testing on myoscar web service
 //		MyOscarHelper myHelper = new MyOscarHelper();
-		
-		
-		System.out.println("calling myoscar---" + MyOscarHelper.exists("https://127.0.0.1:8091/myoscar_server"));
-//		System.out.println("calling myoscar by other way ---" + MyOscarHelper.existsByOtherWay("https://127.0.0.1:8091/myoscar_server"));
-		
+//		
 //		try {
 //			myHelper.example();
 //		}catch (Exception e){
 //			System.out.println("Some exception occured when try to call myoscar to get patient's info   " + e.getMessage());
+//			e.printStackTrace();
 //		}
 		
 		model.addAttribute("report", report);

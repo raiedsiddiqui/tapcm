@@ -61,11 +61,14 @@
 				<a href="#bookAppointment" class="btn btn-primary" data-toggle="modal">Book Appointment</a>
 			</div>
 		</div>
-
-
-
+		
 			<c:if test="${not empty success}">
 				<div class="alert alert-info">Appointment has been successfully booked</div>
+			 </c:if>
+			 <c:if test="${not empty noMachedTime }">
+			 	<div id = "noMatchInfo" class="alert alert-info">
+			 		<c:out value="${noMachedTime}" />
+			 	</div>
 			 </c:if>
 			<!--<div class="panel-group" id="accordian">
 			<c:forEach items="${patients}" var="p">
@@ -356,12 +359,7 @@
 				    	<i class="icon-time"></i>
 				    </span>
 				</div>
-				<label>type:</label>
-				<select name="appointmentType" form="appt-form">
-					<c:forEach items="${types}" var="t">
-						<option value="${t.key}">${t.value}</option>
-					</c:forEach>
-				</select><br />
+				
   			</form>
 
       </div>

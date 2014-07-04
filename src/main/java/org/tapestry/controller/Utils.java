@@ -143,7 +143,7 @@ public class Utils {
 	public static String getFormatDate(Date date){
 		//convert current date to the format matched in DB				
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		String strDate = sdf.format(new Date()); 
+		String strDate = sdf.format(date); 
 		
 		return strDate;
 		
@@ -531,26 +531,6 @@ public class Utils {
 		
 		return clinics.get(code);		
 	}
-	
-	/**
-	 * 
-	 * hardcode appointment's type
-	 */
-	public static Map<String, String> getAppointmentType(){
-		Map<String, String> tMap = new TreeMap<String, String>();
-		
-		tMap.put("1", "First Visit");
-		tMap.put("2", "First Follow-up Visit");
-		tMap.put("3", "Second Follow-up Visit");
-		tMap.put("4", "Third Follow-up Visit");
-		tMap.put("5", "Forth Follow-up Visit");
-		tMap.put("6", "Fifth Follow-up Visit");
-		tMap.put("7", "Sixth Follow-up Visit");
-		
-		return tMap;
-	}
-	
-	
 	
 	public static int getVolunteerByLoginUser(SecurityContextHolderAwareRequestWrapper request, UserDao uDao, VolunteerDao vDao){
 		int volunteerId=0;
