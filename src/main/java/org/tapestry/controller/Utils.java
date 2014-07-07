@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -145,8 +144,14 @@ public class Utils {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		String strDate = sdf.format(date); 
 		
-		return strDate;
+		return strDate;		
+	}
+	
+	public static String getDateByFormat(Date date, String format){
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		String strDate = sdf.format(date); 
 		
+		return strDate;	
 	}
 	
 	public static String getDateOfWeek(String day){
@@ -649,6 +654,20 @@ public class Utils {
 		
 		return plan;
 		
+	}
+	
+	public static int getAgeByBirthDate(Calendar birthDate){
+		int age = 0;
+		
+		Calendar today = Calendar.getInstance(); 
+		int yearOfToday = today.get(Calendar.YEAR);
+		
+		int yearOfBirth = birthDate.get(Calendar.YEAR);
+
+		if (yearOfBirth <= yearOfToday)
+			age = yearOfToday - yearOfBirth;
+			
+		return age;
 	}
 	
 }

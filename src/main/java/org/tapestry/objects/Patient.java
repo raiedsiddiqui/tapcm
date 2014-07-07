@@ -24,7 +24,10 @@ public class Patient{
 	private String myOscarAuthentication;
 	private String clinicName;
 	private String address;
+	private String userName; //registered for MyOscar account
 	
+	
+
 	/**
 	* Empty constructor
 	*/
@@ -281,5 +284,13 @@ public class Patient{
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+	
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 }

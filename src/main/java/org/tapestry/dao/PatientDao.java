@@ -328,6 +328,8 @@ public class PatientDao {
 			setVolunteerDisplayName(p, "volunteer1");
 			setVolunteerDisplayName(p, "volunteer2");
 			
+			p.setUserName(result.getString("username"));
+			
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create Patient object");
 			e.printStackTrace();

@@ -245,8 +245,6 @@ public class AppointmentController{
 				int volunteer1Id = p.getVolunteer();
 				int volunteer2Id = p.getPartner();
 				int userId = user.getUserID();
-//				String volunteer1Email = volunteer1.getEmail();
-//				String volunteer2Email = volunteer2.getEmail();
 										
 				//send message to both volunteers
 				if (mailAddress != null){					
@@ -280,7 +278,7 @@ public class AppointmentController{
 					else //login as volunteer
 					{
 						sendMessageToInbox(msg, volunteer1Id, volunteer1Id);//send message to volunteer his/her self
-						sendMessageToInbox(msg, volunteer1Id, volunteer2Id);//send message to another volunteer
+	//					sendMessageToInbox(msg, volunteer1Id, volunteer2Id);//send message to another volunteer
 	//					sendMessageToInbox(msg, volunteer1Id, userId);//send message to admin 
 					}
 						

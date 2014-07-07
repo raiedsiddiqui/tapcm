@@ -356,16 +356,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		report.setVolunteerInformations(vMap);
 		
-//		//testing on myoscar web service
-//		MyOscarHelper myHelper = new MyOscarHelper();
-//		
-//		try {
-//			myHelper.example();
-//		}catch (Exception e){
-//			System.out.println("Some exception occured when try to call myoscar to get patient's info   " + e.getMessage());
-//			e.printStackTrace();
-//		}
-		
 		model.addAttribute("report", report);
 		return "/admin/view_report";
 	}
