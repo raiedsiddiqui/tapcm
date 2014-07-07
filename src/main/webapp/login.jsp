@@ -33,7 +33,7 @@
    			<div class="row-fluid">
 	    		<div class="col-md-12">
 					 <c:if test="${not empty error}">
-					<div class="alert alert-error">Login failed <br /> Caused :
+					<div class="alert alert-danger">Login failed <br /> Caused :
 							${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}</div>
 					</c:if>
 					<c:if test="${not empty usernameChanged}">

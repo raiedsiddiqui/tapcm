@@ -125,15 +125,17 @@
 		</c:if>
 		<div class="row-fluid">
 			<div class="col-md-6">
-			
-				<button id="homebtn"> <span class="glyphicon glyphicon-pencil"></span> <a href="<c:url value="/view_activityLogs"/>">Activity Log</a></button>
+
+
+				<a href="<c:url value="/view_activityLogs"/>" id="homebtn" class="btn">Activity Log</a>
+<!-- 				<button id="homebtn"> <span class="glyphicon glyphicon-pencil"></span> <a href="<c:url value="/view_activityLogs"/>">Activity Log</a></button> -->
 			
 <!-- 			<a href="<c:url value="/view_activityLogs"/>" class="btn btn-primary">Activity Log</a>
 -->
 			</div>
 
 			<div class="col-md-6">
-				<button id="homebtn"> <a href="<c:url value="/view_narratives"/>">Narratives</a></button>
+				<a href="<c:url value="/view_narratives"/>" id="homebtn" class="btn">Narratives</a>
 			</div>
 			
 		</div>
@@ -187,7 +189,7 @@
 						      </h4>
     						</div>
 						  
-					        <div id="collapseOne" class="panel-collapse collapse">
+					        <div id="collapseDeclined" class="panel-collapse collapse">
 	  							<div class="panel-body">
 				    				<c:forEach items="${declined_appointments}" var="da">
 										<div class="pname">
