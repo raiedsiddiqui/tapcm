@@ -16,7 +16,9 @@ import javax.mail.Session;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import org.apache.commons.lang.time.DateFormatUtils;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -381,7 +383,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		List<Patient> patients = getAllPatients();
 		int age;		
 		
-		try {
+		try {			
 			List<PersonTransfer3> patientsInMyOscar = ClientManager.getClients();
 			
 			for(PersonTransfer3 person: patientsInMyOscar)
@@ -393,12 +395,12 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 					if (person.getUserName().equals(p.getUserName()))
 					{
 						Calendar birthDate = person.getBirthDate();						
-						Date date = birthDate.getTime();
+						if (birthDate != null)
+							p.setBod(Utils.getDateByCalendar(birthDate));
 						
 						p.setAge(age);
-						p.setCity(person.getCity());
-						p.setBod(Utils.getDateByFormat(date, "yyyy-MM-dd"));
-						p.setHomePhone(person.getPhone1());					
+						p.setCity(person.getCity());					
+						p.setHomePhone(person.getPhone1());								
 						
 						break;
 					}

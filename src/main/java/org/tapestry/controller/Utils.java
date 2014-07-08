@@ -11,8 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -149,9 +151,16 @@ public class Utils {
 	
 	public static String getDateByFormat(Date date, String format){
 		SimpleDateFormat sdf = new SimpleDateFormat(format);
+		
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		String strDate = sdf.format(date); 
 		
 		return strDate;	
+	}
+	
+	//return date with format yyyy-MM-dd'T'HH:mm:ss. 
+	public static String getDateByCalendar(Calendar calendar){
+		return DateFormatUtils.ISO_DATE_FORMAT.format(calendar);
 	}
 	
 	public static String getDateOfWeek(String day){

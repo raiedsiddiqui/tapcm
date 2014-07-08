@@ -9,8 +9,10 @@ import java.util.HashMap;
 
 import org.oscarehr.myoscar.client.ws_manager.AccountManager;
 import org.oscarehr.myoscar.client.ws_manager.GroupManager;
+import org.oscarehr.myoscar.client.ws_manager.RoleRelationshipManager;
 import org.oscarehr.myoscar_server.ws.LoginResultTransfer3;
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
+import org.oscarehr.myoscar_server.ws.RelationshipTransfer6;
 import org.oscarehr.util.MiscUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.yaml.snakeyaml.Yaml;
@@ -38,12 +40,27 @@ public class ClientManager {
 		LoginResultTransfer3 loginResultTransfer = AccountManager.login(serverUrl, user, password);		
 		
 		MyOscarCredentialsImpl credentials=new MyOscarCredentialsImpl(serverUrl, loginResultTransfer.getPerson().getId(), 
-				loginResultTransfer.getSecurityTokenKey(), "fake sessionId, not from browser", Locale.ENGLISH);
-		
+				loginResultTransfer.getSecurityTokenKey(), "fake sessionId, not from browser", Locale.ENGLISH);		
 		
 		//--- this will retrieve an account and print some of the patients demographic information ---
 		
 		PersonTransfer3 client = AccountManager.getPerson(credentials, userName);	
+		
+		return client;
+	}
+	
+	public static PersonTransfer3 getClientById(Long id) throws Exception
+	{			
+		MiscUtils.setJvmDefaultSSLSocketFactoryAllowAllCertificates();
+				
+		LoginResultTransfer3 loginResultTransfer = AccountManager.login(serverUrl, user, password);		
+		
+		MyOscarCredentialsImpl credentials=new MyOscarCredentialsImpl(serverUrl, loginResultTransfer.getPerson().getId(), 
+				loginResultTransfer.getSecurityTokenKey(), "fake sessionId, not from browser", Locale.ENGLISH);		
+		
+		//--- this will retrieve an account and print some of the patients demographic information ---
+		
+		PersonTransfer3 client = AccountManager.getPerson(credentials, id);	
 		
 		return client;
 	}
@@ -76,9 +93,27 @@ public class ClientManager {
 		else
 			System.out.println("There not any client in tapestry group" );
 		
-		return patients;
-		
+		return patients;		
 	}	
+	
+	public static List<RelationshipTransfer6> getMRPs(Long patientId) throws Exception {
+		MiscUtils.setJvmDefaultSSLSocketFactoryAllowAllCertificates();
+		
+		LoginResultTransfer3 loginResultTransfer = AccountManager.login(serverUrl, user, password);		
+		
+		MyOscarCredentialsImpl credentials=new MyOscarCredentialsImpl(serverUrl, loginResultTransfer.getPerson().getId(), 
+				loginResultTransfer.getSecurityTokenKey(), "fake sessionId, not from browser", Locale.ENGLISH);
+		
+		List<RelationshipTransfer6> primaryCareProviders = RoleRelationshipManager.getRelationshipsByPersonId(credentials,patientId, 0, 100);
+		
+		if (primaryCareProviders != null)
+			System.out.println("size of PHR is === "+ primaryCareProviders.size());
+		else
+			System.out.println("size of PHR is === null");
+		
+		return  primaryCareProviders;
+	}
+	
 	private static Map<String, String> readMyOscarWSConfig()
 	{
 		Map<String, String> myOscarWSInit = new HashMap<String, String>();

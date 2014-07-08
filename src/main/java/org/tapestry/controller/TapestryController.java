@@ -167,15 +167,15 @@ public class TapestryController{
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
 	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, @RequestParam(value="patientId", required=false) Integer patientId, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		int unreadMessages;
 		if (request.isUserInRole("ROLE_USER")){
 			String username = request.getUserPrincipal().getName();					
 			User u = userDao.getUserByUsername(username);
 			
 			//get volunteer Id from login user
-			int volunteerId = volunteerDao.getVolunteerIdByUsername(u.getUsername());			
-			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
+			int volunteerId = volunteerDao.getVolunteerIdByUsername(u.getUsername());		
 			
-//			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(u.getUserID());
+			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
 			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(u.getUserID(), 5); //Cap recent activities at 5
 			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(u.getUserID());
 			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
@@ -185,10 +185,6 @@ public class TapestryController{
 				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
 				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId, volunteerId);
 				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
-				System.out.println("patient id is === "+ patientId);
-				System.out.println("volunteerId id is === "+ volunteerId);
-				if (declinedAppointments != null)
-					System.out.println("size of decline appointment is === "+ declinedAppointments.size());
 				
 				Patient patient = patientDao.getPatientByID(patientId);
 				model.addAttribute("patient", patient);
@@ -201,18 +197,7 @@ public class TapestryController{
 			{
 				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(volunteerId);
 				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(volunteerId);
-				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);
-				
-				System.out.println("volunteerId id is === "+ volunteerId);
-				System.out.println("size of decline appointment is === "+ declinedAppointments.size());
-				
-				/*	approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(u.getUserID());
-				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(u.getUserID());
-				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(u.getUserID());
-				ArrayList<Appointment> appointmentsForToday = appointmentDao.getAllAppointmentsForVolunteerForToday(u.getUserID());
-				ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointmentsForVolunteer(u.getUserID());
-				model.addAttribute("appointments_today", appointmentsForToday);
-				model.addAttribute("appointments_all", allAppointments);*/
+				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);						
 			}
 			
 			model.addAttribute("approved_appointments", approvedAppointments);
@@ -220,7 +205,8 @@ public class TapestryController{
 			model.addAttribute("declined_appointments", declinedAppointments);
 			model.addAttribute("name", u.getName());
 			model.addAttribute("patients", patientsForUser);
-			int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
+			
+			unreadMessages = messageDao.countUnreadMessagesForRecipient(volunteerId);
 			model.addAttribute("unread", unreadMessages);
 			model.addAttribute("activities", activityLog);
 			model.addAttribute("announcements", announcements);
@@ -230,7 +216,7 @@ public class TapestryController{
 		}
 		else if (request.isUserInRole("ROLE_ADMIN")){
 			User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
-			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
 			model.addAttribute("name", loggedInUser.getName());
 			return "admin/index";
@@ -260,8 +246,7 @@ public class TapestryController{
 		//get volunteer Id from login user		
 		int volunteerId= volunteerDao.getVolunteerIdByUsername(loggedInUser.getUsername());
 		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(volunteerId);		
-		
-//		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(loggedInUser.getUserID());
+	
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		model.addAttribute("clients", clients);
@@ -417,21 +402,31 @@ public class TapestryController{
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
 	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent,@RequestParam(value="failure", required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());	
-		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getUserID());
-		model.addAttribute("messages", messages);
-
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-		model.addAttribute("unread", unreadMessages);
+		ArrayList<Message> messages;
+		int unreadMessages;
+		int volunteerId = volunteerDao.getVolunteerIdByUsername(loggedInUser.getUsername());
 		
 		if (messageSent != null)
 			model.addAttribute("success", messageSent);
 		if (messageFailed != null)
 			model.addAttribute("failure", messageFailed);
 		if (request.isUserInRole("ROLE_USER")) {
+			messages = messageDao.getAllMessagesForRecipient(volunteerId);
+			model.addAttribute("messages", messages);
+			
+			unreadMessages = messageDao.countUnreadMessagesForRecipient(volunteerId);
+			model.addAttribute("unread", unreadMessages);
+			
 			ArrayList<User> administrators = userDao.getAllUsersWithRole("ROLE_ADMIN");
 			model.addAttribute("administrators", administrators);
 			return "/volunteer/inbox";
 		} else {
+			messages = messageDao.getAllMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("messages", messages);
+	
+			unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+			
 			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");			
 			model.addAttribute("volunteers", volunteers);
 			return "/admin/inbox";
