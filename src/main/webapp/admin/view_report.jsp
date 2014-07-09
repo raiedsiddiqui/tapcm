@@ -51,7 +51,7 @@
 		<table>
 			<tr>
 				<td><label>Patient:</label> ${patient.firstName} ${patient.lastName}</td>
-				<td><label>Address:</label> </td>			
+				<td><label>Address:</label> ${patient.address }</td>			
 			</tr>
 			<tr>
 				<td><label>MRP:</label></td>
@@ -59,7 +59,7 @@
 			</tr>
 			<tr>
 				<td><label>Time: </label> ${appointment.time }</td>
-				<td><label>Visit: </label> ${appointment.type }</td>				
+				<td><label>Visit: </label> ${appointment.strType }</td>				
 			</tr>
 		</table>
 		
@@ -67,7 +67,7 @@
 			
 			<hr/>
 			
-			<H1><b>TAPESTRY REPORT:   </b></H1><br/>
+			<H1><b>TAPESTRY REPORT:  ${patient.firstName} ${patient.lastName} ( ${patient.bod }) </b></H1><br/>
 			<h2 align="center"><span>PATIENT GOAL(S)</span></h2><br>
 			Wait for GAS app
 			<h2 align="center"><span>ALERTS: Consider Case Review with IP-TEAM</span></h2><br>

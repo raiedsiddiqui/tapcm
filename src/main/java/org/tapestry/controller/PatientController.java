@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Calendar;
 
 import javax.annotation.PostConstruct;
 import javax.mail.PasswordAuthentication;
@@ -15,7 +16,9 @@ import javax.mail.Session;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import org.apache.commons.lang.time.DateFormatUtils;
 
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -36,9 +39,8 @@ import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
-//import org.tapestry.objects.Activity;
+import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Appointment;
-//import org.tapestry.objects.Message;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Picture;
 import org.tapestry.objects.SurveyResult;
@@ -50,6 +52,7 @@ import org.tapestry.surveys.SurveyFactory;
 import org.tapestry.surveys.TapestryPHRSurvey;
 import org.tapestry.surveys.TapestrySurveyMap;
 import org.yaml.snakeyaml.Yaml;
+import org.oscarehr.myoscar_server.ws.PersonTransfer3;
 
 @Controller
 public class PatientController {
@@ -378,6 +381,35 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	@RequestMapping(value="/view_clients_admin", method=RequestMethod.GET)
 	public String viewPatientsFromAdmin(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		List<Patient> patients = getAllPatients();
+		int age;		
+		
+		try {			
+			List<PersonTransfer3> patientsInMyOscar = ClientManager.getClients();
+			
+			for(PersonTransfer3 person: patientsInMyOscar)
+			{	
+				age = Utils.getAgeByBirthDate(person.getBirthDate());
+				
+				for(Patient p: patients)
+				{
+					if (person.getUserName().equals(p.getUserName()))
+					{
+						Calendar birthDate = person.getBirthDate();						
+						if (birthDate != null)
+							p.setBod(Utils.getDateByCalendar(birthDate));
+						
+						p.setAge(age);
+						p.setCity(person.getCity());					
+						p.setHomePhone(person.getPhone1());								
+						
+						break;
+					}
+				}
+			}
+		} catch (Exception e) {
+			System.out.println("something wrong when calling myoscar server...");			
+			e.printStackTrace();
+		}
 		
 		model.addAttribute("patients", patients);
 		return "/admin/view_clients";

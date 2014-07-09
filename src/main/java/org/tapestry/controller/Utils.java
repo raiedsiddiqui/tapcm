@@ -8,12 +8,13 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -143,10 +144,23 @@ public class Utils {
 	public static String getFormatDate(Date date){
 		//convert current date to the format matched in DB				
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		String strDate = sdf.format(new Date()); 
+		String strDate = sdf.format(date); 
 		
-		return strDate;
+		return strDate;		
+	}
+	
+	public static String getDateByFormat(Date date, String format){
+		SimpleDateFormat sdf = new SimpleDateFormat(format);
 		
+		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+		String strDate = sdf.format(date); 
+		
+		return strDate;	
+	}
+	
+	//return date with format yyyy-MM-dd'T'HH:mm:ss. 
+	public static String getDateByCalendar(Calendar calendar){
+		return DateFormatUtils.ISO_DATE_FORMAT.format(calendar);
 	}
 	
 	public static String getDateOfWeek(String day){
@@ -532,26 +546,6 @@ public class Utils {
 		return clinics.get(code);		
 	}
 	
-	/**
-	 * 
-	 * hardcode appointment's type
-	 */
-	public static Map<String, String> getAppointmentType(){
-		Map<String, String> tMap = new TreeMap<String, String>();
-		
-		tMap.put("1", "First Visit");
-		tMap.put("2", "First Follow-up Visit");
-		tMap.put("3", "Second Follow-up Visit");
-		tMap.put("4", "Third Follow-up Visit");
-		tMap.put("5", "Forth Follow-up Visit");
-		tMap.put("6", "Fifth Follow-up Visit");
-		tMap.put("7", "Sixth Follow-up Visit");
-		
-		return tMap;
-	}
-	
-	
-	
 	public static int getVolunteerByLoginUser(SecurityContextHolderAwareRequestWrapper request, UserDao uDao, VolunteerDao vDao){
 		int volunteerId=0;
 		User user = uDao.getUserByUsername(request.getUserPrincipal().getName());
@@ -669,6 +663,20 @@ public class Utils {
 		
 		return plan;
 		
+	}
+	
+	public static int getAgeByBirthDate(Calendar birthDate){
+		int age = 0;
+		
+		Calendar today = Calendar.getInstance(); 
+		int yearOfToday = today.get(Calendar.YEAR);
+		
+		int yearOfBirth = birthDate.get(Calendar.YEAR);
+
+		if (yearOfBirth <= yearOfToday)
+			age = yearOfToday - yearOfBirth;
+			
+		return age;
 	}
 	
 }
