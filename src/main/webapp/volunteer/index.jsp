@@ -17,17 +17,6 @@
 		html,body{
 			height:100%;
 		}
-		.content{
-/*			overflow-x:auto;
-*/			border-radius:5px;
-			-moz-border-radius:5px;
-			-webkit-border-radius:5px;
-			-o-border-radius:5px;
-			-ms-border-radius:5px;
-		}
-		.span12{
-			padding:0px 15px;
-		}
 		.bootstrap-datetimepicker-widget{
 			z-index:9999;
 		}

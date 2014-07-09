@@ -67,7 +67,7 @@
 
 								<input id="activityDate" class="datepickera form-control" data-format="yyyy-MM-dd" type="text" placeholder="CLICK" name="activityDate" value = "${activityLog.date}" required>
 									<span class="add-on">
-										<i class="icon-calendar"></i>
+										<!-- <i class="icon-calendar"></i> -->
 									</span>
 							</div>
 					</div>
@@ -80,7 +80,7 @@
 								<input id="activityStartTime" data-format="hh:mm:00" class="timepickera form-control" type="text" placeholder="Try me&hellip;" name="activityStartTime" value="${activityLog.startTime}">
 
 					    		<span class="add-on">
-					    			<i class="icon-time"></i>
+					    			<!-- <i class="icon-time"></i> -->
 					   			 </span>
 							</div>
 					</div>
@@ -95,7 +95,7 @@
 
 
 					    		<span class="add-on">
-					    			<i class="icon-time"></i>
+					    			<!-- <i class="icon-time"></i> -->
 					   			 </span>
 							</div>
 					</div>

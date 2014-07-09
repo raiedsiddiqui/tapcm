@@ -130,6 +130,14 @@ div.area {
 }
 
 .content {
+
+	overflow-x:auto;
+	border-radius:5px;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	-o-border-radius:5px;
+	-ms-border-radius:5px;
+	padding:0px 15px;
 	clear: both !important;
 	/*padding-left: 1%;
 	padding-right: 1%;*/
