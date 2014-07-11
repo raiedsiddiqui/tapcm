@@ -14,17 +14,8 @@
 		html,body{
 			height:100%;
 		}
-		.content{
-			overflow-x:auto;
-			border-radius:5px;
-			-moz-border-radius:5px;
-			-webkit-border-radius:5px;
-			-o-border-radius:5px;
-			-ms-border-radius:5px;
-		}
-		.span12{
-			padding:0px 15px;
-		}
+
+
 	</style>
 </head>
 
@@ -44,7 +35,6 @@
 	
 	<div class="content">
 		<div class="row-fluid">
-			<div class="span12">
 				<h3>Select a client</h3>
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">
@@ -62,7 +52,6 @@
 						</c:forEach>
 					</div>
 				</div>
-			</div>
 		</div>
 	</div>
 </body>

@@ -5,12 +5,9 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>Tapestry</title>
+	<title>Inbox</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+	<%@include file="volunteer_head.jsp" %>
 
 	<style type="text/css">
 		html,body{
@@ -29,10 +26,8 @@
 </head>
 	
 <body>	
-  <img src="<c:url value="/resources/images/logo.png"/>" />
-      <!-- <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" /> -->
-  	<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
-         <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/> 
+  <%@ include file="subNavi.jsp" %>
+
 	<div class="content">
 		<div class="navbar">
 			<div class="navbar-inner">
