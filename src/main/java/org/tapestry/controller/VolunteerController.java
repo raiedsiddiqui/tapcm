@@ -195,7 +195,9 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		model.addAttribute("activityLogs", activities);
 		
 		//get all messages		
-		ArrayList<Message> messages = messageDao.getAllMessagesForRecipient(id);
+		String username = request.getUserPrincipal().getName();		
+		User loggedInUser = userDao.getUserByUsername(username);
+		List<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("messages", messages);		
 		
 		return "/admin/display_volunteer";

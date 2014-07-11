@@ -103,6 +103,7 @@
 			<tr>
 				<td width="500"><label>e-signature</label></td>
 				<td width="520">
+				<form method="post" id="myoscarAuthentication-form" action="<c:url value="/authenticate_myoscar/${patient.volunteer}?patientId=${patient.patientID}"/>">
 					<table>
 						<tr>
 							<td><label><h3>Client: </h3></label></td>
@@ -111,13 +112,13 @@
 							<td><label>First Name:</label></td>
 						</tr>
 						<tr>
-							<td><input value="${patient.firstName}"/></td>
+							<td><input id="client_first_name" name="client_first_name" value="${patient.firstName}"/></td>
 						</tr>
 						<tr>
 							<td><label>Last Name:</label></td>
 						</tr>
 						<tr>
-							<td><input value="${patient.lastName}"/></td>
+							<td><input id="client_last_name" name="client_last_name" value="${patient.lastName}"/></td>
 						</tr>
 						<tr>
 							<td><label><h3>Volunteer: </h3></label></td>
@@ -126,21 +127,26 @@
 							<td><label>First Name:: </label></td>							
 						</tr>
 						<tr>
-							<td><input value="${vFirstName}"/></td>
+							<td><input id="volunteer_first_name" name="volunteer_first_name" value="${vFirstName}"/></td>
 						</tr>
 						<tr>
 							<td><label>Last Name:</label></td>
 						</tr>
 						<tr>
-							<td><input value="${vLastName}"/></td>
+							<td><input d="volunteer_last_name" name="volunteer_last_name" value="${vLastName}"/></td>
 						</tr>
 						<tr>
 							<td>&nbsp</td>
 						</tr>
-						<tr>
-							<td><a href="" role="button" class="btn btn-primary pull-right lgbtn">Authenticate </a></td>
+						<tr><!--  
+							<td><a href="<c:url value="/authenticate_myoscar/${patient.volunteer}?patientId=${patient.patientID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Authenticate </a></td>
+						-->
+							<td>
+								<input class="completevisitbtn btn btn-primary pull-right" type="submit" value="Authenticate" />
+							</td>
 						</tr>
 					</table>
+					</form>
 				</td>
 			</tr>
 		</table>

@@ -121,12 +121,12 @@
 <!-- 	breadcrumb END-->
 	<div class="content">
 		<form id="appt-form" method="post" action="<c:url value="/complete_visit/${appointment.appointmentID}"/>">
-	 		<h2> Date: ${appointment.date} <h2> <!-- <br /> -->
-<!-- 	 		<input id="contactedcheck" type="radio" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie
-	 		<br /> -->
+	 		<h2> Date: ${appointment.date} <h2> <!-- <br /> 
+ 	 		<input id="contactedcheck" type="radio" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie
+	 		<br />-->
 	 		<h3> What does the clinic need to know about today's visit?
 			<br/>Example: unsafe walking, poor access to food, patient not behaving appropriately </h3><br />
-	 		<textarea id="visitcomments" name="comments" id="comments"></textarea><br />
+	 		<textarea  name="visitAlerts" id="visitAlerts"></textarea><br />
 	 		<a href="<c:url value="/patient/${appointment.patientID}?appointmentId=${appointment.appointmentID}"/>" class="tleft btn btn-danger">Cancel</a>
  			<input class="completevisitbtn btn btn-primary pull-right" type="submit" value="Submit" />
  		</form>

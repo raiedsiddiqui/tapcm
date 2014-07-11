@@ -116,8 +116,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			
 		}
 		
-		
-		
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
 		Report report = new Report();		
 		
@@ -328,6 +326,19 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.getPhysicalActivityAlertMsg());
+		
+		//Mobility Survey
+		
+		try{
+			Long lll = ClientManager.sentMessageToPatientInMyOscar(new Long(15231), "Message From Tapestry", "Hello");
+			System.out.println("lll is === "+ lll);
+			
+		} catch (Exception e){
+			System.out.println("something wrong with myoscar server");
+			e.printStackTrace();
+		}
+		
+		
 		
 		report.setAlerts(lAlert);
 		//end of alert
