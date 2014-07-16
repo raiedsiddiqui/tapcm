@@ -64,7 +64,7 @@
 							<th>Sender</th>
 							<th>Subject</th>
 							<th>Date</th>
-							<th></th>
+							<th></th>							
 						</tr>
 						<c:forEach items="${messages}" var="m">
 						<c:choose>
@@ -74,7 +74,7 @@
 							<td>${m.sender}</td>
 							<td>${m.subject}</td>
 							<td>${m.date}</td>
-							<td><a href="<c:url value="/delete_message/${m.messageID}"/>" class="btn btn-danger">Delete</button><td>
+							<td><a href="<c:url value="/delete_message/${m.messageID}"/>" class="btn btn-danger">Delete</button><td>							
 						</tr>
 						</c:forEach>
 					</table>

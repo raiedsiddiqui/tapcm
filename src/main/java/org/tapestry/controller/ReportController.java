@@ -1,18 +1,15 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
-import javax.mail.Session;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
@@ -30,8 +27,10 @@ import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Report;
 import org.tapestry.objects.SurveyResult;
+import org.tapestry.report.AlertManager;
 import org.tapestry.report.AlertsInReport;
 import org.tapestry.surveys.ResultParser;
+import org.tapestry.report.CalculationManager;
 import org.yaml.snakeyaml.Yaml;
 import org.tapestry.myoscar.utils.*;
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
@@ -105,18 +104,17 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			
 			if (personInMyoscar.getBirthDate() != null)
 			{
-				Calendar birthday = personInMyoscar.getBirthDate();
-				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");	
-				System.out.println("Patient's DOB is ===" + sdf.format(birthday.getTime()));
-				patient.setBod(sdf.format(birthday.getTime()));
+				Calendar birthDay = personInMyoscar.getBirthDate();
+				patient.setBod(Utils.getDateByCalendar(birthDay));
+				
+//				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");					
+//				patient.setBod(sdf.format(birthday.getTime()));
 			}
 			
 		} catch (Exception e){
 			System.err.println("Have some problems when calling myoscar web service");
 			
 		}
-		
-		
 		
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
 		Report report = new Report();		
@@ -141,13 +139,15 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("appointment", appointment);
 		model.addAttribute("plans", pMap);
 		
-		//Survey---  goal setting
+		//Survey---  goals setting
 		List<SurveyResult> surveyResultList = surveyResultDao.getCompletedSurveysByPatientID(id);
 		SurveyResult healthGoalsSurvey = new SurveyResult();
 		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
 		SurveyResult nutritionSurvey = new SurveyResult();
 		SurveyResult rAPASurvey = new SurveyResult();
 		SurveyResult mobilitySurvey = new SurveyResult();
+		SurveyResult socialLifeSurvey = new SurveyResult();
+		SurveyResult generalHealthySurvey = new SurveyResult();
 		
 		for(SurveyResult survey: surveyResultList){
 			int surveyId = survey.getSurveyID();
@@ -166,6 +166,12 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			
 			if (surveyId == 16)//Mobility survey
 				mobilitySurvey = survey;
+			
+			if (surveyId == 8) //Social Life(Duke Index of Social Support)
+				socialLifeSurvey = survey;
+			
+			if (surveyId == 9) //General Health(Edmonton Frail Scale)
+				generalHealthySurvey = survey;
 		}
 		
 		String xml;
@@ -188,7 +194,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		
    		report.setHealthGoals(sMap);
    		
-   		//Survey--- daily life activity 
+   		//Daily Life Activities
    		try{
    			xml = new String(dailyLifeActivitySurvey.getResults(), "UTF-8");
    		} catch (Exception e) {
@@ -206,15 +212,44 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		List<String> lAlert = new ArrayList<String>();
    		String fallingQA = qList.get(qList.size() -1);
    		if (fallingQA.contains("yes")||fallingQA.contains("fall"))
-   			lAlert.add(AlertsInReport.getDailyActiveityAlertMsg());
-   		
+   			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);   		
    		   		
    		sMap = new TreeMap<String, String>();
    		sMap = getSurveyContentMap(questionTextList, qList);
    		
    		report.setDailyActivities(sMap);   		
    		
-   		//Nutrition survey   		
+ 		//General Healthy Alert
+   		try{
+   			xml = new String(generalHealthySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+		
+		LinkedHashMap<String, String> mGeneralHealthySurvey = ResultParser.getResults(xml);
+		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = getQuestionList(mGeneralHealthySurvey);
+		
+		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
+		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert);
+		
+		//Social Life Alert
+		try{
+   			xml = new String(socialLifeSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+		
+		LinkedHashMap<String, String> mSocialLifeSurvey = ResultParser.getResults(xml);
+		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = getQuestionList(mSocialLifeSurvey);
+		
+		int socialLifeScore = CalculationManager.getScoreByQuestionsList(qList);
+		lAlert = AlertManager.getSocialLifeAlerts(socialLifeScore, lAlert);
+   		
+   		//Nutrition Alerts   		
    		try{
    			xml = new String(nutritionSurvey.getResults(), "UTF-8");
    		} catch (Exception e) {
@@ -225,62 +260,21 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		qList = new ArrayList<String>();   		
    		//get answer list
 		qList = getQuestionList(mNutritionSurvey);  
-		String ans ="";
-		int scores = 0;
-		int iAns = 0;
+
+		//get scores for nutrition survey based on answer list
+		int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
 		
-		
-		for (int i=0; i< qList.size(); i++){
-			ans = qList.get(i);
-			//get score for high nutrition risk alert in nutrition
-			if (!Utils.isNullOrEmpty(ans) && !ans.contains("-"))
-			{
-				iAns = Integer.parseInt(ans.trim());
-				scores = scores + iAns;
-			}			
-		}
 		//high nutrition risk alert
 		Map<String, String> nAlert = new TreeMap<String, String>();
-		if (scores < 50)
-			lAlert.add(AlertsInReport.getNutritionAlertMsg1());
-				
-		//weight alert-- the first question in nutrition survey
-		ans = qList.get(1);
-		ans = ans.trim();		
+		lAlert = AlertManager.getNutritionAlerts(nutritionScore, lAlert, qList);
 		
-		if (!Utils.isNullOrEmpty(ans)) {
-			if (ans.equals("2"))				
-				lAlert.add(AlertsInReport.getNutritionAlertMsg2a());			
-			else if (ans.equals("3"))
-				lAlert.add(AlertsInReport.getNutritionAlertMsg2b());
-			else if (ans.equals("6"))
-				lAlert.add(AlertsInReport.getNutritionAlertMsg2c());
-		}
-		
-		//meal alert -- forth question in nutrition survey
-		ans = qList.get(4);
-		ans = ans.trim();
-		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
-			lAlert.add(AlertsInReport.getNutritionAlertMsg3());
-		
-		//Appetitive alert --- sixth question in nutrition survey
-		ans = qList.get(6);
-		ans = ans.trim();
-		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
-			lAlert.add(AlertsInReport.getNutritionAlertMsg4());
-		
-		//cough, choke and pain alert --- ninth question in nutrition survey
-		ans = qList.get(11);
-		ans = ans.trim();
-		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
-			lAlert.add(AlertsInReport.getNutritionAlertMsg5());	
 		//set alerts in report bean
 		if (nAlert != null && nAlert.size()>0)	
 			report.setAlerts(lAlert);
 		else
 			report.setAlerts(null);
 		
-		//RAPA survey
+		//RAPA Alert
 		try{
    			xml = new String(rAPASurvey.getResults(), "UTF-8");
    		} catch (Exception e) {
@@ -290,44 +284,34 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		LinkedHashMap<String, String> mRAPASurvey = ResultParser.getResults(xml);
    		qList = new ArrayList<String>();   		
    		//get answer list
-		qList = getQuestionList(mRAPASurvey);  
-		
-		int rAPAScore = 0;
-		Integer[] answerArray = new Integer[6];
-		//set answer into an array
-		for(int i = 0; i < qList.size() - 2; i++)
-			answerArray[i] = Integer.valueOf(qList.get(i));	
-		
-		Integer[] otherAnswers = removeFirstElementInArray(answerArray);
-		
-		if ((answerArray[0].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			rAPAScore = 2;
-		
-		otherAnswers = removeFirstElementInArray(otherAnswers);
-		
-		if ((answerArray[1].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			rAPAScore = 3;
-		
-		otherAnswers = removeFirstElementInArray(otherAnswers);
-		
-		if ((answerArray[2].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			rAPAScore = 4;
-		
-		otherAnswers = removeFirstElementInArray(otherAnswers);
-		
-		if ((answerArray[3].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			rAPAScore = 5;
-		
-		otherAnswers = removeFirstElementInArray(otherAnswers);
-		
-		if ((answerArray[4].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			rAPAScore = 6;		
-	
-		if (answerArray[5].intValue() == 1) 
-			rAPAScore = 7;
-		
+		qList = getQuestionList(mRAPASurvey);  		
+
+		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
 		if (rAPAScore < 6)
-			lAlert.add(AlertsInReport.getPhysicalActivityAlertMsg());
+			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
+		
+		//Mobility Alerts
+		try{
+   			xml = new String(mobilitySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+		
+		LinkedHashMap<String, String> mMobilitySurvey = ResultParser.getResults(xml);
+   		Map<String, String> qMap = getQuestionMap(mMobilitySurvey);  
+   		   		
+   		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);   
+		
+		//send message to MyOscar test
+//		try{
+//			Long lll = ClientManager.sentMessageToPatientInMyOscar(new Long(15231), "Message From Tapestry", "Hello");
+//			System.out.println("lll is === "+ lll);
+//			
+//		} catch (Exception e){
+//			System.out.println("something wrong with myoscar server");
+//			e.printStackTrace();
+//		}
+		
 		
 		report.setAlerts(lAlert);
 		//end of alert
@@ -358,31 +342,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		model.addAttribute("report", report);
 		return "/admin/view_report";
-	}
-	
-	private boolean isAllOtherAnswersNo(Integer[] answers){
-		boolean allNo = true;
-		for(Integer a: answers){
-			if (a.equals(1))
-			{
-				allNo = false;
-				break;
-			}
-		}
-		
-		return allNo;
-	}
-	
-	private Integer[] removeFirstElementInArray(Integer[] array){		
-		final Integer[] EMPTY_Integer_ARRAY = new Integer[0];
-		//convert array to ArrayList
-		List<Integer> list = new ArrayList<Integer>(Arrays.asList(array));
-		//remove first element from list
-		list.remove(0);	
-		
-		return list.toArray(EMPTY_Integer_ARRAY);
-	}
-	
+	}	
+
 	private Map<String, String> getSurveyContentMap(List<String> questionTextList, List<String> questionAnswerList){
 		Map<String, String> content;
 		
@@ -444,6 +405,31 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		}
 		
 		return qList;
+	}
+	//remove observer notes and other not related to question/answer
+	private Map<String, String> getQuestionMap(LinkedHashMap<String, String> questions){
+		Map<String, String> qMap = new LinkedHashMap<String, String>();		
+		String question;
+		int index;
+		
+		for (Map.Entry<String, String> entry : questions.entrySet()) {
+   		    String key = entry.getKey();
+   		    
+   		    if (!key.equalsIgnoreCase("title") && !key.equalsIgnoreCase("date") && !key.equalsIgnoreCase("surveyId"))
+   		    {
+   		    	Object value = entry.getValue();
+   		    	question = value.toString();
+   		    	
+   		    	index = question.indexOf("/observernote/");
+   		    	
+   		    	if (index > 0)
+   		    		question = question.substring(0, index);
+   		    	
+   		    	if (!question.equals("-"))
+   		    		qMap.put(key, question);    	
+   		    }
+   		}
+		return qMap;
 	}
 
 }

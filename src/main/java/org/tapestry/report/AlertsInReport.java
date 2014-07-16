@@ -7,71 +7,32 @@ public class AlertsInReport {
 	private Map<String, Boolean> nutritionAlerts;
 	private boolean hasDailyActivityAlert;
 	private boolean hasPhysicalActivityAlert;
-	private static final String socialAlertMsg = "Cognitive concerns9abnormal clock test); poor functional perfomance";
-	private static final String nutritionAlertMsg1 = "High Nutritional Risk";
-	private static final String nutritionAlertMsg2a= "Don't know if weight changed";	
-	private static final String nutritionAlertMsg2b = "Gained > 10 pounds";
-	private static final String nutritionAlertMsg2c = "Lost > 10 pounds";
-	private static final String nutritionAlertMsg3 = "Skip meals";
-	private static final String nutritionAlertMsg4 = "Poor Appetitite";
-	private static final String nutritionAlertMsg5 = "Patient cough, choke or have pain when swallowing";
-	private static final String dailyActiveityAlertMsg = "High risk for fall";
-	private static final String physicalActivityAlertMsg = "Activity level is suboptimal";
 	
+	public static final String SOCIAL_ALERT = "Cognitive concerns(abnormal clock test); poor functional performance";
+	public static final String NUTRITION_ALERT1 =  "High Nutritional Risk";
+	public static final String NUTRITION_ALERT2A = "Don't know if weight changed";	
+	public static final String NUTRITION_ALERT2B = "Gained > 10 pounds";
+	public static final String NUTRITION_ALERT2C = "Lost > 10 pounds";
+	public static final String NUTRITION_ALERT3 = "Skip meals";
+	public static final String NUTRITION_ALERT4 = "Poor Appetitite";
+	public static final String NUTRITION_ALERT5 = "Patient cough, choke or have pain when swallowing";
+	public static final String DAILY_ACTIVITY_ALERT = "High risk for fall";
+	public static final String PHYSICAL_ACTIVITY_ALERT = "Activity level is suboptimal";
+	public static final String MOBILITY_WALKING_ALERT1 = "Preclinical Limitation in Walking 2.0 km";
+	public static final String MOBILITY_WALKING_ALERT2 = "Minor Manifest Limitation in Walking 2.0 km";
+	public static final String MOBILITY_WALKING_ALERT3 = "Major Manifest Limitation in Walking 2.0 km";
+	public static final String MOBILITY_WALKING_ALERT4 = "Preclinical Limitation in Walking 0.5 km";
+	public static final String MOBILITY_WALKING_ALERT5 = "Minor Manifest Limitation in Walking 0.5 km";
+	public static final String MOBILITY_WALKING_ALERT6 = "Major Manifest Limitation in Walking 0.5 km";
+	public static final String MOBILITY_CLIMBING_ALERT1 = "Preclinical Limitation in Climbing Stairs";
+	public static final String MOBILITY_CLIMBING_ALERT2 = "Minor Manifest Limitation in Climbing Stairs";
+	public static final String MOBILITY_CLIMBING_ALERT3 = "Major Manifest Limitation in Climbing Stairs";
+	public static final String EDMONTON_FRAIL_SCALE_ALERT = "Edmonton Frail Scale socores indicates high risk";
+	public static final String DUKE_INDEX_OF_SOCIAL_SUPPORT_ALERT = "Social Support Scale scores denotes hight risk";	
 	
-	public static String getSocialAlertMsg() {
-		return socialAlertMsg;
-	}
-
-
-	public static String getNutritionAlertMsg1() {
-		return nutritionAlertMsg1;
-	}
-
-
-	public static String getNutritionAlertMsg2a() {
-		return nutritionAlertMsg2a;
-	}
-
-
-	public static String getNutritionAlertMsg3() {
-		return nutritionAlertMsg3;
-	}
-
-
-	public static String getNutritionAlertMsg4() {
-		return nutritionAlertMsg4;
-	}
-
-
-	public static String getNutritionAlertMsg5() {
-		return nutritionAlertMsg5;
-	}
-
-
-	public static String getNutritionAlertMsg2b() {
-		return nutritionAlertMsg2b;
-	}
-
-
-	public static String getNutritionAlertMsg2c() {
-		return nutritionAlertMsg2c;
-	}
-
-
-	public static String getDailyActiveityAlertMsg() {
-		return dailyActiveityAlertMsg;
-	}
-
-
-	public static String getPhysicalActivityAlertMsg() {
-		return physicalActivityAlertMsg;
-	}
-
-	public AlertsInReport() {
-		
-	}	
-	
+	private AlertsInReport() {
+		//
+	}		
 	
 	public boolean isHasSocialAlert() {
 		return hasSocialAlert;
@@ -97,26 +58,6 @@ public class AlertsInReport {
 		this.hasPhysicalActivityAlert = hasPhysicalActivityAlert;
 	}
 
-	public String getSocialAlertMessage(){
-		return socialAlertMsg;
-	}
 	
-	
-	public String getDailyActivityAlertMessage(){
-		return dailyActiveityAlertMsg;
-	}
-	
-	public String getPhysicalActivityAlertMessage(){
-		return physicalActivityAlertMsg;
-	}
-
-	public Map<String, Boolean> getNutritionAlerts() {
-		return nutritionAlerts;
-	}
-
-
-	public void setNutritionAlerts(Map<String, Boolean> nutritionAlerts) {
-		this.nutritionAlerts = nutritionAlerts;
-	}
 
 }

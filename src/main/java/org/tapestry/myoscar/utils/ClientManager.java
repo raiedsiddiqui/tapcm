@@ -10,6 +10,7 @@ import java.util.HashMap;
 import org.oscarehr.myoscar.client.ws_manager.AccountManager;
 import org.oscarehr.myoscar.client.ws_manager.GroupManager;
 import org.oscarehr.myoscar.client.ws_manager.RoleRelationshipManager;
+import org.oscarehr.myoscar.client.ws_manager.MessageManager;
 import org.oscarehr.myoscar_server.ws.LoginResultTransfer3;
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
 import org.oscarehr.myoscar_server.ws.RelationshipTransfer6;
@@ -31,7 +32,7 @@ public class ClientManager {
 	
 	private static ClassPathResource dbConfigFile;
 	private static Map<String, String> config;
-	private static Yaml yaml;
+	private static Yaml yaml;	
 	
 	public static PersonTransfer3 getClientByUsername(String userName) throws Exception
 	{			
@@ -113,6 +114,19 @@ public class ClientManager {
 		
 		return  primaryCareProviders;
 	}
+	
+	public static Long sentMessageToPatientInMyOscar(Long patientId, String subject, String contents) throws Exception{
+		MiscUtils.setJvmDefaultSSLSocketFactoryAllowAllCertificates();
+		LoginResultTransfer3 loginResultTransfer = AccountManager.login(serverUrl, user, password);	
+		
+		MyOscarCredentialsImpl credentials=new MyOscarCredentialsImpl(serverUrl, loginResultTransfer.getPerson().getId(), 
+				loginResultTransfer.getSecurityTokenKey(), "fake sessionId, not from browser", Locale.ENGLISH);
+		
+		Long success = MessageManager.sendMessage(credentials, patientId, subject, contents);
+		return success;
+	}
+	
+	
 	
 	private static Map<String, String> readMyOscarWSConfig()
 	{

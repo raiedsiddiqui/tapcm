@@ -154,6 +154,45 @@ public class AppointmentController{
    		
    		return "admin/manage_appointments";
    	}
+     
+   	@RequestMapping(value="/authenticate_myoscar/{volunteerId}", method=RequestMethod.POST)
+   	public String authenticateMyOscar(@PathVariable("volunteerId") int id, @RequestParam(value="patientId", required=true) int patientId,
+   			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+   		int centralAdminId = 1;
+ 
+   		String clientFirstName = request.getParameter("client_first_name");
+   		String clientLastName = request.getParameter("client_last_name");
+   		String volunteerFirstName = request.getParameter("volunteer_first_name");
+   		String volunteerLastName = request.getParameter("volunteer_last_name");
+   		
+   		StringBuffer sb = new StringBuffer();
+   		String subject = "MyOscar Authentication";   		
+   		
+   		sb.append("Please authenticate ");
+   		sb.append(clientFirstName);
+   		sb.append(" ");
+   		sb.append(clientLastName);
+   		sb.append(" to level 3 -- PHR.");
+   		sb.append("/n");
+   		sb.append("Send by Volunteer: ");
+   		sb.append(volunteerFirstName);
+   		sb.append(" ");
+   		sb.append(volunteerLastName);
+   		String message = sb.toString();
+   		
+   		//send message to Central Admin
+   		sendMessageToInbox(subject, message, id, centralAdminId);
+   		
+   		HttpSession session = request.getSession();
+   		if (session.getAttribute("appointmentId") != null)
+   		{
+   			String appointmentId = session.getAttribute("appointmentId").toString();
+   			
+   			return "redirect:/patient/" + patientId + "?appointmentId=" + appointmentId;
+   		}
+   		else
+   			return "redirect:/?patientId=" + patientId;   		
+   	}
    	
    	@RequestMapping(value="/display_appointment/{appointmentID}", method=RequestMethod.GET)
    	public String displayAppointment(@PathVariable("appointmentID") int id, 
@@ -794,7 +833,7 @@ public class AppointmentController{
 		model.addAttribute("patient", patient);
 		model.addAttribute("vFirstName", firstName);
 		model.addAttribute("vLastName", lastName);
-		model.addAttribute("termsInfo", termsInfo);		
+		model.addAttribute("termsInfo", termsInfo);			
 		
 		return "/volunteer/client_myoscar_authentication";
 	}
@@ -817,6 +856,16 @@ public class AppointmentController{
 			m.setSenderID(sender);
 			m.setText(msg);
 			m.setSubject("New Appointment");
+			messageDao.sendMessage(m);
+	}
+	
+	//this is a temporary method for sending message only into Inbox
+	private void sendMessageToInbox(String subject, String msg, int sender, int recipient){	
+			Message m = new Message();
+			m.setRecipient(recipient);
+			m.setSenderID(sender);
+			m.setText(msg);
+			m.setSubject(subject);
 			messageDao.sendMessage(m);
 	}
 	
