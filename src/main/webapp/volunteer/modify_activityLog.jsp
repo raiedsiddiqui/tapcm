@@ -10,33 +10,6 @@
 
 	<title>Modify Activity Log</title>
 	<%@include file="volunteer_head.jsp" %>
-
-	<script type="text/javascript">
-		$(function(){
-			$('#tp1').datetimepicker({
-				pickDate: false,
-				pickSeconds: false
-			});
-			
-			$('#tp2').datetimepicker({
-				pickDate: false,
-				pickSeconds: false
-			});
-			
-			$('#dp1').datetimepicker({
-				pickTime: false,
-				startDate: new Date()
-  			});
-  			
- 			$('#newActivityLogButton').click(function(){
-		        var btn = $(this)
-		        btn.button('loading')
-		        setTimeout(function () {
-		            btn.button('reset')
-		        }, 3000)
-		    });
-		});
-	</script>
 </head>
 
 <body>
@@ -53,10 +26,12 @@
 		<div class="row-fluid">
 			<div class="col-md-3">
 				<label>Date:</label>
-					<div id="dp" class="input-append">
-						<input id="activityDate" name="activityDate" data-format="yyyy-MM-dd" type="text" value = "${activityLog.date}" required>
+					<div id="dp1" class="input-append">
+						<!-- <input id="activityDate" name="activityDate" data-format="yyyy-MM-dd" type="text" value = "${activityLog.date}" required> -->
+
+						<input id="activityDate" class="datepickera form-control" data-format="yyyy-MM-dd" type="text" placeholder="Select Date" name="activityDate" value = "${activityLog.date}" required>
 							<span class="add-on">
-								<i class="icon-calendar"></i>
+								<!-- <i class="icon-calendar"></i> -->
 							</span>
 					</div>
 			</div>
@@ -64,9 +39,11 @@
 			<div class="col-md-3">						
 				<label>Start Time:</label>
 					<div id="tp1" class="input-append" role="dialog">
-						<input data-format="hh:mm:00" type="text" name="activityStartTime" id="activityStartTime" value="${activityLog.startTime}" >
+						<!-- <input data-format="hh:mm:00" type="text" name="activityStartTime" id="activityStartTime" value="${activityLog.startTime}" > -->
+
+						<input id="activityStartTime" data-format="hh:mm:00" class="timepickera form-control" type="text" placeholder="Select Start Time" name="activityStartTime" value="${activityLog.startTime}">
 			    		<span class="add-on">
-			    			<i class="icon-time"></i>
+			    			<!-- <i class="icon-time"></i> -->
 			   			 </span>
 					</div>
 			</div>
@@ -74,9 +51,12 @@
 			<div class="col-md-3">
 				<label>End Time:</label>
 					<div id="tp2" class="input-append" role="dialog">
-						<input data-format="hh:mm:00" type="text" name="activityEndTime" id="activityEndTime" value="${activityLog.endTime}">
+						<!-- <input data-format="hh:mm:00" type="text" name="activityEndTime" id="activityEndTime" value="${activityLog.endTime}"> -->
+
+						<input id="activityEndTime" data-format="hh:mm:00" class="timepickerb form-control" type="text" placeholder="Select End Time" name="activityEndTime" value="${activityLog.endTime}">
+
 			    		<span class="add-on">
-			    			<i class="icon-time"></i>
+			    			<!-- <i class="icon-time"></i> -->
 			   			 </span>
 					</div>
 			</div>
@@ -106,8 +86,50 @@
 		</div>
 		
 	</div>
-	
-	
+	<script type="text/javascript">
+		$(function(){
+  			
+ 			$('#newActivityLogButton').click(function(){
+		        var btn = $(this)
+		        btn.button('loading')
+		        setTimeout(function () {
+		            btn.button('reset')
+		        }, 3000)
+		    });
+		});
 
+
+			$('.datepickera').pickadate({
+		    // Escape any “rule” characters with an exclamation mark (!).
+		    format: 'You selecte!d: dddd, dd mmm, yyyy',
+		    formatSubmit: 'yyyy-mm-dd',
+		    hiddenName: true
+		   	// hiddenPrefix: 'prefix__',
+		    // hiddenSuffix: '__suffix'
+			})
+		
+
+		$('.timepickera').pickatime({
+		    // Escape any “rule” characters with an exclamation mark (!).
+		    formatSubmit: 'HH:i:00',
+		   	hiddenName: true,
+		   	min: [8,0],
+		   	max: [17,0]
+
+		    // hiddenPrefix: 'prefix__',
+		    // hiddenSuffix: '__suffix'
+		})
+
+		$('.timepickerb').pickatime({
+		    // Escape any “rule” characters with an exclamation mark (!).
+		    formatSubmit: 'HH:i:00',
+		   	hiddenName: true,
+		   	min: [8,0],
+		   	max: [17,0]
+
+		    // hiddenPrefix: 'prefix__',
+		    // hiddenSuffix: '__suffix'
+		})
+	</script>
 </body>
 </html>

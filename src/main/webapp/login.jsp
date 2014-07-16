@@ -10,7 +10,7 @@
  	</head>
  	<body>
   <div id="headerholder"> 
-    <div class="row-fluid">
+    <div class="row">
       <div class="col-md-3 tpurple logoheight">
         <img id="logo" src="<c:url value="/resources/images/logow.png"/>" />
       </div>
@@ -30,7 +30,7 @@
 
 
   		<div class="container-fluid">
-   			<div class="row-fluid">
+   			<div class="row">
 	    		<div class="col-md-12">
 					 <c:if test="${not empty error}">
 					<div class="alert alert-danger">Login failed <br /> Caused :
@@ -96,7 +96,7 @@
       					</form>
      				</div> -->
     			</div>
-          <div id="row-fluid">
+          <div id="footer row-fluid">
             <div class="col-md-12">
                 <img id="logofhs" src="${pageContext.request.contextPath}/resources/images/fhs.png"/>
                 <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>
