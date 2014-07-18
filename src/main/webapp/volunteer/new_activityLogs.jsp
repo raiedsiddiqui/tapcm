@@ -8,7 +8,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Tapestry Volunteer Add Activity for Appointment</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
 <%@include file="volunteer_head.jsp" %>
 
 
@@ -16,56 +16,27 @@
 		html,body{
 			height:100%;
 		}
-		.content{
-/*			overflow-x:auto;
-		overflow-y:auto;*/	
-			border-radius:5px;
-			-moz-border-radius:5px;
-			-webkit-border-radius:5px;
-			-o-border-radius:5px;
-			-ms-border-radius:5px;
-
-		}
-		.content a{
-			color:#ffffff;
-		}
-		textarea{
-			width:90%;
-			margin-right:10px;
-		}
-		.modal-backdrop{
-			z-index:0;
-		}
-		
-		.lightbox{
-			z-index:1;
-		}
-		.thumbnail{
-			width:320px;
-		}
 		
 	</style>
-
-
 
 </head>
 <body>
 <%@ include file="subNavi.jsp" %>
 <div class="content">
 			<form id="newActivityLog" action="<c:url value="/add_activityLogs"/>" method="post">
-				<div class="row-fluid">
+				<div class="row">
 					<div class="col-md-6">
 						<h4>New Activity Log</h4>
 					</div>
 				</div>
 
-				<div class="row-fluid">
+				<div class="row">
 					<div class="col-md-3">
 						<label>Date:</label>
 							<div id="dp1" class="input-append">
 								<!-- <input id="activityDate" name="activityDate" data-format="yyyy-MM-dd" type="text" value = "${activityLog.date}" required> -->
 
-								<input id="activityDate" class="datepickera form-control" data-format="yyyy-MM-dd" type="text" placeholder="CLICK" name="activityDate" value = "${activityLog.date}" required>
+								<input id="activityDate" class="datepickera form-control" data-format="yyyy-MM-dd" type="text" placeholder="Select Date" name="activityDate" value = "${activityLog.date}" required>
 									<span class="add-on">
 										<!-- <i class="icon-calendar"></i> -->
 									</span>
@@ -77,7 +48,7 @@
 							<div id="tp1" class="input-append" role="dialog">
 								<!-- <input data-format="hh:mm:00" type="text" name="activityStartTime" id="activityStartTime" value="${activityLog.startTime}" > -->
 
-								<input id="activityStartTime" data-format="hh:mm:00" class="timepickera form-control" type="text" placeholder="Try me&hellip;" name="activityStartTime" value="${activityLog.startTime}">
+								<input id="activityStartTime" data-format="hh:mm:00" class="timepickera form-control" type="text" placeholder="Select Start Time" name="activityStartTime" value="${activityLog.startTime}">
 
 					    		<span class="add-on">
 					    			<!-- <i class="icon-time"></i> -->
@@ -91,7 +62,7 @@
 								<!-- <input data-format="hh:mm:00" type="text" name="activityEndTime" id="activityEndTime" value="${activityLog.endTime}"> -->
 
 
-								<input id="activityEndTime" data-format="hh:mm:00" class="timepickerb form-control" type="text" placeholder="Try me&hellip;" name="activityEndTime" value="${activityLog.endTime}">
+								<input id="activityEndTime" data-format="hh:mm:00" class="timepickerb form-control" type="text" placeholder="Select End Time" name="activityEndTime" value="${activityLog.endTime}">
 
 
 					    		<span class="add-on">
@@ -101,13 +72,13 @@
 					</div>
 				</div>
 				
-			<div class="row-fluid">
-				<div class="col-md-3">
+			<div class="row">
+				<div class="col-md-12">
 					<h3>Activity Description:</h3>
 				</div>
 			</div>
 			
-			<div class="row-fluid">
+			<div class="row">
 				<div class="col-md-3">
 					<textarea name="activityDesc"  maxlength="50">${activityLog.description}</textarea>
 					<input type="hidden" name="activityId" value="${activityLog.activityId}"/>	
@@ -151,7 +122,9 @@
 		$('.timepickera').pickatime({
 		    // Escape any “rule” characters with an exclamation mark (!).
 		    formatSubmit: 'HH:i:00',
-		   	hiddenName: true
+		   	hiddenName: true,
+		   	min: [8,0],
+		   	max: [17,0]
 
 		    // hiddenPrefix: 'prefix__',
 		    // hiddenSuffix: '__suffix'
@@ -160,7 +133,9 @@
 		$('.timepickerb').pickatime({
 		    // Escape any “rule” characters with an exclamation mark (!).
 		    formatSubmit: 'HH:i:00',
-		   	hiddenName: true
+		   	hiddenName: true,
+		   	min: [8,0],
+		   	max: [17,0]
 
 		    // hiddenPrefix: 'prefix__',
 		    // hiddenSuffix: '__suffix'

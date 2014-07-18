@@ -24,10 +24,7 @@ img {
 	width: 200px;
 	height: 40px;
 }
-#headerholder {
-/*	border-bottom: 2px solid lightgray;
-*/	height: auto;
-}
+
 
 .navbar {
 	margin-bottom: 0px !important;
@@ -57,15 +54,17 @@ img {
 
 #homebtn {
 	width: 100%;
-	font-size: 30px;
-	height: 50px;
+	font-size: 19px;
+	letter-spacing: 1px;
+	height: 35px;
 	background-color: #4a307b;
 	color: white;
 	font-family: 'Open Sans', serif;
 	-webkit-tap-highlight-color: rgba(0,0,0,0); 
 	border:0;
-	margin-bottom: 5px;
-	margin-top: 4%;
+	/* margin-bottom: 3px; */
+	margin-top: 20px;
+	/* padding-top: 5px; */
 
 }
 #homebtn a {
@@ -78,161 +77,20 @@ img {
 
 #mainnavbar a {
 	color:white;
-	font-size:25px;
+	font-size:14px;
 	font-family: 'Open Sans';
-	border-right:1px solid white;
 }
+/*
 @media (min-width: 960px) {
 
-
-
-
-#maincontent {
-	margin: 0 auto;
-/*	border: 1px solid black;
-*/	width: 80%;
 }
-
-.control-label {
-/*	width: 370px !important;
-*/	font-size: 30px;
-	font-family: 'Open Sans', serif;
-
-
-}
-
-.form-horizontal .control-group {
-	margin-bottom: 50px !important;
-}
-
-.form-horizontal .controls {
-	float: right;
-
-}
-
-
-
-div.area {
-	width: 80%;
-	margin: 10% auto;
-}
-
-/*.form-horizontal .controls {
-	margin-left: 0;
-}*/
-
-.heading {
-	margin-bottom: 30px !important;
-}
-
-.navbar {
-	float: right !important;
-}
-
-.content {
-
-	overflow-x:auto;
-	border-radius:5px;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
-	-o-border-radius:5px;
-	-ms-border-radius:5px;
-	padding:0px 15px;
-	clear: both !important;
-	/*padding-left: 1%;
-	padding-right: 1%;*/
-}
-
-.navbar-inner {
-	height: 60px;
-}
-a {
-	font-size: 18px;
-}
-
-.form-search input, .form-inline input, .form-horizontal input, .form-search textarea, .form-inline textarea, .form-horizontal textarea, .form-search select, .form-inline select, .form-horizontal select, .form-search .help-inline, .form-inline .help-inline, .form-horizontal .help-inline, .form-search .uneditable-input, .form-inline .uneditable-input, .form-horizontal .uneditable-input, .form-search .input-prepend, .form-inline .input-prepend, .form-horizontal .input-prepend, .form-search .input-append, .form-inline .input-append, .form-horizontal .input-append {
-	width: 70%;
-	float: right;
-}
+Lanscape CSS ENDS*/
 
 .pname {
 	margin-bottom: 8px;
+	margin-top: 8px;
 	width: 100%;
 }
-
-.patientinfo {
-	padding: 4px;
-	width: 90%;
-	height: 20%;
-}
-.app-data {
-	font-style: oblique;
-	font-size: 20px;
-}
-.patient-info {
-	width: 90%;
-	border: 1px solid red;
-	height: 40px;
-}
-
-
-.patientinfo:hover {
-	background-color: lightgray;
-
-}
-
-
-
-#squestion2 {
-	width: 100%;
-	text-align: center;
-}
-
-
-
-.sheading {
-	width:90%;
-/*	background-color: lightgray;
-*/	font-family: 'Open Sans', serif;
-	font-size: 20px;
-	margin-bottom: 20px;
-/*	height: 30px;
-	padding-left:8px;*/
-}
-
-.sheadingactive {
-	width:90%;
-	background-color: lightgray;
-	font-family: 'Roboto Slab', serif;
-	font-size: 20px;
-	margin-bottom: 20px;
-	height: 30px;
-	padding-left:8px;
-}
-
-.navbar .nav > li > a
-{
-	padding: 18px 9px 23px !important;
-	font-size: 25px !important;
-	border-left: 1px solid white;
-	font-family: 'Open Sans', 'sans-serif';
-	color: white !important;
-}
-
-.navbar .brand {
-	font-size: 25px !important;
-	padding: 18px 3px 23px;
-	font-family: 'Roboto Slab', serif;
-
-}
-
-.navbar-inner {
-/*	padding-left:0 !important;
-*/}
-
-
-}
-/*Lanscape CSS ENDS*/
 
 #answer {
 	width: 90%;
@@ -241,15 +99,16 @@ a {
 }
 .cbutton {
 	width: 100%;
-	height: 60px;
+	height: 40px;
 	text-align: left;
-	padding-left: 20px;
+	/* padding-left: 20px; */
 	padding-right: 20px;
-	font-size: 35px; 
+	padding-top: 6px;
+	font-size: 18px; 
 	font-family:'Open Sans', 'sans-serif';
 	background-color: #6BB040;
 	color:white;
-	border:0px;
+
 
 }
 
@@ -271,12 +130,38 @@ a {
 .tleft {
 	float:left;
 }
-.survey-list {
-	width:85% !important;
+.surveybtn {
+	width:100% !important;
 	font-size: 30px;
-	font-family: 'Roboto Slab', serif;
-
+	font-family: 'Open Sans', serif;
+	background-color: #6BB040;
+	color: white;
+	margin-bottom: 10px;
+	min-height: 78px;
 }
+
+/*Button for inactive surveys */
+.surveybtnc {
+	width:100% !important;
+	font-size: 30px;
+	font-family: 'Open Sans', serif;
+	background-image: linear-gradient(to bottom, rgba(150, 150, 150, 0.84), #C2C2C2) !important;
+	background-image: -webkit-gradient(linear, left bottom, right top, from(rgba(150, 150, 150, 0.84)), to(#C2C2C2)) !important;
+	color: white;
+	margin-bottom: 10px;
+	min-height: 40px;
+}
+
+.surveydesc {
+	font-size:15px;
+}
+
+.surveycomp{
+	font-style: italic;
+	font-size:13px;
+}
+
+
 
 #qtext {
 	margin-top: 3%;
@@ -297,6 +182,7 @@ input[type=button] {
 .btn-primary {
 background-image: linear-gradient(to bottom,rgba(106, 175, 65, 0.84),#6AAF41) !important;
 background-image: -webkit-gradient(linear, left bottom, right top, from(rgba(106, 175, 65, 0.84)), to(#6AAF41));
+margin-top: 15px;
 }
 
 .btn-completed {
@@ -399,19 +285,27 @@ input > #contacted {
 	width: 80%;
 }
 
-div#visitandbook.span12.btn-group {
+#visitandbook {
 /*	border:1px solid gray;
 */	width:100%;
 	float:right;
-	margin-bottom: 10px;
-	margin-top:10px;
+	background-color:#FAFAFA;
+	margin-bottom: 15px;
+
 }
 
 .lgbtn {
-	padding-right:10px;
-	margin-right:10px;
-	font-size: 20px !important;
-	height:35px;
+	padding:6px 8px 6px 8px;
+	margin-right:20px;
+	font-size: 17px !important;
+	font-family: 'Open Sans';
+	letter-spacing: 1px;
+	color:white;
+	background-color: #4A307A;
+	border:none;
+	border-radius: 0px;
+	/*margin-top: 15px;*/
+
 }
 
 .completevisitbtn {
@@ -493,7 +387,6 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 
 .tpurple {
 	background-color: #BF1F82;
-	border-right: 5px solid white;
 }
 
 .tblack {
@@ -513,4 +406,207 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 	background-color: lightgray;
 }
 
+.row {
+	margin:0;
+}
+
+
+@media (min-width: 768px) {
+	.navbar .nav > li > a
+	{
+		/*padding: 18px 9px 23px !important;*/
+		padding-top: 18px;
+		font-size: 14px !important;
+		/*border-left: 1px solid white;*/
+		font-family: 'Open Sans', 'sans-serif';
+		color: white !important;
+	}
+
+	.navbar .brand {
+		font-size: 14px !important;
+		padding: 18px 3px 23px;
+
+	}
+
+	.navbar-inner {
+	/*	padding-left:0 !important;
+	*/}
+
+}
+
+@media (min-width: 992px) {
+
+	.cbutton {
+		width: 100%;
+		height: 55px;
+		text-align: left;
+		padding-left: 20px;
+		padding-right: 20px;
+		font-size: 30px; 
+		font-family:'Open Sans', 'sans-serif';
+		background-color: #6BB040;
+		color:white;
+		border:0px;
+
+	}
+
+		#maincontent {
+		margin: 0 auto;
+	/*	border: 1px solid black;
+	*/	width: 80%;
+	}
+
+	.control-label {
+	/*	width: 370px !important;
+	*/	font-size: 30px;
+		font-family: 'Open Sans', serif;
+
+
+	}
+
+	.form-horizontal .control-group {
+		margin-bottom: 50px !important;
+	}
+
+	.form-horizontal .controls {
+		float: right;
+
+	}
+
+
+
+	div.area {
+		width: 80%;
+		margin: 10% auto;
+	}
+
+	/*.form-horizontal .controls {
+		margin-left: 0;
+	}*/
+
+	.heading {
+		margin-bottom: 30px !important;
+	}
+
+	/*.navbar {
+		float: right !important;
+	}*/
+
+	.content {
+
+		overflow-x:auto;
+		border-radius:5px;
+		-moz-border-radius:5px;
+		-webkit-border-radius:5px;
+		-o-border-radius:5px;
+		-ms-border-radius:5px;
+		padding:0px 15px;
+		clear: both !important;
+		/*padding-left: 1%;
+		padding-right: 1%;*/
+	}
+
+	.navbar-inner {
+		height: 60px;
+	}
+
+	.form-search input, .form-inline input, .form-horizontal input, .form-search textarea, .form-inline textarea, .form-horizontal textarea, .form-search select, .form-inline select, .form-horizontal select, .form-search .help-inline, .form-inline .help-inline, .form-horizontal .help-inline, .form-search .uneditable-input, .form-inline .uneditable-input, .form-horizontal .uneditable-input, .form-search .input-prepend, .form-inline .input-prepend, .form-horizontal .input-prepend, .form-search .input-append, .form-inline .input-append, .form-horizontal .input-append {
+		width: 70%;
+		float: right;
+	}
+
+	.patientinfo {
+		padding: 4px;
+		width: 90%;
+		height: 20%;
+	}
+	.app-data {
+		font-style: oblique;
+		font-size: 20px;
+	}
+	.patient-info {
+		width: 90%;
+		border: 1px solid red;
+		height: 40px;
+	}
+
+
+	.patientinfo:hover {
+		background-color: lightgray;
+
+	}
+
+
+
+	#squestion2 {
+		width: 100%;
+		text-align: center;
+	}
+
+	.sheadingactive {
+		width:90%;
+		background-color: lightgray;
+		font-family: 'Roboto Slab', serif;
+		font-size: 20px;
+		margin-bottom: 20px;
+		height: 30px;
+		padding-left:8px;
+	}
+
+	.navbar .nav > li > a
+	{
+		/*padding: 18px 9px 23px !important;*/
+		padding-top: 18px;
+		font-size: 20px !important;
+		/*border-left: 1px solid white;*/
+		font-family: 'Open Sans', 'sans-serif';
+		color: white !important;
+		font-weight: 300;
+	}
+
+	.navbar .brand {
+		font-size: 20px !important;
+		padding: 18px 3px 23px;
+
+	}
+
+	.navbar-inner {
+	/*	padding-left:0 !important;
+	*/}
+
+	.tpurple {
+		border-right: 5px solid white;
+		}
+
+	.pageheader {
+		font-size: 23px;
+		font-family: 'Open Sans';
+		font-weight: 500;
+		margin-bottom: 2%;
+		border-bottom: 1px solid lightgray;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
+
+	#footer {
+		top:150px;
+	}
+
+	#headerholder {
+	/*	border-bottom: 2px solid lightgray;
+	*/	height: auto;
+	margin-bottom: 15px;
+	}
+
+	.lgbtn:hover {
+		color:white;
+	}
+
+	.patientname {
+		font-family: 'Open Sans', sans-serif;
+		font-size: 25px;
+		color:black;
+		margin:0px;
+	}
+}
 

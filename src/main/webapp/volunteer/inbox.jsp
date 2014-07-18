@@ -5,7 +5,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<title>Tapestry</title>
+	<title>Inbox</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
  	<%@include file="volunteer_head.jsp" %>
 	<style type="text/css">

@@ -50,7 +50,7 @@
 </head>
 
 	<div id="headerholder">	
-		<div class="row-fluid">
+		<div class="row">
 			<div class="col-md-3 tpurple logoheight">
 				<img id="logo" src="<c:url value="/resources/images/logow.png"/>" />
 			</div>
@@ -60,11 +60,10 @@
 			<ul id="mainnavbar" class="nav navbar-nav">	
 	    		<li id="navhome"><a class="brand" href="<c:url value="/"/>">Home</a></li>
 	    		<li id="navclient"><a href="<c:url value="/client"/>">Clients</a></li>    	
-	    		<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
-	    		<li><a href="#bookAppointment" data-toggle="modal">Book Appointment</a></li>    	
-
-<!-- 	    		<li><a href="<c:url value="/view_activityLogs"/>">Activity Logs</a></li>
-	    		<li><a href="<c:url value="/view_narratives"/>">Narratives</a></li> -->
+	    		<li><a href="#bookAppointment" data-toggle="modal">Book Visit</a></li>    	
+ 	    		<li><a href="<c:url value="/view_activityLogs"/>">Journal</a> </li>
+	    		<li><a href="<c:url value="/view_narratives"/>">Narratives</a></li>
+	    		<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 				<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 
 		    </ul>

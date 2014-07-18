@@ -85,7 +85,8 @@
 	</div> -->
 <!-- 	breadcrumb END-->	
 	
-	<div class="content">
+	<div class="container">
+
 <!-- 		<h2>Welcome, ${name}</h2>-->		
 	<c:if test="${not empty announcements}">
 		<div class="row-fluid">
@@ -112,288 +113,92 @@
 		<c:if test="${not empty booked}">
 			<div class="alert alert-info">The appointment was successfully booked</div>
 		</c:if>
+		
 		<div class="row-fluid">
-			<div class="col-md-6">
-
-
-				<a href="<c:url value="/view_activityLogs"/>" id="homebtn" class="btn">Activity Log</a>
-<!-- 				<button id="homebtn"> <span class="glyphicon glyphicon-pencil"></span> <a href="<c:url value="/view_activityLogs"/>">Activity Log</a></button> -->
-			
-<!-- 			<a href="<c:url value="/view_activityLogs"/>" class="btn btn-primary">Activity Log</a>
--->
-			</div>
-
-			<div class="col-md-6">
-				<a href="<c:url value="/view_narratives"/>" id="homebtn" class="btn">Narratives</a>
-			</div>
-			
-		</div>
-
-		<div class="row-fluid">
-			<div class="span12">
+			<!-- <div class="col-md-8"> -->
 				<c:choose>
 					<c:when test="${not empty patient}">
-						<h3> Select an appointment </h3>
+						<p> Select an appointment </p>
 					</c:when>
 					<c:otherwise>
-						<h3>My Appointments: </h3>
+						<p class="pageheader">Appointments</p>
 
 					</c:otherwise>
 				</c:choose>
-<!-- 				<ul class="nav nav-tabs" id="appointmentSelect">
-					<li class="active"><a href="#today" data-toggle="tab">Today</a></li>
- 					<li class="active"><a href="#all" data-toggle="tab">All</a></li>
-				</ul>-->
-				<div class="tab-content">
-					<div class="tab-pane active" id="all">
-<!-- 						<div class="sheading"><h4>Approved Appointments:</h4></div>
- -->						<table class="table">
-							<c:forEach items="${approved_appointments}" var="aa">
-								<div class="pname">
-<!-- 									<div class="app-date"> ${aa.date} </div>
- -->									<button type="button" class="cbutton" onclick="location.href='<c:url value="/patient/${aa.patientID}?appointmentId=${aa.appointmentID}"/>'">${aa.patient} <span class="app-date">${aa.date}</span> <span class="tright"> ${aa.time}</button>
+			<!-- </div> -->
+
+			<!--<div class="col-md-2">
+				 <a href="<c:url value="/view_activityLogs"/>" id="homebtn" class="btn">Activity Log</a> 
+			</div>-->
+
+			<!-- <div class="col-md-2">
+				<a href="<c:url value="/view_narratives"/>" id="homebtn" class="btn">Narratives</a>
+			</div> -->
+
+		</div>
+
+		<div class="row-fluid">				
+			<c:forEach items="${approved_appointments}" var="aa">
+	<!-- 								<div class="pname">
+					<button type="button" class="cbutton" onclick="location.href='<c:url value="/patient/${aa.patientID}?appointmentId=${aa.appointmentID}"/>'">${aa.patient} <span class="app-date">${aa.date}</span> <span class="tright"> ${aa.time}</button> -->
+
+				<!-- custom -->
+					
+					<div class="pname">
+						<a href="<c:url value="/patient/${aa.patientID}?appointmentId=${aa.appointmentID}"/>">
+							<div class="row cbutton">
+								<div class="col-sm-6 col-xs-5">
+									${aa.patient}
 								</div>
-							</c:forEach>
-						</table>
-
-
-			      		<h4 class="panel-title">
-			        		Pending Completion
-			      		</h4>
-						<c:forEach items="${pending_appointments}" var="pa">
-							<div class="pname">
-								<button type="button" class="pendingappt btn-lg btn-block cbutton">${pa.patient} <span class="app-date">${pa.date}</span> <span class="tright"> ${pa.time}</button>
-							</div>
-						</c:forEach>
-
-
-						
-						<div class="panel-group" id="accordion"> 
-						  <div class="panel panel-default">
-						    <div class="panel-heading">
-						      <h4 class="panel-title">
-								<a class="accordion-toggle" data-toggle="collapse" href="#collapseDeclined">
-						        	Declined Appointments
-						      	</a>
-						      </h4>
-    						</div>
-						  
-					        <div id="collapseDeclined" class="panel-collapse collapse">
-	  							<div class="panel-body">
-				    				<c:forEach items="${declined_appointments}" var="da">
-										<div class="pname">
-										<div class="app-date"> ${da.date} </div>
-											<button type="button" class="inactiveclr btn-lg btn-block cbutton">${da.patient} <span class="tright"> ${da.time}</button>
-										</div>
-									</c:forEach>
+								<div class="col-sm-5 col-xs-5">
+									${aa.date}
+								</div>
+								<div class="col-sm-1 col-xs-2">
+									${aa.time}
 								</div>
 							</div>
-						</div>
+						</a>
 					</div>
+						
+				<!-- custom -->
+			</c:forEach>
 
-						    
-<!-- 					<div class="tab-pane active" id="today">	
-					<c:choose>
-						<c:when test="${not empty appointments_today}">
-						<table class="table">
-							<tr>
-								<th>Patient</th>
-								<th>Time</th>
-								<th>Approval Status</th>
-								<th>Delete</th>
-							</tr>
-							<c:forEach items="${appointments_today}" var="a">
-							<tr>
-								<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
-								<td>${a.time}</td>
-								<td>${a.status}</td>
-								<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this appointment?')">Delete</a></td>
-							</tr>
-							</c:forEach>
-						</table>
-						</c:when>
-						<c:otherwise>
-							<p style="margin-left:25px">No appointments for today</p>
-						</c:otherwise>
-					</c:choose>
-					</div>	 -->				
-<!--					<c:choose>
-						<c:when test="${not empty appointments_patient}">
-							<table class="table">
-								<c:forEach items="${appointments_patient}" var="a">
-									<div class="pname">
-										<div class="app-date"> ${a.date} </div>
-										<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}?appointmentId=${a.appointmentID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>
-									</div>
-								</c:forEach>
-							</table>
-						</c:when>
-						
-						<c:when test="${not empty appointments_all}">
-							<table class="table"> -->
-		<!-- 						<tr>
-									<th>Patient</th>
-									<th>Time</th>
-									<th>Approval Status</th>
-									<th>Delete</th>
-								</tr> -->
-	<!--							<c:forEach items="${appointments_all}" var="a"> -->
-	<!-- 							<tr>
-									<td><a href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></td>
-									<td>${a.date} ${a.time}</td>
-									<td>${a.status}</td>
-									<td><a href="<c:url value="/delete_appointment/${a.appointmentID}"/>" class="btn btn-danger">Delete</a></td>
-								</tr> -->
+		</div>
+
+		<div class="row-fluid">				
+			<p class="pageheader">Pending Completion</p>
+			<c:forEach items="${pending_appointments}" var="pa">
+				<div class="pname">
+					<button type="button" class="pendingappt btn-lg btn-block cbutton">${pa.patient} <span class="app-date">${pa.date}</span> <span class="tright"> ${pa.time}</button>
+				</div>
+			</c:forEach>
+		</div>
+
 	
-	<!--							<div class="pname">
-									<div class="app-date"> ${a.date} </div> -->
-	<!-- 								<div class="patient-info"><a class="patientinfo" href="<c:url value="/patient/${a.patientID}"/>">${a.patient}</a></div>
-	 -->								
-	<!--								<button type="button" class="btn btn-primary btn-lg btn-block cbutton" onclick="location.href='<c:url value="/patient/${a.patientID}?appointmentId=${a.appointmentID}"/>'">${a.patient} <span class="tright"> ${a.time}</button>								 
-	
+		<div class="row-fluid">						
+			<div class="panel-group" id="accordion"> 
+			  <div class="panel panel-default">
+			    <div class="panel-heading">
+			      <h4 class="panel-title">
+					<a class="accordion-toggle" data-toggle="collapse" href="#collapseDeclined">
+			        	Declined Appointments
+			      	</a>
+			      </h4>
+				</div>
+			  
+		        <div id="collapseDeclined" class="panel-collapse collapse">
+						<div class="panel-body">
+		    				<c:forEach items="${declined_appointments}" var="da">
+								<div class="pname">
+								<div class="app-date"> ${da.date} </div>
+									<button type="button" class="inactiveclr btn-lg btn-block cbutton">${da.patient} <span class="tright"> ${da.time}</button>
 								</div>
-								</c:forEach>
-							</table>
-						</c:when>
-						
-						<c:otherwise>
-							<p style="margin-left:25px">No appointments</p>
-						</c:otherwise>
-					</c:choose> -->
+							</c:forEach>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-
-	<!-- OLD Modal -->
-<!-- 	<div id="bookAppointment" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="modalHeader" aria-hidden="true">
-  		<div class="modal-header">
-    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-    		<h3 id="modalHeader">Book Appointment</h3>
-  		</div>
-  		<div class="modal-body">
-  			<form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
-  				<label>With patient:</label>
-				<select name="patient" form="appt-form">
-					<c:forEach items="${patients}" var="p">
-					<option value="${p.patientID}">${p.displayName}</option>
-					</c:forEach>
-				</select><br />
-				<label>Date:</label>		
-				<div id="dp" class="input-append">
-					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate" readonly>
-					<span class="add-on">
-						<i class="icon-calendar"></i>
-					</span>
-				</div>
-				<label>Time:</label>
-				<div id="tp" class="input-append" role="dialog">
-					<input data-format="hh:mm:00" type="text" name="appointmentTime" readonly>
-				    <span class="add-on">
-				    	<i class="icon-time"></i>
-				    </span>
-				</div>
-  			</form>
-  		</div>
-  		<div class="modal-footer">
-    		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-    		<button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
-  		</div>
-	</div> -->
-
-<!-- OLD MODAL-->
-
-<!-- <div class="modal fade" id="bookAppointment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Book Appointment</h4>
-      </div>
-      <div class="modal-body">
-        
-        <form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
-  				<label>With patient:</label>
-				<select name="patient" form="appt-form">
-					<c:forEach items="${patients}" var="p">
-					<option value="${p.patientID}">${p.displayName}</option>
-					</c:forEach>
-				</select><br />
-				<label>Date:</label>		
-				<div id="dp" class="input-append">
-					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate">
-					<span class="add-on">
-						<i class="icon-calendar"></i>
-					</span>
-				</div>
-				<label>Time:</label>
-				<div id="tp" class="input-append">
-					<input data-format="hh:mm:00" type="text" name="appointmentTime">
-				    <span class="add-on">
-				    	<i class="icon-time"></i>
-				    </span>
-				</div>
-  			</form>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-
-
-
-
-<!-- <div class="modal fade" id="bookAppointment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Book Appointment</h4>
-      </div>
-      <div class="modal-body">
-        
-        <form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
-  				<label>With patient:</label>
-				<select name="patient" form="appt-form">
-					<c:forEach items="${patients}" var="p">
-					<option value="${p.patientID}">${p.displayName}</option>
-					</c:forEach>
-				</select><br />
-				<label>Date:</label>		
-				<div id="dp" class="input-append"> -->
-<!--  					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate">
- --> <!-- 					<input class="datepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentDate">
-
-					<span class="add-on">
-						<i class="icon-calendar"></i>
-					</span>
-				</div>
-				<label>Time:</label>
-				<div id="tp" class="input-append"> -->
-<!--  					<input data-format="hh:mm:00" type="text" name="appointmentTime">
- --> 					<!-- <input data-format="HH:i:00" class="timepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentTime">
-
-				    <span class="add-on">
-				    	<i class="icon-time"></i>
-				    </span>
-				</div>
-  			</form>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
-      </div>
-    </div>
-  </div> 
-
-
-  
-</div>-->
 </body>
 </html>
