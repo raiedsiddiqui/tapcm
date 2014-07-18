@@ -47,6 +47,15 @@
 									<label>Last Name:</label>
 									<input type="text" name="lastname" class="form-control" value="${volunteer.lastName}" required/>
 								</div>
+								
+								<div class="col-md-4">
+									<label>Organization:</label>
+										<select name="organization" form="modify_volunteer" class="form-control">
+											<c:forEach items="${organizations}" var="o">
+												<option value="${o.organizationId}" <c:if test="${o.organizationId eq volunteer.organizationId}">selected</c:if>>${o.name}</option>
+											</c:forEach>
+										</select>
+								</div>
 							</div>
 
 							<div class="row form-group">

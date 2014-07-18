@@ -11,7 +11,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.Volunteer;
-
+import org.tapestry.objects.Organization;
+							
 /**
  * 
  * @author lxie
@@ -247,8 +248,8 @@ public class VolunteerDao {
 				stmt = con.prepareStatement("INSERT INTO volunteers (firstname, lastname, street,"
 						+ "username, email, experience_level, city, province, home_phone, cell_phone,"
 						+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
-						+ " availability, street_number, password) "
-						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)");
+						+ " availability, street_number, password, organization) "
+						+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 				
 				stmt.setString(1, volunteer.getFirstName()); 
 				stmt.setString(2, volunteer.getLastName());	
@@ -269,6 +270,8 @@ public class VolunteerDao {
 				stmt.setString(17, volunteer.getAvailability());				
 				stmt.setString(18, volunteer.getStreetNumber());
 				stmt.setString(19, volunteer.getPassword());
+				stmt.setInt(20, volunteer.getOrganizationId());
+				
 				
 				stmt.execute();
 				success = true;
@@ -294,7 +297,7 @@ public class VolunteerDao {
 			stmt = con.prepareStatement("UPDATE volunteers SET firstname=?,lastname=?, username=?, street=?,"
 					+ "email=?, experience_level=?, city=?, province=?, home_phone=?, cell_phone=?,"
 					+ "postal_code=?, country=?, emergency_contact=?, emergency_phone=?, appartment=?, "
-					+ "notes=?, availability=?, street_number=?, password=? WHERE volunteer_ID=?");
+					+ "notes=?, availability=?, street_number=?, password=?, organization=? WHERE volunteer_ID=?");
 			
 			stmt.setString(1, volunteer.getFirstName());
 			stmt.setString(2, volunteer.getLastName());
@@ -315,7 +318,8 @@ public class VolunteerDao {
 			stmt.setString(17, volunteer.getAvailability());
 			stmt.setString(18,  volunteer.getStreetNumber());
 			stmt.setString(19,  volunteer.getPassword());
-			stmt.setInt(20, volunteer.getVolunteerId());
+			stmt.setInt(20, volunteer.getOrganizationId());
+			stmt.setInt(21, volunteer.getVolunteerId());
 			
 			stmt.execute();
 		}catch (SQLException e){
@@ -401,6 +405,181 @@ public class VolunteerDao {
 		return name;
 	}
 	
+	public List<Organization> getAllOrganizations(){
+		List<Organization> list = new ArrayList<Organization>();
+		
+		try{
+			stmt = con.prepareStatement("SELECT * FROM organizations ORDER BY name DESC ");			
+			rs = stmt.executeQuery();
+			
+			list = getOrganizationsByResultSet(rs);
+			
+			if (rs != null)
+				rs.close();
+			
+			
+		}catch (SQLException e){			
+			logger.error("Error: Could not retrieve organizations");				
+			e.printStackTrace();			
+		}finally {
+    		try{
+    			//close statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}	
+		
+		return list;
+	}
+	
+	public Organization getOrganizationById(int id){
+		Organization organization = new Organization();
+		List<Organization> organizations = new ArrayList<Organization>();
+		
+		try{
+			stmt = con.prepareStatement("SELECT * FROM organizations WHERE organization_ID = ? ORDER BY name DESC ");		
+			stmt.setInt(1, id);
+			rs = stmt.executeQuery();
+						
+			organizations = getOrganizationsByResultSet(rs);
+			organization = organizations.get(0);
+			
+			if (rs != null)
+				rs.close();
+			
+		}catch (SQLException e){			
+			logger.error("Error: Could not retrieve organization by id # " + id);				
+			e.printStackTrace();			
+		}finally {
+    		try{
+    			//close statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+		
+		return organization;
+	}
+	
+	public boolean addOrganization(Organization organization){
+		boolean success = false;
+		
+		//check if it is new record in DB		
+		if(!isExist(organization))
+		{			
+			try{
+				stmt = con.prepareStatement("INSERT INTO organizations (name, street_number, street, city, province,"
+						+ "country, postal_code, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+				
+				stmt.setString(1, organization.getName()); 
+				stmt.setString(2, organization.getStreetNumbet());	
+				stmt.setString(3, organization.getStreetName());
+				stmt.setString(4, organization.getCity());
+				stmt.setString(5, organization.getProvince());
+				stmt.setString(6, organization.getCountry());
+				stmt.setString(7, organization.getPostCode());
+				stmt.setString(8, organization.getPhone());									
+				
+				stmt.execute();
+				success = true;
+			}catch (SQLException e){
+				logger.error("Error: Could not create a organization");			
+				e.printStackTrace();
+			}finally {
+	    		try{
+	    			//close statement    			
+	    			if (stmt != null)
+	    				stmt.close();  
+	    
+	    		} catch (Exception e) {
+	    			//Ignore
+	    		}
+			}				
+		}
+		return success;
+	}
+	
+	public void updateOrganization(Organization organization){		
+		try{
+			stmt = con.prepareStatement("UPDATE organizations SET name=?, street_number=?, street=?, city=?, "
+					+ "province=?,postal_code=?, phone=? WHERE organization_ID=?");
+			
+			stmt.setString(1, organization.getName());
+			stmt.setString(2, organization.getStreetNumbet());
+			stmt.setString(3, organization.getStreetName());
+			stmt.setString(4, organization.getCity());
+			stmt.setString(5, organization.getProvince());
+			stmt.setString(6, organization.getPostCode());
+			stmt.setString(7, organization.getPhone());
+			stmt.setInt(8, organization.getOrganizationId());			
+			
+			stmt.execute();
+		}catch (SQLException e){
+			logger.error("Error: updating organization is failed ");		
+			System.out.println("updating organization is failed");
+			e.printStackTrace();
+		}finally {
+    		try{
+    			//close statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+		}
+	}
+	
+	public void deleteOrganizationById(int id){		
+		try{
+			stmt = con.prepareStatement("DELETE FROM organizations WHERE organization_ID=?");
+			stmt.setInt(1, id);
+			stmt.execute();
+		} catch (SQLException e){
+			logger.error("Error: Could not delete organization");			
+			e.printStackTrace();
+		} finally {
+    		try{    			
+    			//close statement
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+	}	
+	
+	
+	private List<Organization> getOrganizationsByResultSet(ResultSet rs){
+		List<Organization> organizations = new ArrayList<Organization>();
+		
+		Organization organization = null;
+		
+		try{
+			while(rs.next())
+			{
+				organization = new Organization();
+				organization.setOrganizationId(rs.getInt("organization_ID"));
+				organization.setName(rs.getString("name"));
+				organization.setStreetNumbet(rs.getString("street_number"));
+				organization.setStreetName(rs.getString("street"));
+				organization.setCity(rs.getString("city"));
+				organization.setProvince(rs.getString("province"));
+				organization.setPostCode(rs.getString("postal_code"));
+				organization.setPhone(rs.getString("phone"));
+				
+				organizations.add(organization);
+			}			
+		}catch (SQLException e){
+			e.printStackTrace();
+		}
+		return organizations;
+	}
+	
 	private List<Volunteer> getVolunteersByResultSet(ResultSet rs, boolean modified){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		Volunteer volunteer = null;
@@ -439,8 +618,6 @@ public class VolunteerDao {
 						else if (level.equals("I"))
 							volunteer.setExperienceLevel("Intermediate");
 					}
-					
-
 				}
 				else						
 					volunteer.setExperienceLevel(level);		
@@ -457,7 +634,15 @@ public class VolunteerDao {
 				volunteer.setEmergencyPhone(rs.getString("emergency_phone"));
 				volunteer.setPostalCode(rs.getString("postal_code"));
 				volunteer.setNotes(rs.getString("notes"));
-				volunteer.setAvailability(rs.getString("availability"));				
+				volunteer.setAvailability(rs.getString("availability"));
+				
+				int organizationId = rs.getInt("organization");
+				volunteer.setOrganizationId(rs.getInt("organization"));
+				
+				Organization organization = getOrganizationById(organizationId);
+				if (organization != null)
+					volunteer.setOrganization(organization.getName());
+				
 				
 				volunteers.add(volunteer);
 			}
@@ -479,6 +664,42 @@ public class VolunteerDao {
 			stmt.setString(2, volunteer.getLastName());
 			stmt.setString(3, volunteer.getHomePhone());
 			
+			rs = stmt.executeQuery();
+			rs.first();
+			
+			count = rs.getInt("c");
+			
+			if (rs != null)
+				rs.close();
+			
+		} catch (SQLException e){
+			System.out.println("Error: Could not count volunteers");
+			e.printStackTrace();
+			
+		} finally {
+    		try{//close statement
+    			if (stmt != null)
+    				stmt.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}	
+		
+		if (count > 0)
+			return true;
+		else 
+			return false;
+		
+	}
+	
+	private boolean isExist(Organization organization){		
+		int count = 0;
+		
+		try{
+			stmt = con.prepareStatement("SELECT COUNT(*) as c FROM organizations WHERE UPPER(name) = UPPER(?) AND phone= ?");
+			stmt.setString(1, organization.getName());
+			stmt.setString(2, organization.getPhone());
+		
 			rs = stmt.executeQuery();
 			rs.first();
 			

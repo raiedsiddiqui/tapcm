@@ -26,7 +26,8 @@ public class Volunteer {
 	private String notes;
 	private String availability;	
 	private String address;
-	
+	private String organization;
+	private int organizationId;
 
 	public String getPassword() {
 		return password;
@@ -224,4 +225,19 @@ public class Volunteer {
 		this.availability = availability;
 	}	
 	
+	public String getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+
+	public int getOrganizationId() {
+		return organizationId;
+	}
+
+	public void setOrganizationId(int organizationId) {
+		this.organizationId = organizationId;
+	}
 }

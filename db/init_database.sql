@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
 	enabled BOOLEAN NOT NULL,
 	email VARCHAR(50) NOT NULL,
 	role VARCHAR(45),
+	organization MEDIUMINT UNSIGNED NOT NULL, /*for volunteer and volunteer coordinator*/
 	PRIMARY KEY (user_ID)
 );
 
@@ -121,8 +122,7 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	lastname VARCHAR(255) NOT NULL,
 	preferredname VARCHAR(255),
 	username VARCHAR(50),
-	password VARCHAR(255) NOT NULL,
-	age_type VARCHAR(1),/* 1 character, expecting value like 'Y' for younger, 'O' for older */
+	password VARCHAR(255) NOT NULL,	
 	gender VARCHAR(3), /*Using VARCHAR(3) allows for 3 characters, expecting values like 'M', 'F', 'MTF', etc...*/
 	email VARCHAR(50),
 	experience_level VARCHAR(1), /* Using VARCHAR(1) for 1 character, expecting value like "E", "B", "I"...*/
@@ -139,7 +139,21 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	postal_code VARCHAR(10),
 	notes TEXT,
 	availability TEXT,
+	organization MEDIUMINT UNSIGNED NOT NULL,
 	PRIMARY KEY (volunteer_ID)	
+);
+
+CREATE TABLE IF NOT EXISTS organizations (
+	organization_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	name VARCHAR(255) NOT NULL,
+	street_number VARCHAR(20),
+	street VARCHAR(100),
+	city VARCHAR(50),
+	province VARCHAR(3),
+	country VARCHAR(50),
+	postal_code VARCHAR(10),
+	phone VARCHAR(20),
+	PRIMARY KEY (organization_ID)	
 );
 CREATE TABLE IF NOT EXISTS report(
 	report_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,

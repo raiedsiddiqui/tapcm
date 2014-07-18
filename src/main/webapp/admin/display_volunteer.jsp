@@ -109,6 +109,14 @@
 		<div class="col-md-2">
 	  		<p class="form-control-static">${volunteer.email}</p>
 		</div>
+		
+		<div class="col-md-2">
+			<label class="control-label">Organization : </label>
+		</div>
+		<div class="col-md-2">
+	  		<p class="form-control-static">${volunteer.organization}</p>
+		</div>
+		
   </div>
 
 	<div class="row form-group">

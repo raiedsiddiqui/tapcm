@@ -139,6 +139,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("appointment", appointment);
 		model.addAttribute("plans", pMap);
 		
+		
 		//Survey---  goals setting
 		List<SurveyResult> surveyResultList = surveyResultDao.getCompletedSurveysByPatientID(id);
 		SurveyResult healthGoalsSurvey = new SurveyResult();
@@ -148,6 +149,9 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		SurveyResult mobilitySurvey = new SurveyResult();
 		SurveyResult socialLifeSurvey = new SurveyResult();
 		SurveyResult generalHealthySurvey = new SurveyResult();
+		SurveyResult memorySurvey = new SurveyResult();
+		SurveyResult carePlanSurvey = new SurveyResult();
+		
 		
 		for(SurveyResult survey: surveyResultList){
 			int surveyId = survey.getSurveyID();
@@ -172,6 +176,12 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			
 			if (surveyId == 9) //General Health(Edmonton Frail Scale)
 				generalHealthySurvey = survey;
+			
+			if (surveyId == 14) //Memory Survey
+				memorySurvey = survey;
+			
+			if (surveyId == 15) //Care Plan/Advanced_Directive survey
+				carePlanSurvey = survey;
 		}
 		
 		String xml;
@@ -187,13 +197,62 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		List<String> questionTextList = new ArrayList<String>();
    		questionTextList = ResultParser.getSurveyQuestions(xml);
    		//get answer list
-		qList = getQuestionList(mHealthGoalsSurvey);   	
-   		
+		qList = getQuestionList(mHealthGoalsSurvey);   
+		
    		Map<String, String> sMap = new TreeMap<String, String>();
    		sMap = getSurveyContentMap(questionTextList, qList);
    		
-   		report.setHealthGoals(sMap);
+  		report.setHealthGoals(sMap);
    		
+   		//Additional Information
+  		//Memory
+   		try{
+   			xml = new String(memorySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mMemorySurvey = ResultParser.getResults(xml);
+   		qList = new ArrayList<String>();
+   		questionTextList = new ArrayList<String>();
+   		questionTextList = ResultParser.getSurveyQuestions(xml);
+   		
+   		//only keep the second and forth question text in the list
+   		List<String> displayQuestionTextList = new ArrayList<String>();
+   		displayQuestionTextList.add(questionTextList.get(1));
+   		displayQuestionTextList.add(questionTextList.get(3));
+   		
+   		displayQuestionTextList = removeRedundantFromQuestionText(displayQuestionTextList, "of 2");
+   	
+   		//get answer list
+		qList = getQuestionListForMemorySurvey(mMemorySurvey);   					
+   		sMap = new TreeMap<String, String>(); 	
+   		
+   		//Care Plan/Advanced_Directive
+   		try{
+   			xml = new String(carePlanSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mCarePlanSurvey = ResultParser.getResults(xml);
+
+   		questionTextList = new ArrayList<String>();
+   		questionTextList = ResultParser.getSurveyQuestions(xml);
+   		
+   		//take 3 question text from the list
+   		for (int i = 1; i <= 3; i++)
+   			displayQuestionTextList.add(questionTextList.get(i));
+   		
+   		displayQuestionTextList = removeRedundantFromQuestionText(displayQuestionTextList, "of 3");
+   		
+   		//get answer list   		
+   		qList.addAll(getQuestionList(mCarePlanSurvey));   	
+   		
+   		sMap = getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
+   		report.setAdditionalInfos(sMap);	  			
+   			
+   			
    		//Daily Life Activities
    		try{
    			xml = new String(dailyLifeActivitySurvey.getResults(), "UTF-8");
@@ -203,7 +262,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		
    		LinkedHashMap<String, String> mDailyLifeActivitySurvey = ResultParser.getResults(xml);
    		questionTextList = new ArrayList<String>();
-   		questionTextList = ResultParser.getSurveyQuestions(xml);
+   		questionTextList = ResultParser.getSurveyQuestions(xml);   		
    		
    		qList = new ArrayList<String>();
    		qList = getQuestionList(mDailyLifeActivitySurvey);
@@ -343,6 +402,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("report", report);
 		return "/admin/view_report";
 	}	
+	
 
 	private Map<String, String> getSurveyContentMap(List<String> questionTextList, List<String> questionAnswerList){
 		Map<String, String> content;
@@ -366,18 +426,61 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	   	   			sb.append(questionAnswerList.get(i));
 	   	   			sb.append("\"");
 	   	   			content.put(String.valueOf(i + 1), sb.toString());
-	   	   		}
-	   	   		
+	   	   		}	   	   		
 	   	   		return content;
    	   		}
    	   		else
-   	   			System.out.println("All answers in Goal Setting survey are empty!");
-   	   			
+   	   			System.out.println("All answers in Goal Setting survey are empty!");   	   			
    		}   			
    		else
    			System.out.println("Bad thing happens, no question text found for this Goal Setting survey!");
 		
 		return null;   	
+	}
+	
+	private Map<String, String> getSurveyContentMapForMemorySurvey(List<String> questionTextList, List<String> questionAnswerList){
+		Map<String, String> displayContent = new TreeMap<String, String>();
+		int size = questionTextList.size();
+		Object answer;
+		String questionText;
+		
+		if (questionAnswerList.size() == size)
+		{
+			for (int i = 0; i < size; i++)
+			{
+				questionText = questionTextList.get(i).toString();
+				
+				answer = questionAnswerList.get(i);
+				if ((answer != null) && (answer.toString().equals("1")))
+					displayContent.put(questionText, "YES");					
+				else
+					displayContent.put(questionText, "NO");			
+			}
+			
+			return displayContent;
+		}
+		else
+			System.out.println("Bad thing happens");
+		
+		return null;   	
+	}
+	
+	private List<String> removeRedundantFromQuestionText(List<String> list, String redundantStr){
+		String str;
+		int index;		
+		
+		for (int i = 0 ; i < list.size(); i ++)
+		{
+			str = list.get(i).toString();
+			index = str.indexOf(redundantStr);
+			if (index > 0)
+			{
+				str = str.substring(index + 4);
+				list.set(i, str);
+			}
+		}
+		
+		return list;
 	}
 	
 	//remove observer notes from answer
@@ -402,8 +505,31 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		    	if (!question.equals("-"))
    		    		qList.add(question);   		    	
    		    }
-   		}
+   		}		
+		return qList;
+	}
+	
+	private List<String> getQuestionListForMemorySurvey(LinkedHashMap<String, String> questionMap){
+		List<String> qList = new ArrayList<String>();
+		String question;
+		int index;
 		
+		for (Map.Entry<String, String> entry : questionMap.entrySet()) {
+   		    String key = entry.getKey();
+   		
+   		    if ((key.equalsIgnoreCase("YM1"))||(key.equalsIgnoreCase("YM2")))
+   		    {
+   		    	Object value = entry.getValue();
+   		    	question = value.toString();
+   		    	
+   		    	//remove observer notes
+   		    	index = question.indexOf("/observernote/");
+   		    	
+   		    	if (index > 0)
+   		    		question = question.substring(0, index);   		    	
+   		    	qList.add(question); 
+   		    }   		   
+   		}		
 		return qList;
 	}
 	//remove observer notes and other not related to question/answer

@@ -107,6 +107,7 @@ public class UserDao {
 			u.setUsername(result.getString("username"));
 			u.setEmail(result.getString("email"));
 			u.setPassword(result.getString("password"));
+			u.setOrganization(result.getInt("organization"));
 			
 			if (!Utils.isNullOrEmpty(result.getString("site")))
 				u.setSite(result.getString("site"));
@@ -117,6 +118,7 @@ public class UserDao {
 				u.setEnabled(true);
 			else
 				u.setEnabled(false);
+						
 		} catch (SQLException e) {
 			System.out.println("Error: Failed to create User object");
 			e.printStackTrace();
@@ -188,7 +190,7 @@ public class UserDao {
 			//If the username doesn't exist, create the user
 			if(!rs.isBeforeFirst()) {
 				statement = con.prepareStatement("INSERT INTO users (username, name, password, role, email,"
-						+ " phone_number, site, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, 1)");
+						+ " phone_number, site, enabled, organization) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)");
 				statement.setString(1, u.getUsername());
 				statement.setString(2, u.getName());
 				statement.setString(3, u.getPassword());
@@ -196,6 +198,7 @@ public class UserDao {
 				statement.setString(5, u.getEmail());
 				statement.setString(6, u.getPhoneNumber());
 				statement.setString(7, u.getSite());
+				statement.setInt(8, u.getOrganization());
 				
 				statement.execute();
 				success = true;
