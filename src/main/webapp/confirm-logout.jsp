@@ -3,25 +3,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Tapestry</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-			<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />     
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
+	<title>LogOut</title>
+	<%@include file="volunteer/volunteer_head.jsp" %>
+
 </head>
 	
 <body>
-<div id="headerholder">	
-	<img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-	<!-- <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" /> -->
-	<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
+	<div id="headerholder"> 
+		<div class="row">
+		  <div class="col-md-3 tpurple logoheight">
+	        <img id="logo" src="<c:url value="/resources/images/logow.png"/>" />
+	      </div>
+    	<div class="col-md-9 tblack" style="height:63px;">
+    </div>
+  </div>
 </div>
+
 <div id="logouttext">
-	<h2 id="logoutheader">Are you sure you want to log out?</h2>
+	<p id="logoutheader">Are you sure you want to log out?</p>
 	<button class="btn btn-info" onClick="history.back()" style="float:left">Cancel</button>
-	<a href="<c:url value="/j_spring_security_logout"/>" class="btn btn-primary logoutbtn" style="float:right">Yes</a>
+	<a href="<c:url value="/j_spring_security_logout"/>" class="btn btn-primary logoutbtn">Yes</a>
 </div>
 </body>
 </html>

@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.time.css" id="theme_time">
    <link href="${pageContext.request.contextPath}/resources/css/custom_admin.css" rel="stylesheet" />      
 <link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />     
+<link href="${pageContext.request.contextPath}/resources/css/animate.min.css" rel="stylesheet" />     
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
