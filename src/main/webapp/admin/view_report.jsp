@@ -97,6 +97,17 @@
 			<br/><hr/>
 		</div>
 		
+		<h2 align="center"><span>ADDITIONAL INFORMATION</span></h2><br>
+		<table border="1">
+			<c:forEach items="${report.additionalInfos}" var="a">					
+					<tr>
+						<td valign = "top" width="930"> ${a.key}</td>
+						<td align = "center">${a.value}</td>
+					</tr>
+					
+				</c:forEach>
+		</table>
+		
 		<h2 align="center"><span>HEALTH-RELATED GOALS </span></h2><br>		
 		<table>
 			<c:forEach items="${report.healthGoals}" var="h">					

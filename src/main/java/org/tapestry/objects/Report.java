@@ -10,7 +10,7 @@ public class Report {
 	private Map<String, String> healthGoals;
 	private Map<String, String> dailyActivities;
 	private Map<String, String> volunteerInformations;
-	private List<String> additionalInfos;
+	private Map<String, String> additionalInfos;
 	
 	public Report(){}
 
@@ -62,11 +62,11 @@ public class Report {
 		this.volunteerInformations = volunteerInformations;
 	}
 	
-	public List<String> getAdditionalInfos() {
+	public Map<String, String> getAdditionalInfos() {
 		return additionalInfos;
 	}
 
-	public void setAdditionalInfos(List<String> additionalInfos) {
+	public void setAdditionalInfos(Map<String, String> additionalInfos) {
 		this.additionalInfos = additionalInfos;
 	}
 	

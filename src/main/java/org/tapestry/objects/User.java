@@ -19,6 +19,7 @@ public class User {
 	private String lastName;
 	private String site;
 	private String phoneNumber;
+	private int organization; //for user role as volunteer and volunteer coordinator(site admin)
 
 	public String getFirstName() {
 		return firstName;
@@ -156,6 +157,14 @@ public class User {
 	*/
 	public void setRole(String role){
 		this.role = role;
+	}
+	
+	public int getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(int organization) {
+		this.organization = organization;
 	}
 
 }

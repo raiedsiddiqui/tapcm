@@ -34,6 +34,7 @@ import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
+import org.tapestry.objects.Organization;
 
 @Controller
 public class VolunteerController {
@@ -141,8 +142,29 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		//save exist user names for validating on UI
 		List<String> existUserNames = new ArrayList<String>();
 		existUserNames = volunteerDao.getAllExistUsernames();
-		
 		model.addAttribute("existUserNames", existUserNames);
+//		Organization o = new Organization();
+//		o.setName("MIP FMD");
+//		o.setCity("Hamilton");
+//		o.setCountry("Canada");
+//		o.setPhone("905-525-9140");
+//		o.setStreetName("Longwood Rd S");
+//		o.setStreetNumbet("175");
+//		o.setPostCode("L8P 0A1");
+//		o.setProvince("ON");
+//		volunteerDao.addOrganization(o);
+		List<Organization> organizations;
+		HttpSession session = request.getSession();
+		if (session.getAttribute("organizations") != null)
+			organizations = (List<Organization>) session.getAttribute("organizations");
+		else 
+		{
+			organizations = volunteerDao.getAllOrganizations();
+			session.setAttribute("organizations", organizations);
+		}
+
+		model.addAttribute("organizations", organizations);
+		
 		return "/admin/add_volunteer";
 	}
 		
@@ -256,7 +278,9 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 				volunteer.setAptNumber(request.getParameter("aptnum"));
 			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
 				volunteer.setNotes(request.getParameter("notes"));
-		
+			if (!Utils.isNullOrEmpty(request.getParameter("organization")))
+				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
+					
 			String strAvailableTime = getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
@@ -282,6 +306,16 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			@PathVariable("volunteerId") int id, ModelMap model){
 		Volunteer volunteer = new Volunteer();
 		volunteer = volunteerDao.getVolunteerById(id);
+		
+		List<Organization> organizations;
+		HttpSession session = request.getSession();
+		if (session.getAttribute("organizations") != null)
+			organizations = (List<Organization>) session.getAttribute("organizations");
+		else 
+		{
+			organizations = volunteerDao.getAllOrganizations();
+			session.setAttribute("organizations", organizations);
+		}
 		
 		String strAvailibilities = volunteer.getAvailability();
 		boolean mondayNull = false;
@@ -315,6 +349,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		model.addAttribute("wednesdayNull", wednesdayNull);
 		model.addAttribute("thursdayNull", thursdayNull);
 		model.addAttribute("fridayNull", fridayNull);
+		model.addAttribute("organizations", organizations);
 				
 		return "/admin/modify_volunteer";
 	}
@@ -382,6 +417,9 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			
 		if (!Utils.isNullOrEmpty(request.getParameter("notes")))
 			volunteer.setNotes(request.getParameter("notes"));
+		
+		if (!Utils.isNullOrEmpty(request.getParameter("organization")))
+			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
 			
 		String strAvailableTime = getAvailableTime(request);		
 		
@@ -410,64 +448,64 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 	}
 	
-	private void saveAvailability(String availability, ModelMap model){
-		List<String> aList = new ArrayList<String>();		
-		List<String> lMonday = new ArrayList<String>();
-		List<String> lTuesday = new ArrayList<String>();
-		List<String> lWednesday = new ArrayList<String>();
-		List<String> lThursday = new ArrayList<String>();
-		List<String> lFriday = new ArrayList<String>();	
-			
-		Map<String, String> showAvailableTime = Utils.getAvailabilityMap();		
-		aList = Arrays.asList(availability.split(","));		
+//	private void saveAvailability(String availability, ModelMap model){
+//		List<String> aList = new ArrayList<String>();		
+//		List<String> lMonday = new ArrayList<String>();
+//		List<String> lTuesday = new ArrayList<String>();
+//		List<String> lWednesday = new ArrayList<String>();
+//		List<String> lThursday = new ArrayList<String>();
+//		List<String> lFriday = new ArrayList<String>();	
+//			
+//		Map<String, String> showAvailableTime = Utils.getAvailabilityMap();		
+//		aList = Arrays.asList(availability.split(","));		
+//	
+//		for (String l : aList){			
+//			if (l.startsWith("1"))
+//				lMonday = getFormatedTimeList(l, showAvailableTime, lMonday);									
+//			
+//			if (l.startsWith("2"))
+//				lTuesday = getFormatedTimeList(l, showAvailableTime, lTuesday);									
+//
+//			if (l.startsWith("3"))
+//				lWednesday = getFormatedTimeList(l, showAvailableTime, lWednesday);					
+//			
+//			if (l.startsWith("4"))
+//				lThursday = getFormatedTimeList(l, showAvailableTime, lThursday);	
+//						
+//			if (l.startsWith("5"))
+//				lFriday = getFormatedTimeList(l, showAvailableTime, lFriday);							
+//		}	
+//		
+//		if ((lMonday == null)||(lMonday.size() == 0))
+//			lMonday.add("1non");	
+//		if ((lTuesday == null)||(lTuesday.size() == 0))
+//			lTuesday.add("2non");
+//		if ((lWednesday == null)||(lWednesday.size() == 0))
+//			lWednesday.add("3non");
+//		if ((lThursday == null)||(lThursday.size() == 0))
+//			lThursday.add("4non");
+//		if ((lFriday == null)||(lFriday.size() == 0))
+//			lFriday.add("5non");
+//		
+//		model.addAttribute("monAvailability", lMonday);		
+//		model.addAttribute("tueAvailability", lTuesday);
+//		model.addAttribute("wedAvailability", lWednesday);
+//		model.addAttribute("thuAvailability", lThursday);
+//		model.addAttribute("friAvailability", lFriday);		
+//	}
 	
-		for (String l : aList){			
-			if (l.startsWith("1"))
-				lMonday = getFormatedTimeList(l, showAvailableTime, lMonday);									
-			
-			if (l.startsWith("2"))
-				lTuesday = getFormatedTimeList(l, showAvailableTime, lTuesday);									
-
-			if (l.startsWith("3"))
-				lWednesday = getFormatedTimeList(l, showAvailableTime, lWednesday);					
-			
-			if (l.startsWith("4"))
-				lThursday = getFormatedTimeList(l, showAvailableTime, lThursday);	
-						
-			if (l.startsWith("5"))
-				lFriday = getFormatedTimeList(l, showAvailableTime, lFriday);							
-		}	
-		
-		if ((lMonday == null)||(lMonday.size() == 0))
-			lMonday.add("1non");	
-		if ((lTuesday == null)||(lTuesday.size() == 0))
-			lTuesday.add("2non");
-		if ((lWednesday == null)||(lWednesday.size() == 0))
-			lWednesday.add("3non");
-		if ((lThursday == null)||(lThursday.size() == 0))
-			lThursday.add("4non");
-		if ((lFriday == null)||(lFriday.size() == 0))
-			lFriday.add("5non");
-		
-		model.addAttribute("monAvailability", lMonday);		
-		model.addAttribute("tueAvailability", lTuesday);
-		model.addAttribute("wedAvailability", lWednesday);
-		model.addAttribute("thuAvailability", lThursday);
-		model.addAttribute("friAvailability", lFriday);		
-	}
-	
-	private List<String> getFormatedTimeList(String str, Map<String, String> map, List<String> list){
-		String key;
-		key = str.substring(1);
-		
-		if (!key.equals("non"))
-		{
-			list.add(map.get(key));
-			Utils.sortList(list);
-		}	
-		
-		return list;
-	}
+//	private List<String> getFormatedTimeList(String str, Map<String, String> map, List<String> list){
+//		String key;
+//		key = str.substring(1);
+//		
+//		if (!key.equals("non"))
+//		{
+//			list.add(map.get(key));
+//			Utils.sortList(list);
+//		}	
+//		
+//		return list;
+//	}
 	
 	private void modifyUser(Volunteer volunteer){		
 		User user = userDao.getUserByUsername(volunteer.getUserName());

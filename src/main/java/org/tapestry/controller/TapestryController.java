@@ -35,6 +35,7 @@ import org.tapestry.dao.VolunteerDao;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
+import org.tapestry.objects.Organization;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Picture;
 import org.tapestry.objects.User;
@@ -266,6 +267,16 @@ public class TapestryController{
 		if(failed != null) {
 			model.addAttribute("failed", true);
 		}
+		
+		List<Organization> organizations;
+		HttpSession session = request.getSession();
+		if (session.getAttribute("organizations") != null)
+			organizations = (List<Organization>) session.getAttribute("organizations");
+		else 
+		{
+			organizations = volunteerDao.getAllOrganizations();
+			session.setAttribute("organizations", organizations);
+		}
 		return "admin/manage_users";
 	}
 	
@@ -297,13 +308,14 @@ public class TapestryController{
 		sb.append(" ");
 		sb.append(request.getParameter("lastname").trim());
 		u.setName(sb.toString());
-//		u.setName(request.getParameter("name").trim());
+
 		u.setUsername(request.getParameter("username").trim());
-		u.setRole(request.getParameter("role"));
+		u.setRole(request.getParameter("role"));		
+		u.setOrganization(Integer.valueOf(request.getParameter("organization")));
 		
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
 		String hashedPassword = enc.encodePassword(request.getParameter("password"), null); 
-//		String hashedPassword = enc.encodePassword("password", null); //Default		
+	
 		u.setPassword(hashedPassword);
 		u.setEmail(request.getParameter("email").trim());
 		u.setPhoneNumber(request.getParameter("phonenumber"));

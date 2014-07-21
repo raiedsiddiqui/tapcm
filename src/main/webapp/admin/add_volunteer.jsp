@@ -38,6 +38,10 @@
 			function printTable(){
 				$('.table').printThis();
 			}
+			
+			function isUsernameExist(){
+				alert("hi...");
+			}
 		</script>
 	</head>
 	
@@ -68,6 +72,14 @@
 									<label>Last Name:</label>
 									<input type="text" name="lastname" class="form-control" required/>
 								</div>
+								<div class="col-md-4">
+									<label>Organization:</label>									
+									<select name="organization" form="add_volunteer" class="form-control">
+										<c:forEach items="${organizations}" var="o">
+											<option value="${o.organizationId}">${o.name}</option>
+										</c:forEach>
+									</select>
+								</div>
 							</div>
 
 							<div class="row form-group">
@@ -88,7 +100,7 @@
 							<div class="row form-group">
 								<div class="col-md-4">	
 									<label>Country:</label>
-										<select name="country" form="add_volunteer" class="form-control"s>
+										<select name="country" form="add_volunteer" class="form-control">
 											<option value="CA" selected>Canada</option>
 											<option value="ST">USA</option>
 											<option value="CH">China</option>
@@ -162,7 +174,7 @@
 								<div class="col-md-4">
 									<div class="input-group input-group-lg">
 										<span class="input-group-addon">Username</span>
-								 		<input name="username" type="text" class="form-control">
+								 		<input name="username" type="text" class="form-control" onchange="isUsernameExist();">
 									</div>
 								</div>
 								
