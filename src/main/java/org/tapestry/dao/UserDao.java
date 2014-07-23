@@ -151,16 +151,16 @@ public class UserDao {
 	* @param u The User object to store
 	*/
 	public boolean createUser(User u){
-		boolean success = false;
-		try{
+		boolean success = false;		
+		try{			
 			statement = con.prepareStatement("SELECT * FROM users WHERE UPPER(username) LIKE UPPER(?)");
 			statement.setString(1, u.getUsername());
 			ResultSet rs = statement.executeQuery();
 			
 			//If the username doesn't exist, create the user
-			if(!rs.isBeforeFirst()) {
+			if(!rs.isBeforeFirst()) {								
 				statement = con.prepareStatement("INSERT INTO users (username, name, password, role, email,"
-						+ " phone_number, site, enabled, organization) VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)");
+						+ " phone_number, site, organization, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)");
 				statement.setString(1, u.getUsername());
 				statement.setString(2, u.getName());
 				statement.setString(3, u.getPassword());

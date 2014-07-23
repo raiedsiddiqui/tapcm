@@ -275,14 +275,14 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 				volunteer.setNotes(request.getParameter("notes"));
 			if (!Utils.isNullOrEmpty(request.getParameter("organization")))
 				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
-					
+								
 			String strAvailableTime = getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
 			boolean success = volunteerDao.addVolunteer(volunteer);			
 			//save in the table users
 			if (success)
-				addUser(volunteer);	
+				addUser(volunteer, request);	
 			else{
 				model.addAttribute("volunteerExist", true);
 				return "/admin/add_volunteer";	
@@ -460,7 +460,9 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		userDao.setPasswordForUser(user.getUserID(), volunteer.getPassword());		
 	}
 	
-	private void addUser(Volunteer volunteer){	
+	private void addUser(Volunteer volunteer, SecurityContextHolderAwareRequestWrapper request){	
+		HttpSession httpSession = request.getSession();
+		userDao = (UserDao)httpSession.getAttribute("userDao");
 		User user = new User();
 		StringBuffer sb = new StringBuffer();
 		sb.append(volunteer.getFirstName());
@@ -472,7 +474,10 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 				
 		user.setPassword(volunteer.getPassword());
 		user.setEmail(volunteer.getEmail());
-				
+		user.setOrganization(volunteer.getOrganizationId());
+		
+//		user.setPhoneNumber("905-999-9999");
+//		user.setSite("UBC");
 		boolean success = userDao.createUser(user);
 				
 		if (mailAddress != null && success){
