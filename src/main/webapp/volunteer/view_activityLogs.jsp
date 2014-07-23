@@ -28,7 +28,7 @@
 		</div>
 
 		<div class="col-md-2">
-			<a href="<c:url value="/new_activityLogs"/>" class="btn btn-primary" data-toggle="modal">New Activity</a>
+			<a href="<c:url value="/new_activity"/>" class="btn btn-primary" data-toggle="modal">New Activity</a>
 		</div>
 	</div>
 	<c:if test="${not empty activityCreated}">					
@@ -53,11 +53,11 @@
 
 				<c:forEach items="${activityLogs}" var="al">
 					<tr>
-						<td><a href="<c:url value="/modify_activityLog/${al.activityId}"/>">${al.date}</a></td>
+						<td><a href="<c:url value="/modify_activity/${al.activityId}"/>">${al.date}</a></td>
 						
 						<td>${al.time}</td>
 						<td width = 260>${al.description}</td>
-						<td><a href="<c:url value="/delete_activityLog/${al.activityId}"/>" class="btn btn-danger">Delete</a></td>
+						<td><a href="<c:url value="/delete_activity/${al.activityId}"/>" class="btn btn-danger">Delete</a></td>
 					</tr>
 				</c:forEach>
 			</table>

@@ -19,13 +19,13 @@
 		<intercept-url pattern="/caretaker/*" access="ROLE_USER" />
 		<intercept-url pattern="/login" filters="none" />
 		<intercept-url pattern="/loginfailed" filters="none" />
-		<intercept-url pattern="/logout" access="ROLE_USER, ROLE_ADMIN" />
+		<intercept-url pattern="/logout" access="ROLE_USER, ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
 		<intercept-url pattern="/resources/**" filters="none" />
 		<intercept-url pattern="/manage_appointments" access="ROLE_ADMIN" />
-		<intercept-url pattern="/manage_patients" access="ROLE_ADMIN" />
+		<intercept-url pattern="/manage_patients" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
 		<intercept-url pattern="/manage_users" access="ROLE_ADMIN" />
-		<intercept-url pattern="/manage_survey_templates" access="ROLE_ADMIN" />
-		<intercept-url pattern="/manage_surveys" access="ROLE_ADMIN" />
+		<intercept-url pattern="/manage_survey_templates" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
+		<intercept-url pattern="/manage_surveys" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
 		<intercept-url pattern="/user_logs" access="ROLE_ADMIN" />
 		<intercept-url pattern="/add_user" access="ROLE_ADMIN" />
 		<intercept-url pattern="/update_user/**" access="ROLE_USER" />
@@ -38,10 +38,10 @@
 		<intercept-url pattern="/client" access="ROLE_USER" />
 		<intercept-url pattern="/visit_complete/*" access="ROLE_USER" />
 		<intercept-url pattern="/complete_visit/*" access="ROLE_USER" />
-		<intercept-url pattern="/inbox" access="ROLE_USER, ROLE_ADMIN" />
-		<intercept-url pattern="/view_message/**" access="ROLE_USER, ROLE_ADMIN" />
-		<intercept-url pattern="/send_message" access="ROLE_ADMIN, ROLE_USER" />
-		<intercept-url pattern="/delete_message/**" access="ROLE_USER, ROLE_ADMIN" />
+		<intercept-url pattern="/inbox" access="ROLE_USER, ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
+		<intercept-url pattern="/view_message/**" access="ROLE_USER, ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
+		<intercept-url pattern="/send_message" access="ROLE_ADMIN, ROLE_USER, ROLE_LOCAL_ADMIN" />
+		<intercept-url pattern="/delete_message/**" access="ROLE_USER, ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
 		<intercept-url pattern="/view_narratives" access="ROLE_USER"/>
 		<intercept-url pattern="/modify_narrative" access="ROLE_USER"/>
 		<intercept-url pattern="/new_narrative" access="ROLE_USER"/>		
@@ -62,8 +62,8 @@
 		<intercept-url pattern="/show_survey/**" access="ROLE_ADMIN, ROLE_USER" />
 		<intercept-url pattern="/save_survey/**" access="ROLE_ADMIN, ROLE_USER" />
 		<intercept-url pattern="/user_logs/**" access="ROLE_ADMIN" />
-		<intercept-url pattern="/view_survey_results/**" access="ROLE_ADMIN" />
-		<intercept-url pattern="/export_csv/**" access="ROLE_ADMIN" />
+		<intercept-url pattern="/view_survey_results/**" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
+		<intercept-url pattern="/export_csv/**" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
 		<intercept-url pattern="/view_volunteers" access="ROLE_ADMIN"/>
 		<intercept-url pattern="/display_volunteer" access="ROLE_ADMIN"/>
 		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>

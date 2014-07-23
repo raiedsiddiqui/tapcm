@@ -16,9 +16,7 @@ import javax.mail.Session;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
-import org.apache.commons.lang.time.DateFormatUtils;
 
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -30,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.SurveyQuestion;
+import org.tapestry.controller.utils.MisUtils;
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
@@ -52,7 +51,7 @@ import org.tapestry.surveys.SurveyFactory;
 import org.tapestry.surveys.TapestryPHRSurvey;
 import org.tapestry.surveys.TapestrySurveyMap;
 import org.yaml.snakeyaml.Yaml;
-import org.oscarehr.myoscar_server.ws.PersonTransfer3;
+
 
 @Controller
 public class PatientController {
@@ -109,7 +108,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			System.out.println("Error reading from config file");
 			System.out.println(e.toString());
 		}
-		userDao = new UserDao(DB, UN, PW);
+
 		patientDao = new PatientDao(DB, UN, PW);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
@@ -140,8 +139,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    	
    	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
 	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
-		
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+   		User loggedInUser = Utils.getLoggedInUser(request);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);		
 		loadPatientsAndVolunteers(model);
@@ -330,13 +328,21 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 				
 		Patient patient = patientDao.getPatientByID(id);
 		//Find the name of the current user
-		User u = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		User u = Utils.getLoggedInUser(request);
+		HttpSession session = request.getSession();
+		userDao = (UserDao)session.getAttribute("userDao");
 		
-		int vid = Utils.getVolunteerByLoginUser(request, userDao, volunteerDao);
+		int volunteerId =0;
+		if (session.getAttribute("logged_in_volunteer") != null)
+			volunteerId = Integer.parseInt(session.getAttribute("logged_in_volunteer").toString());
+		else
+			volunteerId = Utils.getVolunteerByLoginUser(request, volunteerDao);
+		
+		int userId = u.getUserID();
 		
 		//Make sure that the user is actually responsible for the patient in question
 		int volunteerForPatient = patient.getVolunteer();
-		if (!(vid == patient.getVolunteer()) && !(vid == patient.getPartner()))
+		if (!(volunteerId == patient.getVolunteer()) && !(volunteerId == patient.getPartner()))
 		{
 			String loggedInUser = u.getName();
 			model.addAttribute("loggedIn", loggedInUser);
@@ -344,19 +350,17 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			return "redirect:/403";
 		}
 		model.addAttribute("patient", patient);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(u.getUserID());
+		int unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
 		model.addAttribute("unread", unreadMessages);
 		ArrayList<SurveyResult> completedSurveyResultList = surveyResultDao.getCompletedSurveysByPatientID(id);
 		ArrayList<SurveyResult> incompleteSurveyResultList = surveyResultDao.getIncompleteSurveysByPatientID(id);
 		Collections.sort(completedSurveyResultList);
 		Collections.sort(incompleteSurveyResultList);
-		ArrayList<SurveyTemplate> surveyList = surveyTemplateDao.getAllSurveyTemplates();
-		
-		//use volunteerId to replace userId		
-		int volunteerId= volunteerDao.getVolunteerIdByUsername(u.getUsername());
-		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);		
-				
+		ArrayList<SurveyTemplate> surveyList = surveyTemplateDao.getAllSurveyTemplates();		
+	
+		ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);						
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
+		
 		model.addAttribute("appointment", appointment);
 		model.addAttribute("patients", patientsForUser);
 		model.addAttribute("completedSurveys", completedSurveyResultList);
@@ -364,14 +368,20 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("surveys", surveyList);
 		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
 		model.addAttribute("pictures", pics);
-		if(patient.getPreferredName() != null && patient.getPreferredName() != ""){
-			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getPreferredName(), u.getUserID(), patient.getPatientID());
-		} else {
-			activityDao.logActivity(u.getName() + " viewing patient: " + patient.getDisplayName(), u.getUserID(), patient.getPatientID());
-		}
+		
+		//user logs
+		StringBuffer sb = new StringBuffer();
+		sb.append(u.getName());
+		sb.append(" viewing patient: ");
+		
+		if(patient.getPreferredName() != null && patient.getPreferredName() != "")
+			sb.append(patient.getPreferredName());
+		else 
+			sb.append(patient.getDisplayName());
+		
+		activityDao.addUserLog(sb.toString(), u);	
 				
-		//save selected appointmentId in the session for other screen, like narrative
-		HttpSession  session = request.getSession();		
+		//save selected appointmentId in the session for other screen, like narrative		
 		session.setAttribute("appointmentId", appointmentId);
 		session.setAttribute("patientId", id);
 				
@@ -380,38 +390,9 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	
 	@RequestMapping(value="/view_clients_admin", method=RequestMethod.GET)
 	public String viewPatientsFromAdmin(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		List<Patient> patients = getAllPatients();
-		int age;		
-		
-		try {			
-			List<PersonTransfer3> patientsInMyOscar = ClientManager.getClients();
-			
-			for(PersonTransfer3 person: patientsInMyOscar)
-			{	
-				age = Utils.getAgeByBirthDate(person.getBirthDate());
-				
-				for(Patient p: patients)
-				{
-					if (person.getUserName().equals(p.getUserName()))
-					{
-						Calendar birthDate = person.getBirthDate();						
-						if (birthDate != null)
-							p.setBod(Utils.getDateByCalendar(birthDate));
-						
-						p.setAge(age);
-						p.setCity(person.getCity());					
-						p.setHomePhone(person.getPhone1());								
-						
-						break;
-					}
-				}
-			}
-		} catch (Exception e) {
-			System.out.println("something wrong when calling myoscar server...");			
-			e.printStackTrace();
-		}
-		
+		List<Patient> patients = MisUtils.getAllPatientsWithFullInfos(patientDao, request);
 		model.addAttribute("patients", patients);
+		
 		return "/admin/view_clients";
 	}
 	

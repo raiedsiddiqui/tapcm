@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.tapestry.controller.Utils;
@@ -93,38 +94,7 @@ public class UserDao {
     	}
 	}
 
-	/**
-	* Creates a User object from the result of executing an SQL query
-	* @param result The ResultSet returned by calling PreparedStatement.executeQuery()
-	* @return A User object representing the person
-	*/
-	private User createFromSearch(ResultSet result){
-		User u = new User();
-		try{
-			u.setName(result.getString("name"));
-			u.setUserID(result.getInt("user_ID"));
-			u.setRole(result.getString("role"));
-			u.setUsername(result.getString("username"));
-			u.setEmail(result.getString("email"));
-			u.setPassword(result.getString("password"));
-			u.setOrganization(result.getInt("organization"));
-			
-			if (!Utils.isNullOrEmpty(result.getString("site")))
-				u.setSite(result.getString("site"));
-			if (!Utils.isNullOrEmpty(result.getString("phone_number")))
-				u.setPhoneNumber(result.getString("phone_number"));
-			
-			if (result.getString("enabled").equals("1"))
-				u.setEnabled(true);
-			else
-				u.setEnabled(false);
-						
-		} catch (SQLException e) {
-			System.out.println("Error: Failed to create User object");
-			e.printStackTrace();
-		}
-		return u;
-	}
+	
 
 	/**
 	* Selects a user based off the user ID
@@ -444,5 +414,65 @@ public class UserDao {
     			//Ignore
     		}
     	}
+	}
+	
+	/**
+	* Creates a User object from the result of executing an SQL query
+	* @param result The ResultSet returned by calling PreparedStatement.executeQuery()
+	* @return A User object representing the person
+	*/
+	private User createFromSearch(ResultSet result){
+		User u = new User();
+		try{
+			u.setName(result.getString("name"));
+			u.setUserID(result.getInt("user_ID"));
+			u.setRole(result.getString("role"));
+			u.setUsername(result.getString("username"));
+			u.setEmail(result.getString("email"));
+			u.setPassword(result.getString("password"));
+			u.setOrganization(result.getInt("organization"));
+			
+			if (!Utils.isNullOrEmpty(result.getString("site")))
+				u.setSite(result.getString("site"));
+			if (!Utils.isNullOrEmpty(result.getString("phone_number")))
+				u.setPhoneNumber(result.getString("phone_number"));
+			
+			if (result.getString("enabled").equals("1"))
+				u.setEnabled(true);
+			else
+				u.setEnabled(false);
+						
+		} catch (SQLException e) {
+			System.out.println("Error: Failed to create User object");
+			e.printStackTrace();
+		}
+		return u;
+	}
+	
+	public List<Integer> getVolunteerCoordinatorByOrganizationId(int id){
+		List<Integer> coordinatorIds = new ArrayList<Integer>();
+		User user;
+		try{
+			statement = con.prepareStatement("SELECT * FROM users WHERE organization=? AND role ='ROLE_LOCAL_ADMIN'");
+			statement.setInt(1, id);
+			ResultSet result = statement.executeQuery();
+			
+			while(result.next()){
+				user = createFromSearch(result);
+				coordinatorIds.add(Integer.valueOf(user.getUserID()));
+			}
+			
+			return coordinatorIds;
+		} catch (SQLException e){
+			System.out.println("Error: Could not retrieve user");
+			e.printStackTrace();
+			return null;
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}	
 	}
 }

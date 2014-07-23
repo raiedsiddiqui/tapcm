@@ -141,6 +141,33 @@ public class VolunteerDao {
 		return volunteers;
 	}
 	
+	public List<Volunteer> getAllVolunteersByOrganization(int id){
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		
+		try{			
+			stmt = con.prepareStatement("SELECT * FROM volunteers WHERE organization=? ORDER BY firstname DESC ");
+			stmt.setInt(1, id);
+			rs = stmt.executeQuery();	
+			
+			volunteers = getVolunteersByResultSet(rs, true);
+			
+		} catch (SQLException e){
+			System.out.println("Error: Could not retrieve users by organization # " + id);
+			e.printStackTrace();
+			
+		} finally {
+    		try{
+    			//close statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+		
+		return volunteers;
+	}
+	
 	public Volunteer getVolunteerById(int id){
 		Volunteer volunteer = new Volunteer();
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
@@ -553,6 +580,37 @@ public class VolunteerDao {
     	}
 	}	
 	
+	public int getUserIdByVolunteerId(int volunteerId){
+		int userId = 0;
+		try{
+			stmt = con.prepareStatement("SELECT users.user_ID FROM users INNER JOIN volunteers ON "
+					+ "users.username = volunteers.username WHERE volunteers.volunteer_ID = ?");
+			
+			stmt.setInt(1, volunteerId);				
+			rs = stmt.executeQuery();
+			
+			while(rs.next())
+				userId = rs.getInt("user_ID");
+			
+			if (rs != null)
+				rs.close();
+			
+		}catch (SQLException e){
+			logger.error("Error: Could not find volunteer ID #" + volunteerId);			
+			e.printStackTrace();
+		} finally {
+    		try{    			
+    			//close statement
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+		
+		return userId;
+	}
+	
 	
 	private List<Organization> getOrganizationsByResultSet(ResultSet rs){
 		List<Organization> organizations = new ArrayList<Organization>();
@@ -731,7 +789,7 @@ public class VolunteerDao {
 	public List<Volunteer> getMatchedVolunteersByLevel(String level){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		if (level.equals("E"))
-			volunteers = this.getAllVolunteers();
+			volunteers = getAllVolunteers();
 		
 		if (level.equals("I")){
 			try{

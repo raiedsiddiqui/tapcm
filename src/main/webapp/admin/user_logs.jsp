@@ -37,22 +37,22 @@
 					<fieldset>
 						<legend>Search Logs</legend>
 						<label>Name:</label>
-						<input type="text" name="name" />
+						<input type="text" name="name" required/>
 						<input class="btn btn-primary" type="submit" value="Search" />
 					</fieldset>
 				</form>
 			</div>
 			<table class="table">
 				<tr>
-					<th>Volunteer Name</th>
+					<th>User Name</th>
 					<th>Activity</th>
 					<th>Date</th>
 				</tr>
-				<c:forEach items="${activities}" var="a">
+				<c:forEach items="${logs}" var="l">
 					<tr>
-						<td>${a.volunteer}</td>
-						<td>${a.description}</td>
-						<td>${a.date}</td>
+						<td>${l.userName}</td>
+						<td>${l.description}</td>
+						<td>${l.date}</td>
 					</tr>
 				</c:forEach>
 			</table>

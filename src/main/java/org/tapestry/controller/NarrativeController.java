@@ -52,29 +52,12 @@ public class NarrativeController {
 	@RequestMapping(value="/view_narratives", method=RequestMethod.GET)
 	public String getNarrativesByUser(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		int loggedInUserId = 0;
-//		int patientId = 0;
-//		int appointmentId = 0;
 		List<Narrative> narratives = new ArrayList<Narrative>();
+		HttpSession  session = request.getSession();					
+		loggedInUserId = Utils.getLoggedInUserId(request);	
+		
+		narratives = narrativeDao.getAllNarrativesByUser(loggedInUserId);		
 
-		HttpSession  session = request.getSession();		
-		session.setAttribute("userDao", userDao);
-			
-		loggedInUserId = Utils.getLoggedInUserId(session, request);	
-		narratives = narrativeDao.getAllNarrativesByUser(loggedInUserId);
-		
-//		patientId = getPatientId(session);
-//		appointmentId = getAppointmentId(session);
-				
-//		if ((patientId != 0)&&(appointmentId != 0))
-//		{			
-//			narratives = narrativeDao.getAllNarrativesByUser(loggedInUserId, patientId, appointmentId);			
-//		}
-//		else
-//		{			
-//			System.out.println("Please select a patient first in getNarrativesByUser");
-//			logger.info("Please select a patient first===getNarrativesByUser");					
-//		}
-		
 		//check if there is message should be displayed
 		if (session.getAttribute("narrativeMessage") != null)
 		{
@@ -187,7 +170,7 @@ public class NarrativeController {
 		HttpSession  session = request.getSession();	
 		session.setAttribute("userDao", userDao);		
 		
-		loggedInUserId = Utils.getLoggedInUserId(session, request);		
+		loggedInUserId = Utils.getLoggedInUserId(request);		
 		
 		patientId = getPatientId(session);
 		appointmentId = getAppointmentId(session);

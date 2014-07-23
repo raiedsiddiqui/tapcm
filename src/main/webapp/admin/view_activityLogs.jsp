@@ -34,7 +34,7 @@ function validateVolunteer(){
 					<div class ="alert alert-info"><spring:message code="message_emptyActivityLogs"/></div>
 				</c:if>
 				<div class="row-fluid">
-				<form id="searchVolunteerForActivity" action="<c:url value="/view_activitylogs_admin"/>" method="POST" onsubmit="return validateVolunteer()">
+				<form id="searchVolunteerForActivity" action="<c:url value="/view_activity_admin"/>" method="POST" onsubmit="return validateVolunteer()">
 					<fieldset>
 						<label>Volunteer:</label>
 						<select name="search_volunteer" form="searchVolunteerForActivity" id="search_volunteer" >

@@ -61,7 +61,7 @@
 	    		<li id="navhome"><a class="brand" href="<c:url value="/"/>">Home</a></li>
 	    		<li id="navclient"><a href="<c:url value="/client"/>">Clients</a></li>    	
 	    		<li><a href="#bookAppointment" data-toggle="modal">Book Visit</a></li>    	
- 	    		<li><a href="<c:url value="/view_activityLogs"/>">Journal</a> </li>
+ 	    		<li><a href="<c:url value="/view_activity"/>">Journal</a> </li>
 	    		<li><a href="<c:url value="/view_narratives"/>">Narratives</a></li>
 	    		<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
 				<li><a href="<c:url value="/logout"/>">Log Out</a></li>

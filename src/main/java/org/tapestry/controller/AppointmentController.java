@@ -136,7 +136,7 @@ public class AppointmentController{
    			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
    		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
    		ArrayList<Patient> allPatients = patientDao.getAllPatients();
-   		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
+ //  		ArrayList<Activity> allAppointmentActivities = activityDao.getAllActivitiesWithAppointments();
    		List<Appointment> allPastAppointments = appointmentDao.getAllPastAppointments();
    		List<Appointment> allPendingAppointments = appointmentDao.getAllPendingAppointments();
    
@@ -144,7 +144,7 @@ public class AppointmentController{
    		model.addAttribute("pastAppointments", allPastAppointments);   		
    		model.addAttribute("pendingAppointments", allPendingAppointments);   		
    		model.addAttribute("patients", allPatients);
-   		model.addAttribute("activities", allAppointmentActivities); 
+//   		model.addAttribute("activities", allAppointmentActivities); 
    		
    		if(appointmentBooked != null)
    			model.addAttribute("success", appointmentBooked);
@@ -231,7 +231,7 @@ public class AppointmentController{
    	
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
 	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		
+	
 		int patientId = Integer.parseInt(request.getParameter("patient"));	
 		String noMatchedMsg="";			
 		Patient p = patientDao.getPatientByID(patientId);
@@ -264,7 +264,7 @@ public class AppointmentController{
 		String availability = sb.toString();		
 		
 		if ((isAvailableForVolunteer(availability, vAvailability)) && (isAvailableForVolunteer(availability, pAvailability)))
-		{	//both volunteers are avilable, go to create an appointment for patient and send message to admin and volunteers
+		{	//both volunteers are available, go to create an appointment for patient and send message to admin and volunteers
 			a.setVolunteerID(p.getVolunteer());
 			a.setPartnerId(p.getPartner());
 			a.setPatientID(p.getPatientID());
@@ -280,10 +280,10 @@ public class AppointmentController{
 			if (appointmentDao.createAppointment(a))
 			{			
 				String logginUser = request.getUserPrincipal().getName();	
-				User user = userDao.getUserByUsername(logginUser);	
-				int volunteer1Id = p.getVolunteer();
-				int volunteer2Id = p.getPartner();
-				int userId = user.getUserID();
+				User user = Utils.getLoggedInUser(request);
+				int userId = user.getUserID();	
+				int volunteer1UserId = volunteerDao.getUserIdByVolunteerId(p.getVolunteer());	
+				int volunteer2UserId = volunteerDao.getUserIdByVolunteerId(p.getPartner());							
 										
 				//send message to both volunteers
 				if (mailAddress != null){					
@@ -304,23 +304,28 @@ public class AppointmentController{
 					String msg = sb.toString();
 					
 					if (request.isUserInRole("ROLE_ADMIN"))//login as admin/volunteer coordinator
-					{
-				//		String adminEmail= user.getEmail();
-//						if (!Utils.isNullOrEmpty(adminEmail) && !Utils.isNullOrEmpty(volunteer1Email) && !Utils.isNullOrEmpty(volunteer2Email))
-//						{
-							sendMessageToInbox(msg, userId, volunteer1Id);//send message to volunteer1 
-							sendMessageToInbox(msg, userId, volunteer2Id);//send message to volunteer2
-							sendMessageToInbox(msg, userId, userId);//send message to admin self
-	//					}
-						
+					{				
+						sendMessageToInbox(msg, userId, volunteer1UserId);//send message to volunteer1 
+						sendMessageToInbox(msg, userId, volunteer2UserId);//send message to volunteer2
+						sendMessageToInbox(msg, userId, userId);//send message to admin self	
 					}
 					else //login as volunteer
 					{
-						sendMessageToInbox(msg, volunteer1Id, volunteer1Id);//send message to volunteer his/her self
-	//					sendMessageToInbox(msg, volunteer1Id, volunteer2Id);//send message to another volunteer
-	//					sendMessageToInbox(msg, volunteer1Id, userId);//send message to admin 
-					}
+						int organizationId = volunteer1.getOrganizationId();
+						List<Integer> coordinators = userDao.getVolunteerCoordinatorByOrganizationId(organizationId);
 						
+						if (coordinators != null)
+						{	//send message to all coordinators in the organization						
+							for (int i = 0; i<coordinators.size(); i++)		
+								sendMessageToInbox(msg, volunteer1UserId, coordinators.get(i).intValue());			
+						}
+						else{
+							System.out.println("Can't find any coordinator in organization id# " + organizationId);
+							logger.error("Can't find any coordinator in organization id# " + organizationId);
+						}
+						
+						sendMessageToInbox(msg, volunteer1UserId, volunteer1UserId);//send message to volunteer his/her self
+					}						
 				}
 				else {
 					System.out.println("Email address not set");
@@ -623,7 +628,7 @@ public class AppointmentController{
 		{
 			Patient patient = patientDao.getPatientByID(patientId);	
 			String logginUser = request.getUserPrincipal().getName();	
-			User user = userDao.getUserByUsername(logginUser);
+			User user = Utils.getLoggedInUser(request);
 			int userId = user.getUserID();
 						
 			//send message to both volunteers
@@ -851,6 +856,8 @@ public class AppointmentController{
 	
 	//this is a temporary method for sending message only into Inbox
 	private void sendMessageToInbox(String msg, int sender, int recipient){	
+		
+		System.out.println("sending message ...from "+ sender + "  To: " + recipient );
 			Message m = new Message();
 			m.setRecipient(recipient);
 			m.setSenderID(sender);

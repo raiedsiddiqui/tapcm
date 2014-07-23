@@ -11,6 +11,7 @@ public class Activity{
 	private int appointment;
 	private String volunteerName;
 	private String patient;
+	private int organizationId;	
 	
 	public Activity(){
 	}
@@ -93,6 +94,14 @@ public class Activity{
 
 	public void setPatient(String patient) {
 		this.patient = patient;
+	}
+
+	public int getOrganizationId() {
+		return organizationId;
+	}
+
+	public void setOrganizationId(int organizationId) {
+		this.organizationId = organizationId;
 	}
 
 }

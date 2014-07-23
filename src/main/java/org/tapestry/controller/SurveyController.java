@@ -47,6 +47,7 @@ import org.tapestry.surveys.ResultParser;
 import org.tapestry.surveys.SurveyFactory;
 import org.tapestry.surveys.TapestryPHRSurvey;
 import org.tapestry.surveys.TapestrySurveyMap;
+import org.tapestry.controller.utils.MisUtils;
 import org.yaml.snakeyaml.Yaml;
 
 @Controller
@@ -148,12 +149,12 @@ public class SurveyController{
    	@RequestMapping(value="/go_assign_survey/{patientId}", method=RequestMethod.GET)
 	public String goAssignSurvey(@PathVariable("patientId") int id, SecurityContextHolderAwareRequestWrapper request, 
 			ModelMap model){
-   		
+   		HttpSession session = request.getSession();
    		List<SurveyTemplate> surveyTemplates = getSurveyTemplates(request);
    		//Assign Survey in Survey Mangement, it will load all patients in the table with checkbox for later selection
    		if (id == 0)
    		{
-   			List<Patient> patients = getPatients(request);
+   			List<Patient> patients  = MisUtils.getAllPatientsWithFullInfos(patientDao, request);
    			
    			if(patients == null || surveyTemplates == null)
    				return "redirect:/manage_surveys?failed=true";
@@ -306,9 +307,12 @@ public class SurveyController{
 	}
 	
 	@RequestMapping(value="open_survey/{resultID}", method=RequestMethod.GET)
-	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {
+	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {	
 		String username = request.getUserPrincipal().getName();
 		User u = userDao.getUserByUsername(username);
+		String name = u.getName();
+		int userId = u.getUserID();
+		
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		Patient p = patientDao.getPatientByID(surveyResult.getPatientID());
 		
@@ -317,11 +321,18 @@ public class SurveyController{
 		}
 		
 		//user logs
-		if(p.getPreferredName() != null && p.getPreferredName() != "") {
-			activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getPreferredName(), u.getUserID());
-		} else {
-			activityDao.logActivity(u.getName() + " opened survey " + surveyResult.getSurveyTitle() + " for patient " + p.getDisplayName(), u.getUserID());
-		}
+		StringBuffer sb  = new StringBuffer();
+		sb.append(name);
+		sb.append(" opened survey ");
+		sb.append(surveyResult.getSurveyTitle());
+		sb.append(" for patient ");
+		if(p.getPreferredName() != null && p.getPreferredName() != "")
+			sb.append(p.getPreferredName());
+		else 
+			sb.append(p.getDisplayName());
+	
+		activityDao.addUserLog(sb.toString(), u);
+		
 		return "redirect:/show_survey/" + id;
 	}
    	
@@ -375,6 +386,7 @@ public class SurveyController{
 		Patient currentPatient = patientDao.getPatientByID(surveyResult.getPatientID());
 		Appointment appointment = appointmentDao.getAppointmentByMostRecentIncomplete(currentPatient.getPatientID());
 		
+		StringBuffer sb;
 		if (isComplete) {
 			byte[] data = null;
 				try {
@@ -386,22 +398,38 @@ public class SurveyController{
 			}
 			surveyResultDao.updateSurveyResults(id, data);
 			surveyResultDao.markAsComplete(id);
-			if(currentPatient.getPreferredName() != null && currentPatient.getPreferredName() != "") {
-				activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getPreferredName(), currentUser.getUserID(), currentPatient.getPatientID(), appointment.getAppointmentID());
-			} else {
-				activityDao.logActivity("Completed survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID(), appointment.getAppointmentID());
-			}
+			
+			//user logs
+			sb  = new StringBuffer();
+			sb.append("Completed survey ");
+			sb.append(surveyResult.getSurveyTitle());
+			sb.append(" for patient ");
+			
+			if(currentPatient.getPreferredName() != null && currentPatient.getPreferredName() != "") 
+				sb.append( currentPatient.getPreferredName());
+			else
+				sb.append( currentPatient.getDisplayName());
+			
+			activityDao.addUserLog(sb.toString(), currentUser);
 		}
 		
 		if (!currentSurvey.isComplete())
 		{
 			byte[] data = SurveyAction.updateSurveyResult(currentSurvey);
 			surveyResultDao.updateSurveyResults(id, data);
-			if(currentPatient.getPreferredName() != null && currentPatient.getPreferredName() != "") {
-				activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getPreferredName(), currentUser.getUserID(), currentPatient.getPatientID(), appointment.getAppointmentID());
-			} else {
-				activityDao.logActivity("Saved incomplete survey " + surveyResult.getSurveyTitle() + " for patient: " + currentPatient.getDisplayName(), currentUser.getUserID(), currentPatient.getPatientID(), appointment.getAppointmentID());
-			}
+			
+			//user logs
+			sb  = new StringBuffer();
+			sb.append("Saved incomplete survey ");
+			sb.append(surveyResult.getSurveyTitle());
+			sb.append(" for patient ");
+			
+			if(currentPatient.getPreferredName() != null && currentPatient.getPreferredName() != "") 
+				sb.append( currentPatient.getPreferredName());
+			else 
+				sb.append( currentPatient.getDisplayName());
+		
+			activityDao.addUserLog(sb.toString(), currentUser);
 		}
 		
 		if (request.isUserInRole("ROLE_ADMIN")){
@@ -505,7 +533,8 @@ public class SurveyController{
 		return surveyTemplateList;
 	}
 	
-   	private List<Patient> getPatients(SecurityContextHolderAwareRequestWrapper request){
+   	private List<Patient> getPatients(SecurityContextHolderAwareRequestWrapper request ){
+   		
    		HttpSession session = request.getSession();		
 		List<Patient> patients;
 		if (session.getAttribute("patient_list") == null)
@@ -519,7 +548,7 @@ public class SurveyController{
 		else
 			patients = (List<Patient>)session.getAttribute("patient_list");
 		
-		return patients;
+		return MisUtils.getAllPatientsWithFullInfos(patientDao, request);
    	}
    	
    	//void duplicating survey in result sheet

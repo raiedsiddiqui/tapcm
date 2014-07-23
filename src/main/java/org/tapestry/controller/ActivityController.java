@@ -43,12 +43,22 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		volunteerDao = new VolunteerDao(DB, UN, PW);
 	}
 		
-	//display all activity logs input by volunteers
-	@RequestMapping(value="/view_activitylogs_admin", method=RequestMethod.GET)
-	public String viewActivityLogByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
-		
-		List<Activity> activities = activityDao.getAllActivitiesForAdmin();
-		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
+	//display all activity input by volunteers
+	@RequestMapping(value="/view_activity_admin", method=RequestMethod.GET)
+	public String viewActivityByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		List<Activity> activities = new ArrayList<Activity>();
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();		
+		User loggedInUser = Utils.getLoggedInUser(request);
+		if(request.isUserInRole("ROLE_ADMIN")) {
+			activities = activityDao.getAllActivitiesForAdmin();
+			volunteers = volunteerDao.getAllVolunteers();
+		}
+		else if (request.isUserInRole("ROLE_LOCAL_ADMIN"))
+		{
+			int organizationId = loggedInUser.getOrganization();
+			activities = activityDao.getAllActivitiesForLocalAdmin(organizationId);
+			volunteers = volunteerDao.getAllVolunteersByOrganization(organizationId);
+		}
 		
 		if (activities.size() == 0 )  
 			model.addAttribute("emptyActivityLogs", true);			
@@ -60,8 +70,8 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 	}
 	
 	//display all activity logs for selected volunteer
-	@RequestMapping(value="/view_activitylogs_admin", method=RequestMethod.POST)
-	public String viewActivityLogBySelectedVolunteerByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	@RequestMapping(value="/view_activity_admin", method=RequestMethod.POST)
+	public String viewActivityBySelectedVolunteerByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		
 		String strVId = request.getParameter("search_volunteer");		
 		List<Activity> activities = new ArrayList<Activity>();
@@ -71,10 +81,8 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 			activities = activityDao.getAllActivitiesForVolunteer(Integer.parseInt(strVId));		
 			
 			if (activities.size() == 0 )  
-				model.addAttribute("emptyActivityLogs", true);	
-			
-		}
-		
+				model.addAttribute("emptyActivityLogs", true);				
+		}		
 		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();
 		
 		model.addAttribute("activityLogs", activities);	
@@ -84,12 +92,12 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		return "/admin/view_activityLogs";
 	}
 	
-	@RequestMapping(value="/view_activityLogs", method=RequestMethod.GET)
+	@RequestMapping(value="/view_activity", method=RequestMethod.GET)
 	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		HttpSession  session = request.getSession();		
 		int volunteerId = getVolunteerIdFromLoginUser(request);	
 		List<Activity> activities = new ArrayList<Activity>();
-		activities = activityDao.getAllActivitiesForVolunteer(volunteerId, true);
+		activities = activityDao.getAllActivitiesForVolunteer(volunteerId);
 				
 		//check if there is message should be displayed
 		if (session.getAttribute("ActivityMessage") != null)
@@ -114,16 +122,19 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		return "/volunteer/view_activityLogs";
 	}
 	
-	@RequestMapping(value="/new_activityLogs", method=RequestMethod.GET)
+	@RequestMapping(value="/new_activity", method=RequestMethod.GET)
 	public String newActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		
 		return "/volunteer/new_activityLogs";
 	}
 	
-	@RequestMapping(value="/add_activityLogs", method=RequestMethod.POST)
+	@RequestMapping(value="/add_activity", method=RequestMethod.POST)
 	public String addActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		HttpSession  session = request.getSession();		
 		int volunteerId = getVolunteerIdFromLoginUser(request);	
+		
+		Volunteer volunteer = volunteerDao.getVolunteerById(volunteerId);
+		int organizationId = volunteer.getOrganizationId();
 		
 		String date = request.getParameter("activityDate");
 		String startTime = request.getParameter("activityStartTime");	
@@ -134,6 +145,7 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		activity.setDescription(description);
 		activity.setVolunteer(String.valueOf(volunteerId));				
 		activity.setDate(date);		
+		activity.setOrganizationId(organizationId);
 		
 		//format start_Time and end_Time to match data type in DB
 		StringBuffer sb = new StringBuffer();
@@ -155,10 +167,10 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		
 		//update view activity page with new record		
 		session.setAttribute("ActivityMessage", "C");
-		return "redirect:/view_activityLogs";
+		return "redirect:/view_activity";
 	}	
 	
-	@RequestMapping(value="/delete_activityLog/{activityId}", method=RequestMethod.GET)
+	@RequestMapping(value="/delete_activity/{activityId}", method=RequestMethod.GET)
 	public String deleteActivityById(@PathVariable("activityId") int id, 
 				SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		
@@ -167,10 +179,10 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		HttpSession  session = request.getSession();		
 		session.setAttribute("ActivityMessage", "D");		
 	
-		return "redirect:/view_activityLogs";		
+		return "redirect:/view_activity";		
 	}
 	
-	@RequestMapping(value="/modify_activityLog/{activityId}", method=RequestMethod.GET)
+	@RequestMapping(value="/modify_activity/{activityId}", method=RequestMethod.GET)
 	public String modifyActivityLog(SecurityContextHolderAwareRequestWrapper request, 
 			@PathVariable("activityId") int id, ModelMap model){
 		Activity activity = new Activity();
@@ -181,7 +193,7 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		return "/volunteer/modify_activityLog";
 	}
 	
-	@RequestMapping(value="/update_activityLog", method=RequestMethod.POST)
+	@RequestMapping(value="/update_activity", method=RequestMethod.POST)
 	public String updateActivityById(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		String activityId = null;
 		int iActivityId = 0;		
@@ -230,25 +242,22 @@ protected static Logger logger = Logger.getLogger(ActivityController.class);
 		activityDao.updateActivity(activity);
 		
 		session.setAttribute("ActivityMessage","U");
-		return "redirect:/view_activityLogs";	
+		return "redirect:/view_activity";	
 	}
 	
-	private int getVolunteerIdFromLoginUser(SecurityContextHolderAwareRequestWrapper request){
-		String name = null;		
-		int volunteerId = 0;
-		String username = null;
-		User loggedInUser = null;
-	
-		if (request.getUserPrincipal() != null){			
-			name = request.getUserPrincipal().getName();	
-					
-			if (name != null){							
-				loggedInUser = userDao.getUserByUsername(name);
-				username = loggedInUser.getUsername();
-				
-				volunteerId = volunteerDao.getVolunteerIdByUsername(username);
-			}
-		}
+	private int getVolunteerIdFromLoginUser(SecurityContextHolderAwareRequestWrapper request)
+	{	
+		HttpSession session = request.getSession();
+		int volunteerId =0;
+		if (session.getAttribute("logged_in_volunteer") != null)
+			volunteerId = Integer.parseInt(session.getAttribute("logged_in_volunteer").toString());
+		else
+			volunteerId = Utils.getVolunteerByLoginUser(request, volunteerDao);
+		
+		
+//		User loggedInUser = Utils.getLoggedInUser(request);
+//		String username = loggedInUser.getUsername();
+//		int volunteerId = volunteerDao.getVolunteerIdByUsername(username);
 		
 		return volunteerId;
 	}

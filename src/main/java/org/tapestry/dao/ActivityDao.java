@@ -11,6 +11,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.Activity;
+import org.tapestry.objects.User;
+import org.tapestry.objects.UserLog;
 
 /**
  * ActivityDAO
@@ -37,10 +39,10 @@ public class ActivityDao {
     		e.printStackTrace();
     	}
     }
-    
+    //is going to be removed
     public ArrayList<Activity> getAllActivities(){
     	try{
-    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment "
+    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment, organization "
     				+ "FROM activities ORDER BY event_timestamp DESC");
     		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
@@ -80,7 +82,8 @@ public class ActivityDao {
     public ArrayList<Activity> getAllActivitiesWithAppointments(){
     	try{
     		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer, appointment, "
-    				+ "TIME(event_timestamp) AS time FROM activities WHERE appointment IS NOT NULL ORDER BY event_timestamp DESC");
+    				+ "TIME(event_timestamp) AS time, organization FROM activities WHERE appointment IS NOT NULL "
+    				+ "ORDER BY event_timestamp DESC");
     		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
     		while (result.next()){
@@ -117,22 +120,13 @@ public class ActivityDao {
     		}
     	}
     }
-    //get all activities set by volunteers , not by Admin(logged in and logged out...)
-    public List<Activity> getAllActivitiesForVolunteer(int user, boolean isVolunteer){
-    	List<Activity> activities = new ArrayList<Activity>();
-    	
-    	if (isVolunteer)
-    		activities = getAllActivitiesForVolunteer(user);
-    	
-    	return activities;
-    }
     
-    public List<Activity> getAllActivitiesForVolunteer(int user){
+    public List<Activity> getAllActivitiesForVolunteer(int volunteer){
     	try{
     		//filter out all logged in/out, or password changing... by setting patient = 0
     		stmt = con.prepareStatement("SELECT * FROM activities WHERE volunteer=? AND patient = 0");
     		
-    		stmt.setInt(1, user);
+    		stmt.setInt(1, volunteer);
     		ResultSet result = stmt.executeQuery();
     		
     		List<Activity> log = new ArrayList<Activity>();
@@ -157,7 +151,7 @@ public class ActivityDao {
     public List<Activity> getAllActivitiesForAdmin(){
     	try{
     		//filter out all logged in/out, or password changing... by setting patient = 0
-    		stmt = con.prepareStatement("SELECT * FROM activities WHERE patient = 0 ORDER BY event_timestamp"  );    		
+    		stmt = con.prepareStatement("SELECT * FROM activities WHERE patient = 0 ORDER BY event_timestamp");      		
     		ResultSet result = stmt.executeQuery();
     		
     		List<Activity> log = new ArrayList<Activity>();
@@ -179,50 +173,76 @@ public class ActivityDao {
     	}
     }
     
-    public ArrayList<Activity> getAllActivitiesForVolunteers(ArrayList<Integer> users){
+    public List<Activity> getAllActivitiesForLocalAdmin(int id){    	
     	try{
-    		String sqlStatement = "SELECT event_timestamp, description, volunteer FROM activities WHERE ";
-    		for(Integer id : users){
-    			sqlStatement += "volunteer=" + id + " OR ";
-    		}
-    		if (sqlStatement.endsWith("OR ")) {
-    			  sqlStatement = sqlStatement.substring(0, sqlStatement.length() - 3);
-    		}
-    		sqlStatement += "ORDER BY event_timestamp DESC";
-    		stmt = con.prepareStatement(sqlStatement);
+    		//filter out all logged in/out, or password changing... by setting patient = 0
+    		stmt = con.prepareStatement("SELECT * FROM activities WHERE patient = 0 AND organization = ? ORDER BY event_timestamp");    
+    		stmt.setInt(1, id);
     		ResultSet result = stmt.executeQuery();
-    		ArrayList<Activity> log = new ArrayList<Activity>();
-    		while (result.next()){
-    			Activity a = new Activity();
-    			a.setDate(result.getString("event_timestamp"));
-    			a.setDescription(result.getString("description"));
-    			
-    			stmt = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
-    			stmt.setInt(1, result.getInt("volunteer"));
-    			ResultSet r = stmt.executeQuery();
-    			if(r.isBeforeFirst()) {
-    				r.first();
-	    			a.setVolunteer(r.getString("name"));
-    			} else {
-    				a.setVolunteer("");
-    			}
-    			log.add(a);
-    		}
+    		
+    		List<Activity> log = new ArrayList<Activity>();
+    		log = getActivitiesByResultSet(result);
+
     		return log;
     	} catch (SQLException e){
-    		System.out.println("Error: Could not retrieve activities log");
+    		System.out.println("Error: Could not retrieve activities log for Admin");
     		e.printStackTrace();
     		return null;
-    	}finally {
+    	} finally {
     		try{
     			//close  statement    			
     			if (stmt != null)
     				stmt.close();  
-    		} catch (Exception e){
+    		} catch (Exception e) {
     			//Ignore
     		}
     	}
     }
+    
+//    public ArrayList<Activity> getAllActivitiesForVolunteers(ArrayList<Integer> users){
+//    	try{
+//    		String sqlStatement = "SELECT event_timestamp, description, volunteer, organization FROM activities WHERE ";
+//    		for(Integer id : users){
+//    			sqlStatement += "volunteer=" + id + " OR ";
+//    		}
+//    		if (sqlStatement.endsWith("OR ")) {
+//    			  sqlStatement = sqlStatement.substring(0, sqlStatement.length() - 3);
+//    		}
+//    		sqlStatement += "ORDER BY event_timestamp DESC";
+//    		stmt = con.prepareStatement(sqlStatement);
+//    		ResultSet result = stmt.executeQuery();
+//    		ArrayList<Activity> log = new ArrayList<Activity>();
+//    		while (result.next()){
+//    			Activity a = new Activity();
+//    			a.setDate(result.getString("event_timestamp"));
+//    			a.setDescription(result.getString("description"));
+//    			
+//    			stmt = con.prepareStatement("SELECT name FROM users WHERE user_ID=?");
+//    			stmt.setInt(1, result.getInt("volunteer"));
+//    			ResultSet r = stmt.executeQuery();
+//    			if(r.isBeforeFirst()) {
+//    				r.first();
+//	    			a.setVolunteer(r.getString("name"));
+//    			} else {
+//    				a.setVolunteer("");
+//    			}
+//    			log.add(a);
+//    		}
+//    		return log;
+//    	} catch (SQLException e){
+//    		System.out.println("Error: Could not retrieve activities log");
+//    		e.printStackTrace();
+//    		return null;
+//    	}finally {
+//    		try{
+//    			//close  statement    			
+//    			if (stmt != null)
+//    				stmt.close();  
+//    		} catch (Exception e){
+//    			//Ignore
+//    		}
+//    	}
+//    }
     
     public List<Activity> getDetailedLog(int patientId, int appointmentId){
     	try{
@@ -235,18 +255,8 @@ public class ActivityDao {
     		
     		ResultSet result = stmt.executeQuery();    		
     		
-    		List<Activity> log = this.getActivitiesByResultSet(result);
-//    		while (result.next()){
-//    			Activity a = new Activity();
-//    			a.setDate(result.getString("event_timestamp"));
-//    			a.setDescription(result.getString("description"));    			
-//    			    			
-//    			a.setVolunteer(String.valueOf(result.getInt("volunteer")));
-//    			a.setPatient(String.valueOf(patientId));
-//    			a.setAppointment(appointmentId);
-//
-//    			log.add(a);
-//    		}
+    		List<Activity> log = getActivitiesByResultSet(result);
+
     		return log;
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve detailed activity log");
@@ -263,6 +273,7 @@ public class ActivityDao {
     	}
     }
     
+    //volunteer add activity
     public void logActivity(String description, int volunteer){
     	try{
     		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer) VALUES (?, ?)");
@@ -280,6 +291,8 @@ public class ActivityDao {
     		}
     	}
     }
+    
+    
     
     public void logActivity(String description, int volunteer, int patient){
     	try{
@@ -306,7 +319,7 @@ public class ActivityDao {
     public void logActivity(Activity activity){
     	try{
     		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,"
-    				+ "event_timestamp,start_Time,end_Time, patient) VALUES (?, ?, ?, ?, ?, ?)");
+    				+ "event_timestamp,start_Time,end_Time, patient, organization) VALUES (?, ?, ?, ?, ?, ?, ?)");
     		    		
     		stmt.setString(1, activity.getDescription());
     		stmt.setInt(2, Integer.parseInt(activity.getVolunteer()));   	
@@ -314,6 +327,7 @@ public class ActivityDao {
     		stmt.setString(4, activity.getStartTime());
     		stmt.setString(5, activity.getEndTime()); 
     		stmt.setInt(6, 0);
+    		stmt.setInt(7, activity.getOrganizationId());
     		
     		stmt.execute();
     		
@@ -362,11 +376,13 @@ public class ActivityDao {
     
     public void logActivity(String description, int volunteer, int patient, int appointment){
     	try{
-    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,patient,appointment) VALUES (?, ?, ?, ?)");
+    		stmt = con.prepareStatement("INSERT INTO activities (description,volunteer,patient,appointment) "
+    				+ "VALUES (?, ?, ?, ?, ?)");
     		stmt.setString(1, description);
     		stmt.setInt(2, volunteer);
     		stmt.setInt(3, patient);
     		stmt.setInt(4, appointment);
+    		
     		stmt.execute();
     	} catch (SQLException e){
     		System.out.println("Error: Could not record event");
@@ -384,7 +400,7 @@ public class ActivityDao {
     
     public int countEntries(){
     	try{
-    		stmt = con.prepareStatement("SELECT COUNT(event_ID) AS c FROM activities");
+    		stmt = con.prepareStatement("SELECT COUNT(log_ID) AS c FROM user_logs");
     		ResultSet result = stmt.executeQuery();
     		result.first();
     		return result.getInt("c");
@@ -403,8 +419,6 @@ public class ActivityDao {
     	}
     }
     
-   
-    
     /**
      * Returns a list of n items starting at start
      * @param start The position in the log to start at
@@ -412,7 +426,8 @@ public class ActivityDao {
      */
     public ArrayList<Activity> getPage(int start, int n){
     	try{
-    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer FROM activities ORDER BY event_timestamp DESC LIMIT ?,?");
+    		stmt = con.prepareStatement("SELECT event_timestamp, description, volunteer, organization "
+    				+ "FROM activities ORDER BY event_timestamp DESC LIMIT ?,?");
     		stmt.setInt(1, start);
     		stmt.setInt(2, n);
     		ResultSet result = stmt.executeQuery();
@@ -450,7 +465,8 @@ public class ActivityDao {
     
     public ArrayList<Activity> getLastNActivitiesForVolunteer(int user, int n){
     	try{
-    		stmt = con.prepareStatement("SELECT event_timestamp, description FROM activities WHERE volunteer=? ORDER BY event_timestamp DESC");
+    		stmt = con.prepareStatement("SELECT event_timestamp, description, organization FROM activities "
+    				+ "WHERE volunteer=? ORDER BY event_timestamp DESC");
     		stmt.setInt(1, user);
     		ResultSet result = stmt.executeQuery();
     		ArrayList<Activity> log = new ArrayList<Activity>();
@@ -482,7 +498,7 @@ public class ActivityDao {
     	Activity activity = new Activity();
     	
     	try{
-    		String sql = "SELECT event_ID, event_timestamp, description, start_Time, end_Time, volunteer"
+    		String sql = "SELECT event_ID, event_timestamp, description, start_Time, end_Time, volunteer, organization"
     				+ " FROM activities WHERE event_ID = ?";
     		stmt = con.prepareStatement(sql);
     		stmt.setInt(1, activityId);
@@ -491,8 +507,11 @@ public class ActivityDao {
     		List<Activity> activities = new ArrayList<Activity>();
     		activities = getActivitiesByResultSet(rs);
     		    		
-    		activity = activities.get(0);
-    		activity.setActivityId(activityId);
+    		if ((activities != null)&&(activities.size()>0))
+    		{
+    			activity = activities.get(0);
+        		activity.setActivityId(activityId);
+    		}    		
         		
     	} catch (SQLException e){
     		System.out.println("Error: Could not retrieve activitie log");
@@ -509,6 +528,110 @@ public class ActivityDao {
     	}
 		
 		return activity;
+    }
+    
+    public List<UserLog> getAllUserLogs(){
+    	try{
+    		stmt = con.prepareStatement("SELECT * FROM user_logs ORDER BY event_timestamp DESC");
+    		ResultSet result = stmt.executeQuery();
+    		List<UserLog> logs = new ArrayList<UserLog>();
+    		logs = getUserLogsByResultSet(result);
+
+    		return logs;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not retrieve user log");
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }  
+    
+    public List<UserLog> getUserLogsPage(int start, int n){
+    	try{
+    		stmt = con.prepareStatement("SELECT * FROM user_logs ORDER BY event_timestamp DESC LIMIT ?,?");
+    		stmt.setInt(1, start);
+    		stmt.setInt(2, n);
+    		ResultSet result = stmt.executeQuery();
+    		
+    		List<UserLog> page = new ArrayList<UserLog>();
+    		
+    		page = getUserLogsByResultSet(result);
+    		
+    		return page;
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not create page");
+    		e.printStackTrace();
+    		return null;
+    	} finally {
+    		try{
+    			//close  statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e){
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public void addUserLog(String description, User user){
+    	try{
+    		stmt = con.prepareStatement("INSERT INTO user_logs (description,user,user_name) VALUES (?, ?, ?)");
+    		stmt.setString(1, description);
+    		stmt.setInt(2, user.getUserID());
+    		stmt.setString(3, user.getName());
+    		stmt.execute();
+    	} catch (SQLException e){
+    		System.out.println("Error: Could not create a user log by user" + user.getName());
+    		e.printStackTrace();
+    	} finally {
+    		try{
+    			stmt.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+    }
+    
+    public List<UserLog> getUserLogsByPartialName(String partialName){
+    	List<UserLog> logs = new ArrayList<UserLog>();
+		try{
+			stmt = con.prepareStatement("SELECT * FROM user_logs WHERE UPPER(user_name) LIKE UPPER('%" + partialName + "%')");
+			ResultSet result = stmt.executeQuery();
+			
+			logs = getUserLogsByResultSet(result);
+			
+			return logs;
+		} catch (SQLException e){
+			System.out.println("Error: Could not retrieve user logs by partial name " + partialName);
+			e.printStackTrace();
+			return null;
+		}
+	}
+    
+    private List<UserLog> getUserLogsByResultSet(ResultSet rs){
+    	List<UserLog> logs = new ArrayList<UserLog>();
+    	UserLog log;
+    	try{
+    		while (rs.next()){
+    			log = new UserLog();
+    			log.setDate(rs.getString("event_timestamp"));
+    			log.setDescription(rs.getString("description"));
+    			log.setUserId(rs.getInt("user"));    
+    			log.setUserName(rs.getString("user_name"));    			
+    			
+    			logs.add(log);
+    		}
+    	}catch (SQLException e){
+			e.printStackTrace();
+		} 
+		return logs;
     }
     
     private List<Activity> getActivitiesByResultSet(ResultSet rs){
@@ -568,6 +691,8 @@ public class ActivityDao {
     					activity.setTime(Utils.timeFormat(strStartTime) + " -");
     			}
     			
+    			activity.setOrganizationId(rs.getInt("organization"));
+    			
     			//set volunteer    
     			int vId = rs.getInt("volunteer");
     			activity.setVolunteer(String.valueOf(vId));
@@ -586,6 +711,8 @@ public class ActivityDao {
     				
     				activity.setVolunteerName(sb.toString());      				
     			}
+    			
+    			
     			
     			activities.add(activity);
         	}

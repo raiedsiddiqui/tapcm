@@ -1,9 +1,7 @@
 package org.tapestry.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -69,7 +67,6 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		volunteerDao = new VolunteerDao(DB, UN, PW);		
 		appointmentDao = new AppointmentDao(DB, UN, PW);
-		userDao = new UserDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
 		messageDao = new MessageDao(DB, UN, PW);
 		
@@ -217,9 +214,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		model.addAttribute("activityLogs", activities);
 		
 		//get all messages		
-		String username = request.getUserPrincipal().getName();		
-		User loggedInUser = userDao.getUserByUsername(username);
-		List<Message> messages = messageDao.getAllMessagesForRecipient(loggedInUser.getUserID());
+		List<Message> messages = messageDao.getAllMessagesForRecipient(Utils.getLoggedInUserId(request));
 		model.addAttribute("messages", messages);		
 		
 		return "/admin/display_volunteer";
@@ -428,7 +423,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		volunteerDao.updateVolunteer(volunteer);
 			
 		//update users table as well
-		modifyUser(volunteer);
+		modifyUser(volunteer, session);
 		
 		session.setAttribute("volunteerMessage","U");
 		return "redirect:/view_volunteers";
@@ -448,66 +443,8 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 	}
 	
-//	private void saveAvailability(String availability, ModelMap model){
-//		List<String> aList = new ArrayList<String>();		
-//		List<String> lMonday = new ArrayList<String>();
-//		List<String> lTuesday = new ArrayList<String>();
-//		List<String> lWednesday = new ArrayList<String>();
-//		List<String> lThursday = new ArrayList<String>();
-//		List<String> lFriday = new ArrayList<String>();	
-//			
-//		Map<String, String> showAvailableTime = Utils.getAvailabilityMap();		
-//		aList = Arrays.asList(availability.split(","));		
-//	
-//		for (String l : aList){			
-//			if (l.startsWith("1"))
-//				lMonday = getFormatedTimeList(l, showAvailableTime, lMonday);									
-//			
-//			if (l.startsWith("2"))
-//				lTuesday = getFormatedTimeList(l, showAvailableTime, lTuesday);									
-//
-//			if (l.startsWith("3"))
-//				lWednesday = getFormatedTimeList(l, showAvailableTime, lWednesday);					
-//			
-//			if (l.startsWith("4"))
-//				lThursday = getFormatedTimeList(l, showAvailableTime, lThursday);	
-//						
-//			if (l.startsWith("5"))
-//				lFriday = getFormatedTimeList(l, showAvailableTime, lFriday);							
-//		}	
-//		
-//		if ((lMonday == null)||(lMonday.size() == 0))
-//			lMonday.add("1non");	
-//		if ((lTuesday == null)||(lTuesday.size() == 0))
-//			lTuesday.add("2non");
-//		if ((lWednesday == null)||(lWednesday.size() == 0))
-//			lWednesday.add("3non");
-//		if ((lThursday == null)||(lThursday.size() == 0))
-//			lThursday.add("4non");
-//		if ((lFriday == null)||(lFriday.size() == 0))
-//			lFriday.add("5non");
-//		
-//		model.addAttribute("monAvailability", lMonday);		
-//		model.addAttribute("tueAvailability", lTuesday);
-//		model.addAttribute("wedAvailability", lWednesday);
-//		model.addAttribute("thuAvailability", lThursday);
-//		model.addAttribute("friAvailability", lFriday);		
-//	}
-	
-//	private List<String> getFormatedTimeList(String str, Map<String, String> map, List<String> list){
-//		String key;
-//		key = str.substring(1);
-//		
-//		if (!key.equals("non"))
-//		{
-//			list.add(map.get(key));
-//			Utils.sortList(list);
-//		}	
-//		
-//		return list;
-//	}
-	
-	private void modifyUser(Volunteer volunteer){		
+	private void modifyUser(Volunteer volunteer, HttpSession  session){			
+		userDao = (UserDao)session.getAttribute("userDao");
 		User user = userDao.getUserByUsername(volunteer.getUserName());
 		
 		StringBuffer sb = new StringBuffer();
@@ -523,8 +460,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		userDao.setPasswordForUser(user.getUserID(), volunteer.getPassword());		
 	}
 	
-	private void addUser(Volunteer volunteer){
-	
+	private void addUser(Volunteer volunteer){	
 		User user = new User();
 		StringBuffer sb = new StringBuffer();
 		sb.append(volunteer.getFirstName());

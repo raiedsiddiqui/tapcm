@@ -101,12 +101,14 @@ public class FileController extends MultiActionController{
    	
 	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
 	public String uploadPicture(MultipartHttpServletRequest request){
-		String currentUsername = request.getUserPrincipal().getName();
-		User loggedInUser = userDao.getUserByUsername(currentUsername);
+
+		User loggedInUser = Utils.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
 		System.out.println("Uploaded: " + pic);
-		pictureDao.uploadPicture(pic, loggedInUser.getUserID(), true);
-		activityDao.logActivity("Uploaded picture for profile", loggedInUser.getUserID());
+		pictureDao.uploadPicture(pic, loggedInUser.getUserID(), true);				
+
+		activityDao.addUserLog("Uploaded picture for profile", loggedInUser);
+		
 		return "redirect:/profile";
 	}
 
@@ -118,7 +120,10 @@ public class FileController extends MultiActionController{
 		System.out.println("Uploaded: " + pic);
 		Patient p = patientDao.getPatientByID(id);
 		pictureDao.uploadPicture(pic, id, false);
-		activityDao.logActivity("Uploaded picture for " + p.getDisplayName(), loggedInUser.getUserID());
+		
+//		activityDao.logActivity("Uploaded picture for " + p.getDisplayName(), loggedInUser.getUserID());
+		activityDao.addUserLog("Uploaded picture for " + p.getDisplayName(), loggedInUser);
+		
 		return "redirect:/patient/" + id;
 	}
 }

@@ -18,6 +18,7 @@ import org.apache.commons.lang.time.DateFormatUtils;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.tapestry.dao.NarrativeDao;
@@ -98,40 +99,77 @@ public class Utils {
 		return time;
 	}
 	
-	public static int getLoggedInUserId(HttpSession session, SecurityContextHolderAwareRequestWrapper request ){				
-		String name = null;		
-		int loggedInUserId = 0;
-		String strLoggedInUserId = null;
-		User loggedInUser = null;
-		//check if loggedInUserId is in the session
+	public static int getLoggedInUserId(SecurityContextHolderAwareRequestWrapper request ){	
+		int loggedInUserId;
+		HttpSession session = request.getSession();
 		if (session.getAttribute("loggedInUserId") != null){
-			//get loggedInUserId from session
-			strLoggedInUserId = session.getAttribute("loggedInUserId").toString();
+			String strLoggedInUserId = session.getAttribute("loggedInUserId").toString();
 			loggedInUserId = Integer.parseInt(strLoggedInUserId);
+		}
+		else
+		{
+			User loggedInUser = getLoggedInUser(request);
+			loggedInUserId = loggedInUser.getUserID();
 			
-		}//get loggedInUserId from request
-		else if (request.getUserPrincipal() != null){			
-			name = request.getUserPrincipal().getName();	
-					
-			if (name != null){				
-				userDao = (UserDao)session.getAttribute("userDao");
-				loggedInUser = userDao.getUserByUsername(name);
-				loggedInUserId = loggedInUser.getUserID();
-						
-				session.setAttribute("loggedInUserId", String.valueOf(loggedInUserId));			
-			}
+			session.setAttribute("loggedInUserId", String.valueOf(loggedInUserId));	
 		}
 		
 		return loggedInUserId;
 	}
 	
-	public static String getStrLoggedInUserId(HttpSession session, SecurityContextHolderAwareRequestWrapper request){
-		int loggedInUserId = 0;
-		loggedInUserId = getLoggedInUserId(session, request);
+	public static User getLoggedInUser(SecurityContextHolderAwareRequestWrapper request){
+		HttpSession session = request.getSession();
+		String name = null;		
+
+		User loggedInUser = null;
+		//check if loggedInUserId is in the session
+		if (session.getAttribute("loggedInUser") != null) //get loggedInUser from session			
+			loggedInUser = (User)session.getAttribute("loggedInUser");		
+		else if (request.getUserPrincipal() != null){		
+			//get loggedInUser from request
+			name = request.getUserPrincipal().getName();	
+					
+			if (name != null){				
+				userDao = (UserDao)session.getAttribute("userDao");
+				loggedInUser = userDao.getUserByUsername(name);		
+						
+				session.setAttribute("loggedInUser", loggedInUser);	
+			}
+		}
 		
-		return String.valueOf(loggedInUserId);
-				
-	}	
+		return loggedInUser;
+	}
+	
+	public static User getLoggedInUser(MultipartHttpServletRequest request){
+		HttpSession session = request.getSession();
+		String name = null;		
+
+		User loggedInUser = null;
+		//check if loggedInUserId is in the session
+		if (session.getAttribute("loggedInUser") != null) //get loggedInUser from session			
+			loggedInUser = (User)session.getAttribute("loggedInUser");		
+		else if (request.getUserPrincipal() != null){		
+			//get loggedInUser from request
+			name = request.getUserPrincipal().getName();	
+					
+			if (name != null){				
+				userDao = (UserDao)session.getAttribute("userDao");
+				loggedInUser = userDao.getUserByUsername(name);		
+						
+				session.setAttribute("loggedInUser", loggedInUser);	
+			}
+		}
+		
+		return loggedInUser;
+	}
+	
+//	public static String getStrLoggedInUserId(HttpSession session, SecurityContextHolderAwareRequestWrapper request){
+//		int loggedInUserId = 0;
+//		loggedInUserId = getLoggedInUserId(session, request);
+//		
+//		return String.valueOf(loggedInUserId);
+//				
+//	}	
 	
 	public static boolean isNullOrEmpty(String str){
 		if (str != null && !str.equals(""))
@@ -546,9 +584,9 @@ public class Utils {
 		return clinics.get(code);		
 	}
 	
-	public static int getVolunteerByLoginUser(SecurityContextHolderAwareRequestWrapper request, UserDao uDao, VolunteerDao vDao){
+	public static int getVolunteerByLoginUser(SecurityContextHolderAwareRequestWrapper request, VolunteerDao vDao){
 		int volunteerId=0;
-		User user = uDao.getUserByUsername(request.getUserPrincipal().getName());
+		User user = getLoggedInUser(request);
 		
 		String role = user.getRole();
 		

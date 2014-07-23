@@ -16,7 +16,7 @@
 	<%@ include file="subNavi.jsp" %>
 
 	<div class="content">
-		<form id="modifyActivity" action="<c:url value="/update_activityLog"/>" method="POST">
+		<form id="modifyActivity" action="<c:url value="/update_activity"/>" method="post">
 		<div class="row-fluid">
 			<div class="col-md-6">
 				<h4>Modify Activity Log</h4>

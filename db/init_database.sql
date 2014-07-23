@@ -64,7 +64,17 @@ CREATE TABLE IF NOT EXISTS activities (
 	patient SMALLINT UNSIGNED,
 	appointment SMALLINT UNSIGNED,
 	description TEXT,
+	organization MEDIUMINT UNSIGNED,
 	PRIMARY KEY (event_ID)
+);
+
+CREATE TABLE IF NOT EXISTS user_logs(
+	log_ID INT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED INT allows for 4,294,967,295 logs, which should be enough*/
+	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	description TEXT,
+	user SMALLINT UNSIGNED NOT NULL,
+	user_name VARCHAR(255),
+	PRIMARY KEY (log_ID)
 );
 
 CREATE TABLE IF NOT EXISTS appointments (

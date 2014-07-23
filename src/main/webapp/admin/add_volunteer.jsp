@@ -40,7 +40,7 @@
 			}
 			
 			function isUsernameExist(){
-				alert("hi...");
+		//		alert("hi...");
 			}
 		</script>
 	</head>

@@ -39,6 +39,7 @@ import org.tapestry.objects.Organization;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.Picture;
 import org.tapestry.objects.User;
+import org.tapestry.objects.UserLog;
 import org.yaml.snakeyaml.Yaml;
 
 
@@ -151,29 +152,36 @@ public class TapestryController{
 	
 	@RequestMapping(value="/loginsuccess", method=RequestMethod.GET)
 	public String loginSuccess(SecurityContextHolderAwareRequestWrapper request){
-		String username = request.getUserPrincipal().getName();
-		User u = userDao.getUserByUsername(username);
-		if (request.isUserInRole("ROLE_USER")){
-			activityDao.logActivity(u.getName() + " logged in", u.getUserID());
-		}
+		HttpSession session = request.getSession();
+		session.setAttribute("userDao", userDao);
+		
+		User u = Utils.getLoggedInUser(request);
+
+		StringBuffer sb = new StringBuffer();
+		sb.append(u.getName());
+		sb.append(" logged in");
+		activityDao.addUserLog(sb.toString(), u);
+		
 		return "redirect:/";
 	}
 
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
 	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, @RequestParam(value="patientId", required=false) Integer patientId, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		int unreadMessages;
-		
+		int unreadMessages;			
+		HttpSession session = request.getSession();
+			
 		if (request.isUserInRole("ROLE_USER"))
 		{
-			String username = request.getUserPrincipal().getName();					
-			User loggedInUser = userDao.getUserByUsername(username);
+			String username = request.getUserPrincipal().getName();	
+			User loggedInUser = Utils.getLoggedInUser(request);
 			int userId = loggedInUser.getUserID();
 			//get volunteer Id from login user
 			int volunteerId = volunteerDao.getVolunteerIdByUsername(username);		
 			
-			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);	
-			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(userId, 5); //Cap recent activities at 5
+			session.setAttribute("logged_in_volunteer", volunteerId);
+			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);
+//			ArrayList<Activity> activityLog = activityDao.getLastNActivitiesForVolunteer(userId, 5); //Cap recent activities at 5
 			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(userId);
 			
 			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
@@ -188,7 +196,6 @@ public class TapestryController{
 				model.addAttribute("patient", patient);
 				
 				//set patientId in the session for other screen, like narratives 
-				HttpSession  session = request.getSession();		
 				session.setAttribute("patientId", patientId);				
 			} 
 			else 
@@ -206,13 +213,13 @@ public class TapestryController{
 			
 			unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
 			model.addAttribute("unread", unreadMessages);
-			model.addAttribute("activities", activityLog);
+	//		model.addAttribute("activities", activityLog);
 			model.addAttribute("announcements", announcements);
 			if (booked != null)
 				model.addAttribute("booked", booked);
 			return "volunteer/index";
 		}
-		else if (request.isUserInRole("ROLE_ADMIN"))
+		else if (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_LOCAL_ADMIN"))
 		{			
 			String username = request.getUserPrincipal().getName();
 			User loggedInUser = userDao.getUserByUsername(username);
@@ -236,15 +243,19 @@ public class TapestryController{
 
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
 	public String logout(SecurityContextHolderAwareRequestWrapper request){
-		String username = request.getUserPrincipal().getName();
-		User currentUser = userDao.getUserByUsername(username);
-		activityDao.logActivity(currentUser.getName() + " logged out", currentUser.getUserID());
+		User u = Utils.getLoggedInUser(request);
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(u.getName());
+		sb.append(" logged out");
+		activityDao.addUserLog(sb.toString(), u);
+
 		return "confirm-logout";
 	}
 	
 	@RequestMapping(value="/client", method=RequestMethod.GET)
 	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+		User loggedInUser = Utils.getLoggedInUser(request);
 		//get volunteer Id from login user		
 		int volunteerId= volunteerDao.getVolunteerIdByUsername(loggedInUser.getUsername());
 		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(volunteerId);		
@@ -256,8 +267,10 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
-	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model,
+			SecurityContextHolderAwareRequestWrapper request){
+
+		User loggedInUser = Utils.getLoggedInUser(request);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
 		ArrayList<User> userList = userDao.getAllUsers();
@@ -282,7 +295,8 @@ public class TapestryController{
 	
 	
 	@RequestMapping(value="/manage_users", method=RequestMethod.POST)
-	public String searchOnUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+	public String searchOnUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model,
+			SecurityContextHolderAwareRequestWrapper request){
 	
 		String name = request.getParameter("searchName");		
 		List<User> userList = userDao.getUsersByPartialName(name);		
@@ -290,8 +304,7 @@ public class TapestryController{
 	
 		if(failed != null) {
 			model.addAttribute("failed", true);
-		}		 
-		
+		}		
 		model.addAttribute("searchName", name);
 		
 		return "admin/manage_users";
@@ -359,14 +372,32 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/disable_user/{user_id}", method=RequestMethod.GET)
-	public String disableUser(@PathVariable("user_id") int id){
+	public String disableUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request){
 		userDao.disableUserWithID(id);
+		
+		User u = userDao.getUserByID(id);
+		User loggedInUser = Utils.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" disable ");
+		sb.append(u.getName());
+		activityDao.addUserLog(sb.toString(), loggedInUser);		
+		
 		return "redirect:/manage_users";
 	}
 
 	@RequestMapping(value="/enable_user/{user_id}", method=RequestMethod.GET)
-	public String enableUser(@PathVariable("user_id") int id){
+	public String enableUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request){
 		userDao.enableUserWithID(id);
+		
+		User u = userDao.getUserByID(id);
+		User loggedInUser = Utils.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" enable ");
+		sb.append(u.getName());
+		activityDao.addUserLog(sb.toString(), loggedInUser);		
+		
 		return "redirect:/manage_users";
 	}
 	
@@ -401,7 +432,8 @@ public class TapestryController{
 	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
 	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, @RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+	
+		User loggedInUser = Utils.getLoggedInUser(request);
 		model.addAttribute("vol", loggedInUser);
 		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 		model.addAttribute("unread", unreadMessages);
@@ -415,12 +447,12 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
-	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent,@RequestParam(value="failure", required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		String username = request.getUserPrincipal().getName();		
-		User loggedInUser = userDao.getUserByUsername(username);	
+	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent,@RequestParam(value="failure",
+			required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+
+		int userId = Utils.getLoggedInUserId(request);
 		List<Message> messages;
-		int unreadMessages;		
-		int userId = loggedInUser.getUserID();
+		int unreadMessages;	
 		
 		if (messageSent != null)
 			model.addAttribute("success", messageSent);
@@ -451,8 +483,8 @@ public class TapestryController{
 	
 	@RequestMapping(value="/view_message/{msgID}", method=RequestMethod.GET)
 	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
-		int userId = loggedInUser.getUserID();
+
+		int userId = Utils.getLoggedInUserId(request);
 		Message m;		
 		m = messageDao.getMessageByID(id);		
 		
@@ -473,13 +505,13 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/dismiss/{announcement}", method=RequestMethod.GET)
-	public String dismissAnnouncement(@PathVariable("announcement") int id, SecurityContextHolderAwareRequestWrapper request){
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());
+	public String dismissAnnouncement(@PathVariable("announcement") int id, SecurityContextHolderAwareRequestWrapper request){	
+		int userId = Utils.getLoggedInUserId(request);
 		Message m;
 		
 		m = messageDao.getMessageByID(id);		
 
-		if (!(m.getRecipient() == loggedInUser.getUserID()))
+		if (!(m.getRecipient() == userId))
 			return "redirect:/403";
 		
 		messageDao.markAsRead(id);
@@ -489,7 +521,8 @@ public class TapestryController{
 
 	@RequestMapping(value="/send_message", method=RequestMethod.POST)
 	public String sendMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User loggedInUser = userDao.getUserByUsername(request.getUserPrincipal().getName());		
+	
+		User loggedInUser = Utils.getLoggedInUser(request);
 		Message m = new Message();
 		
 		m.setSender(loggedInUser.getName());
@@ -614,7 +647,8 @@ public class TapestryController{
 	@RequestMapping(value="/update_user", method=RequestMethod.POST)
 	public String updateUser(SecurityContextHolderAwareRequestWrapper request){
 		String currentUsername = request.getUserPrincipal().getName();
-		User loggedInUser = userDao.getUserByUsername(currentUsername);
+
+		User loggedInUser = Utils.getLoggedInUser(request);
 		User u = new User();
 		u.setUserID(loggedInUser.getUserID());
 		u.setUsername(request.getParameter("volUsername"));
@@ -650,7 +684,15 @@ public class TapestryController{
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
 		String hashedPassword = enc.encodePassword(newPassword, null);
 		userDao.setPasswordForUser(userID, hashedPassword);
-		activityDao.logActivity("Changed password", userID);
+		
+		User whosePwdChanged = userDao.getUserByID(userID);
+		User loggedInUser = Utils.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" Changed password for ");
+		sb.append(whosePwdChanged.getName());
+		activityDao.addUserLog(sb.toString(), loggedInUser);		
+	
 		return target;
 	}
 	
@@ -662,28 +704,22 @@ public class TapestryController{
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.GET)
 	public String viewUserLogs(@PathVariable("page") int page, SecurityContextHolderAwareRequestWrapper request, ModelMap m){
-		ArrayList<Activity> activityLog = activityDao.getPage((page - 1) * 20, 20);
+		List<UserLog> logs = activityDao.getUserLogsPage((page - 1) * 20, 20);
 		int count = activityDao.countEntries();
-		m.addAttribute("numPages", count / 20);
-		m.addAttribute("activities", activityLog);
+		
+		m.addAttribute("numPages", count / 20 + 1);
+		m.addAttribute("logs", logs);
 		return "/admin/user_logs";
 	}
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.POST)
 	public String viewFilteredUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap m){
-		List<Activity> activityLog = new ArrayList<Activity>();
+		List<UserLog> logs = new ArrayList<UserLog>();
 		String name = request.getParameter("name");
-		if(name != null) {
-			ArrayList<User> u = userDao.getUsersByPartialName(name);
-			ArrayList<Integer> userIds = new ArrayList<Integer>();
-			for(User user : u) {
-				userIds.add(user.getUserID());
-			}
-			activityLog = activityDao.getAllActivitiesForVolunteers(userIds);
-		} else {
-			activityLog = activityDao.getAllActivities();
-		}
-		m.addAttribute("activities", activityLog);
+		
+		logs = activityDao.getUserLogsByPartialName(name);
+
+		m.addAttribute("logs", logs);
 		return "/admin/user_logs";
 	}
 }

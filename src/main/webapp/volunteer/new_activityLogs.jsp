@@ -23,7 +23,7 @@
 <body>
 <%@ include file="subNavi.jsp" %>
 <div class="content">
-			<form id="newActivityLog" action="<c:url value="/add_activityLogs"/>" method="post">
+			<form id="newActivityLog" action="<c:url value="/add_activity"/>" method="post">
 				<div class="row">
 					<div class="col-md-6">
 						<h4>New Activity Log</h4>
