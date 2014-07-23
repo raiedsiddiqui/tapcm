@@ -26,7 +26,7 @@
 			<form id="newActivityLog" action="<c:url value="/add_activity"/>" method="post">
 				<div class="row">
 					<div class="col-md-6">
-						<h4>New Activity Log</h4>
+						<h1>New Journal Entry</h1>
 					</div>
 				</div>
 
@@ -74,13 +74,13 @@
 				
 			<div class="row">
 				<div class="col-md-12">
-					<h3>Activity Description:</h3>
+					<h3>Journal Entry Description:</h3>
 				</div>
 			</div>
 			
 			<div class="row">
-				<div class="col-md-3">
-					<textarea name="activityDesc"  maxlength="50">${activityLog.description}</textarea>
+				<div class="col-md-12">
+					<textarea id="activitytxt" name="activityDesc"  maxlength="50">${activityLog.description}</textarea>
 					<input type="hidden" name="activityId" value="${activityLog.activityId}"/>	
 				</div>
 			</div>
@@ -89,8 +89,8 @@
 	</div>
 
 		<div class="row-fluid">
-			<div class="col-md-3">
-				<button id="newActivityLogButton" data-loading-text="Loading..." type="submit"  form="newActivityLog" class="btn btn-primary">Finish</button>
+			<div class="col-md-12">
+				<button id="newActivityLogButton" data-loading-text="Loading..." type="submit"  form="newActivityLog" class="lgbtn pull-right">Save</button>
 			</div>
 		</div>
 	</div>

@@ -42,29 +42,13 @@
 		message = messageObject.toString();
 %>
 <head>
-	<title>Tapestry Admin--------------Survey</title>
+	<title>Survey Mode</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"></meta>
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	
-		<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />  		
-		<link href='http://fonts.googleapis.com/css?family=Bitter:400,700' rel='stylesheet' type='text/css'>
 
-				<!-- FONTS -->
-		<link href='http://fonts.googleapis.com/css?family=Krona+One' rel='stylesheet' type='text/css'>
-
+	<%@include file="/volunteer/volunteer_head.jsp" %>
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
-		}
-
-		#surveyQuestion{
-			font-size:25px;
-			font-family: 'Bitter', serif;
-			font-weight: 400;
-			text-align: left;
 		}
 		
 		input[type="radio"], input[type="checkbox"]{
@@ -84,6 +68,8 @@
 			function saveObserverNotes(){
 				document.forms['surveyQuestion'].observernote.value = document.getElementById("observerNote").value;			
 			}
+
+			$('#qtext').addClass('animated bounceOutLeft');
 		</script>
 	
 	
@@ -92,8 +78,8 @@
 <body>
 
 <div id="headerholder">	
-  <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-<!--       <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" />
+ <!-- <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
+       <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" />
  <img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
         <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>-->    
 <!--   <div class="navbar">
@@ -118,44 +104,55 @@
     			<div id="squestion2" > <!-- style="float: left;" -->
         			<!-- Look at the div with class="questionWidth" at the bottom to adjust question min-width) -->
         			
-        			<form action="/tapestry/show_survey/<%=documentId%>" name="surveyQuestion" id="surveyQuestion">
+        			<form action="/tapestry/show_survey/<%=documentId%>" name="surveyQuestion" id="surveyform">
             			<input type="hidden" name="questionid" value="<%=question.getId()%>">
             			<input type="hidden" name="direction" value="forward">
-            			<input id="saveclose" type="button" value="<%if (!survey.isComplete()) {%>End <%}%>Survey" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>?survey_completed=<%=completed%>'">
+
+            			<div class="row"> 
+            				<div class="col-md-6 pull-left">
+            					<b>${surveyTitle}</b><br/>
+									${description}
+            				</div>
+            				<div class="col-md-6 pull-right">
+            					<input id="saveclose" type="button" value="<%if (!survey.isComplete()) {%>End <%}%>Survey" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>?survey_completed=<%=completed%>'">
+            				</div>
+            			</div>
+            			
             			<input type="hidden" name="documentid" value="<%=documentId%>">
             			<input type="hidden" name="observernote" value="" >
             			
             		
-					<b>${surveyTitle}</b><br/>
-					${description}
-							</a>
+					
             		
-            			<div id="qtext" style="padding: 3px;border-top: 1px solid #cdcdcd;border-bottom: 1px solid #cdcdcd;font-family: 'Bitter', serif; font-weight:700;">
-           				<%
-           					String questionText = question.getQuestionTextRenderKeys(survey);
-            				//put enterspaces into the text, except if the <script tag is unclosed (allows javascript)
-            				int index = 0;
-            				while ((index = questionText.indexOf("\n", index)) != -1) {
-                				String questionTextBefore = questionText.substring(0, index);
-                				String questionTextAfter = questionText.substring(index+1);
-                				int scriptOpenBefore = questionTextBefore.lastIndexOf("<"+"%--");
-                				int scriptCloseBefore = questionTextBefore.lastIndexOf("--%" + ">");
-                				if (scriptOpenBefore == -1 || (scriptOpenBefore < scriptCloseBefore)) {
-                    				questionText = questionTextBefore + "<br>" + questionTextAfter;
-                				}
-                				index++;
-            				}
-							questionText = questionText.replaceAll("<"+"%--", "");
-							questionText = questionText.replaceAll("--%" + ">", "");
-						%>
-            			<%=questionText%>
+            		<div class="row">
+            			<div id="qtext" class="col-md-12 animated fadeIn">
+	           				<%
+	           					String questionText = question.getQuestionTextRenderKeys(survey);
+	            				//put enterspaces into the text, except if the <script tag is unclosed (allows javascript)
+	            				int index = 0;
+	            				while ((index = questionText.indexOf("\n", index)) != -1) {
+	                				String questionTextBefore = questionText.substring(0, index);
+	                				String questionTextAfter = questionText.substring(index+1);
+	                				int scriptOpenBefore = questionTextBefore.lastIndexOf("<"+"%--");
+	                				int scriptCloseBefore = questionTextBefore.lastIndexOf("--%" + ">");
+	                				if (scriptOpenBefore == -1 || (scriptOpenBefore < scriptCloseBefore)) {
+	                    				questionText = questionTextBefore + "<br>" + questionTextAfter;
+	                				}
+	                				index++;
+	            				}
+								questionText = questionText.replaceAll("<"+"%--", "");
+								questionText = questionText.replaceAll("--%" + ">", "");
+							%>
+	            			<%=questionText%>
+            			</div>
             		</div>
+
             		<br/>
-            		<div style="padding: 3px;background-color: #e1ebef;font-family: Verdana, Arial, Helvetica, sans-serif; text-align: left">
+            		<div id="surveybackground">
                 		<% if (!message.equals("")) { %>
                 		<div class="alert alert-warning notificationMessage"><%=message%></div>
                 		<% } %>
-                		Answer: 
+                		<!-- Answer:  -->
                 
                 		<%
 	           	 			String answer="";
@@ -185,23 +182,34 @@
 
                 		<%} else if (question.getQuestionType().equals(SurveyQuestion.ANSWER_CHECK)) { %>
                   		<ul>
+                  			<div id="surveyquestion" class="row">
+                   					<div class="col-md-6">
                   			<%
                   				for (SurveyAnswerChoice choice: question.getChoices()) {
                   				boolean selected = question.getAnswers().contains(new SurveyAnswerString(choice.getAnswerValue()));
                    			%>
-                        		<li><input type="checkbox" name="answer" class="answerChoice" value="<%=choice.getAnswerValue()%>" <%if (selected) out.print("checked");%><%if (survey.isComplete()) {%> readonly<%}%>> <%=choice.getAnswerText()%></li>
+                   				
+                        				<li><input type="checkbox" name="answer" class="answerChoice" value="<%=choice.getAnswerValue()%>" <%if (selected) out.print("checked");%><%if (survey.isComplete()) {%> readonly<%}%>> <%=choice.getAnswerText()%></li>
+                        		
+                  			
                   			<%}%>
+                  				</div>
+                        	</div>
                   		</ul>
                   
                 		<%} else if (question.isQuestionType(SurveyQuestion.ANSWER_SELECT)) {%>
                   			<br/>
+                  			<div id="surveyquestion" class="row">
                   			<%
                   				for (SurveyAnswerChoice choice: question.getChoices()) {
                   				boolean selected = question.getAnswers().contains(new SurveyAnswerString(choice.getAnswerValue()));
                    			%>
-                   				<input type="radio" name="answer" class="answerChoice" value="<%=choice.getAnswerValue()%>" <%if (selected) out.print("checked");%><%if (survey.isComplete()) {%> readonly<%}%>> <%=choice.getAnswerText()%><br/>
+                   				
+                   					<div class="col-md-6">
+                   						<input type="radio" name="answer" class="answerChoice" value="<%=choice.getAnswerValue()%>" <%if (selected) out.print("checked");%><%if (survey.isComplete()) {%> readonly<%}%>> <%=choice.getAnswerText()%><br/>
+                  					</div>
                   		<%}%>
-                
+                		</div>
                 		<%} else {%>
                     		<input type="hidden" name="answer" value="-">
                 		<%}%>
@@ -211,12 +219,24 @@
                 	<input id="saveclose" type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>?survey_completed=<%=completed%>'">
                 	-->	
                 	<div id="answer-buttons">
-                		<input class="tleft" type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();"> 
-                		<input class="tright" type="submit" value="Next">
-                		<c:if test="${not hideObservernote}">
-                			<a href="#modalObserverNotes" data-toggle="modal" class="btn btn-primary pull-right">Observer Notes</a>
-                		</c:if>
-                		
+                		<div class="row">
+                			<div class="col-md-4">
+	                			<input class="tleft btn" type="button" value="BACK" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();">
+	                		</div>
+
+	                		
+
+	                		<div class="col-md-4">
+		                		<c:if test="${not hideObservernote}">
+		                			<a href="#modalObserverNotes" data-toggle="modal" id="observernote">Observer Notes</a>
+		                		</c:if>
+	                		</div>
+
+
+	                		<div class="col-md-4"> 
+	                			<input class="tright btn" type="submit" value="NEXT">
+	                		</div>
+                		</div>
                 		
                 	</div>
 		        </form>

@@ -12,25 +12,13 @@
 		html,body{
 			height:100%;
 		}
-		.content{
-			overflow-x:auto;
-			border-radius:5px;
-			-moz-border-radius:5px;
-			-webkit-border-radius:5px;
-			-o-border-radius:5px;
-			-ms-border-radius:5px;
-		}
-
-		tr:hover{
-			background-color:#D9EDF7;
-		}
+		
 	</style>
 </head>
 	
 <body>	
-<div id="headerholder">	
 	<%@include file="subNavi.jsp" %>
-</div>
+
 
 <!-- 	breadcrumb START-->	
 <!-- 	<div id="crumbs"> 
@@ -40,23 +28,25 @@
 	</div> -->
 <!-- 	breadcrumb END-->	
 	<div class="content">
-		</div>
 		<div class="row-fluid">
-			<div class="span12" style="padding:0px 15px;">
-			<ul class="breadcrumb">
-				<li><h2><a href="<c:url value="/inbox"/>">Inbox</a></h2></li>
-				<a href="#modalSend" data-toggle="modal" class="btn btn-primary pull-right">Message Administrator</a>
-			</ul>
-			<c:if test="${not empty success}">
-			<div class="alert alert-info">
-				<p>Message sent</p>
+			<div class="row" style="padding:0px 15px;">
+				<div class="col-md-6">
+					<h2 class="pull-left">Inbox</h2>
+				</div>
+				<div class="col-md-6">
+					<a href="#modalSend" data-toggle="modal" class="pull-right lgbtn">New Message</a>
+				</div>
 			</div>
-			</c:if>
-			<c:if test="${not empty failure}">
-			<div class="alert alert-error">
-				<p>Message failed to send: make sure you select a recipient</p>
-			</div>
-			</c:if>
+				<c:if test="${not empty success}">
+					<div class="alert alert-info">
+						<p>Message sent</p>
+					</div>
+				</c:if>
+				<c:if test="${not empty failure}">
+					<div class="alert alert-error">
+						<p>Message failed to send: make sure you select a recipient</p>
+					</div>
+				</c:if>
 				<c:choose>
 					<c:when test="${not empty messages}">
 					<table class="table">
@@ -84,6 +74,8 @@
 					</c:otherwise>
 				</c:choose>
 			</div>
+		</div>
+	</div>
 <!-- 			<div class="modal hide fade" id="modalSend">
 				<div class="modal-header">
     				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
@@ -117,7 +109,7 @@
 
 <div class="modal fade" id="modalSend" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content newmsg">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
 		<h3>Message Administrator</h3>
@@ -145,7 +137,7 @@
 					<label>Subject:</label>
 				</div>
 				<div class="col-md-9">
-					<input type="text" name="msgSubject" required/>
+					<input id="msgsubject" type="text" name="msgSubject" required/>
 				</div>
 			</div>
 
@@ -155,14 +147,14 @@
 				</div>
 
 				<div class="col-md-9">
-					<textarea name="msgBody"></textarea><br />
+					<textarea id="msgtxt" name="msgBody"></textarea><br />
 				</div>
 			</div>
 		</form>
 
       </div>
       <div class="modal-footer">
-        <input type="submit" form="messageAdministrator" class="btn btn-primary" value="Send" />
+        <input type="submit" form="messageAdministrator" class="btn lgbtn" value="Send" />
       </div>
     </div>
   </div>

@@ -72,7 +72,8 @@ img {
 }
 
 #rec {
-	width: 100%;
+	width: 95%;
+	margin-bottom: 10px;
 }
 
 #mainnavbar a {
@@ -125,10 +126,12 @@ Lanscape CSS ENDS*/
 }
 .tright {
 	float:right;
+	background-color: #E0E7AB;
 }
 
 .tleft {
 	float:left;
+	background-color: #E96B56;
 }
 .surveybtn {
 	width:100% !important;
@@ -164,13 +167,49 @@ Lanscape CSS ENDS*/
 
 
 #qtext {
-	margin-top: 3%;
-	line-height: 1;
+	margin-top: 2%;
+	line-height: 1.2;
+	/*border-top: 1px solid #cdcdcd;
+	border-bottom: 1px solid #cdcdcd;*/
+	font-family: 'Open Sans', serif;
+	font-weight: 400;
+	font-size: 30px;
+}
+
+#surveybackground {
+
+}
+
+#surveyform {
+
+}
+
+#surveyquestion {
+	text-align: left;
+	font-size: 23px;
+}
+
+
+.surveyprogress {
+	font-size: 12px;
+	color: darkred;
+}
+#observernote {
+	padding:6px 8px 6px 8px;
+	margin-right:20px;
+	font-size: 17px !important;
+	font-family: 'Open Sans';
+	letter-spacing: 1px;
+	color:white;
+	background-color: #4A307A;
+	border:none;
+	border-radius: 0px;
 }
 
 #answer-buttons {
-	margin-top: 20px;
-	height: 40px;
+	position: absolute;
+	bottom: 50px;
+	width: 90%
 }
 input[type=submit] {
     -webkit-border-radius:0px;
@@ -375,6 +414,13 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 
 #logoutheader {
 	margin-bottom: 70px;
+	font-family: 'Verdana';
+	font-size: 30px;
+	margin-top: 20%;
+	background-color: rgb(226, 226, 226);
+	border-radius: 3px;
+	padding: 10px 10px 10px 10px;
+	color: rgb(196, 40, 40);
 }
 
 .logoutbtn {
@@ -383,6 +429,11 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 	margin-right:0px;
 	font-size: 40px !important;
 	height:auto;
+	background-color: #BF1F82;
+	background:#BF1F82 !important;
+	border:none;
+	border-radius: 0;
+	float:right;
 }
 
 .tpurple {
@@ -408,6 +459,12 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 
 .row {
 	margin:0;
+}
+
+#activitytxt {
+	width:100%;
+
+
 }
 
 
@@ -607,6 +664,32 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 		font-size: 25px;
 		color:black;
 		margin:0px;
+	}
+
+	#activitytxt {
+		width:90%;
+		height: 200px;
+		font-size: 20px;
+		letter-spacing: 1px;
+		font-family: "Open Sans", sans-serif;
+	}
+
+	.newmsg {
+		height: 500px;
+	}
+
+	#msgtxt {
+		width:95%;
+		height: 200px;
+		margin-bottom: 10px;
+		font-size: 20px;
+	}
+
+	#msgsubject {
+		height: 30px;
+		width: 95%;
+		font-size:20px;
+		margin-bottom: 10px; 
 	}
 }
 

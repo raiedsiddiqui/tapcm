@@ -24,11 +24,13 @@
 <div class="content">
 	<div class="row-fluid">
 		<div class="col-md-10">
-			<h3>My Activity Logs </h3>
+			<h3>Activity Journal </h3>
 		</div>
 
-		<div class="col-md-2">
-			<a href="<c:url value="/new_activity"/>" class="btn btn-primary" data-toggle="modal">New Activity</a>
+		<div class="col-md-2">			
+
+			<a href="<c:url value="/new_activity"/>" class="btn btn-primary" data-toggle="modal">New Entry</a>
+
 		</div>
 	</div>
 	<c:if test="${not empty activityCreated}">					
