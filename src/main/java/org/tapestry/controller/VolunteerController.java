@@ -69,6 +69,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
 		messageDao = new MessageDao(DB, UN, PW);
+		userDao = new UserDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -114,8 +115,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 				model.addAttribute("volunteerUpdate", true);
 				session.removeAttribute("volunteerMessage");
 			}			
-		}
-		
+		}		
 		return "/admin/view_volunteers";
 	}
 	
@@ -127,8 +127,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		String name = request.getParameter("searchName");
 		if(!Utils.isNullOrEmpty(name)) {
 			volunteers = volunteerDao.getVolunteersByName(name);			
-		} 
-		
+		} 		
 		model.addAttribute("searchName", name);
 		model.addAttribute("volunteers", volunteers);
 		return "/admin/view_volunteers";
@@ -140,16 +139,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		List<String> existUserNames = new ArrayList<String>();
 		existUserNames = volunteerDao.getAllExistUsernames();
 		model.addAttribute("existUserNames", existUserNames);
-//		Organization o = new Organization();
-//		o.setName("MIP FMD");
-//		o.setCity("Hamilton");
-//		o.setCountry("Canada");
-//		o.setPhone("905-525-9140");
-//		o.setStreetName("Longwood Rd S");
-//		o.setStreetNumbet("175");
-//		o.setPostCode("L8P 0A1");
-//		o.setProvince("ON");
-//		volunteerDao.addOrganization(o);
+		
 		List<Organization> organizations;
 		HttpSession session = request.getSession();
 		if (session.getAttribute("organizations") != null)
@@ -282,7 +272,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			boolean success = volunteerDao.addVolunteer(volunteer);			
 			//save in the table users
 			if (success)
-				addUser(volunteer, request);	
+				addUser(volunteer);	
 			else{
 				model.addAttribute("volunteerExist", true);
 				return "/admin/add_volunteer";	
@@ -423,7 +413,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		volunteerDao.updateVolunteer(volunteer);
 			
 		//update users table as well
-		modifyUser(volunteer, session);
+		modifyUser(volunteer);
 		
 		session.setAttribute("volunteerMessage","U");
 		return "redirect:/view_volunteers";
@@ -431,7 +421,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	}
 	
 	@RequestMapping(value="/delete_volunteer/{volunteerId}", method=RequestMethod.GET)
-	public String deleteActivityById(@PathVariable("volunteerId") int id, 
+	public String deleteVolunteerById(@PathVariable("volunteerId") int id, 
 				SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		
 		volunteerDao.deleteVolunteerById(id);
@@ -443,8 +433,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 	}
 	
-	private void modifyUser(Volunteer volunteer, HttpSession  session){			
-		userDao = (UserDao)session.getAttribute("userDao");
+	private void modifyUser(Volunteer volunteer){				
 		User user = userDao.getUserByUsername(volunteer.getUserName());
 		
 		StringBuffer sb = new StringBuffer();
@@ -460,9 +449,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		userDao.setPasswordForUser(user.getUserID(), volunteer.getPassword());		
 	}
 	
-	private void addUser(Volunteer volunteer, SecurityContextHolderAwareRequestWrapper request){	
-		HttpSession httpSession = request.getSession();
-		userDao = (UserDao)httpSession.getAttribute("userDao");
+	private void addUser(Volunteer volunteer){		
 		User user = new User();
 		StringBuffer sb = new StringBuffer();
 		sb.append(volunteer.getFirstName());
@@ -474,10 +461,8 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 				
 		user.setPassword(volunteer.getPassword());
 		user.setEmail(volunteer.getEmail());
-		user.setOrganization(volunteer.getOrganizationId());
-		
-//		user.setPhoneNumber("905-999-9999");
-//		user.setSite("UBC");
+		user.setOrganization(volunteer.getOrganizationId());		
+
 		boolean success = userDao.createUser(user);
 				
 		if (mailAddress != null && success){
@@ -619,6 +604,221 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			strAvailableTime=StringUtils.collectionToCommaDelimitedString(availability);	
 		
 		return strAvailableTime;
+	}
+	
+	//Activity in Volunteer
+	//display all activity input by volunteers
+	@RequestMapping(value="/view_activity_admin", method=RequestMethod.GET)
+	public String viewActivityByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		List<Activity> activities = new ArrayList<Activity>();
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();		
+		User loggedInUser = Utils.getLoggedInUser(request);
+		
+		if(request.isUserInRole("ROLE_ADMIN")) {
+			activities = activityDao.getAllActivitiesForAdmin();
+			volunteers = volunteerDao.getAllVolunteers();
+		}
+		else if (request.isUserInRole("ROLE_LOCAL_ADMIN"))
+		{
+			int organizationId = loggedInUser.getOrganization();
+			activities = activityDao.getAllActivitiesForLocalAdmin(organizationId);
+			volunteers = volunteerDao.getAllVolunteersByOrganization(organizationId);
+		}
+			
+		if (activities.size() == 0 )  
+			model.addAttribute("emptyActivityLogs", true);			
+		
+		model.addAttribute("activityLogs", activities);	
+		model.addAttribute("volunteers", volunteers);	
+			
+		return "/admin/view_activityLogs";
+	}
+		
+	//display all activity logs for selected volunteer
+	@RequestMapping(value="/view_activity_admin", method=RequestMethod.POST)
+	public String viewActivityBySelectedVolunteerByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		
+		String strVId = request.getParameter("search_volunteer");		
+		List<Activity> activities = new ArrayList<Activity>();
+		
+		if (!Utils.isNullOrEmpty(strVId))
+		{
+			activities = activityDao.getAllActivitiesForVolunteer(Integer.parseInt(strVId));		
+				
+			if (activities.size() == 0 )  
+				model.addAttribute("emptyActivityLogs", true);				
+		}		
+		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();
+			
+		model.addAttribute("activityLogs", activities);	
+		model.addAttribute("volunteers", volunteers);	
+		model.addAttribute("selectedVolunteer", strVId);
+			
+		return "/admin/view_activityLogs";
+	}
+		
+	@RequestMapping(value="/view_activity", method=RequestMethod.GET)
+	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		HttpSession  session = request.getSession();		
+		int volunteerId = getVolunteerIdFromLoginUser(request);	
+		List<Activity> activities = new ArrayList<Activity>();
+		activities = activityDao.getAllActivitiesForVolunteer(volunteerId);
+					
+			//check if there is message should be displayed
+		if (session.getAttribute("ActivityMessage") != null)
+		{
+			String message = session.getAttribute("ActivityMessage").toString();
+				
+			if ("C".equals(message)){
+				model.addAttribute("activityCreated", true);
+				session.removeAttribute("ActivityMessage");
+			}
+			else if ("D".equals(message)){
+				model.addAttribute("activityDeleted", true);
+				session.removeAttribute("ActivityMessage");
+			}
+			else if ("U".equals(message)){
+				model.addAttribute("activityUpdate", true);
+				session.removeAttribute("ActivityMessage");
+			}			
+		}
+		model.addAttribute("activityLogs", activities);	
+			
+		return "/volunteer/view_activityLogs";
+	}
+		
+	@RequestMapping(value="/new_activity", method=RequestMethod.GET)
+	public String newActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
+		return "/volunteer/new_activityLogs";
+	}
+		
+	@RequestMapping(value="/add_activity", method=RequestMethod.POST)
+	public String addActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		HttpSession  session = request.getSession();		
+		int volunteerId = getVolunteerIdFromLoginUser(request);	
+			
+		Volunteer volunteer = volunteerDao.getVolunteerById(volunteerId);
+		int organizationId = volunteer.getOrganizationId();
+			
+		String date = request.getParameter("activityDate");
+		String startTime = request.getParameter("activityStartTime");	
+		String endTime = request.getParameter("activityEndTime");	
+		String description = request.getParameter("activityDesc");
+			
+		Activity activity = new Activity();
+		activity.setDescription(description);
+		activity.setVolunteer(String.valueOf(volunteerId));				
+		activity.setDate(date);		
+		activity.setOrganizationId(organizationId);
+			
+			//format start_Time and end_Time to match data type in DB
+		StringBuffer sb = new StringBuffer();
+		sb.append(date);
+		sb.append(" ");
+		sb.append(startTime);
+		startTime = sb.toString();
+		activity.setStartTime(startTime);
+			
+		sb = new StringBuffer();
+		sb.append(date);
+		sb.append(" ");
+		sb.append(endTime);
+		endTime = sb.toString();
+			
+		activity.setEndTime(endTime);
+			
+		activityDao.logActivity(activity);
+			
+		//update view activity page with new record		
+		session.setAttribute("ActivityMessage", "C");
+		return "redirect:/view_activity";
+	}	
+		
+	@RequestMapping(value="/delete_activity/{activityId}", method=RequestMethod.GET)
+	public String deleteActivityById(@PathVariable("activityId") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+				
+		activityDao.deleteActivityById(id);	
+					
+		HttpSession  session = request.getSession();		
+		session.setAttribute("ActivityMessage", "D");		
+		
+		return "redirect:/view_activity";		
+	}
+		
+	@RequestMapping(value="/modify_activity/{activityId}", method=RequestMethod.GET)
+	public String modifyActivityLog(SecurityContextHolderAwareRequestWrapper request, 
+			@PathVariable("activityId") int id, ModelMap model){
+		Activity activity = new Activity();
+		activity = activityDao.getActivityLogById(id);
+			
+		model.addAttribute("activityLog", activity);
+			
+		return "/volunteer/modify_activityLog";
+	}
+		
+	@RequestMapping(value="/update_activity", method=RequestMethod.POST)
+	public String updateActivityById(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		String activityId = null;
+		int iActivityId = 0;		
+		Activity activity = new Activity();
+			
+		HttpSession  session = request.getSession();		
+		int volunteerId = getVolunteerIdFromLoginUser(request);	
+			
+		if (!Utils.isNullOrEmpty(request.getParameter("activityId")))
+		{
+			activityId = request.getParameter("activityId");
+			iActivityId = Integer.parseInt(activityId);
+				
+			activity = activityDao.getActivityLogById(iActivityId);
+			activity.setVolunteer(String.valueOf(volunteerId));
+				
+			String date = null;
+			if(!Utils.isNullOrEmpty(request.getParameter("activityDate")))
+				date = request.getParameter("activityDate");
+			activity.setDate(date + " 00:00:00");
+				
+			String startTime = null;
+			if (!Utils.isNullOrEmpty(request.getParameter("activityStartTime")))
+				startTime = request.getParameter("activityStartTime");
+			
+			if (startTime.length() < 6)//format 
+				activity.setStartTime(date +" " + startTime + ":00"); 
+			else
+				activity.setStartTime(date +" " + startTime); 
+				
+			String endTime = null;
+			if (!Utils.isNullOrEmpty(request.getParameter("activityEndTime")))
+				endTime = request.getParameter("activityEndTime");
+				
+			if (endTime.length() < 6)//format
+				activity.setEndTime(date + " " + endTime + ":00");
+			else
+				activity.setEndTime(date + " " + endTime);
+				
+			String desc = null;
+			desc = request.getParameter("activityDesc");
+			if (!Utils.isNullOrEmpty(desc))
+				activity.setDescription(desc);						
+		}
+			
+		activityDao.updateActivity(activity);
+			
+		session.setAttribute("ActivityMessage","U");
+		return "redirect:/view_activity";	
+	}
+		
+	private int getVolunteerIdFromLoginUser(SecurityContextHolderAwareRequestWrapper request)
+	{	
+		HttpSession session = request.getSession();
+		int volunteerId =0;
+		if (session.getAttribute("logged_in_volunteer") != null)
+			volunteerId = Integer.parseInt(session.getAttribute("logged_in_volunteer").toString());
+		else
+				volunteerId = Utils.getVolunteerByLoginUser(request, volunteerDao);
+			
+		return volunteerId;
 	}
 
 }

@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
@@ -62,7 +64,6 @@ public class SurveyController{
 	private PatientDao patientDao;
 	private AppointmentDao appointmentDao;
 	private ActivityDao activityDao;
-	private UserDao userDao;
 	
 	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
@@ -88,7 +89,7 @@ public class SurveyController{
 		patientDao = new PatientDao(DB, UN, PW);
 		activityDao = new ActivityDao(DB, UN, PW);
 		appointmentDao = new AppointmentDao(DB, UN, PW);
-		userDao = new UserDao(DB, UN, PW);
+
    	}
    	
 	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
@@ -149,7 +150,7 @@ public class SurveyController{
    	@RequestMapping(value="/go_assign_survey/{patientId}", method=RequestMethod.GET)
 	public String goAssignSurvey(@PathVariable("patientId") int id, SecurityContextHolderAwareRequestWrapper request, 
 			ModelMap model){
-   		HttpSession session = request.getSession();
+ 
    		List<SurveyTemplate> surveyTemplates = getSurveyTemplates(request);
    		//Assign Survey in Survey Mangement, it will load all patients in the table with checkbox for later selection
    		if (id == 0)
@@ -306,12 +307,43 @@ public class SurveyController{
 		return "redirect:/manage_surveys";
 	}
 	
+ 	@RequestMapping(value = "/upload_survey_template", method=RequestMethod.POST)
+	public String addSurveyTemplate(HttpServletRequest request) throws Exception{
+   		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+   		MultipartFile multipartFile = multipartRequest.getFile("file");
+   		
+		//Add a new survey template
+		SurveyTemplate st = new SurveyTemplate();
+		st.setTitle(request.getParameter("title"));
+		st.setType(request.getParameter("type"));
+		st.setDescription(request.getParameter("desc"));
+		int p = Integer.parseInt(request.getParameter("priority"));
+		st.setPriority(p);
+		st.setContents(multipartFile.getBytes());
+		surveyTemplateDao.uploadSurveyTemplate(st);
+		
+		return "redirect:/manage_survey_templates";
+	}
+ 	
+   	@RequestMapping(value="/delete_survey_template/{surveyID}", method=RequestMethod.GET)
+   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model){   		
+   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResultsBySurveyId(id);  		
+   		
+   		if(surveyResults.isEmpty()) {
+   			surveyTemplateDao.deleteSurveyTemplate(id);
+   			return "redirect:/manage_survey_templates";
+   		} else {
+   			return "redirect:/manage_survey_templates?failed=true";
+   		}
+   	}
+	
 	@RequestMapping(value="open_survey/{resultID}", method=RequestMethod.GET)
-	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {	
-		String username = request.getUserPrincipal().getName();
-		User u = userDao.getUserByUsername(username);
+	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {		
+		HttpSession session = request.getSession();
+		User u = (User)session.getAttribute("loggedInUser");	
+//		String username = request.getUserPrincipal().getName();
+	//	User u = userDao.getUserByUsername(username);
 		String name = u.getName();
-		int userId = u.getUserID();
 		
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		Patient p = patientDao.getPatientByID(surveyResult.getPatientID());
@@ -381,7 +413,9 @@ public class SurveyController{
 		PHRSurvey currentSurvey = surveys.getSurvey(Integer.toString(id));
 		
 		//For activity logging purposes
-		User currentUser = userDao.getUserByUsername(request.getRemoteUser());
+		HttpSession session = request.getSession();
+//		User currentUser = userDao.getUserByUsername(request.getRemoteUser());
+		User currentUser = (User)session.getAttribute("loggedInUser");	
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		Patient currentPatient = patientDao.getPatientByID(surveyResult.getPatientID());
 		Appointment appointment = appointmentDao.getAppointmentByMostRecentIncomplete(currentPatient.getPatientID());
@@ -547,8 +581,8 @@ public class SurveyController{
 		}
 		else
 			patients = (List<Patient>)session.getAttribute("patient_list");
-		
-		return MisUtils.getAllPatientsWithFullInfos(patientDao, request);
+		return patients;
+	//	return MisUtils.getAllPatientsWithFullInfos(patientDao, request);
    	}
    	
    	//void duplicating survey in result sheet

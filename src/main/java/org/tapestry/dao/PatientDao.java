@@ -141,8 +141,9 @@ public class PatientDao {
 	*/
     	public ArrayList<Patient> getPatientsForVolunteer(int volunteer){
         	try{
-            		statement = con.prepareStatement("SELECT * FROM patients WHERE volunteer=?");
+            		statement = con.prepareStatement("SELECT * FROM patients WHERE volunteer=? OR volunteer2=?");
             		statement.setInt(1, volunteer);
+            		statement.setInt(2, volunteer);
             		ResultSet result = statement.executeQuery();
             		ArrayList<Patient> patients = new ArrayList<Patient>();
             		while(result.next()){

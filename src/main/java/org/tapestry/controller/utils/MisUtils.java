@@ -34,7 +34,7 @@ public class MisUtils {
 			patients = (List<Patient>)session.getAttribute("allPatientWithFullInfos");
 		else
 		{
-			int age;		
+			int age;				
 			
 			try {			
 				List<PersonTransfer3> patientsInMyOscar = ClientManager.getClients();
@@ -53,7 +53,11 @@ public class MisUtils {
 							
 							p.setAge(age);
 							p.setCity(person.getCity());					
-							p.setHomePhone(person.getPhone1());								
+							p.setHomePhone(person.getPhone1());		
+							if (person.getStreetAddress1() != null)
+								p.setAddress(person.getStreetAddress1());
+							else if(person.getStreetAddress2() != null)
+								p.setAddress(person.getStreetAddress2());
 							
 							break;
 						}

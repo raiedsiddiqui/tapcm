@@ -60,7 +60,8 @@
 			<ul id="mainnavbar" class="nav navbar-nav">	
 	    		<li id="navhome"><a class="brand" href="<c:url value="/"/>">Home</a></li>
 	    		<li id="navclient"><a href="<c:url value="/client"/>">Clients</a></li>    	
-	    		<li><a href="#bookAppointment" data-toggle="modal">Book Visit</a></li>    	
+	 <!--    		<li><a href="#bookAppointment" data-toggle="modal">Book Visit</a></li>    	--> 
+	 			<li><a href="<c:url value="/book_appointment"/>">Book Visit</a></li>
  	    		<li><a href="<c:url value="/view_activity"/>">Journal</a> </li>
 	    		<li><a href="<c:url value="/view_narratives"/>">Narratives</a></li>
 	    		<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
@@ -73,50 +74,8 @@
 		</div>
 	</div>
 
-<div class="modal fade" id="bookAppointment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Book Appointment</h4>
-      </div>
-      <div class="modal-body">
-        
-        <form id="appt-form" method="post" action="<c:url value="/book_appointment"/>">
-  				<label>With patient:</label>
-				<select name="patient" form="appt-form">
-					<c:forEach items="${patients}" var="p">
-					<option value="${p.patientID}">${p.displayName}</option>
-					</c:forEach>
-				</select><br />
-				<label>Date:</label>		
-				<div id="dp" class="input-append">
-<!--  					<input data-format="yyyy-MM-dd" type="text" name="appointmentDate">
- --> 					<input class="datepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentDate">
 
-					<span class="add-on">
-						<i class="icon-calendar"></i>
-					</span>
-				</div>
-				<label>Time:</label>
-				<div id="tp" class="input-append">
-<!--  					<input data-format="hh:mm:00" type="text" name="appointmentTime">
- --> 					<input data-format="HH:i:00" class="timepicker form-control" type="text" placeholder="Try me&hellip;" name="appointmentTime">
 
-				    <span class="add-on">
-				    	<i class="icon-time"></i>
-				    </span>
-				</div>
-  			</form>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="appt-form" class="btn btn-primary">Book</button>
-      </div>
-    </div>
-  </div>
-</div>
 
   	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script>window.jQuery||document.write('<script src="tests/jquery.2.0.0.js"><\/script>')</script>
