@@ -15,9 +15,7 @@
 		<div class="row-fluid">
 			<div class="span12">
 				<h3>My Narrative </h3><!--  <a href="<c:url value="/new_narrative"/>" class="btn btn-primary" data-toggle="modal">New Narrative</a>-->  
-				<c:if test="${not empty narrativeCreated}">					
-					<div class ="alert alert-info"><spring:message code="message_newNarrative"/></div>
-				</c:if>				
+							
 				<c:if test="${not empty narrativeDeleted }">
 					<div class ="alert alert-info"><spring:message code="message_removeNarrative"/></div>
 				</c:if>

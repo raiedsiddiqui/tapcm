@@ -108,7 +108,7 @@
 		</div>
 		<br/>
 		<div>
-		<a href="<c:url value="/open_alerts_keyObservations_plan/${appointment.appointmentID}"/>" class="btn btn-primary" >Cancel</a> 	
+		<input type="button" value="Cancel" class="btn btn-primary" onclick="javascript:history.go(-1)">		
 		<button id="newNarrativeButton" data-loading-text="Loading..." type="submit"  form="newNarrative" class="btn btn-primary">Save</button>		
 		</div>		
 	</div>

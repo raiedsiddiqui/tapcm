@@ -2,6 +2,7 @@ package org.tapestry.controller.utils;
 
 import java.util.Calendar;
 import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
@@ -75,5 +76,16 @@ public class MisUtils {
 		
 		
 		return patients;
+	}
+	
+	public static int getLoggedInVolunteerId(SecurityContextHolderAwareRequestWrapper request){
+		int volunteerId = 0;
+		HttpSession session = request.getSession();
+		
+		if (session.getAttribute("logged_in_volunteer") != null){			
+			volunteerId = Integer.parseInt(session.getAttribute("logged_in_volunteer").toString());
+		}
+		
+		return volunteerId;
 	}
 }

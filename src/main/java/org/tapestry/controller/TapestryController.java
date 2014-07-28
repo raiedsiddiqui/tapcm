@@ -405,34 +405,34 @@ public class TapestryController{
 		return "redirect:/manage_users";
 	}
 	
-	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
-	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
-		
-		Appointment appointment = appointmentDao.getAppointmentById(id);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(appointment.getVolunteerID());
-		model.addAttribute("unread", unreadMessages);
-		Patient patient = patientDao.getPatientByID(appointment.getPatientID());
-		model.addAttribute("appointment", appointment);
-		model.addAttribute("patient", patient);
-		return "/volunteer/visit_complete";
-	}
-	
-	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
-	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
-//		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
-//		appointmentDao.completeAppointment(id, request.getParameter("comments"), contactedAdmin);
-		//return "redirect:/";
-		Appointment appt = appointmentDao.getAppointmentById(id);
-		System.out.println("here is alert input...");
-		String alert = request.getParameter("visitAlerts");
-		System.out.println("and alert input is ..." + alert);
-		int patientId = appt.getPatientID();
-		Patient patient = patientDao.getPatientByID(patientId);
-				
-		model.addAttribute("appointment", appt);
-		model.addAttribute("patient", patient);
-		return "/volunteer/alerts_keyObservations_plan";
-	}
+//	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
+//	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
+//		
+//		Appointment appointment = appointmentDao.getAppointmentById(id);
+//		int unreadMessages = messageDao.countUnreadMessagesForRecipient(appointment.getVolunteerID());
+//		model.addAttribute("unread", unreadMessages);
+//		Patient patient = patientDao.getPatientByID(appointment.getPatientID());
+//		model.addAttribute("appointment", appointment);
+//		model.addAttribute("patient", patient);
+//		return "/volunteer/visit_complete";
+//	}
+//	
+//	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
+//	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
+////		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
+////		appointmentDao.completeAppointment(id, request.getParameter("comments"), contactedAdmin);
+//		//return "redirect:/";
+//		Appointment appt = appointmentDao.getAppointmentById(id);
+//		System.out.println("here is alert input...");
+//		String alert = request.getParameter("visitAlerts");
+//		System.out.println("and alert input is ..." + alert);
+//		int patientId = appt.getPatientID();
+//		Patient patient = patientDao.getPatientByID(patientId);
+//				
+//		model.addAttribute("appointment", appt);
+//		model.addAttribute("patient", patient);
+//		return "/volunteer/alerts_keyObservations_plan";
+//	}
 	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
 	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, @RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, ModelMap model){

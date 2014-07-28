@@ -81,6 +81,7 @@
 
 		<div class="row-fluid">
 			<div class="col-md-3">	
+				<input type="button" value="Cancel" class="btn btn-primary" onclick="javascript:history.go(-1)">
 				<button id="mActivityLog" data-loading-text="Loading..." type="submit"  form="modifyActivity" class="btn btn-primary">Save Changes</button>
 			</div>
 		</div>

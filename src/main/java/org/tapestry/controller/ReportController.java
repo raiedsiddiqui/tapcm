@@ -78,6 +78,9 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	public String viewReport(@PathVariable("patientID") int id,
 			@RequestParam(value="appointmentId", required=true) int appointmentId, 	
 			ModelMap model, HttpServletRequest request){
+		//should get patient id from session
+		
+		
 		Patient patient = patientDao.getPatientByID(id);
 		//call web service to get patient info from myoscar
 		String userName = "carolchou.test";

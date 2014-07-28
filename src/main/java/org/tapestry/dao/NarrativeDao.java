@@ -16,7 +16,7 @@ import org.tapestry.objects.Narrative;
  * @author lxie
  * 
  * NarrativeDAO
- * Allow searching for narratives for current user,
+ * Allow searching for narratives for current user/volunteer,
  * adding new narrative, modifying, and deleting a selected narrative.
  */
 
@@ -44,13 +44,13 @@ public class NarrativeDao {
 		}
 	}
 	
-	public List<Narrative> getAllNarrativesByUser(int userId){
+	public List<Narrative> getAllNarrativesByUser(int volunteerId){
 		
 		List<Narrative> narratives = new ArrayList<Narrative>();
 		
 		try{
-			stmt = con.prepareStatement("SELECT * FROM narratives WHERE user_ID=? ORDER BY edit_Date DESC ");
-			stmt.setInt(1, userId);
+			stmt = con.prepareStatement("SELECT * FROM narratives WHERE volunteer=? ORDER BY edit_Date DESC ");
+			stmt.setInt(1, volunteerId);
 			
 			rs = stmt.executeQuery();
 			
@@ -70,19 +70,18 @@ public class NarrativeDao {
     		} catch (Exception e) {
     			//Ignore
     		}
-    	}
-				
+    	}				
 		return narratives;
 	}
 
 	//get all narratives for volunteer by patient
-	public List<Narrative> getAllNarrativesByUser(int userId, int patientId){
+	public List<Narrative> getAllNarrativesByUser(int volunteerId, int patientId){
 		
 		List<Narrative> narratives = new ArrayList<Narrative>();
 		
 		try{
-			stmt = con.prepareStatement("SELECT * FROM narratives WHERE user_ID=? AND patient_ID=? ORDER BY edit_Date DESC ");
-			stmt.setInt(1, userId);
+			stmt = con.prepareStatement("SELECT * FROM narratives WHERE volunteer=? AND patient_ID=? ORDER BY edit_Date DESC ");
+			stmt.setInt(1, volunteerId);
 			stmt.setInt(2, patientId);
 			rs = stmt.executeQuery();
 			
@@ -107,7 +106,7 @@ public class NarrativeDao {
 		return narratives;
 	}
 	
-	public List<Narrative> getAllNarrativesByVolunteer(int volunteerId, int patientId, int appointmentId){
+	public List<Narrative> getNarrativesByVolunteer(int volunteerId, int patientId, int appointmentId){
 		
 		List<Narrative> narratives = new ArrayList<Narrative>();
 		
@@ -140,37 +139,37 @@ public class NarrativeDao {
 	}
 	
 	//get narrative for volunteer by patient, and appointment
-	public List<Narrative> getAllNarrativesByUser(int userId, int patientId, int appointmentId){
-		
-		List<Narrative> narratives = new ArrayList<Narrative>();
-		
-		try{
-			stmt = con.prepareStatement("SELECT * FROM narratives WHERE user_ID=? AND patient_ID=? AND appointment=? ORDER BY edit_Date DESC ");
-			stmt.setInt(1, userId);
-			stmt.setInt(2, patientId);
-			stmt.setInt(3, appointmentId);
-			rs = stmt.executeQuery();
-			
-			narratives = getNarrativesByResultSet(rs);
-			
-			if (rs != null)
-				rs.close();
-			
-		}catch (SQLException e){			
-			logger.error("Error: Could not retrieve narratives");				
-			e.printStackTrace();			
-		}finally {
-    		try{
-    			//close statement  
-    			if (stmt != null)
-    				stmt.close();  
-    		} catch (Exception e) {
-    			//Ignore
-    		}
-    	}
-				
-		return narratives;
-	}
+//	public List<Narrative> getAllNarrativesByUser(int userId, int patientId, int appointmentId){
+//		
+//		List<Narrative> narratives = new ArrayList<Narrative>();
+//		
+//		try{
+//			stmt = con.prepareStatement("SELECT * FROM narratives WHERE user_ID=? AND patient_ID=? AND appointment=? ORDER BY edit_Date DESC ");
+//			stmt.setInt(1, userId);
+//			stmt.setInt(2, patientId);
+//			stmt.setInt(3, appointmentId);
+//			rs = stmt.executeQuery();
+//			
+//			narratives = getNarrativesByResultSet(rs);
+//			
+//			if (rs != null)
+//				rs.close();
+//			
+//		}catch (SQLException e){			
+//			logger.error("Error: Could not retrieve narratives");				
+//			e.printStackTrace();			
+//		}finally {
+//    		try{
+//    			//close statement  
+//    			if (stmt != null)
+//    				stmt.close();  
+//    		} catch (Exception e) {
+//    			//Ignore
+//    		}
+//    	}
+//				
+//		return narratives;
+//	}
 	
 	//get narrative for selected ID
 	public Narrative getNarrativeById(int narrativeId){
@@ -205,44 +204,16 @@ public class NarrativeDao {
 	}
 	
 	public void addNarrative(Narrative narrative){
-		try{
-			PreparedStatement stmt1 = con.prepareStatement("SELECT username FROM users WHERE user_ID =?");
-			int userId = narrative.getUserId();
-			stmt1.setInt(1, userId);
-			rs = stmt1.executeQuery();
-			int volunteerId = 0;
-			while(rs.next()){
-				String username = rs.getString("username");
-				
-				PreparedStatement stmt2 = con.prepareStatement("SELECT volunteer_ID FROM volunteers WHERE username =?");
-				stmt2.setString(1, username);
-				
-				ResultSet rs1 = stmt2.executeQuery();
-				
-				while(rs1.next()){
-					volunteerId = rs1.getInt("volunteer_ID");					
-				}
-				
-				if (rs1 != null)
-					rs1.close();
-				
-				if (stmt2 != null)
-					stmt2.close();				
-			}
-			
-			if (rs != null)
-				rs.close();
-			
-			stmt = con.prepareStatement("INSERT INTO narratives (title, contents, user_ID, edit_Date, patient_ID,"
-					+ " appointment, volunteer) VALUES (?, ?, ?, ?, ?, ?, ?)");
+		try{			
+			stmt = con.prepareStatement("INSERT INTO narratives (title, contents, edit_Date, patient_ID,"
+					+ " appointment, volunteer) VALUES (?, ?, ?, ?, ?, ?)");
 			
 			stmt.setString(1, narrative.getTitle());
-			stmt.setString(2, narrative.getContents());
-			stmt.setInt(3, narrative.getUserId());
-			stmt.setString(4, narrative.getEditDate());
-			stmt.setInt(5, narrative.getPatientId());
-			stmt.setInt(6, narrative.getAppointmentId());			
-			stmt.setInt(7, volunteerId);
+			stmt.setString(2, narrative.getContents());			
+			stmt.setString(3, narrative.getEditDate());
+			stmt.setInt(4, narrative.getPatientId());
+			stmt.setInt(5, narrative.getAppointmentId());			
+			stmt.setInt(6, narrative.getVolunteerId());
 			
 			stmt.execute();
 		}catch (SQLException e){
@@ -320,9 +291,7 @@ public class NarrativeDao {
 				narrative.setContents(results.getString("contents"));
 				
 				if (results.getString("edit_Date") != null)
-					narrative.setEditDate(results.getString("edit_Date").substring(0,10));
-
-				narrative.setUserId(results.getInt("user_ID"));	
+					narrative.setEditDate(results.getString("edit_Date").substring(0,10));				
 				
 				int patientId = results.getInt("patient_ID");
 				narrative.setPatientId(patientId);			

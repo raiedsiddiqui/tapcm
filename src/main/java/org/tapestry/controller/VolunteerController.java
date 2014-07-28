@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.tapestry.controller.utils.MisUtils;
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
@@ -660,7 +661,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	@RequestMapping(value="/view_activity", method=RequestMethod.GET)
 	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		HttpSession  session = request.getSession();		
-		int volunteerId = getVolunteerIdFromLoginUser(request);	
+		int volunteerId = getLoggedInVolunteerId(request);	
 		List<Activity> activities = new ArrayList<Activity>();
 		activities = activityDao.getAllActivitiesForVolunteer(volunteerId);
 					
@@ -695,7 +696,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	@RequestMapping(value="/add_activity", method=RequestMethod.POST)
 	public String addActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		HttpSession  session = request.getSession();		
-		int volunteerId = getVolunteerIdFromLoginUser(request);	
+		int volunteerId = getLoggedInVolunteerId(request);	
 			
 		Volunteer volunteer = volunteerDao.getVolunteerById(volunteerId);
 		int organizationId = volunteer.getOrganizationId();
@@ -764,7 +765,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		Activity activity = new Activity();
 			
 		HttpSession  session = request.getSession();		
-		int volunteerId = getVolunteerIdFromLoginUser(request);	
+		int volunteerId = getLoggedInVolunteerId(request);	
 			
 		if (!Utils.isNullOrEmpty(request.getParameter("activityId")))
 		{
@@ -809,14 +810,13 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		return "redirect:/view_activity";	
 	}
 		
-	private int getVolunteerIdFromLoginUser(SecurityContextHolderAwareRequestWrapper request)
-	{	
-		HttpSession session = request.getSession();
-		int volunteerId =0;
-		if (session.getAttribute("logged_in_volunteer") != null)
-			volunteerId = Integer.parseInt(session.getAttribute("logged_in_volunteer").toString());
-		else
-				volunteerId = Utils.getVolunteerByLoginUser(request, volunteerDao);
+	private int getLoggedInVolunteerId(SecurityContextHolderAwareRequestWrapper request)
+	{			
+		int volunteerId = MisUtils.getLoggedInVolunteerId(request);
+		
+		if (volunteerId == 0)
+			volunteerId = Utils.getVolunteerByLoginUser(request, volunteerDao);
+						
 			
 		return volunteerId;
 	}
