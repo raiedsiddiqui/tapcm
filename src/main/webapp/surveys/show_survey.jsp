@@ -148,7 +148,7 @@
             		</div>
 
             		<br/>
-            		<div id="surveybackground">
+            		<div id="surveybackground" class="animated fadeIn">
                 		<% if (!message.equals("")) { %>
                 		<div class="alert alert-warning notificationMessage"><%=message%></div>
                 		<% } %>
@@ -219,7 +219,7 @@
                 	<input id="saveclose" type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>?survey_completed=<%=completed%>'">
                 	-->	
                 	<div id="answer-buttons">
-                		<div class="row">
+                		<div class="row animated bounceInLeft">
                 			<div class="col-md-4">
 	                			<input class="tleft btn" type="button" value="BACK" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();">
 	                		</div>

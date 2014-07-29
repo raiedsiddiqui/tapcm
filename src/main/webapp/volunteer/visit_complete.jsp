@@ -8,23 +8,7 @@
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
 
-		<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
-		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
-
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
-	
-
-	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
-	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
-
-
-	  		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
-
+	<%@include file="volunteer_head.jsp" %>
 	<style type="text/css">
 		html,body{
 			height:100%;
@@ -67,34 +51,16 @@
 </head>
 	
 <body>
-<div id="headerholder">	
-  <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-    <!-- <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" /> -->
-  	<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
-  	<img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>
-  <div class="navbar">
-			<div class="navbar-inner">
-				<div class="container">
-					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        					<span class="icon-bar"></span>
-        					<span class="icon-bar"></span>
-       				 		<span class="icon-bar"></span>
-     					</a>
-     					
-<!--      					<a class="brand" href="<c:url value="/"/>">Home</a>
- -->     					<div class="nav-collapse collapse">
-						<ul class="nav">
-							<li><a class="brand" href="<c:url value="/"/>">Appointments</a></li>
-<!-- 							<li><a href="<c:url value="/profile"/>">My Profile</a></li>-->							
-						<li><a href="<c:url value="/"/>">Activity Log <!-- <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if> --></a></li>
-						<li><a href="<c:url value="/inbox"/>">Messages <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
-							<li><a href="<c:url value="/logout"/>">Log Out</a></li>
-						</ul>
-					</div>
-				</div>
-			</div>
+  <div id="headerholder"> 
+    <div class="row">
+      <div class="col-md-3 tpurple logoheight">
+        <img id="logo" src="<c:url value="/resources/images/logow.png"/>" />
+      </div>
 
-	</div>
+    <div class="col-md-9 tblack" style="height:63px;">
+
+    </div>
+  </div>
 </div>
 <!-- 	breadcrumb START-->	
 	<div id="crumbs"> 
@@ -129,7 +95,7 @@
 	 		<textarea  name="visitAlerts" id="visitAlerts"></textarea><br />
 	 		
 	 		<a href="<c:url value="/patient/${appointment.patientID}?appointmentId=${appointment.appointmentID}"/>" class="tleft btn btn-danger">Cancel</a>
- 			<input class="completevisitbtn btn btn-primary pull-right" type="submit" value="Submit" />
+ 			<input class="btn lgbtn pull-right" type="submit" value="Submit" />
  		</form>
  		
  	</div>
