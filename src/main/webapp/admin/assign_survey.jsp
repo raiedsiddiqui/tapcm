@@ -41,13 +41,13 @@
 			{
 				document.getElementById("searchPatient").disabled = true; 
 				document.getElementById('searchPatientName').disabled = true;
-			//	document.getElementById('searchPatientName').readOnly = true;
+			
 			}				
 			else
 			{
 				document.getElementById("searchPatient").disabled = false;
 				document.getElementById('searchPatientName').disabled = false;
-		//		document.getElementById('searchPatientName').readOnly = false;
+		
 			}
 				
 		}

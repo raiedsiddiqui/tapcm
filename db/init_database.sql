@@ -118,8 +118,7 @@ CREATE TABLE IF NOT EXISTS narratives (
     narrative_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
     title VARCHAR(50) NOT NULL,
     contents TEXT,
-    edit_Date TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP, /*edit_Date represents the last edit date*/
-    user_ID INT NOT NULL,
+    edit_Date TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP, /*edit_Date represents the last edit date*/    
     volunteer SMALLINT UNSIGNED NOT NULL,
     patient_ID SMALLINT UNSIGNED NOT NULL,
     appointment SMALLINT UNSIGNED NOT NULL,

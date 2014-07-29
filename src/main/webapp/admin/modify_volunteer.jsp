@@ -183,7 +183,8 @@
 						<input type="textarea" class="form-control" maxlength="50" name="notes" value="${volunteer.notes}"/>
 					</div>				
 
-						<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a>
+				<!--  	<a href="<c:url value="/view_volunteers"/>" class="btn btn-primary" data-toggle="modal">Cancel</a> -->	
+						<input type="button" value="Cancel" class="btn btn-primary" onclick="javascript:history.go(-1)">	
 						<input class="btn btn-primary" type="submit" value="Save Change" />
 						<input id="volunteerId" name="volunteerId" type="hidden" value="${volunteer.volunteerId}"/>
 					</fieldset>

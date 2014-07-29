@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Calendar;
 
 import javax.annotation.PostConstruct;
 import javax.mail.PasswordAuthentication;
@@ -33,15 +32,15 @@ import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.PatientDao;
-import org.tapestry.dao.PictureDao;
+//import org.tapestry.dao.PictureDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
-import org.tapestry.myoscar.utils.ClientManager;
+//import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Patient;
-import org.tapestry.objects.Picture;
+//import org.tapestry.objects.Picture;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.User;
@@ -60,8 +59,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
 	private Yaml yaml;
-	
-	private UserDao userDao;
+
 	private PatientDao patientDao;
 	private AppointmentDao appointmentDao;
 	private ActivityDao activityDao;
@@ -69,7 +67,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private MessageDao messageDao;
 	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
-   	private PictureDao pictureDao;
+//   	private PictureDao pictureDao;
 	
    	//Mail-related settings;
    	private Properties props;
@@ -116,7 +114,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		messageDao = new MessageDao(DB, UN, PW);
 		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
 		surveyResultDao = new SurveyResultDao(DB, UN, PW);
-		pictureDao = new PictureDao(DB, UN, PW);
+//		pictureDao = new PictureDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -236,44 +234,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("patient", p);		
 		
 		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();			
-		model.addAttribute("volunteers", volunteers);
-		/*
-		//client's availability is removed    
-		String strAvailibilities = p.getAvailability();	
-		boolean mondayNull = false;
-		boolean tuesdayNull = false;
-		boolean wednesdayNull = false;
-		boolean thursdayNull = false;
-		boolean fridayNull = false;
-		
-		if (!Utils.isNullOrEmpty(strAvailibilities))
-		{
-			if (strAvailibilities.contains("1non"))
-				mondayNull = true;
-			if (strAvailibilities.contains("2non"))
-				tuesdayNull = true;
-			if (strAvailibilities.contains("3non"))
-				wednesdayNull = true;
-			if (strAvailibilities.contains("4non"))
-				thursdayNull = true;
-			if (strAvailibilities.contains("5non"))
-				fridayNull = true;
-			
-			String[] arrayAvailibilities = strAvailibilities.split(",");
-			
-			Utils.getPosition("1","monDropPosition",arrayAvailibilities,mondayNull, model);
-			Utils.getPosition("2","tueDropPosition",arrayAvailibilities,tuesdayNull, model);
-			Utils.getPosition("3","wedDropPosition",arrayAvailibilities,wednesdayNull, model);
-			Utils.getPosition("4","thuDropPosition",arrayAvailibilities,thursdayNull, model);
-			Utils.getPosition("5","friDropPosition",arrayAvailibilities,fridayNull, model);
-			
-			model.addAttribute("mondayNull", mondayNull);
-			model.addAttribute("tuesdayNull", tuesdayNull);
-			model.addAttribute("wednesdayNull", wednesdayNull);
-			model.addAttribute("thursdayNull", thursdayNull);
-			model.addAttribute("fridayNull", fridayNull);
-		}
-		*/
+		model.addAttribute("volunteers", volunteers);	
 		
 		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
 	}
@@ -330,7 +291,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		//Find the name of the current user
 		User u = Utils.getLoggedInUser(request);
 		HttpSession session = request.getSession();
-		userDao = (UserDao)session.getAttribute("userDao");
 		
 		int volunteerId =0;
 		if (session.getAttribute("logged_in_volunteer") != null)
@@ -366,8 +326,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("completedSurveys", completedSurveyResultList);
 		model.addAttribute("inProgressSurveys", incompleteSurveyResultList);
 		model.addAttribute("surveys", surveyList);
-		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
-		model.addAttribute("pictures", pics);
+//		ArrayList<Picture> pics = pictureDao.getPicturesForPatient(id);
+//		model.addAttribute("pictures", pics);
 		
 		//user logs
 		StringBuffer sb = new StringBuffer();
@@ -412,7 +372,17 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	@RequestMapping(value="/display_client/{patient_id}",method=RequestMethod.GET)
 	public String displayPatientDetails(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper
 			request, ModelMap model){
-		Patient patient = patientDao.getPatientByID(id);		
+		Patient patient = new Patient();
+		List<Patient> patients  = MisUtils.getAllPatientsWithFullInfos(patientDao, request);
+		for (Patient p: patients)
+		{
+			if (id == p.getPatientID())
+			{
+				patient = p;
+				break;
+			}
+		}		
+		
 		model.addAttribute("patient", patient);
 		
 		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
@@ -423,11 +393,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		model.addAttribute("selectedVolunteer1", v1);
 		model.addAttribute("selectedVolunteer2", v2);
-		
-		//remove client's availability 
-//		if (!Utils.isNullOrEmpty(patient.getAvailability()))
-//			Utils.saveAvailability(patient.getAvailability(),model);		
-		
+				
 		List<Appointment> appointments = new ArrayList<Appointment>();
 		appointments = appointmentDao.getAllUpcommingAppointmentForPatient(id);
 				

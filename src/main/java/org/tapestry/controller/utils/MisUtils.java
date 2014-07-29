@@ -2,6 +2,7 @@ package org.tapestry.controller.utils;
 
 import java.util.Calendar;
 import java.util.List;
+
 import javax.servlet.http.HttpSession;
 
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
@@ -34,7 +35,7 @@ public class MisUtils {
 			patients = (List<Patient>)session.getAttribute("allPatientWithFullInfos");
 		else
 		{
-			int age;		
+			int age;				
 			
 			try {			
 				List<PersonTransfer3> patientsInMyOscar = ClientManager.getClients();
@@ -53,7 +54,11 @@ public class MisUtils {
 							
 							p.setAge(age);
 							p.setCity(person.getCity());					
-							p.setHomePhone(person.getPhone1());								
+							p.setHomePhone(person.getPhone1());		
+							if (person.getStreetAddress1() != null)
+								p.setAddress(person.getStreetAddress1());
+							else if(person.getStreetAddress2() != null)
+								p.setAddress(person.getStreetAddress2());
 							
 							break;
 						}
@@ -71,5 +76,16 @@ public class MisUtils {
 		
 		
 		return patients;
+	}
+	
+	public static int getLoggedInVolunteerId(SecurityContextHolderAwareRequestWrapper request){
+		int volunteerId = 0;
+		HttpSession session = request.getSession();
+		
+		if (session.getAttribute("logged_in_volunteer") != null){			
+			volunteerId = Integer.parseInt(session.getAttribute("logged_in_volunteer").toString());
+		}
+		
+		return volunteerId;
 	}
 }

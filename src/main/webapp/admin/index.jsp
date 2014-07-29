@@ -20,7 +20,7 @@
 <body>	
 	<div class="content">
 		<%@include file="navbar.jsp" %>
-		
+		<h4 align="right">Welcome, ${name}</h4>		
 		<div class="row-fluid">
 			<div class="span12">
 				<h2>Tapestry Admin</h2>

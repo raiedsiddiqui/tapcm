@@ -100,7 +100,8 @@
 	</div>
 	
 	<form id="plansfrm" action="<c:url value="/savePlans"/>" method="post">
-<h2>                                                                  <button type="submit">Submit</button></h2><a href="<c:url value="/open_alerts_keyObservations_plan/${appointment.appointmentID}"/>" class="btn btn-primary" >Cancel</a><br/>
+<h2>    <button type="submit" align="right">Submit</button><input type="button" value="Cancel" class="btn btn-primary" onclick="javascript:history.go(-1)"></h2>
+<br/>
 <label>1 &nbsp &nbsp  </label>
 	<select name="plan1" form="plansfrm">
 		<c:forEach items="${plans}" var="p">							

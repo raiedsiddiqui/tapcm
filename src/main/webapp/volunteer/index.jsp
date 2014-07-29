@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -85,9 +86,9 @@
 	</div> -->
 <!-- 	breadcrumb END-->	
 	
-	<div class="container">
-
-<!-- 		<h2>Welcome, ${name}</h2>-->		
+	<div class="container">				
+			
+ 		<h4 align="right">Welcome, ${name}</h4>		
 	<c:if test="${not empty announcements}">
 		<div class="row-fluid">
 			<div class="span12">
@@ -111,8 +112,13 @@
 		</div>
 		</c:if>
 		<c:if test="${not empty booked}">
-			<div class="alert alert-info">The appointment was successfully booked</div>
+			<div class="alert alert-info"><spring:message code="message_newAppointment_successful"/></div>
 		</c:if>
+		 <c:if test="${not empty noMachedTime }">
+			 	<div  class="alert alert-info">
+			 		<c:out value="${noMachedTime}" />
+			 	</div>
+			 </c:if>
 		
 		<div class="row-fluid">
 			<!-- <div class="col-md-8"> -->

@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 import org.tapestry.dao.NarrativeDao;
-import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
@@ -41,8 +40,7 @@ public class Utils {
 		static String useAuth = "";
 		static String mailAddress="";
 		
-		static NarrativeDao narrativeDao = null;
-   		static UserDao userDao = null;
+		static NarrativeDao narrativeDao = null;   		
    		static VolunteerDao volunteerDao = null;
    		
 		
@@ -119,57 +117,28 @@ public class Utils {
 	
 	public static User getLoggedInUser(SecurityContextHolderAwareRequestWrapper request){
 		HttpSession session = request.getSession();
-		String name = null;		
 
 		User loggedInUser = null;
 		//check if loggedInUserId is in the session
 		if (session.getAttribute("loggedInUser") != null) //get loggedInUser from session			
 			loggedInUser = (User)session.getAttribute("loggedInUser");		
-		else if (request.getUserPrincipal() != null){		
-			//get loggedInUser from request
-			name = request.getUserPrincipal().getName();	
-					
-			if (name != null){				
-				userDao = (UserDao)session.getAttribute("userDao");
-				loggedInUser = userDao.getUserByUsername(name);		
-						
-				session.setAttribute("loggedInUser", loggedInUser);	
-			}
-		}
+
 		
 		return loggedInUser;
 	}
 	
 	public static User getLoggedInUser(MultipartHttpServletRequest request){
 		HttpSession session = request.getSession();
-		String name = null;		
 
 		User loggedInUser = null;
 		//check if loggedInUserId is in the session
 		if (session.getAttribute("loggedInUser") != null) //get loggedInUser from session			
 			loggedInUser = (User)session.getAttribute("loggedInUser");		
-		else if (request.getUserPrincipal() != null){		
-			//get loggedInUser from request
-			name = request.getUserPrincipal().getName();	
-					
-			if (name != null){				
-				userDao = (UserDao)session.getAttribute("userDao");
-				loggedInUser = userDao.getUserByUsername(name);		
-						
-				session.setAttribute("loggedInUser", loggedInUser);	
-			}
-		}
 		
 		return loggedInUser;
 	}
 	
-//	public static String getStrLoggedInUserId(HttpSession session, SecurityContextHolderAwareRequestWrapper request){
-//		int loggedInUserId = 0;
-//		loggedInUserId = getLoggedInUserId(session, request);
-//		
-//		return String.valueOf(loggedInUserId);
-//				
-//	}	
+
 	
 	public static boolean isNullOrEmpty(String str){
 		if (str != null && !str.equals(""))

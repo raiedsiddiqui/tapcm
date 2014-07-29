@@ -3,7 +3,6 @@ package org.tapestry.objects;
 public class Narrative {
 	
 	private int narrativeId;
-	private int userId;
 	private int patientId;	
 	private String patientName;
 	private int appointmentId;
@@ -29,14 +28,6 @@ public class Narrative {
 	
 	public void setNarrativeId(int narrativeId) {
 		this.narrativeId = narrativeId;
-	}
-	
-	public int getUserId() {
-		return userId;
-	}
-	
-	public void setUserId(int userId) {
-		this.userId = userId;
 	}
 	
 	public int getPatientId() {

@@ -90,6 +90,7 @@
 
 		<div class="row-fluid">
 			<div class="col-md-12">
+			<input type="button" value="Cancel" class="btn btn-primary" onclick="javascript:history.go(-1)">
 				<button id="newActivityLogButton" data-loading-text="Loading..." type="submit"  form="newActivityLog" class="lgbtn pull-right">Save</button>
 			</div>
 		</div>
