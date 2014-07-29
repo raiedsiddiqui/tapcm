@@ -109,17 +109,21 @@
 	</c:if>	
 	
 	<c:if test="${not appointment.hasNarrative}">
-		<a href="<c:url value="/new_narrative"/>"><h2><button type="submit">Narrrative</button></h2></a> 
+		<a href="<c:url value="/new_narrative"/>"><h2><button type="submit" style="float: right;">Narrrative</button></h2></a> 
 	</c:if>   
 
 
 <div class="row-fluid">
-	<a href="<c:url value="/open_alerts_keyObservations/${appointment.appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
-		<b>Alerts and Key Observations</b><br/>								
-	</a>
-	<a href="<c:url value="/open_plan/${appointment.appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
-		<b>Plan</b><br/>								
-	</a>
+	<c:if test="${not empty showAlertsAndKeyObservation}">
+		<a href="<c:url value="/open_alerts_keyObservations/${appointment.appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+			<b>Alerts and Key Observations</b><br/>								
+		</a>
+	</c:if>
+	<c:if test="${not empty showPlan}">
+		<a href="<c:url value="/open_plan/${appointment.appointmentID}"/>" class="span12 btn btn-primary survey-list" style="height:50px; margin-bottom:10px;">
+			<b>Plan</b><br/>								
+		</a>
+	</c:if>
 						</div>
 
 </body>

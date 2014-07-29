@@ -37,7 +37,6 @@ import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.SurveyResultDao;
 import org.tapestry.dao.SurveyTemplateDao;
-import org.tapestry.dao.UserDao;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.DisplayedSurveyResult;
 import org.tapestry.objects.Patient;
@@ -341,8 +340,6 @@ public class SurveyController{
 	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {		
 		HttpSession session = request.getSession();
 		User u = (User)session.getAttribute("loggedInUser");	
-//		String username = request.getUserPrincipal().getName();
-	//	User u = userDao.getUserByUsername(username);
 		String name = u.getName();
 		
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);

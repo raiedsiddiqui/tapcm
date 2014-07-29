@@ -190,4 +190,23 @@ public class SurveyTemplateDao
     		}
     	}
 	}
+	
+	public int countSurveyTemplate(){
+		try{
+			statement = con.prepareStatement("SELECT COUNT(*) as c FROM surveys");
+			ResultSet result = statement.executeQuery();
+			result.first();
+			return result.getInt("c");
+		} catch (SQLException e){
+			System.out.println("Error: Could not count survey template");
+			e.printStackTrace();
+			return 0;
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+	}
 }

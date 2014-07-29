@@ -3,11 +3,14 @@ package org.tapestry.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -21,6 +24,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.oscarehr.myoscar_server.ws.PersonTransfer3;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
@@ -36,15 +40,24 @@ import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.NarrativeDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.UserDao;
+import org.tapestry.dao.SurveyResultDao;
+import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.dao.VolunteerDao;
+import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Availability;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.Narrative;
 import org.tapestry.objects.Patient;
+import org.tapestry.objects.Report;
+import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
+import org.tapestry.report.AlertManager;
+import org.tapestry.report.AlertsInReport;
+import org.tapestry.report.CalculationManager;
+import org.tapestry.surveys.ResultParser;
 import org.tapestry.controller.utils.MisUtils;
 import org.yaml.snakeyaml.Yaml;
 
@@ -63,6 +76,8 @@ public class AppointmentController{
 	private VolunteerDao volunteerDao;
 	private MessageDao messageDao;
 	private NarrativeDao narrativeDao;
+	private SurveyResultDao surveyResultDao;
+	private SurveyTemplateDao surveyTemplateDao;
 	
    	//Mail-related settings;
    	private Properties props;
@@ -108,6 +123,8 @@ public class AppointmentController{
 		volunteerDao = new VolunteerDao(DB, UN, PW);
 		messageDao = new MessageDao(DB, UN, PW);
 		narrativeDao = new NarrativeDao(DB, UN, PW);
+		surveyResultDao = new SurveyResultDao(DB, UN, PW);
+		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
 		
 		//Mail-related settings
 		final String username = mailUser;
@@ -127,6 +144,81 @@ public class AppointmentController{
 		props.setProperty("mail.user", mailUser);
 		props.setProperty("mail.password", mailPassword);
    	}
+   	
+	@RequestMapping(value="/", method=RequestMethod.GET)
+	//Note that messageSent is Boolean, not boolean, to allow it to be null
+	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, 
+			@RequestParam(value="noMachedTime", required=false) String noMachedTime,
+			@RequestParam(value="patientId", required=false) Integer patientId, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		int unreadMessages;			
+		HttpSession session = request.getSession();
+			
+		if (request.isUserInRole("ROLE_USER"))
+		{
+			User loggedInUser = Utils.getLoggedInUser(request);
+			String username = loggedInUser.getUsername();	
+			
+			int userId = loggedInUser.getUserID();
+			//get volunteer Id from login user
+			int volunteerId = volunteerDao.getVolunteerIdByUsername(username);		
+		
+			session.setAttribute("logged_in_volunteer", volunteerId);
+			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);
+			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(userId);
+			
+			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
+			List<Appointment> pendingAppointments = new ArrayList<Appointment>();
+			List<Appointment> declinedAppointments = new ArrayList<Appointment>();
+			if(patientId != null) {				
+				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
+				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId, volunteerId);
+				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
+				
+				Patient patient = patientDao.getPatientByID(patientId);
+				model.addAttribute("patient", patient);
+				
+				//set patientId in the session for other screen, like narratives 
+				session.setAttribute("patientId", patientId);				
+			} 
+			else 
+			{
+				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(volunteerId);				
+				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(volunteerId);
+				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);						
+			}
+			
+			model.addAttribute("approved_appointments", approvedAppointments);
+			model.addAttribute("pending_appointments", pendingAppointments);
+			model.addAttribute("declined_appointments", declinedAppointments);
+			model.addAttribute("name", loggedInUser.getName());
+			model.addAttribute("patients", patientsForUser);
+			
+			unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
+			model.addAttribute("unread", unreadMessages);	
+			model.addAttribute("announcements", announcements);
+			if (booked != null)
+				model.addAttribute("booked", booked);
+			
+			if (noMachedTime != null)
+				model.addAttribute("noMachedTime", noMachedTime);
+				
+			return "volunteer/index";
+		}
+		else if (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_LOCAL_ADMIN"))
+		{			
+			User loggedInUser = Utils.getLoggedInUser(request);			
+			
+			unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+			model.addAttribute("name", loggedInUser.getName());
+
+			return "admin/index";
+		}
+		else{ //This should not happen, but catch any unforseen behavior and logout			
+			return "redirect:/login";
+		}
+	}
    	
    	@RequestMapping(value="/manage_appointments", method=RequestMethod.GET)
    	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked,
@@ -684,15 +776,18 @@ public class AppointmentController{
 	 */
 	@RequestMapping(value="/open_alerts_keyObservations/{appointmentId}", method=RequestMethod.GET)
 	public String openAlertsAndKeyObservations(@PathVariable("appointmentId") int id, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		
-		HttpSession session = request.getSession();
-		session.setAttribute("appointmentId", id);
-		
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
 		Appointment appt = appointmentDao.getAppointmentById(id);
 		
 		int patientId = appt.getPatientID();
 		Patient patient = patientDao.getPatientByID(patientId);
+		//session.setAttribute("newNarrative", true);
+		HttpSession session = request.getSession();
+		if (session.getAttribute("newNarrative") != null)
+		{
+			model.addAttribute("newNarrative", true);
+			session.removeAttribute("newNarrative");
+		}
 		
 		model.addAttribute("appointment", appt);
 		model.addAttribute("patient", patient);		
@@ -709,17 +804,40 @@ public class AppointmentController{
 	 */
 	@RequestMapping(value="/saveAlertsAndKeyObservations", method=RequestMethod.POST)
 	public String saveAlertsAndKeyObservations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		
-		HttpSession session = request.getSession();
-		Integer appointmentId = (Integer)session.getAttribute("appointmentId");
-		int iAppointmentId = appointmentId.intValue();
-		
+		int appointmentId = getAppointmentId(request);		
 		String alerts = request.getParameter("alerts");
 		String keyObservations = request.getParameter("keyObservations");
 		
-		appointmentDao.addAlertsAndKeyObservations(iAppointmentId, alerts, keyObservations);
+		appointmentDao.addAlertsAndKeyObservations(appointmentId, alerts, keyObservations);
 		
-		return "/volunteer/alerts_keyObservations_plan";
+		int patientId = getPatientId(request);		
+		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);		
+				
+		if (!Utils.isNullOrEmpty(appointment.getComments()))
+		{System.out.println("alert is ==="  +  appointment.getComments());
+			if (completedAllSurveys(patientId))
+			{System.out.println("in save alerts and keyobservation, for first visit there is alert and finish all servey, and and go to Plan");
+				return "redirect:/open_plan/" + appointmentId ;			
+			}
+			else
+			{System.out.println("in save alerts and keyobservation, for first visit there is alert and not finish all servey, and and go Home");
+				//send alert to MRP
+				return "redirect:/";
+			}
+		}
+		else//no alert, no complete surveys
+		{
+			if (completedAllSurveys(patientId))
+			{System.out.println("in save alerts and keyobservation, for fowllowup visit there is no alert and finish all servey, "
+					+ "and and go to Plan");
+				return "redirect:/open_plan/" + appointmentId ;		
+			}
+			else
+			{System.out.println("in save alerts and keyobservation, for fowllowup visit there is no alert and not finish all servey, "
+					+ "and and go to Plan");
+				return "redirect:/";
+			}
+		}
 	}
 	
 	/**
@@ -732,11 +850,7 @@ public class AppointmentController{
 	@RequestMapping(value="/open_plan/{appointmentId}", method=RequestMethod.GET)
 	public String openPlan(@PathVariable("appointmentId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		List<String> planDef = Utils.getPlanDefinition();
-		
-		HttpSession session = request.getSession();
-		session.setAttribute("appointmentId", id);
-		
+		List<String> planDef = Utils.getPlanDefinition();				
 		Appointment appt = appointmentDao.getAppointmentById(id);
 		
 		int patientId = appt.getPatientID();
@@ -745,6 +859,7 @@ public class AppointmentController{
 		model.addAttribute("appointment", appt);
 		model.addAttribute("patient", patient);
 		model.addAttribute("plans", planDef);
+		
 		return "/volunteer/add_plan";
 	}
 	
@@ -758,9 +873,8 @@ public class AppointmentController{
 	@RequestMapping(value="/savePlans", method=RequestMethod.POST)
 	public String savePlans(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		
-		HttpSession session = request.getSession();
-		Integer appointmentId = (Integer)session.getAttribute("appointmentId");
-		int iAppointmentId = appointmentId.intValue();
+		int patientId = getPatientId(request);
+		int appointmentId = getAppointmentId(request);
 		
 		StringBuffer sb = new StringBuffer();		
 		sb.append(request.getParameter("plan1"));
@@ -778,19 +892,27 @@ public class AppointmentController{
 			sb.append(request.getParameter("planSpecify"));
 		}
 				
-		String plans = sb.toString();
+		appointmentDao.addPlans(appointmentId, sb.toString());
+		//generate report for patient 
+	//	generateReport(patientId, appointmentId);	
 		
-		appointmentDao.addPlans(iAppointmentId, plans);
+		//Todo: save report as PDF in harddrive
 		
-		Appointment appt = appointmentDao.getAppointmentById(iAppointmentId);
+		//Todo:send copy of report to MRP
 		
-		int patientId = appt.getPatientID();
-		Patient patient = patientDao.getPatientByID(patientId);
+		//send message to patient in MyOscar
+//		Long patientIdInMyOscar = new Long(15231);
+//		try{
+//			Long lll = ClientManager.sentMessageToPatientInMyOscar(patientIdInMyOscar, "Message From Tapestry", "Hello");
+//			System.out.println("lll is === "+ lll);
+//			
+//		} catch (Exception e){
+//			System.out.println("something wrong with myoscar server");
+//			e.printStackTrace();
+//		}
+//		
 		
-		model.addAttribute("appointment", appt);
-		model.addAttribute("patient", patient);
-		
-		return "/volunteer/alerts_keyObservations_plan";
+		return "redirect:/";
 	}
 	
 	/**
@@ -832,8 +954,9 @@ public class AppointmentController{
 	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
 		
 		Appointment appointment = appointmentDao.getAppointmentById(id);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(appointment.getVolunteerID());
-		model.addAttribute("unread", unreadMessages);
+//		int unreadMessages = messageDao.countUnreadMessagesForRecipient(appointment.getVolunteerID());
+//		model.addAttribute("unread", unreadMessages);		
+		
 		Patient patient = patientDao.getPatientByID(appointment.getPatientID());
 		model.addAttribute("appointment", appointment);
 		model.addAttribute("patient", patient);
@@ -843,19 +966,63 @@ public class AppointmentController{
 	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
 	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
 //		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
-//		appointmentDao.completeAppointment(id, request.getParameter("comments"), contactedAdmin);
-		//return "redirect:/";
+		//set visit alert as comments in DB
+		appointmentDao.completeAppointment(id, request.getParameter("visitAlerts"));
+		
 		Appointment appt = appointmentDao.getAppointmentById(id);
-		System.out.println("here is alert input...");
-		String alert = request.getParameter("visitAlerts");
-		System.out.println("and alert input is ..." + alert);
 		int patientId = appt.getPatientID();
 		Patient patient = patientDao.getPatientByID(patientId);
-				
-		model.addAttribute("appointment", appt);
 		model.addAttribute("patient", patient);
-		return "/volunteer/alerts_keyObservations_plan";
+		model.addAttribute("appointment", appt);	
+		
+		if (appt.getType() == 0)
+		{//first visit						
+			System.out.println("in complete visit, for first visit and and go to alert and keyObservation");
+			return "/volunteer/add_alerts_keyObservation";			
+		}
+		else
+		{//follow up visit			
+			boolean completedAllSurveys = completedAllSurveys(patientId);
+			if (!Utils.isNullOrEmpty(appt.getComments()))
+			{//has alert
+				if (completedAllSurveys)
+				{System.out.println("in complete visit, for fowllowup visit, there is alert, finish all surveys and and go to Plans");
+					//alert attached to report
+					return "redirect:/open_plan/" + id ;	
+				}
+				else
+				{System.out.println("in complete visit, for fowllowup visit,there is alert, not finish all surveys and and go to Home");
+					//todo: send Alert to MRP
+					String alerts = appt.getComments();
+					System.out.println("Alert send to MRP in Oscar  === " + alerts);	
+					return "redirect:/";
+				}				
+			}
+			else
+			{//does not have alert
+				if (completedAllSurveys)
+				{System.out.println("in complete visit, for fowllowup visit,there is no alert, finish all surveys and and go to Plan");
+					return "redirect:/open_plan/" + id ;	
+				}
+				else
+				{System.out.println("in complete visit, for fowllowup visit,there is no alert, not finish all surveys and and go to Home");
+					return "redirect:/";
+				}
+			}
+		}
 	}
+	
+	public boolean completedAllSurveys(int patientId){
+   		boolean completed = false;
+   		
+   		int count = surveyTemplateDao.countSurveyTemplate();
+   		List<SurveyResult> completedSurveys = surveyResultDao.getCompletedSurveysByPatientID(patientId);
+   		
+   		if (count == completedSurveys.size())
+   			completed = true;
+   		
+   		return completed;
+   	}
 	
 	private boolean isFirstVisit(int patientId){
 		boolean isFirst = true;
@@ -896,8 +1063,8 @@ public class AppointmentController{
 			m.setSubject(subject);
 			messageDao.sendMessage(m);
 	}
-	
-	//send message into Inbox and email account too
+
+	/**	 send message into Inbox and email account too	
 	private void sendMessage(String email,String msg, int sender, int recipient){
 		Message m = new Message();
 		m.setRecipient(recipient);
@@ -925,7 +1092,7 @@ public class AppointmentController{
 			}
 		}
 	}
-	
+	*/
 	
 	private List<Patient> getPatients()
 	{
@@ -1222,50 +1389,36 @@ public class AppointmentController{
 	//create a new narrative and save it in DB
 	@RequestMapping(value="/add_narrative", method=RequestMethod.POST)
 	public String addNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
-		int patientId = 0;
-		int appointmentId = 0;
-		int loggedInVolunteerId  = MisUtils.getLoggedInVolunteerId(request);
+		int patientId = getPatientId(request);
+		int appointmentId = getAppointmentId(request);
+		int loggedInVolunteerId  = MisUtils.getLoggedInVolunteerId(request);		
 		
-		patientId = getPatientId(request);
-		appointmentId = getAppointmentId(request);
+		String title = request.getParameter("narrativeTitle");
+		String content = request.getParameter("narrativeContent");	
 		
-		if ((patientId != 0) && (appointmentId != 0)){
-			String title = request.getParameter("narrativeTitle");
-			String content = request.getParameter("narrativeContent");	
-			
-			Narrative narrative = new Narrative();
-			//convert current date to the format matched in DB
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-			String date = sdf.format(new Date()); 
-			
-			String editDate = date.toString();		
-			
-			narrative.setVolunteerId(loggedInVolunteerId);
-			narrative.setContents(content);
-			narrative.setTitle(title);
-			narrative.setEditDate(editDate);
-			narrative.setPatientId(patientId);
-			narrative.setAppointmentId(appointmentId);
-			
-			//add new narrative in narrative table in DB
-			narrativeDao.addNarrative(narrative);
-			//set complete narrative in Appointment table in DB
-			appointmentDao.completeNarrative(appointmentId);
-				
-			model.addAttribute("newNarrative", true);
-		}	
-		else
-		{			
-			System.out.println("Please select a patient or appointment first ");
-			logger.error("Please select a patient or appointment first===");
-		}		
+		Narrative narrative = new Narrative();
+		//convert current date to the format matched in DB
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		String date = sdf.format(new Date()); 
+		
+		String editDate = date.toString();		
+		
+		narrative.setVolunteerId(loggedInVolunteerId);
+		narrative.setContents(content);
+		narrative.setTitle(title);
+		narrative.setEditDate(editDate);
+		narrative.setPatientId(patientId);
+		narrative.setAppointmentId(appointmentId);
+		
+		//add new narrative in narrative table in DB
+		narrativeDao.addNarrative(narrative);
+		//set complete narrative in Appointment table in DB
+		appointmentDao.completeNarrative(appointmentId);		
+		
+		HttpSession session = request.getSession();
+		session.setAttribute("newNarrative", true);
 
-		Patient patient = patientDao.getPatientByID(patientId);
-		Appointment appt = appointmentDao.getAppointmentById(appointmentId);
-		model.addAttribute("appointment", appt);
-		model.addAttribute("patient", patient);
-	
-		return "/volunteer/alerts_keyObservations_plan";
+		return "redirect:/open_alerts_keyObservations/" + appointmentId;
 	}
 	
 	@RequestMapping(value="/delete_narrative/{narrativeId}", method=RequestMethod.GET)
@@ -1310,4 +1463,325 @@ public class AppointmentController{
 		
 		return appointmentId;
 	}
+	
+	private void generateReport(int patientId, int appointmentId){
+		
+		Patient patient = patientDao.getPatientByID(patientId);
+		//call web service to get patient info from myoscar
+		String userName = "carolchou.test";
+		try{
+			PersonTransfer3 personInMyoscar = ClientManager.getClientByUsername(userName);
+			StringBuffer sb = new StringBuffer();
+			if (personInMyoscar.getStreetAddress1() != null)
+				sb.append(personInMyoscar.getStreetAddress1());
+			String city = personInMyoscar.getCity();
+			if (city != null)
+			{
+				sb.append(", ");
+				sb.append(city);
+				patient.setCity(city);
+			}
+			
+			if (personInMyoscar.getProvince() != null)
+			{
+				sb.append(", ");
+				sb.append(personInMyoscar.getProvince());
+			}
+			
+			patient.setAddress(sb.toString());
+			
+			if (personInMyoscar.getBirthDate() != null)
+			{
+				Calendar birthDay = personInMyoscar.getBirthDate();
+				patient.setBod(Utils.getDateByCalendar(birthDay));
+			}
+			
+		} catch (Exception e){
+			System.err.println("Have some problems when calling myoscar web service");
+			
+		}
+		
+		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
+		Report report = new Report();		
+		
+		//Plan and Key Observations
+		String keyObservation = appointmentDao.getKeyObservationByAppointmentId(appointmentId);
+		String plan = appointmentDao.getPlanByAppointmentId(appointmentId);
+		appointment.setKeyObservation(keyObservation);
+		appointment.setPlans(plan);
+		
+		List<String> pList = new ArrayList<String>();
+		if (!Utils.isNullOrEmpty(plan))
+			pList = Arrays.asList(plan.split(","));		
+		
+		Map<String, String> pMap = new TreeMap<String, String>();
+		
+		for (int i = 1; i<= pList.size(); i++){
+			pMap.put(String.valueOf(i), pList.get(i-1));
+		}
+		
+//		model.addAttribute("patient", patient);
+//		model.addAttribute("appointment", appointment);
+//		model.addAttribute("plans", pMap);
+				
+		//Survey---  goals setting
+		List<SurveyResult> surveyResultList = surveyResultDao.getCompletedSurveysByPatientID(patientId);
+		SurveyResult healthGoalsSurvey = new SurveyResult();
+		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
+		SurveyResult nutritionSurvey = new SurveyResult();
+		SurveyResult rAPASurvey = new SurveyResult();
+		SurveyResult mobilitySurvey = new SurveyResult();
+		SurveyResult socialLifeSurvey = new SurveyResult();
+		SurveyResult generalHealthySurvey = new SurveyResult();
+		SurveyResult memorySurvey = new SurveyResult();
+		SurveyResult carePlanSurvey = new SurveyResult();
+		
+		
+		for(SurveyResult survey: surveyResultList){
+			int surveyId = survey.getSurveyID();
+			
+			if (surveyId == 10)//Goal Setting survey
+				healthGoalsSurvey = survey;
+			
+			if (surveyId == 11)//Daily life activity survey
+				dailyLifeActivitySurvey = survey;
+			
+			if (surveyId == 7)//Nutrition
+				nutritionSurvey = survey;
+			
+			if (surveyId == 12)//RAPA survey
+				rAPASurvey = survey;
+			
+			if (surveyId == 16)//Mobility survey
+				mobilitySurvey = survey;
+			
+			if (surveyId == 8) //Social Life(Duke Index of Social Support)
+				socialLifeSurvey = survey;
+			
+			if (surveyId == 9) //General Health(Edmonton Frail Scale)
+				generalHealthySurvey = survey;
+			
+			if (surveyId == 14) //Memory Survey
+				memorySurvey = survey;
+			
+			if (surveyId == 15) //Care Plan/Advanced_Directive survey
+				carePlanSurvey = survey;
+		}
+		
+		String xml;
+		//Healthy Goals
+   		try{
+   			xml = new String(healthGoalsSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mHealthGoalsSurvey = ResultParser.getResults(xml);
+   		List<String> qList = new ArrayList<String>();
+   		List<String> questionTextList = new ArrayList<String>();
+   		questionTextList = ResultParser.getSurveyQuestions(xml);
+   		//get answer list
+		qList = MisUtils.getQuestionList(mHealthGoalsSurvey);   
+		
+   		Map<String, String> sMap = new TreeMap<String, String>();
+   		sMap = MisUtils.getSurveyContentMap(questionTextList, qList);
+   		
+  		report.setHealthGoals(sMap);
+   		
+   		//Additional Information
+  		//Memory
+   		try{
+   			xml = new String(memorySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mMemorySurvey = ResultParser.getResults(xml);
+   		qList = new ArrayList<String>();
+   		questionTextList = new ArrayList<String>();
+   		questionTextList = ResultParser.getSurveyQuestions(xml);
+   		
+   		//only keep the second and forth question text in the list
+   		List<String> displayQuestionTextList = new ArrayList<String>();
+   		displayQuestionTextList.add(questionTextList.get(1));
+   		displayQuestionTextList.add(questionTextList.get(3));
+   		
+   		displayQuestionTextList = MisUtils.removeRedundantFromQuestionText(displayQuestionTextList, "of 2");
+   	
+   		//get answer list
+		qList = MisUtils.getQuestionListForMemorySurvey(mMemorySurvey);   					
+   		sMap = new TreeMap<String, String>(); 	
+   		
+   		//Care Plan/Advanced_Directive
+   		try{
+   			xml = new String(carePlanSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mCarePlanSurvey = ResultParser.getResults(xml);
+
+   		questionTextList = new ArrayList<String>();
+   		questionTextList = ResultParser.getSurveyQuestions(xml);
+   		
+   		//take 3 question text from the list
+   		for (int i = 1; i <= 3; i++)
+   			displayQuestionTextList.add(questionTextList.get(i));
+   		
+   		displayQuestionTextList = MisUtils.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");
+   		
+   		//get answer list   		
+   		qList.addAll(MisUtils.getQuestionList(mCarePlanSurvey));   	
+   		
+   		sMap = MisUtils.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
+   		report.setAdditionalInfos(sMap);	  			
+   			
+   			
+   		//Daily Life Activities
+   		try{
+   			xml = new String(dailyLifeActivitySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mDailyLifeActivitySurvey = ResultParser.getResults(xml);
+   		questionTextList = new ArrayList<String>();
+   		questionTextList = ResultParser.getSurveyQuestions(xml);   		
+   		
+   		qList = new ArrayList<String>();
+   		qList = MisUtils.getQuestionList(mDailyLifeActivitySurvey);
+   		
+   		//last question in Daily life activity survey is about falling stuff
+   		List<String> lAlert = new ArrayList<String>();
+   		String fallingQA = qList.get(qList.size() -1);
+   		if (fallingQA.contains("yes")||fallingQA.contains("fall"))
+   			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);   		
+   		   		
+   		sMap = new TreeMap<String, String>();
+   		sMap = MisUtils.getSurveyContentMap(questionTextList, qList);
+   		
+   		report.setDailyActivities(sMap);   		
+   		
+ 		//General Healthy Alert
+   		try{
+   			xml = new String(generalHealthySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+		
+		LinkedHashMap<String, String> mGeneralHealthySurvey = ResultParser.getResults(xml);
+		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = MisUtils.getQuestionList(mGeneralHealthySurvey);
+		
+		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
+		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert);
+		
+		//Social Life Alert
+		try{
+   			xml = new String(socialLifeSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+		
+		LinkedHashMap<String, String> mSocialLifeSurvey = ResultParser.getResults(xml);
+		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = MisUtils.getQuestionList(mSocialLifeSurvey);
+		
+		int socialLifeScore = CalculationManager.getScoreByQuestionsList(qList);
+		lAlert = AlertManager.getSocialLifeAlerts(socialLifeScore, lAlert);
+   		
+   		//Nutrition Alerts   		
+   		try{
+   			xml = new String(nutritionSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mNutritionSurvey = ResultParser.getResults(xml);
+   		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = MisUtils.getQuestionList(mNutritionSurvey);  
+
+		//get scores for nutrition survey based on answer list
+		int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
+		
+		//high nutrition risk alert
+		Map<String, String> nAlert = new TreeMap<String, String>();
+		lAlert = AlertManager.getNutritionAlerts(nutritionScore, lAlert, qList);
+		
+		//set alerts in report bean
+		if (nAlert != null && nAlert.size()>0)	
+			report.setAlerts(lAlert);
+		else
+			report.setAlerts(null);
+		
+		//RAPA Alert
+		try{
+   			xml = new String(rAPASurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mRAPASurvey = ResultParser.getResults(xml);
+   		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = MisUtils.getQuestionList(mRAPASurvey);  		
+
+		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
+		if (rAPAScore < 6)
+			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
+		
+		//Mobility Alerts
+		try{
+   			xml = new String(mobilitySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+		
+		LinkedHashMap<String, String> mMobilitySurvey = ResultParser.getResults(xml);
+   		Map<String, String> qMap = MisUtils.getQuestionMap(mMobilitySurvey);  
+   		   		
+   		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);   
+		
+		//send message to MyOscar test
+//		try{
+//			Long lll = ClientManager.sentMessageToPatientInMyOscar(new Long(15231), "Message From Tapestry", "Hello");
+//			System.out.println("lll is === "+ lll);
+//			
+//		} catch (Exception e){
+//			System.out.println("something wrong with myoscar server");
+//			e.printStackTrace();
+//		}
+		
+		
+		report.setAlerts(lAlert);
+		//end of alert
+		
+		//get volunteer information
+		String volunteer = appointment.getVolunteer();
+		String partner = appointment.getPartner();
+		String comments = appointment.getComments();
+				
+		Map<String, String> vMap = new TreeMap<String, String>();
+		
+		if (!Utils.isNullOrEmpty(volunteer))
+			vMap.put(" 1", volunteer);
+		else
+			vMap.put(" 1", "");
+		
+		if (!Utils.isNullOrEmpty(partner))
+			vMap.put(" 2", partner);
+		else
+			vMap.put(" 2", "");
+		
+		if (!Utils.isNullOrEmpty(comments))
+			vMap.put(" C", comments);					
+		else
+			vMap.put(" C", " ");
+		
+		report.setVolunteerInformations(vMap);
+	}
+	
 }

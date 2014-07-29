@@ -26,13 +26,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.tapestry.dao.ActivityDao;
-import org.tapestry.dao.AppointmentDao;
 import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.PictureDao;
 import org.tapestry.dao.UserDao;
 import org.tapestry.dao.VolunteerDao;
-import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.Organization;
 import org.tapestry.objects.Patient;
@@ -62,8 +60,7 @@ public class TapestryController{
 	private Yaml yaml;
 		
 	private UserDao userDao;
-   	private PatientDao patientDao;
-   	private AppointmentDao appointmentDao;
+   	private PatientDao patientDao;   	
    	private MessageDao messageDao;
    	private PictureDao pictureDao;   
    	private ActivityDao activityDao;
@@ -113,8 +110,7 @@ public class TapestryController{
 		
 		//Create the DAOs
 		userDao = new UserDao(database, dbUsername, dbPassword);
-		patientDao = new PatientDao(database, dbUsername, dbPassword);
-		appointmentDao = new AppointmentDao(database, dbUsername, dbPassword);
+		patientDao = new PatientDao(database, dbUsername, dbPassword);		
 		messageDao = new MessageDao(database, dbUsername, dbPassword);
 		pictureDao = new PictureDao(database, dbUsername, dbPassword);
 		activityDao = new ActivityDao(database, dbUsername, dbPassword);
@@ -161,82 +157,82 @@ public class TapestryController{
 		return "redirect:/";
 	}
 
-	@RequestMapping(value="/", method=RequestMethod.GET)
-	//Note that messageSent is Boolean, not boolean, to allow it to be null
-	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, 
-			@RequestParam(value="noMachedTime", required=false) String noMachedTime,
-			@RequestParam(value="patientId", required=false) Integer patientId, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		int unreadMessages;			
-		HttpSession session = request.getSession();
-			
-		if (request.isUserInRole("ROLE_USER"))
-		{
-			User loggedInUser = getLoggedInUser(request);
-			String username = loggedInUser.getUsername();	
-			
-			int userId = loggedInUser.getUserID();
-			//get volunteer Id from login user
-			int volunteerId = volunteerDao.getVolunteerIdByUsername(username);		
-			
-			session.setAttribute("logged_in_volunteer", volunteerId);
-			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);
-			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(userId);
-			
-			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
-			List<Appointment> pendingAppointments = new ArrayList<Appointment>();
-			List<Appointment> declinedAppointments = new ArrayList<Appointment>();
-			if(patientId != null) {				
-				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
-				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId, volunteerId);
-				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
-				
-				Patient patient = patientDao.getPatientByID(patientId);
-				model.addAttribute("patient", patient);
-				
-				//set patientId in the session for other screen, like narratives 
-				session.setAttribute("patientId", patientId);				
-			} 
-			else 
-			{
-				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(volunteerId);
-				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(volunteerId);
-				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);						
-			}
-			
-			model.addAttribute("approved_appointments", approvedAppointments);
-			model.addAttribute("pending_appointments", pendingAppointments);
-			model.addAttribute("declined_appointments", declinedAppointments);
-			model.addAttribute("name", loggedInUser.getName());
-			model.addAttribute("patients", patientsForUser);
-			
-			unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
-			model.addAttribute("unread", unreadMessages);	
-			model.addAttribute("announcements", announcements);
-			if (booked != null)
-				model.addAttribute("booked", booked);
-			
-			if (noMachedTime != null)
-				model.addAttribute("noMachedTime", noMachedTime);
-				
-			return "volunteer/index";
-		}
-		else if (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_LOCAL_ADMIN"))
-		{			
-//			String username = request.getUserPrincipal().getName();
-//			User loggedInUser = userDao.getUserByUsername(username);
-			User loggedInUser = getLoggedInUser(request);			
-			
-			unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-			model.addAttribute("unread", unreadMessages);
-			model.addAttribute("name", loggedInUser.getName());
-
-			return "admin/index";
-		}
-		else{ //This should not happen, but catch any unforseen behavior and logout			
-			return "redirect:/login";
-		}
-	}
+//	@RequestMapping(value="/", method=RequestMethod.GET)
+//	//Note that messageSent is Boolean, not boolean, to allow it to be null
+//	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, 
+//			@RequestParam(value="noMachedTime", required=false) String noMachedTime,
+//			@RequestParam(value="patientId", required=false) Integer patientId, 
+//			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+//		int unreadMessages;			
+//		HttpSession session = request.getSession();
+//			
+//		if (request.isUserInRole("ROLE_USER"))
+//		{
+//			User loggedInUser = getLoggedInUser(request);
+//			String username = loggedInUser.getUsername();	
+//			
+//			int userId = loggedInUser.getUserID();
+//			//get volunteer Id from login user
+//			int volunteerId = volunteerDao.getVolunteerIdByUsername(username);		
+//			
+//			session.setAttribute("logged_in_volunteer", volunteerId);
+//			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);
+//			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(userId);
+//			
+//			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
+//			List<Appointment> pendingAppointments = new ArrayList<Appointment>();
+//			List<Appointment> declinedAppointments = new ArrayList<Appointment>();
+//			if(patientId != null) {				
+//				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
+//				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId, volunteerId);
+//				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
+//				
+//				Patient patient = patientDao.getPatientByID(patientId);
+//				model.addAttribute("patient", patient);
+//				
+//				//set patientId in the session for other screen, like narratives 
+//				session.setAttribute("patientId", patientId);				
+//			} 
+//			else 
+//			{
+//				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(volunteerId);
+//				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(volunteerId);
+//				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);						
+//			}
+//			
+//			model.addAttribute("approved_appointments", approvedAppointments);
+//			model.addAttribute("pending_appointments", pendingAppointments);
+//			model.addAttribute("declined_appointments", declinedAppointments);
+//			model.addAttribute("name", loggedInUser.getName());
+//			model.addAttribute("patients", patientsForUser);
+//			
+//			unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
+//			model.addAttribute("unread", unreadMessages);	
+//			model.addAttribute("announcements", announcements);
+//			if (booked != null)
+//				model.addAttribute("booked", booked);
+//			
+//			if (noMachedTime != null)
+//				model.addAttribute("noMachedTime", noMachedTime);
+//				
+//			return "volunteer/index";
+//		}
+//		else if (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_LOCAL_ADMIN"))
+//		{			
+////			String username = request.getUserPrincipal().getName();
+////			User loggedInUser = userDao.getUserByUsername(username);
+//			User loggedInUser = getLoggedInUser(request);			
+//			
+//			unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+//			model.addAttribute("unread", unreadMessages);
+//			model.addAttribute("name", loggedInUser.getName());
+//
+//			return "admin/index";
+//		}
+//		else{ //This should not happen, but catch any unforseen behavior and logout			
+//			return "redirect:/login";
+//		}
+//	}
 
 	@RequestMapping(value="/loginfailed", method=RequestMethod.GET)
 	public String failed(ModelMap model){

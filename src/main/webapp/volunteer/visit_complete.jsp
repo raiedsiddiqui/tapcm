@@ -127,6 +127,7 @@
 	 		<h3> What does the clinic need to know about today's visit?
 			<br/>Example: unsafe walking, poor access to food, patient not behaving appropriately </h3><br />
 	 		<textarea  name="visitAlerts" id="visitAlerts"></textarea><br />
+	 		
 	 		<a href="<c:url value="/patient/${appointment.patientID}?appointmentId=${appointment.appointmentID}"/>" class="tleft btn btn-danger">Cancel</a>
  			<input class="completevisitbtn btn btn-primary pull-right" type="submit" value="Submit" />
  		</form>

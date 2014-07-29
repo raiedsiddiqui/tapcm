@@ -124,9 +124,7 @@ public class ClientManager {
 		
 		Long success = MessageManager.sendMessage(credentials, patientId, subject, contents);
 		return success;
-	}
-	
-	
+	}	
 	
 	private static Map<String, String> readMyOscarWSConfig()
 	{

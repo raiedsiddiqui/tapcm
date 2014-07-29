@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -87,6 +88,7 @@
 			<li><a href="">${appointment.date}</a></li>
 			<li><a href=""><b>Alerts and Key Observations</b></a></li>
 		</ul>
+		
 <!-- Message display 
 	<div id="visitandbook" class="span12 btn-group">
 			<c:if test="${not empty patient.notes}">
@@ -98,6 +100,15 @@
 			<a href="" role="button" class="btn btn-primary pull-right lgbtn" >Submit</a>
 	</div>	
 	-->
+	</div>
+	<div id="new_narrative">
+		<c:if test="${not empty newNarrative}">					
+			<div class ="alert alert-info"><spring:message code="message_newNarrative"/></div>
+		</c:if>	
+		
+		<c:if test="${not appointment.hasNarrative}">
+			<a href="<c:url value="/new_narrative"/>"><h2><button type="submit">Narrrative</button></h2></a> 
+		</c:if>  
 	</div>
 <!-- 	breadcrumb END-->	
 <form id="alertAndKeyObservationfrm" action="<c:url value="/saveAlertsAndKeyObservations"/>" method="post">

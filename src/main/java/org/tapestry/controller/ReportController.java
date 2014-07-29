@@ -109,9 +109,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			{
 				Calendar birthDay = personInMyoscar.getBirthDate();
 				patient.setBod(Utils.getDateByCalendar(birthDay));
-				
-//				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");					
-//				patient.setBod(sdf.format(birthday.getTime()));
 			}
 			
 		} catch (Exception e){
