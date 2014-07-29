@@ -333,6 +333,13 @@ input > #contacted {
 
 }
 
+#visitAlerts {
+	width:90%;
+	height: 200px;
+	font-size: 20px;
+	letter-spacing: 1px;
+	font-family: "Open Sans", sans-serif;
+}
 .lgbtn {
 	padding:6px 8px 6px 8px;
 	margin-right:20px;
