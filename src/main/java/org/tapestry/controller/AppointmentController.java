@@ -196,6 +196,9 @@ public class AppointmentController{
 			
 			unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
 			model.addAttribute("unread", unreadMessages);	
+			//save unreadMessages in sesion
+			session.setAttribute("unread_messages", unreadMessages);
+			
 			model.addAttribute("announcements", announcements);
 			if (booked != null)
 				model.addAttribute("booked", booked);
@@ -211,6 +214,9 @@ public class AppointmentController{
 			
 			unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
+			//save unreadMessages in sesion
+			session.setAttribute("unread_messages", unreadMessages);
+			
 			model.addAttribute("name", loggedInUser.getName());
 
 			return "admin/index";
@@ -224,6 +230,7 @@ public class AppointmentController{
    	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked,
    			@RequestParam(value="noMachedTime", required=false) String noMatchedMsg,
    			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+   		
    		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
    		ArrayList<Patient> allPatients = patientDao.getAllPatients();  		
    		List<Appointment> allPastAppointments = appointmentDao.getAllPastAppointments();
@@ -233,6 +240,16 @@ public class AppointmentController{
    		model.addAttribute("pastAppointments", allPastAppointments);   		
    		model.addAttribute("pendingAppointments", allPendingAppointments);   		
    		model.addAttribute("patients", allPatients);
+   		
+   		HttpSession session = request.getSession();
+		User loggedInUser = Utils.getLoggedInUser(request);
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		else
+		{
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+		}
    		
    		if(appointmentBooked != null)
    			model.addAttribute("success", appointmentBooked);
@@ -373,13 +390,12 @@ public class AppointmentController{
 		
 		if ((isAvailableForVolunteer(availability, vAvailability)) && (isAvailableForVolunteer(availability, pAvailability)))
 		{	//both volunteers are available, go to create an appointment for patient and send message to admin and volunteers
-			
 			a.setVolunteerID(p.getVolunteer());
 			a.setPartnerId(p.getPartner());
 			a.setPatientID(p.getPatientID());
 			a.setDate(date);
 			a.setTime(time);
-		
+			
 			if (isFirstVisit(patientId))
 				a.setType(0);//first visit
 			else
@@ -416,7 +432,7 @@ public class AppointmentController{
 					{				
 						sendMessageToInbox(msg, userId, volunteer1UserId);//send message to volunteer1 
 						sendMessageToInbox(msg, userId, volunteer2UserId);//send message to volunteer2
-						sendMessageToInbox(msg, userId, userId);//send message to admin self	
+				//		sendMessageToInbox(msg, userId, userId);//send message to admin self	
 					}
 					else //send message for user login as volunteer
 					{						
@@ -433,7 +449,7 @@ public class AppointmentController{
 							logger.error("Can't find any coordinator in organization id# " + organizationId);
 						}
 						
-						sendMessageToInbox(msg, volunteer1UserId, volunteer1UserId);//send message to volunteer his/her self
+				//		sendMessageToInbox(msg, volunteer1UserId, volunteer1UserId);//send message to volunteer his/her self
 					}						
 				}
 				else  //send mail if mail address is null

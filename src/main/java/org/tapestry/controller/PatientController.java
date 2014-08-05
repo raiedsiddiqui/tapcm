@@ -138,8 +138,14 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
 	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
    		User loggedInUser = Utils.getLoggedInUser(request);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-		model.addAttribute("unread", unreadMessages);		
+   		HttpSession session = request.getSession();
+   		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		else
+		{
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+		}	
 		loadPatientsAndVolunteers(model);
 
 		return "admin/manage_patients";
@@ -350,8 +356,19 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	
 	@RequestMapping(value="/view_clients_admin", method=RequestMethod.GET)
 	public String viewPatientsFromAdmin(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		HttpSession session = request.getSession();
+		User loggedInUser = Utils.getLoggedInUser(request);
+		
 		List<Patient> patients = MisUtils.getAllPatientsWithFullInfos(patientDao, request);
 		model.addAttribute("patients", patients);
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		else
+		{
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+		}
 		
 		return "/admin/view_clients";
 	}

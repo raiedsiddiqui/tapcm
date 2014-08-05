@@ -157,83 +157,6 @@ public class TapestryController{
 		return "redirect:/";
 	}
 
-//	@RequestMapping(value="/", method=RequestMethod.GET)
-//	//Note that messageSent is Boolean, not boolean, to allow it to be null
-//	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, 
-//			@RequestParam(value="noMachedTime", required=false) String noMachedTime,
-//			@RequestParam(value="patientId", required=false) Integer patientId, 
-//			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-//		int unreadMessages;			
-//		HttpSession session = request.getSession();
-//			
-//		if (request.isUserInRole("ROLE_USER"))
-//		{
-//			User loggedInUser = getLoggedInUser(request);
-//			String username = loggedInUser.getUsername();	
-//			
-//			int userId = loggedInUser.getUserID();
-//			//get volunteer Id from login user
-//			int volunteerId = volunteerDao.getVolunteerIdByUsername(username);		
-//			
-//			session.setAttribute("logged_in_volunteer", volunteerId);
-//			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);
-//			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(userId);
-//			
-//			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
-//			List<Appointment> pendingAppointments = new ArrayList<Appointment>();
-//			List<Appointment> declinedAppointments = new ArrayList<Appointment>();
-//			if(patientId != null) {				
-//				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
-//				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId, volunteerId);
-//				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
-//				
-//				Patient patient = patientDao.getPatientByID(patientId);
-//				model.addAttribute("patient", patient);
-//				
-//				//set patientId in the session for other screen, like narratives 
-//				session.setAttribute("patientId", patientId);				
-//			} 
-//			else 
-//			{
-//				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(volunteerId);
-//				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(volunteerId);
-//				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);						
-//			}
-//			
-//			model.addAttribute("approved_appointments", approvedAppointments);
-//			model.addAttribute("pending_appointments", pendingAppointments);
-//			model.addAttribute("declined_appointments", declinedAppointments);
-//			model.addAttribute("name", loggedInUser.getName());
-//			model.addAttribute("patients", patientsForUser);
-//			
-//			unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
-//			model.addAttribute("unread", unreadMessages);	
-//			model.addAttribute("announcements", announcements);
-//			if (booked != null)
-//				model.addAttribute("booked", booked);
-//			
-//			if (noMachedTime != null)
-//				model.addAttribute("noMachedTime", noMachedTime);
-//				
-//			return "volunteer/index";
-//		}
-//		else if (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_LOCAL_ADMIN"))
-//		{			
-////			String username = request.getUserPrincipal().getName();
-////			User loggedInUser = userDao.getUserByUsername(username);
-//			User loggedInUser = getLoggedInUser(request);			
-//			
-//			unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-//			model.addAttribute("unread", unreadMessages);
-//			model.addAttribute("name", loggedInUser.getName());
-//
-//			return "admin/index";
-//		}
-//		else{ //This should not happen, but catch any unforseen behavior and logout			
-//			return "redirect:/login";
-//		}
-//	}
-
 	@RequestMapping(value="/loginfailed", method=RequestMethod.GET)
 	public String failed(ModelMap model){
 		model.addAttribute("error", "true");
@@ -268,11 +191,9 @@ public class TapestryController{
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
 	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model,
 			SecurityContextHolderAwareRequestWrapper request){
-		User loggedInUser = getLoggedInUser(request);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+		setUnreadMessage(request, model);
 		HttpSession session = request.getSession();
 		
-		model.addAttribute("unread", unreadMessages);
 		ArrayList<User> userList = userDao.getAllUsers();
 		model.addAttribute("users", userList);
 		model.addAttribute("active", userDao.countActiveUsers());
@@ -401,35 +322,6 @@ public class TapestryController{
 		return "redirect:/manage_users";
 	}
 	
-//	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
-//	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
-//		
-//		Appointment appointment = appointmentDao.getAppointmentById(id);
-//		int unreadMessages = messageDao.countUnreadMessagesForRecipient(appointment.getVolunteerID());
-//		model.addAttribute("unread", unreadMessages);
-//		Patient patient = patientDao.getPatientByID(appointment.getPatientID());
-//		model.addAttribute("appointment", appointment);
-//		model.addAttribute("patient", patient);
-//		return "/volunteer/visit_complete";
-//	}
-//	
-//	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
-//	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
-////		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
-////		appointmentDao.completeAppointment(id, request.getParameter("comments"), contactedAdmin);
-//		//return "redirect:/";
-//		Appointment appt = appointmentDao.getAppointmentById(id);
-//		System.out.println("here is alert input...");
-//		String alert = request.getParameter("visitAlerts");
-//		System.out.println("and alert input is ..." + alert);
-//		int patientId = appt.getPatientID();
-//		Patient patient = patientDao.getPatientByID(patientId);
-//				
-//		model.addAttribute("appointment", appt);
-//		model.addAttribute("patient", patient);
-//		return "/volunteer/alerts_keyObservations_plan";
-//	}
-	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
 	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, @RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 	
@@ -451,8 +343,7 @@ public class TapestryController{
 			required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = getLoggedInUser(request);
 		int userId = loggedInUser.getUserID();
-		List<Message> messages;
-		int unreadMessages;	
+		List<Message> messages;		
 		
 		if (messageSent != null)
 			model.addAttribute("success", messageSent);
@@ -460,11 +351,9 @@ public class TapestryController{
 			model.addAttribute("failure", messageFailed);
 		
 		messages = messageDao.getAllMessagesForRecipient(userId);
-		model.addAttribute("messages", messages);
-		
-		unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
-		model.addAttribute("unread", unreadMessages);
-		
+		model.addAttribute("messages", messages);		
+		setUnreadMessage(request, model);
+			
 		if (request.isUserInRole("ROLE_USER"))
 		{
 			ArrayList<User> administrators = userDao.getAllUsersWithRole("ROLE_ADMIN");
@@ -705,24 +594,42 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.GET)
-	public String viewUserLogs(@PathVariable("page") int page, SecurityContextHolderAwareRequestWrapper request, ModelMap m){
+	public String viewUserLogs(@PathVariable("page") int page, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		List<UserLog> logs = activityDao.getUserLogsPage((page - 1) * 20, 20);
 		int count = activityDao.countEntries();
 		
-		m.addAttribute("numPages", count / 20 + 1);
-		m.addAttribute("logs", logs);
+		model.addAttribute("numPages", count / 20 + 1);
+		model.addAttribute("logs", logs);
+		
+		setUnreadMessage(request, model);
+		
 		return "/admin/user_logs";
 	}
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.POST)
-	public String viewFilteredUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap m){
+	public String viewFilteredUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		List<UserLog> logs = new ArrayList<UserLog>();
 		String name = request.getParameter("name");
 		
 		logs = activityDao.getUserLogsByPartialName(name);
 
-		m.addAttribute("logs", logs);
+		model.addAttribute("logs", logs);
+		
+		setUnreadMessage(request, model);
+		
 		return "/admin/user_logs";
+	}
+	
+	private void setUnreadMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		HttpSession session = request.getSession();
+		User loggedInUser = Utils.getLoggedInUser(request);
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		else
+		{
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+		}
 	}
 	
 	private User getLoggedInUser(SecurityContextHolderAwareRequestWrapper request){

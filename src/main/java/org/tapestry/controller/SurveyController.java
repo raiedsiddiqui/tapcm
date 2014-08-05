@@ -92,23 +92,34 @@ public class SurveyController{
    	}
    	
 	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
-	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, ModelMap model){
+	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
 		model.addAttribute("survey_templates", surveyTemplateList);
 		if (deleteFailed != null)
 			model.addAttribute("failed", deleteFailed);
+		
+		HttpSession session = request.getSession();
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
+		
 		return "admin/manage_survey_templates";
 	}
 	
 	@RequestMapping(value="/manage_survey", method=RequestMethod.GET)
-	public String manageSurvey(@RequestParam(value="failed", required=false) String failed, Boolean deleteFailed,
+	public String manageSurvey(@RequestParam(value="failed", required=false) String failed, Boolean deleteFailed, 
 			ModelMap model, HttpServletRequest request){
-
+		HttpSession session = request.getSession();
 		List<SurveyTemplate>  surveyTemplateList = getSurveyTemplates(request);		
 		model.addAttribute("survey_templates", surveyTemplateList);
 		
 		if (deleteFailed != null)
 			model.addAttribute("failed", deleteFailed);
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 
 		return "admin/manage_survey";
 	}	

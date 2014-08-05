@@ -699,11 +699,7 @@ public class AppointmentDao {
     		statement.setInt(1, a.getVolunteerID());
     		statement.setInt(2, a.getPatientID());
     		statement.setString(3, a.getDate() + " " + a.getTime());
-    		
-    		if (!Utils.isNullOrEmpty(a.getPartner()))
-    			statement.setString(4, a.getPartner());
-    		else 
-    			statement.setString(4, null);
+    		statement.setInt(4, a.getPartnerId());	
     		statement.setString(5, "Awaiting Approval");
     		statement.setInt(6, a.getType());
     		
