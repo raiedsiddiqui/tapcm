@@ -97,6 +97,9 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		HttpSession  session = request.getSession();	
 		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
 		volunteers = volunteerDao.getAllVolunteers();		
 		model.addAttribute("volunteers", volunteers);	
 		
@@ -631,6 +634,15 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		model.addAttribute("activityLogs", activities);	
 		model.addAttribute("volunteers", volunteers);	
+		
+		HttpSession session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		else
+		{
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+		}
 			
 		return "/admin/view_activityLogs";
 	}
