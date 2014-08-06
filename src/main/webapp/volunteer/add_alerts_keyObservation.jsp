@@ -9,25 +9,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Tapestry Volunteer Add Alerts, KeyObservation for Appointment</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
-		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
-
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
-
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
-		
-		<!-- CUSTOM CSS -->
-	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
-	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" /> 
-     
-
-	  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+<%@include file="volunteer_head.jsp" %>
 	<!-- 	CUSTOM CSS END -->
 		
 		<style type="text/css">
@@ -111,16 +93,45 @@
 		</c:if>  
 	</div>
 <!-- 	breadcrumb END-->	
-<form id="alertAndKeyObservationfrm" action="<c:url value="/saveAlertsAndKeyObservations"/>" method="post">
-<h2>Alerts       <button type="submit" align="right">Submit</button><input type="button" class="btn btn-primary" value="Cancel" onclick="javascript:history.go(-1)"></h2>
+	<form id="alertAndKeyObservationfrm" action="<c:url value="/saveAlertsAndKeyObservations"/>" method="post">
+		<div class="row">
+			<div class="col-md-12">
+				<h2>Alerts</h2>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<p>Are there any alerts that the physcian should be aware of ? </p><br/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<input type="textarea" id="visitAlerts" class="form-control" rows="8" cols="100" name="alerts"/><br/>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<h2>Key Observations</h2>
+			</div>
+		</div>
 
-<br/>
-<h3>Are there any alerts that the physcian should be aware of ? </h3><br/>
-<input type="textarea" class="form-control" rows="8" cols="100" name="alerts"/><br/>
-<h2>Key Observations</h2><br/>
-<h3>Please enter the key observations in the text box below</h3>	
-<input type="textarea" class="form-control" rows="8" cols="100" name="keyObservations"/><br/>
+		<div class="row">
+			<div class="col-md-12">
+				<p>Please enter the key observations in the text box below</p>	
+			</div>
+		</div>
 
-</form>
+		<div class="row">
+			<div class="col-md-12">
+				<input id="visitAlerts" type="textarea" class="form-control" rows="8" cols="100" name="keyObservations"/><br/>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<button type="submit" align="right">Submit</button><input type="button" class="btn btn-primary" value="Cancel" onclick="javascript:history.go(-1)">
+			</div>
+		</div>
+	</form>
 </body>
 </html>
