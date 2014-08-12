@@ -84,7 +84,7 @@ public class AlertManager {
 			
 		if (("1".equals(a2aValue))&&(("2".equals(a2bValue))||("3".equals(a2bValue))||("4".equals(a2bValue))||("5".equals(a2bValue))))
 			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT1);
-		
+				
 		if ("2".equals(a2aValue))
 			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT2);
 		

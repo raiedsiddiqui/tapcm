@@ -58,11 +58,7 @@
 				<div class="alert alert-error"><spring:message code="message_volunteer_exist"/></div>
 			</c:if>
 				<form id="add_volunteer" action="<c:url value="/add_volunteer"/>" method="POST">
-					<fieldset>
-						<table>
-							<tr>
-								<td colspan='3'></td>
-							</tr>
+					<fieldset>						
 							<div class="row form-group">
 								<div class="col-md-4">
 									<label>First Name:</label>

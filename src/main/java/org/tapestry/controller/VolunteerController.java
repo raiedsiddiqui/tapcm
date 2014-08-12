@@ -437,6 +437,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 	}
 	
+
 	private void modifyUser(Volunteer volunteer){				
 		User user = userDao.getUserByUsername(volunteer.getUserName());
 		
@@ -821,6 +822,88 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		session.setAttribute("ActivityMessage","U");
 		return "redirect:/view_activity";	
 	}
+	
+	//Organizations		
+	@RequestMapping(value="/view_organizations", method=RequestMethod.GET)
+	public String getOganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		List<Organization> organizations = new ArrayList<Organization>();
+		HttpSession  session = request.getSession();	
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
+		organizations = volunteerDao.getAllOrganizations();		
+		model.addAttribute("organizations", organizations);	
+		
+		if (session.getAttribute("organizatioMessage") != null)
+		{
+			String message = session.getAttribute("organizatioMessage").toString();
+			
+			if ("C".equals(message)){
+				model.addAttribute("organizationCreated", true);
+				session.removeAttribute("organizatioMessage");
+			}
+//			else if ("D".equals(message)){
+//				model.addAttribute("volunteerDeleted", true);
+//				session.removeAttribute("volunteerMessage");
+//			}
+//			else if ("U".equals(message)){
+//				model.addAttribute("volunteerUpdate", true);
+//				session.removeAttribute("volunteerMessage");
+//			}			
+		}		
+		return "/admin/view_organizations";
+	}
+	
+	//display all volunteers with search criteria
+	@RequestMapping(value="/view_organizations", method=RequestMethod.POST)
+	public String viewFilteredOrganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		List<Organization> organizations = new ArrayList<Organization>();
+		
+		String name = request.getParameter("searchName");
+		if(!Utils.isNullOrEmpty(name)) {
+			organizations = volunteerDao.getOrganizationsByName(name);			
+		} 		
+		model.addAttribute("searchName", name);
+		model.addAttribute("organizations", organizations);	
+		return "/admin/view_organizations";
+	}
+	
+	@RequestMapping(value="/new_organization", method=RequestMethod.GET)
+	public String newOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		
+		return "/admin/add_organization";
+	}
+	
+	//create a new volunteer and save in the table of volunteers and users in the DB
+	@RequestMapping(value="/add_organization", method=RequestMethod.POST)
+	public String addOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){					
+			
+			Organization organization = new Organization();
+			
+			organization.setName(request.getParameter("name").trim());
+			organization.setCity(request.getParameter("city"));
+			organization.setPrimaryContact(request.getParameter("primaryContact"));
+			organization.setPrimaryPhone(request.getParameter("primaryPhone"));
+			organization.setSecondaryContact(request.getParameter("secondaryContact"));
+			organization.setSecondaryPhone(request.getParameter("secondaryPhone"));
+			organization.setStreetNumbet(request.getParameter("streetNumber"));
+			organization.setStreetName(request.getParameter("streetName"));
+			organization.setPostCode(request.getParameter("postCode"));
+			organization.setProvince(request.getParameter("province"));		
+			organization.setCountry(request.getParameter("country"));
+			
+			if (volunteerDao.addOrganization(organization))
+			{
+				HttpSession session = request.getSession();
+				session.setAttribute("organizatioMessage", "C");				
+				
+			}
+			
+			return "redirect:/view_organizations";
+			
+		}	
+
 		
 	private int getLoggedInVolunteerId(SecurityContextHolderAwareRequestWrapper request)
 	{			

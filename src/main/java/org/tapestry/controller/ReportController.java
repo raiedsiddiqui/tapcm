@@ -29,6 +29,7 @@ import org.tapestry.objects.Report;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.report.AlertManager;
 import org.tapestry.report.AlertsInReport;
+import org.tapestry.report.ScoresInReport;
 import org.tapestry.surveys.ResultParser;
 import org.tapestry.report.CalculationManager;
 import org.yaml.snakeyaml.Yaml;
@@ -118,6 +119,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
 		Report report = new Report();		
+		ScoresInReport scores = new ScoresInReport();
 		
 		//Plan and Key Observations
 		String keyObservation = appointmentDao.getKeyObservationByAppointmentId(appointmentId);
@@ -155,32 +157,33 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		for(SurveyResult survey: surveyResultList){
 			int surveyId = survey.getSurveyID();
+			String title = survey.getSurveyTitle();
 			
-			if (surveyId == 10)//Goal Setting survey
+			if (title.equalsIgnoreCase("Goal Setting"))//Goal Setting survey
 				healthGoalsSurvey = survey;
 			
-			if (surveyId == 11)//Daily life activity survey
+			if (title.equalsIgnoreCase("Daily Life Activities"))//Daily life activity survey
 				dailyLifeActivitySurvey = survey;
 			
-			if (surveyId == 7)//Nutrition
+			if (title.equalsIgnoreCase("Nutrition"))//Nutrition
 				nutritionSurvey = survey;
 			
-			if (surveyId == 12)//RAPA survey
+			if (title.equalsIgnoreCase("Rapid Assessment of Physical Activity"))//RAPA survey
 				rAPASurvey = survey;
 			
-			if (surveyId == 16)//Mobility survey
+			if (title.equalsIgnoreCase("Mobility Survey"))//Mobility survey
 				mobilitySurvey = survey;
 			
-			if (surveyId == 8) //Social Life(Duke Index of Social Support)
+			if (title.equalsIgnoreCase("Social Life")) //Social Life(Duke Index of Social Support)
 				socialLifeSurvey = survey;
 			
-			if (surveyId == 9) //General Health(Edmonton Frail Scale)
+			if (title.equalsIgnoreCase("General Health")) //General Health(Edmonton Frail Scale)
 				generalHealthySurvey = survey;
 			
-			if (surveyId == 14) //Memory Survey
+			if (title.equalsIgnoreCase("Memory")) //Memory Survey
 				memorySurvey = survey;
 			
-			if (surveyId == 15) //Care Plan/Advanced_Directive survey
+			if (title.equalsIgnoreCase("Advance_Directives")) //Care Plan/Advanced_Directive survey
 				carePlanSurvey = survey;
 		}
 		
@@ -290,9 +293,37 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		//get answer list
 		qList = getQuestionList(mGeneralHealthySurvey);
 		
+		//get score info for Summary of tapestry tools
+		if ("1".equals(qList.get(0))) 
+			scores.setClockDrawingTest("No errors");
+		else if ("2".equals(qList.get(0))) 
+			scores.setClockDrawingTest("Minor spacing errors");
+		else if ("3".equals(qList.get(0))) 
+			scores.setClockDrawingTest("Other errors");
+		else 
+			scores.setClockDrawingTest("Not done");
+		
+		if ("1".equals(qList.get(10))) 
+			scores.setTimeUpGoTest("1 (0-10s)");
+		else if ("2".equals(qList.get(10))) 
+			scores.setTimeUpGoTest("2 (11-20s)");
+		else if ("3".equals(qList.get(10))) 
+			scores.setTimeUpGoTest("3 (More than 20s)");
+		else if ("4".equals(qList.get(10))) 
+			scores.setTimeUpGoTest("4 (Patient required assistance)");
+		else 
+			scores.setTimeUpGoTest("5 (Patient is unwilling)");		
+		
 		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
 		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert);
 		
+		if (generalHealthyScore < 5)
+			scores.setEdmontonFrailScale(String.valueOf(generalHealthyScore) + " (Robust)");
+		else if (generalHealthyScore < 7)
+			scores.setEdmontonFrailScale(String.valueOf(generalHealthyScore) + " (Apparently Vulnerable)");
+		else
+			scores.setEdmontonFrailScale(String.valueOf(generalHealthyScore) + " (Frail)");		
+	
 		//Social Life Alert
 		try{
    			xml = new String(socialLifeSurvey.getResults(), "UTF-8");
@@ -307,7 +338,13 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		int socialLifeScore = CalculationManager.getScoreByQuestionsList(qList);
 		lAlert = AlertManager.getSocialLifeAlerts(socialLifeScore, lAlert);
-   		
+		
+		//summmary tools for social supports
+		int satisfactionScore = CalculationManager.getScoreByQuestionsList(qList.subList(0, 6));
+		scores.setSocialSatisfication(satisfactionScore);
+		int networkScore = CalculationManager.getScoreByQuestionsList(qList.subList(6, 10));
+   		scores.setSocialNetwork(networkScore);
+   		   		
    		//Nutrition Alerts   		
    		try{
    			xml = new String(nutritionSurvey.getResults(), "UTF-8");
@@ -322,7 +359,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 
 		//get scores for nutrition survey based on answer list
 		int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
-		
+		scores.setNutritionScreen(nutritionScore);
 		//high nutrition risk alert
 		Map<String, String> nAlert = new TreeMap<String, String>();
 		lAlert = AlertManager.getNutritionAlerts(nutritionScore, lAlert, qList);
@@ -349,6 +386,9 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
 		
+		scores.setPhysicalActivity(rAPAScore);
+		System.out.println("physical score is  === " + rAPAScore);
+		
 		//Mobility Alerts
 		try{
    			xml = new String(mobilitySurvey.getResults(), "UTF-8");
@@ -359,8 +399,33 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		LinkedHashMap<String, String> mMobilitySurvey = ResultParser.getResults(xml);
    		Map<String, String> qMap = getQuestionMap(mMobilitySurvey);  
    		   		
-   		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);   
-		
+   		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);    		
+   		
+   		//summary tools for Mobility
+   		for (int i = 0; i < lAlert.size(); i++)
+   		{
+   			if (lAlert.get(i).contains("2.0"))
+   				scores.setMobilityWalking2(lAlert.get(i));
+   			
+   			if (lAlert.get(i).contains("0.5"))
+   				scores.setMobilityWalkingHalf(lAlert.get(i));
+   			
+   			if (lAlert.get(i).contains("climbing"))
+   				scores.setMobilityClimbing(lAlert.get(i));   			
+   		}
+   		
+   		String noLimitation = "No Limitation";   		
+   		if (Utils.isNullOrEmpty(scores.getMobilityWalking2()))
+   			scores.setMobilityWalking2(noLimitation);
+   		
+   		if (Utils.isNullOrEmpty(scores.getMobilityWalkingHalf()))
+   			scores.setMobilityWalkingHalf(noLimitation);
+   		
+   		if (Utils.isNullOrEmpty(scores.getMobilityClimbing()))
+   			scores.setMobilityClimbing(noLimitation);
+   		
+   		model.addAttribute("scores", scores);
+   		
 		//send message to MyOscar test
 //		try{
 //			Long lll = ClientManager.sentMessageToPatientInMyOscar(new Long(15231), "Message From Tapestry", "Hello");

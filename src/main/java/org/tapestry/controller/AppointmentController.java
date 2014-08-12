@@ -828,32 +828,33 @@ public class AppointmentController{
 		
 		int patientId = getPatientId(request);		
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);		
-				
-		if (!Utils.isNullOrEmpty(appointment.getComments()))
-		{System.out.println("alert is ==="  +  appointment.getComments());
-			if (completedAllSurveys(patientId))
-			{System.out.println("in save alerts and keyobservation, for first visit there is alert and finish all servey, and and go to Plan");
-				return "redirect:/open_plan/" + appointmentId ;			
-			}
-			else
-			{System.out.println("in save alerts and keyobservation, for first visit there is alert and not finish all servey, and and go Home");
-				//send alert to MRP
-				return "redirect:/";
-			}
-		}
-		else//no alert, no complete surveys
+		
+		if (completedAllSurveys(patientId))
+			return "redirect:/open_plan/" + appointmentId ;	
+		else 
 		{
-			if (completedAllSurveys(patientId))
-			{System.out.println("in save alerts and keyobservation, for fowllowup visit there is no alert and finish all servey, "
-					+ "and and go to Plan");
-				return "redirect:/open_plan/" + appointmentId ;		
+			if (!Utils.isNullOrEmpty(appointment.getComments()))
+			{//send alert to MRP	
+				
 			}
-			else
-			{System.out.println("in save alerts and keyobservation, for fowllowup visit there is no alert and not finish all servey, "
-					+ "and and go to Plan");
-				return "redirect:/";
-			}
+				
+			return "redirect:/";	
 		}
+				
+//		if (!Utils.isNullOrEmpty(appointment.getComments()))
+//		{
+//			if (completedAllSurveys(patientId))
+//				return "redirect:/open_plan/" + appointmentId ;	
+//			else //send alert to MRP				
+//				return "redirect:/";
+//		}
+//		else//no alert, no complete surveys
+//		{
+//			if (completedAllSurveys(patientId))
+//				return "redirect:/open_plan/" + appointmentId ;	
+//			else
+//				return "redirect:/";
+//		}
 	}
 	
 	/**

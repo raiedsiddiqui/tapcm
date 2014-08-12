@@ -9,7 +9,10 @@ public class Organization {
 	String province;
 	String country;
 	String postCode;
-	String phone;
+	String primaryPhone;
+	String primaryContact;
+	String secondaryContact;
+	String secondaryPhone;
 	
 	public Organization(){
 		
@@ -79,12 +82,36 @@ public class Organization {
 		this.postCode = postCode;
 	}
 
-	public String getPhone() {
-		return phone;
+	public String getPrimaryPhone() {
+		return primaryPhone;
 	}
 
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setPrimaryPhone(String primaryPhone) {
+		this.primaryPhone = primaryPhone;
+	}
+
+	public String getPrimaryContact() {
+		return primaryContact;
+	}
+
+	public void setPrimaryContact(String primaryContact) {
+		this.primaryContact = primaryContact;
+	}
+
+	public String getSecondaryContact() {
+		return secondaryContact;
+	}
+
+	public void setSecondaryContact(String secondaryContact) {
+		this.secondaryContact = secondaryContact;
+	}
+
+	public String getSecondaryPhone() {
+		return secondaryPhone;
+	}
+
+	public void setSecondaryPhone(String secondaryPhone) {
+		this.secondaryPhone = secondaryPhone;
 	}
 
 	
