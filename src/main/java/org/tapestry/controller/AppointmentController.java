@@ -336,13 +336,23 @@ public class AppointmentController{
    	
    	@RequestMapping(value="/book_appointment", method=RequestMethod.GET)
 	public String goAddAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-   		List<Patient> patients = getPatients();
-   		model.addAttribute("patients", patients);
+   		List<Patient> patients = new ArrayList<Patient>();
    		
    		if (request.isUserInRole("ROLE_USER"))
+   		{
+   			int loggedInVolunteer = MisUtils.getLoggedInVolunteerId(request);
+   			patients = patientDao.getPatientsForVolunteer(loggedInVolunteer);
+   			model.addAttribute("patients", patients);
+   			
    			return "/volunteer/volunteer_book_appointment";
+   		}
    		else
-   			return "/admin/admin_book_appointment";	   		
+   		{
+   			patients = getPatients();
+   	   		model.addAttribute("patients", patients);
+   	   		
+   			return "/admin/admin_book_appointment";	 
+   		}
    	}
    	
    	@RequestMapping(value="/out_book_appointment", method=RequestMethod.GET)

@@ -198,10 +198,9 @@ public class PatientDao {
     	//check if it is new record in DB
     	if(!isExist(p)){
     		try{
-//    			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
-//    					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, availability) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
        			statement = con.prepareStatement("INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
-    					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, username) VALUES (?, ?, ?, ?,"
+    					+ " ?, ?, ?, ?, ?, ?, ?)");
     			statement.setString(1, p.getFirstName());
     			statement.setString(2, p.getLastName());
     			statement.setString(3, p.getPreferredName());
@@ -212,7 +211,7 @@ public class PatientDao {
     			statement.setString(8, p.getAlerts());
     			statement.setString(9, p.getMyoscarVerified());
     			statement.setString(10, p.getClinic());
- //   			statement.setString(11, p.getAvailability());
+    			statement.setString(11, "tapestry_patient");
     			
     			statement.execute();
     		} catch (SQLException e){
