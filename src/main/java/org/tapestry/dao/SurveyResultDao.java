@@ -389,4 +389,25 @@ public class SurveyResultDao
 			}
 		}
 	}
+	
+	public int countCompletedSurveys(int patientId){
+		try{
+			statement = con.prepareStatement("SELECT COUNT(*) as c FROM survey_results WHERE (patient_ID=?) AND (completed=1)");
+			statement.setInt(1, patientId);
+			
+			ResultSet result = statement.executeQuery();
+			result.first();
+			return result.getInt("c");
+		} catch (SQLException e){
+			System.out.println("Error: Could not count completed surveys ");
+			e.printStackTrace();
+			return 0;
+		} finally {
+    		try{
+    			statement.close();
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+	}
 }

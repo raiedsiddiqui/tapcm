@@ -3,41 +3,35 @@ package org.tapestry.objects;
 import java.util.List;
 import java.util.Map;
 
+import org.tapestry.report.ScoresInReport;
+
 public class Report {
 	private List<String> alerts;
-	private String keyObservations;
-	private List<String> plans;
 	private Map<String, String> healthGoals;
 	private Map<String, String> dailyActivities;
 	private Map<String, String> volunteerInformations;
 	private Map<String, String> additionalInfos;
-	
+	private Patient patient;
+	private Appointment appointment;
+	private ScoresInReport scores;
+
 	public Report(){}
 
 	public List<String> getAlerts() {
 		return alerts;
 	}
 
+	public ScoresInReport getScores() {
+		return scores;
+	}
+
+	public void setScores(ScoresInReport scores) {
+		this.scores = scores;
+	}
+
 	public void setAlerts(List<String> alerts) {
 		this.alerts = alerts;
 	}
-
-	public String getKeyObservations() {
-		return keyObservations;
-	}
-
-	public void setKeyObservations(String keyObservations) {
-		this.keyObservations = keyObservations;
-	}
-
-	public List<String> getPlans() {
-		return plans;
-	}
-
-	public void setPlans(List<String> plans) {
-		this.plans = plans;
-	}
-
 	public Map<String, String> getHealthGoals() {
 		return healthGoals;
 	}
@@ -68,6 +62,22 @@ public class Report {
 
 	public void setAdditionalInfos(Map<String, String> additionalInfos) {
 		this.additionalInfos = additionalInfos;
+	}
+	
+	public Patient getPatient() {
+		return patient;
+	}
+
+	public void setPatient(Patient patient) {
+		this.patient = patient;
+	}
+
+	public Appointment getAppointment() {
+		return appointment;
+	}
+
+	public void setAppointment(Appointment appointment) {
+		this.appointment = appointment;
 	}
 	
 }

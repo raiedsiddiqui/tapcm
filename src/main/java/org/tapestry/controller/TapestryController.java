@@ -497,7 +497,21 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/delete_message/{msgID}", method=RequestMethod.GET)
-	public String deleteMessage(@PathVariable("msgID") int id, ModelMap model){
+	public String deleteMessage(SecurityContextHolderAwareRequestWrapper request, 
+			@RequestParam(value="isRead", required=true) boolean isRead, @PathVariable("msgID") int id, ModelMap model)
+	{//if an unread message is deleted, unread indicator should be modified
+		if (!isRead){
+			HttpSession session = request.getSession();
+			if (session.getAttribute("unread_messages") != null)
+			{				
+				int iUnRead = Integer.parseInt(session.getAttribute("unread_messages").toString());
+				iUnRead = iUnRead - 1;
+				
+				session.setAttribute("unread_messages", iUnRead);
+				model.addAttribute("unread", iUnRead);
+			}
+		}
+			
 		messageDao.deleteMessage(id);
 		return "redirect:/inbox";
 	}

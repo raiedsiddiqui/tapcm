@@ -402,14 +402,17 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		model.addAttribute("patient", patient);
 		
-		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();		
-		model.addAttribute("volunteers", volunteers);
+		int totalSurveys = surveyTemplateDao.countSurveyTemplate();
+		int totalCompletedSurveys = surveyResultDao.countCompletedSurveys(id);
 		
-		String v1 = String.valueOf(patient.getVolunteer());
-		String v2 = String.valueOf(patient.getPartner());
+		if (totalSurveys == totalCompletedSurveys)
+			model.addAttribute("showReport", true);
+
+		String volunteer1Name = volunteerDao.getVolunteerById(patient.getVolunteer()).getDisplayName();
+		String volunteer2Name = volunteerDao.getVolunteerById(patient.getPartner()).getDisplayName();
 		
-		model.addAttribute("selectedVolunteer1", v1);
-		model.addAttribute("selectedVolunteer2", v2);
+		model.addAttribute("volunteer1", volunteer1Name);
+		model.addAttribute("volunteer2", volunteer2Name);
 				
 		List<Appointment> appointments = new ArrayList<Appointment>();
 		appointments = appointmentDao.getAllUpcommingAppointmentForPatient(id);

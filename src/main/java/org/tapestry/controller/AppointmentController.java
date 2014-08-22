@@ -734,7 +734,8 @@ public class AppointmentController{
 		
 		appointment.setVolunteerID(volunteerId);
 		appointment.setPatientID(patientId);
-		appointment.setPartner(String.valueOf(partnerId));
+//		appointment.setPartner(String.valueOf(partnerId));
+		appointment.setPartnerId(partnerId);
 		
 		//get Date and time for appointment		
 		String date = request.getParameter("appointmentDate");

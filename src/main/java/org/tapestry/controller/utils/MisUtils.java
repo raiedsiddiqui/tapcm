@@ -255,7 +255,7 @@ public class MisUtils {
 		//send message to MyOscar test
 		try{
 			Long lll = ClientManager.sentMessageToPatientInMyOscar(new Long(15231), "Message From Tapestry", "Hello");
-			System.out.println("lll is === "+ lll);
+			
 			
 		} catch (Exception e){
 			System.out.println("something wrong with myoscar server");

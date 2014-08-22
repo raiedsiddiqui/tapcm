@@ -1,15 +1,12 @@
 package org.tapestry.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -19,11 +16,7 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.PatientDao;
 import org.tapestry.dao.PictureDao;
-import org.tapestry.dao.SurveyResultDao;
-import org.tapestry.dao.SurveyTemplateDao;
 import org.tapestry.objects.Patient;
-import org.tapestry.objects.SurveyResult;
-import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.User;
 import org.yaml.snakeyaml.Yaml;
 
@@ -63,45 +56,15 @@ public class FileController extends MultiActionController{
 		patientDao = new PatientDao(DB, UN, PW);
    	}
    	
-//   	@RequestMapping(value = "/upload_survey_template", method=RequestMethod.POST)
-//	public String addSurveyTemplate(HttpServletRequest request) throws Exception{
-//   		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-//   		MultipartFile multipartFile = multipartRequest.getFile("file");
-//   		
-//		//Add a new survey template
-//		SurveyTemplate st = new SurveyTemplate();
-//		st.setTitle(request.getParameter("title"));
-//		st.setType(request.getParameter("type"));
-//		st.setDescription(request.getParameter("desc"));
-//		int p = Integer.parseInt(request.getParameter("priority"));
-//		st.setPriority(p);
-//		st.setContents(multipartFile.getBytes());
-//		surveyTemplateDao.uploadSurveyTemplate(st);
-//		
-//		return "redirect:/manage_survey_templates";
-//	}
-   	
-//   	@RequestMapping(value="/delete_survey_template/{surveyID}", method=RequestMethod.GET)
-//   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model){   		
-//   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResultsBySurveyId(id);  		
-//   		
-//   		if(surveyResults.isEmpty()) {
-//   			surveyTemplateDao.deleteSurveyTemplate(id);
-//   			return "redirect:/manage_survey_templates";
-//   		} else {
-//   			return "redirect:/manage_survey_templates?failed=true";
-//   		}
-//   	}
-   	
 	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
 	public String uploadPicture(MultipartHttpServletRequest request){
 
 		User loggedInUser = Utils.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
-		System.out.println("Uploaded: " + pic);
+		
 		pictureDao.uploadPicture(pic, loggedInUser.getUserID(), true);				
 
-		activityDao.addUserLog("Uploaded picture for profile", loggedInUser);
+		activityDao.addUserLog(loggedInUser.getName() +" uploaded picture for profile", loggedInUser);
 		
 		return "redirect:/profile";
 	}
@@ -111,11 +74,11 @@ public class FileController extends MultiActionController{
 		User loggedInUser = Utils.getLoggedInUser(request);
 
 		MultipartFile pic = request.getFile("pic");
-		System.out.println("Uploaded: " + pic);
+		
 		Patient p = patientDao.getPatientByID(id);
 		pictureDao.uploadPicture(pic, id, false);
 
-		activityDao.addUserLog("Uploaded picture for " + p.getDisplayName(), loggedInUser);
+		activityDao.addUserLog(loggedInUser.getName() + " uploaded picture for " + p.getDisplayName(), loggedInUser);
 		
 		return "redirect:/patient/" + id;
 	}

@@ -14,35 +14,38 @@ public class AlertManager {
 			alerts.add(AlertsInReport.NUTRITION_ALERT1);
 				
 		//weight alert-- the first question in nutrition survey
-		ans = qList.get(1);
-		ans = ans.trim();		
-		
-		if (!Utils.isNullOrEmpty(ans)) {
-			if (ans.equals("2"))				
-				alerts.add(AlertsInReport.NUTRITION_ALERT2A);			
-			else if (ans.equals("3"))
-				alerts.add(AlertsInReport.NUTRITION_ALERT2B);
-			else if (ans.equals("6"))
-				alerts.add(AlertsInReport.NUTRITION_ALERT2C);
-		}
-		
-		//meal alert -- forth question in nutrition survey
-		ans = qList.get(4);
-		ans = ans.trim();
-		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
-			alerts.add(AlertsInReport.NUTRITION_ALERT3);
-		
-		//Appetitive alert --- sixth question in nutrition survey
-		ans = qList.get(6);
-		ans = ans.trim();
-		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
-			alerts.add(AlertsInReport.NUTRITION_ALERT4);
-		
-		//cough, choke and pain alert --- ninth question in nutrition survey
-		ans = qList.get(11);
-		ans = ans.trim();
-		if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
-			alerts.add(AlertsInReport.NUTRITION_ALERT5);	
+		if ((qList != null)&&(qList.size()>0))
+		{
+			ans = qList.get(1);
+			ans = ans.trim();		
+			
+			if (!Utils.isNullOrEmpty(ans)) {
+				if (ans.equals("2"))				
+					alerts.add(AlertsInReport.NUTRITION_ALERT2A);			
+				else if (ans.equals("3"))
+					alerts.add(AlertsInReport.NUTRITION_ALERT2B);
+				else if (ans.equals("6"))
+					alerts.add(AlertsInReport.NUTRITION_ALERT2C);
+			}
+			//meal alert -- forth question in nutrition survey		
+			ans = qList.get(4);
+			ans = ans.trim();
+			if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
+				alerts.add(AlertsInReport.NUTRITION_ALERT3);
+			
+			//Appetitive alert --- sixth question in nutrition survey
+			ans = qList.get(6);
+			ans = ans.trim();
+			if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
+				alerts.add(AlertsInReport.NUTRITION_ALERT4);
+			
+			//cough, choke and pain alert --- ninth question in nutrition survey
+			ans = qList.get(11);
+			ans = ans.trim();
+			if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
+				alerts.add(AlertsInReport.NUTRITION_ALERT5);
+		}			
+			
 		
 		return alerts;
 	}

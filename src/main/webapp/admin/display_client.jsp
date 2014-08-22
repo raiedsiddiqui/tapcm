@@ -83,22 +83,10 @@
 							<td><label>Assigned Volunteers:</label></td>
 						</tr>
 						<tr>
-							<td>
-								<select name="volunteer1"  id ="volunteer1">
-									<c:forEach items="${volunteers}" var="v">
-										<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq selectedVolunteer1}">selected</c:if>>${v.displayName}</option>
-									</c:forEach>						
-								</select>
-							</td>
+							<td>${volunteer1}</td>
 						</tr>
 						<tr>
-							<td>
-								 <select name="volunteer2"  id ="volunteer2">
-									<c:forEach items="${volunteers}" var="v">
-										<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq selectedVolunteer2}">selected</c:if>>${v.displayName}</option>
-									</c:forEach>						
-								</select>
-							</td>
+							<td>${volunteer2}</td>
 						</tr>
 					</table>
 				</td>
@@ -214,14 +202,18 @@
 			<th width="300">Visit #</th>
 			<th width="300"> Visit Date</th>		
 			<th>Assigned Volunteers</th>
-			<th>Report</th>
+			<c:if test="${showReport}">
+				<th>Report</th>
+			</c:if>
 		</tr>
 		<c:forEach items="${completedVisits}" var="cVistits">
 		<tr >
 			<td>${cVistits.appointmentID}</td>	
 			<td>${cVistits.date}</td>			
 			<td>${cVistits.volunteer},&nbsp &nbsp ${cVistits.partner}</td>
-			<td><a href="<c:url value="/view_report/${patient.patientID}?appointmentId=${cVistits.appointmentID}"/>">DOWNLOAD</a> </td>
+			<c:if test="${showReport}">
+				<td><a href="<c:url value="/view_report/${patient.patientID}?appointmentId=${cVistits.appointmentID}"/>">DOWNLOAD</a> </td>
+			</c:if>
 		</tr>
 		</c:forEach>
 	</table>

@@ -38,7 +38,8 @@
 			</div>
 			<div class="col-md-3">
 				<a href="<c:url value="/new_organization"/>" class="btn btn-primary" data-toggle="modal">New Organization</a>
-			</div>
+			</div>				
+			
 		</div>
 		<div class="row-fluid">
 			<form action="<c:url value="/view_organizations"/>" method="POST">
