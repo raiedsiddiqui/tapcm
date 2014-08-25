@@ -220,13 +220,13 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		qList = new ArrayList<String>();
    		questionTextList = new ArrayList<String>();
    		questionTextList = ResultParser.getSurveyQuestions(xml);
-   		
+   		   		
    		//only keep the second and forth question text in the list
    		if ((questionTextList != null) && (questionTextList.size() > 0))
    		{
    			List<String> displayQuestionTextList = new ArrayList<String>();
-   	   		displayQuestionTextList.add(questionTextList.get(1));
-   	   		displayQuestionTextList.add(questionTextList.get(3));
+   	   		displayQuestionTextList.add(removeObserverNotes(questionTextList.get(1)));
+   	   		displayQuestionTextList.add(removeObserverNotes(questionTextList.get(3)));
    	   		
    	   		displayQuestionTextList = removeRedundantFromQuestionText(displayQuestionTextList, "of 2");
    	   	
@@ -248,7 +248,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    	   		
    	   		//take 3 question text from the list
    	   		for (int i = 1; i <= 3; i++)
-   	   			displayQuestionTextList.add(questionTextList.get(i));
+   	   			displayQuestionTextList.add(removeObserverNotes(questionTextList.get(i)));
    	   		
    	   		displayQuestionTextList = removeRedundantFromQuestionText(displayQuestionTextList, "of 3");
    	   		
@@ -269,14 +269,14 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		LinkedHashMap<String, String> mDailyLifeActivitySurvey = ResultParser.getResults(xml);
    		questionTextList = new ArrayList<String>();
    		questionTextList = ResultParser.getSurveyQuestions(xml);   		
-   		
+   		   		
    		qList = new ArrayList<String>();
    		qList = getQuestionList(mDailyLifeActivitySurvey);
    		
    		//last question in Daily life activity survey is about falling stuff
    		List<String> lAlert = new ArrayList<String>();
    		String fallingQA = qList.get(qList.size() -1);
-   		if (fallingQA.contains("yes")||fallingQA.contains("fall"))
+   		if (fallingQA.startsWith("yes")||fallingQA.startsWith("Yes"))
    			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);   		
    		   		
    		sMap = new TreeMap<String, String>();
@@ -482,8 +482,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		return null;
 	}	
 	
-	private void buildPDF(Report report, HttpServletResponse response){
-		System.out.println("patient first name is === " + report.getPatient().getFirstName());
+	private void buildPDF(Report report, HttpServletResponse response){		
 		String orignalFileName="reportTest.pdf";
 		try {
 			Document document = new Document();
@@ -514,7 +513,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	            
 			//tapestry report		        
 			//Font setup
-			//white font
+			//white font			
 			Font wbLargeFont = new Font(Font.FontFamily.HELVETICA  , 20, Font.BOLD);
 			wbLargeFont.setColor(BaseColor.WHITE);
 			Font wMediumFont = new Font(Font.FontFamily.HELVETICA , 16, Font.BOLD);
@@ -653,6 +652,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);	 
 	            
 	            table.addCell(cell);
+	            
 	            cell = new PdfPCell(new Phrase(report.getAppointment().getKeyObservation()));
 	            table.addCell(cell);
 	            document.add(table);
@@ -735,6 +735,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	            //Summary of Tapestry tools
 	            table = new PdfPTable(3);
 	            table.setWidthPercentage(100);
+	            table.setWidths(new float[]{1.2f, 2f, 2f});
 	            cell = new PdfPCell(new Phrase("Summary of TAPESTRY Tools", wbLargeFont));
 	            cell.setBackgroundColor(BaseColor.GRAY);
 	            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1058,30 +1059,46 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    			
    	   		if (questionAnswerList != null && questionAnswerList.size() > 0)
    	   		{//remove the first element which is empty or "-"
-	   	   		questionAnswerList.remove(0);
+   	   			if ("-".equals(questionAnswerList.get(0)))
+   	   				questionAnswerList.remove(0);
 	   	   			
 	   	   		content = new TreeMap<String, String>(); 
 		   	   	StringBuffer sb;
 	   	   		
 	   	   		for (int i = 0; i < questionAnswerList.size(); i++){
 	   	   			sb = new StringBuffer();
-	   	   			sb.append(questionTextList.get(i));
+	   	   //			sb.append(questionTextList.get(i));
+	   	   			sb.append(removeObserverNotes(questionTextList.get(i).toString()));
 	   	  // 			sb.append("<br/><br/>"); //html view
-	   	   			sb.append("\n\n");// for PDF format
-	   	   			sb.append("\"");
+	   	   			sb.append("\n\n");// for PDF format	   	   			
 	   	   			sb.append(questionAnswerList.get(i));
-	   	   			sb.append("\"");
+	   	   			
 	   	   			content.put(String.valueOf(i + 1), sb.toString());
 	   	   		}	   	   		
 	   	   		return content;
    	   		}
    	   		else
-   	   			System.out.println("All answers in Goal Setting survey are empty!");   	   			
+   	   		{
+   	   			System.out.println("All answers in Goal Setting survey are empty!");   	
+   	   			return null;  
+   	   		}
    		}   			
    		else
+   		{
    			System.out.println("Bad thing happens, no question text found for this Goal Setting survey!");
-		
-		return null;   	
+			return null;   	
+   		}
+	}
+	
+	private String removeObserverNotes(String questionText)
+	{		
+		//remove /observernotes/ from question text
+		int index = questionText.indexOf("/observernote/");
+	    	
+	    if (index > 0)
+	    	questionText = questionText.substring(0, index);
+	    
+	    return questionText;
 	}
 	
 	private Map<String, String> getSurveyContentMapForMemorySurvey(List<String> questionTextList, List<String> questionAnswerList){
@@ -1089,13 +1106,16 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		int size = questionTextList.size();
 		Object answer;
 		String questionText;
-		
+			
 		if (questionAnswerList.size() == size)
 		{
 			for (int i = 0; i < size; i++)
 			{
 				questionText = questionTextList.get(i).toString();
 				
+				//remove /observernotes/ from question text
+				removeObserverNotes(questionText);
+
 				answer = questionAnswerList.get(i);
 				if ((answer != null) && (answer.toString().equals("1")))
 					displayContent.put(questionText, "YES");					
@@ -1133,7 +1153,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private List<String> getQuestionList(LinkedHashMap<String, String> questionMap) {
 		List<String> qList = new ArrayList<String>();
 		String question;
-		int index;
 		
 		for (Map.Entry<String, String> entry : questionMap.entrySet()) {
    		    String key = entry.getKey();
@@ -1143,10 +1162,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		    	Object value = entry.getValue();
    		    	question = value.toString();
    		    	
-   		    	index = question.indexOf("/observernote/");
-   		    	
-   		    	if (index > 0)
-   		    		question = question.substring(0, index);
+   		    	question = removeObserverNotes(question);
    		    	
    		    	if (!question.equals("-"))
    		    		qList.add(question);   		    	
@@ -1157,8 +1173,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	
 	private List<String> getQuestionListForMemorySurvey(LinkedHashMap<String, String> questionMap){
 		List<String> qList = new ArrayList<String>();
-		String question;
-		int index;
+		String question;	
 		
 		for (Map.Entry<String, String> entry : questionMap.entrySet()) {
    		    String key = entry.getKey();
@@ -1167,12 +1182,8 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		    {
    		    	Object value = entry.getValue();
    		    	question = value.toString();
-   		    	
    		    	//remove observer notes
-   		    	index = question.indexOf("/observernote/");
-   		    	
-   		    	if (index > 0)
-   		    		question = question.substring(0, index);   		    	
+   		    	question = removeObserverNotes(question);   		    			    	
    		    	qList.add(question); 
    		    }   		   
    		}		
@@ -1182,7 +1193,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private Map<String, String> getQuestionMap(LinkedHashMap<String, String> questions){
 		Map<String, String> qMap = new LinkedHashMap<String, String>();		
 		String question;
-		int index;
 		
 		for (Map.Entry<String, String> entry : questions.entrySet()) {
    		    String key = entry.getKey();
@@ -1192,10 +1202,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
    		    	Object value = entry.getValue();
    		    	question = value.toString();
    		    	
-   		    	index = question.indexOf("/observernote/");
-   		    	
-   		    	if (index > 0)
-   		    		question = question.substring(0, index);
+   		    	question = removeObserverNotes(question);  		
    		    	
    		    	if (!question.equals("-"))
    		    		qMap.put(key, question);    	
