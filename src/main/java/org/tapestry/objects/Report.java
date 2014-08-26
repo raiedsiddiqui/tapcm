@@ -14,8 +14,19 @@ public class Report {
 	private Patient patient;
 	private Appointment appointment;
 	private ScoresInReport scores;
+	private List<String> patientGoals;
 
 	public Report(){}
+	
+	public List<String> getPatientGoals() {
+		return patientGoals;
+	}
+
+
+	public void setPatientGoals(List<String> patientGoals) {
+		this.patientGoals = patientGoals;
+	}
+
 
 	public List<String> getAlerts() {
 		return alerts;

@@ -325,7 +325,7 @@ public class AppointmentDao {
     		statement = con.prepareStatement("SELECT appointment_ID, volunteer, patient, DATE(date_time) as appt_date, "
     				+ "TIME(date_time) as appt_time, comments, status, completed, contactedAdmin, partner,"
     				+ " hasNarrative, type FROM appointments WHERE patient=? AND date_time>=CURDATE() AND"
-    				+ " completed=0 AND status='Approved' ORDER BY date_time ASC");
+    				+ "  status='Approved' ORDER BY date_time ASC");
     		statement.setInt(1, patientId);
     		ResultSet result = statement.executeQuery();
        		ArrayList<Appointment> allAppointments = new ArrayList<Appointment>();

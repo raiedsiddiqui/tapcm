@@ -142,7 +142,15 @@
 	            				}
 								questionText = questionText.replaceAll("<"+"%--", "");
 								questionText = questionText.replaceAll("--%" + ">", "");
+								
+								if (questionText.contains("/observernote"))
+								{
+									int ind = questionText.indexOf("/observernote/");
+									if (ind > 0)
+										questionText = questionText.substring(0, ind);
+								}
 							%>
+							
 	            			<%=questionText%>
             			</div>
             		</div>

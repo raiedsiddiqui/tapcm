@@ -1058,6 +1058,10 @@ public class AppointmentController{
 		
 		if ((appointments != null)&& (appointments.size()>0))
 			isFirst = false;
+		
+		
+		System.out.println("patient Id is === "+ patientId);
+		System.out.println("is first visit === "+ isFirst);
 		return isFirst;
 		
 	}
