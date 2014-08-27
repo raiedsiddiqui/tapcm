@@ -62,7 +62,7 @@
     </div>
   </div>
 </div>
-<!-- 	breadcrumb START-->	
+<!-- 	breadcrumb START
 	<div id="crumbs"> 
 		<ul>
 			<li><a href="<c:url value="/client"/>">My Clients</a> </li>
@@ -84,18 +84,38 @@
 			</li>
 		</ul>	
 	</div>
-<!-- 	breadcrumb END-->
+	breadcrumb END-->
+
+<div class="row">
+	<div class="col-md-6">
+		<c:if test="${not empty patient}">
+			<c:choose>
+				<c:when test="${not empty patient.preferredName}">
+					<p class="patientname">${patient.preferredName}</p>
+				</c:when>
+				<c:otherwise>
+					<p class="patientname">${patient.displayName}</p>
+				</c:otherwise>
+			</c:choose>
+		</c:if>
+		<span class="surveycomp">${appointment.date}</span>
+	</div>
+</div>
+
 	<div class="content">
 		<form id="appt-form" method="post" action="<c:url value="/complete_visit/${appointment.appointmentID}"/>">
-	 		<h2> Date: ${appointment.date} <h2> <!-- <br /> 
+	 		<!--<h2> Date: ${appointment.date} </h2>  <br /> 
  	 		<input id="contactedcheck" type="radio" name="contacted_admin" id="contacted_admin" value="true" /> Contacted Ernie
 	 		<br />-->
-	 		<h3> What does the clinic need to know about today's visit?
-			<br/>Example: unsafe walking, poor access to food, patient not behaving appropriately </h3><br />
+	 		<h4> What does the clinic need to know about today's visit?
+			<br/>Example: unsafe walking, poor access to food, patient not behaving appropriately </h4><br />
 	 		<textarea  name="visitAlerts" id="visitAlerts"></textarea><br />
 	 		
-	 		<a href="<c:url value="/patient/${appointment.patientID}?appointmentId=${appointment.appointmentID}"/>" class="tleft btn btn-danger">Cancel</a>
- 			<input class="btn lgbtn pull-right" type="submit" value="Submit" />
+	 		<div class="row">
+	 			<br>
+		 		<a href="<c:url value="/patient/${appointment.patientID}?appointmentId=${appointment.appointmentID}"/>" class="tleft btn btn-danger">Cancel</a>
+	 			<input class="btn lgbtn pull-right" type="submit" value="Submit" />
+ 			</div>
  		</form>
  		
  	</div>

@@ -113,6 +113,21 @@ Lanscape CSS ENDS*/
 
 }
 
+.pbutton {
+	width: 100%;
+	height: 40px;
+	text-align: left;
+	/* padding-left: 20px; */
+	padding-right: 20px;
+	padding-top: 6px;
+	font-size: 18px; 
+	font-family:'Open Sans', 'sans-serif';
+	background-color: #6BB040;
+	color:white;
+
+
+}
+
 .squestion {
 	margin: 0 auto;
 	/*border: 1px solid black;*/
@@ -206,6 +221,9 @@ Lanscape CSS ENDS*/
 	border-radius: 0px;
 }
 
+#observerNote {
+	height:200px;
+}
 #answer-buttons {
 	position: absolute;
 	bottom: 50px;
@@ -474,6 +492,15 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 
 }
 
+#eq5dheader {
+	font-size: 12px;
+	float:left;
+}
+
+#eq5dqtitle {
+	float:left;
+	font-weight: 600;
+}
 
 @media (min-width: 768px) {
 	.navbar .nav > li > a
@@ -509,6 +536,20 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 		font-size: 30px; 
 		font-family:'Open Sans', 'sans-serif';
 		background-color: #6BB040;
+		color:white;
+		border:0px;
+
+	}
+
+	.paddingbutton {
+		width: 100%;
+		height: 55px;
+		text-align: left;
+		padding-left: 20px;
+		padding-right: 20px;
+		font-size: 30px; 
+		font-family:'Open Sans', 'sans-serif';
+		background-color: #FCB03C;
 		color:white;
 		border:0px;
 
@@ -698,5 +739,15 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 		font-size:20px;
 		margin-bottom: 10px; 
 	}
+
+	#eq5dheader {
+	font-size: 12px;
+	float:left;
+}
+
+#eq5dqtitle {
+	float:left;
+	font-weight: 600;
+}
 }
 

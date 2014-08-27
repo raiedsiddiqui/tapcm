@@ -2,6 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/css/custom.css">
+</head>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.tapestry.surveys.DoSurveyAction"%>
 <%@page import="org.tapestry.surveys.SurveyFactory"%>
@@ -229,7 +232,7 @@
                 	<div id="answer-buttons">
                 		<div class="row animated bounceInLeft">
                 			<div class="col-md-4">
-	                			<input class="tleft btn" type="button" value="BACK" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();">
+	                			<input id="surveyback" class="tleft btn" type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();">
 	                		</div>
 
 	                		
@@ -242,7 +245,7 @@
 
 
 	                		<div class="col-md-4"> 
-	                			<input class="tright btn" type="submit" value="NEXT">
+	                			<input id="surveynext" class="tright btn" type="submit" value="Next">
 	                		</div>
                 		</div>
                 		
@@ -264,7 +267,7 @@
 	  			  <div class="modal-content">
 						<div class="modal-header">
     						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-						<h3>Observer Note</h3>
+						<h3 class="pull-left">Observer Note</h3>
 				 </div>
 				 <div class="modal-body">
 					<div class="col-md-12">
@@ -273,7 +276,7 @@
 					</div>	
 				</div>				
 				<div class="modal-footer">
-					<input type="button"  class="btn btn-primary" data-dismiss="modal" value="Save"  onclick="saveObserverNotes();" />
+					<input type="button"  class="btn lgbtn" data-dismiss="modal" value="Save"  onclick="saveObserverNotes();" />
   				</div>
 			</div>
 		</div>
