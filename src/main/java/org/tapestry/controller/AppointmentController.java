@@ -336,13 +336,23 @@ public class AppointmentController{
    	
    	@RequestMapping(value="/book_appointment", method=RequestMethod.GET)
 	public String goAddAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-   		List<Patient> patients = getPatients();
-   		model.addAttribute("patients", patients);
+   		List<Patient> patients = new ArrayList<Patient>();
    		
    		if (request.isUserInRole("ROLE_USER"))
+   		{
+   			int loggedInVolunteer = MisUtils.getLoggedInVolunteerId(request);
+   			patients = patientDao.getPatientsForVolunteer(loggedInVolunteer);
+   			model.addAttribute("patients", patients);
+   			
    			return "/volunteer/volunteer_book_appointment";
+   		}
    		else
-   			return "/admin/admin_book_appointment";	   		
+   		{
+   			patients = getPatients();
+   	   		model.addAttribute("patients", patients);
+   	   		
+   			return "/admin/admin_book_appointment";	 
+   		}
    	}
    	
    	@RequestMapping(value="/out_book_appointment", method=RequestMethod.GET)
@@ -724,7 +734,8 @@ public class AppointmentController{
 		
 		appointment.setVolunteerID(volunteerId);
 		appointment.setPatientID(patientId);
-		appointment.setPartner(String.valueOf(partnerId));
+//		appointment.setPartner(String.valueOf(partnerId));
+		appointment.setPartnerId(partnerId);
 		
 		//get Date and time for appointment		
 		String date = request.getParameter("appointmentDate");
@@ -828,32 +839,33 @@ public class AppointmentController{
 		
 		int patientId = getPatientId(request);		
 		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);		
-				
-		if (!Utils.isNullOrEmpty(appointment.getComments()))
-		{System.out.println("alert is ==="  +  appointment.getComments());
-			if (completedAllSurveys(patientId))
-			{System.out.println("in save alerts and keyobservation, for first visit there is alert and finish all servey, and and go to Plan");
-				return "redirect:/open_plan/" + appointmentId ;			
-			}
-			else
-			{System.out.println("in save alerts and keyobservation, for first visit there is alert and not finish all servey, and and go Home");
-				//send alert to MRP
-				return "redirect:/";
-			}
-		}
-		else//no alert, no complete surveys
+		
+		if (completedAllSurveys(patientId))
+			return "redirect:/open_plan/" + appointmentId ;	
+		else 
 		{
-			if (completedAllSurveys(patientId))
-			{System.out.println("in save alerts and keyobservation, for fowllowup visit there is no alert and finish all servey, "
-					+ "and and go to Plan");
-				return "redirect:/open_plan/" + appointmentId ;		
+			if (!Utils.isNullOrEmpty(appointment.getComments()))
+			{//send alert to MRP	
+				
 			}
-			else
-			{System.out.println("in save alerts and keyobservation, for fowllowup visit there is no alert and not finish all servey, "
-					+ "and and go to Plan");
-				return "redirect:/";
-			}
+				
+			return "redirect:/";	
 		}
+				
+//		if (!Utils.isNullOrEmpty(appointment.getComments()))
+//		{
+//			if (completedAllSurveys(patientId))
+//				return "redirect:/open_plan/" + appointmentId ;	
+//			else //send alert to MRP				
+//				return "redirect:/";
+//		}
+//		else//no alert, no complete surveys
+//		{
+//			if (completedAllSurveys(patientId))
+//				return "redirect:/open_plan/" + appointmentId ;	
+//			else
+//				return "redirect:/";
+//		}
 	}
 	
 	/**
@@ -1046,6 +1058,10 @@ public class AppointmentController{
 		
 		if ((appointments != null)&& (appointments.size()>0))
 			isFirst = false;
+		
+		
+		System.out.println("patient Id is === "+ patientId);
+		System.out.println("is first visit === "+ isFirst);
 		return isFirst;
 		
 	}

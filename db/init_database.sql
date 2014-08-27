@@ -155,13 +155,17 @@ CREATE TABLE IF NOT EXISTS volunteers (
 CREATE TABLE IF NOT EXISTS organizations (
 	organization_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name VARCHAR(255) NOT NULL,
+	primary_contact VARCHAR(255) NOT NULL,
+	primary_phone VARCHAR(20),
+	secondary_contact VARCHAR(255);
+	secondary_phone VARCHAR(20),
 	street_number VARCHAR(20),
 	street VARCHAR(100),
 	city VARCHAR(50),
 	province VARCHAR(3),
 	country VARCHAR(50),
 	postal_code VARCHAR(10),
-	phone VARCHAR(20),
+	
 	PRIMARY KEY (organization_ID)	
 );
 CREATE TABLE IF NOT EXISTS report(

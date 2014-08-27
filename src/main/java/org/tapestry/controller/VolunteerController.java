@@ -1,5 +1,7 @@
 package org.tapestry.controller;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -12,6 +14,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
@@ -22,6 +25,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import org.tapestry.controller.utils.MisUtils;
 import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDao;
@@ -34,6 +39,20 @@ import org.tapestry.objects.Message;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 import org.tapestry.objects.Organization;
+
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Element;
 
 @Controller
 public class VolunteerController {
@@ -437,6 +456,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 	}
 	
+
 	private void modifyUser(Volunteer volunteer){				
 		User user = userDao.getUserByUsername(volunteer.getUserName());
 		
@@ -821,6 +841,153 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		session.setAttribute("ActivityMessage","U");
 		return "redirect:/view_activity";	
 	}
+	
+	//Organizations		
+	@RequestMapping(value="/view_organizations", method=RequestMethod.GET)
+	public String getOganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		List<Organization> organizations = new ArrayList<Organization>();
+		HttpSession  session = request.getSession();	
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
+		organizations = volunteerDao.getAllOrganizations();		
+		model.addAttribute("organizations", organizations);	
+		
+		if (session.getAttribute("organizatioMessage") != null)
+		{
+			String message = session.getAttribute("organizatioMessage").toString();
+			
+			if ("C".equals(message)){
+				model.addAttribute("organizationCreated", true);
+				session.removeAttribute("organizatioMessage");
+			}
+//			else if ("D".equals(message)){
+//				model.addAttribute("volunteerDeleted", true);
+//				session.removeAttribute("volunteerMessage");
+//			}
+//			else if ("U".equals(message)){
+//				model.addAttribute("volunteerUpdate", true);
+//				session.removeAttribute("volunteerMessage");
+//			}			
+		}		
+		return "/admin/view_organizations";
+	}
+	
+	//display all volunteers with search criteria
+	@RequestMapping(value="/view_organizations", method=RequestMethod.POST)
+	public String viewFilteredOrganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		List<Organization> organizations = new ArrayList<Organization>();
+		
+		String name = request.getParameter("searchName");
+		if(!Utils.isNullOrEmpty(name)) {
+			organizations = volunteerDao.getOrganizationsByName(name);			
+		} 		
+		model.addAttribute("searchName", name);
+		model.addAttribute("organizations", organizations);	
+		return "/admin/view_organizations";
+	}
+	
+	@RequestMapping(value="/new_organization", method=RequestMethod.GET)
+	public String newOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+		
+		return "/admin/add_organization";
+	}
+	
+	//create a new volunteer and save in the table of volunteers and users in the DB
+	@RequestMapping(value="/add_organization", method=RequestMethod.POST)
+	public String addOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){					
+		
+		Organization organization = new Organization();
+			
+		organization.setName(request.getParameter("name").trim());
+		organization.setCity(request.getParameter("city"));
+		organization.setPrimaryContact(request.getParameter("primaryContact"));
+		organization.setPrimaryPhone(request.getParameter("primaryPhone"));
+		organization.setSecondaryContact(request.getParameter("secondaryContact"));
+		organization.setSecondaryPhone(request.getParameter("secondaryPhone"));
+		organization.setStreetNumbet(request.getParameter("streetNumber"));
+		organization.setStreetName(request.getParameter("streetName"));
+		organization.setPostCode(request.getParameter("postCode"));
+		organization.setProvince(request.getParameter("province"));		
+		organization.setCountry(request.getParameter("country"));
+			
+		if (volunteerDao.addOrganization(organization))
+		{
+			HttpSession session = request.getSession();
+			session.setAttribute("organizatioMessage", "C");							
+		}			
+		return "redirect:/view_organizations";			
+	}	
+	
+	
+	@RequestMapping(value="/view_pdf", method=RequestMethod.GET)
+	public String viewPDF(HttpServletResponse response) throws DocumentException, IOException{
+		
+		return "/admin/pdf_generator";
+	}
+	
+	@RequestMapping(value="/go_pdf", method=RequestMethod.GET)
+	@ResponseBody
+	public String goPDF(HttpServletResponse response) throws DocumentException, IOException{	
+
+	       String orignalFileName="reportTest.pdf";
+
+	        try {
+	        	   // step 1
+//	            Document document = new Document();
+	            Document document = new Document(PageSize.A5.rotate());
+	            response.setHeader("Content-Disposition", "outline;filename=\"" +orignalFileName+ "\"");
+	            // step 2
+	            PdfWriter.getInstance(document, response.getOutputStream());
+
+	            // step 3
+	            document.open();
+	            // step 4
+	            PdfPTable table = new PdfPTable(2);
+	            // a long phrase
+	            Phrase p = new Phrase(
+	                "Dr. iText or: How I Learned to Stop Worrying and Love PDF.");
+	            PdfPCell cell = new PdfPCell(p);
+	            // the prhase is wrapped
+	            table.addCell("wrap");
+	            cell.setNoWrap(false);
+	            table.addCell(cell);
+	            // the phrase isn't wrapped
+	            table.addCell("no wrap");
+	            cell.setNoWrap(true);
+	            table.addCell(cell);
+	            // a long phrase with newlines
+	            p = new Phrase(
+	                "Dr. iText or:\nHow I Learned to Stop Worrying\nand Love PDF.");
+	            cell = new PdfPCell(p);
+	            // the phrase fits the fixed height
+	            table.addCell("fixed height (more than sufficient)");
+	            cell.setFixedHeight(72f);
+	            table.addCell(cell);
+	            // the phrase doesn't fit the fixed height
+	            table.addCell("fixed height (not sufficient)");
+	            cell.setFixedHeight(36f);
+	            table.addCell(cell);
+	            // The minimum height is exceeded
+	            table.addCell("minimum height");
+	            cell = new PdfPCell(new Phrase("Dr. iText"));
+	            cell.setMinimumHeight(36f);
+	            table.addCell(cell);
+	            // The last row is extended
+	            table.setExtendLastRow(true);
+	            table.addCell("extend last row");
+	            table.addCell(cell);
+	            document.add(table);
+	            // step 5
+	           
+	            document.close();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+		
+		return null;
+	}	
 		
 	private int getLoggedInVolunteerId(SecurityContextHolderAwareRequestWrapper request)
 	{			

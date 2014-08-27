@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
 	http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.tapestry</groupId>
+	<groupId>org.oscarehr</groupId>
 	<artifactId>tapestry</artifactId>
 	<packaging>war</packaging>
-	<version>13.08.26</version>
+	<version>14.08.01</version>
 	<name>Tapestry</name>
 	<url></url>
 
@@ -247,6 +247,26 @@
 			<artifactId>displaytag</artifactId>
 			<version>1.2</version>
 		</dependency>
+		
+		<!-- itex for PDF file generator -->
+		 <!-- dependency>
+  			<groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.4.1</version>
+        </dependency> -->
+        
+        <dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.5.2</version>
+		</dependency>
+        
+        	
+         <dependency>
+			<groupId>com.lowagie</groupId>
+			<artifactId>itext</artifactId>
+			<version>2.1.7</version>
+		    </dependency>
 	</dependencies>
 		
 	<build>
@@ -257,7 +277,7 @@
 				<version>3.0</version>
 				<configuration>
 					<source>1.6</source>
-					<target>1.6</target>
+					<target>1.6</target>					
 				</configuration>
 			</plugin>
 			<plugin>    

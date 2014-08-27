@@ -148,18 +148,10 @@ public class DoSurveyAction
 			
 			if (answerStrs != null && (currentSurvey.getQuestionById(questionId).getQuestionType().equals(SurveyQuestion.ANSWER_CHECK) || !answerStrs[0].equals("")))
 			{						
-				SurveyQuestion question = currentSurvey.getQuestionById(questionId);	
-				SurveyQuestion questionWithoutObserverNotes = currentSurvey.getQuestionById(questionId);
-				
-				//keep answers without obserbernotes for validation
-//				ArrayList<SurveyAnswer> answersWithoutObserverNotes = convertToSurveyAnswers(answerStrs, questionWithoutObserverNotes);
-//							
-//				//add observernotes into answer when there is no condition or non-number type input
-//				List<SurveyDirectionStatement> logicStatements = question.getNextQuestionLogic();
-//				String type = question.getQuestionType();				
-				
+				SurveyQuestion question = currentSurvey.getQuestionById(questionId);					
 				String questionText = question.getQuestionText();
 				
+				//append observernote to question text
 				if (!Utils.isNullOrEmpty(questionText))
 				{
 					String separator = "/observernote/ ";
@@ -170,31 +162,14 @@ public class DoSurveyAction
 					
 					questionText = sb.toString();
 					question.setQuestionText(questionText);
-				}
-
-//				if (!Utils.isNullOrEmpty(type) && (!type.equalsIgnoreCase("number")) && (logicStatements.size() <= 1))				
-//				{
-//					if (answerStrs.length == 1)
-//					{
-//						String content = answerStrs[0];
-//						String separator = "/observernote/ ";
-//						StringBuffer sb = new StringBuffer();
-//						sb.append(content);
-//						sb.append(separator);
-//						sb.append(observerNotes);
-//						answerStrs[0] = sb.toString();	
-//					}
-//				}
-				
+				}				
 				ArrayList<SurveyAnswer> answers = convertToSurveyAnswers(answerStrs, question);		
 				
 				boolean goodAnswerFormat = true;
 				if (answers == null)
 					goodAnswerFormat = false;
 				
-				//check each answer for validation
-				// if answer passes validation				
-	//			if (goodAnswerFormat && question.validateAnswers(answersWithoutObserverNotes))	
+				//check each answer for validation					
 				if (goodAnswerFormat && question.validateAnswers(answers))	
 				{
 					boolean moreQuestions;

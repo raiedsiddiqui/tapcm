@@ -492,6 +492,34 @@ public class VolunteerDao {
 		return organization;
 	}
 	
+	public List<Organization> getOrganizationsByName(String partialName){
+		List<Organization> organizations = new ArrayList<Organization>();
+		
+		try{
+			String query = "SELECT * FROM organizations WHERE UPPER(name) LIKE UPPER('%" + partialName + "%')";
+
+			stmt = con.prepareStatement(query);
+			rs = stmt.executeQuery();	
+			
+			organizations = getOrganizationsByResultSet(rs);
+			
+		} catch (SQLException e){
+			System.out.println("Error: Could not retrieve organization by partial name " + partialName);
+			e.printStackTrace();
+			
+		} finally {
+    		try{
+    			//close statement    			
+    			if (stmt != null)
+    				stmt.close();  
+    		} catch (Exception e) {
+    			//Ignore
+    		}
+    	}
+		
+		return organizations;
+	}
+	
 	public boolean addOrganization(Organization organization){
 		boolean success = false;
 		
@@ -500,7 +528,7 @@ public class VolunteerDao {
 		{			
 			try{
 				stmt = con.prepareStatement("INSERT INTO organizations (name, street_number, street, city, province,"
-						+ "country, postal_code, phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+						+ "country, postal_code, primary_contact, primary_phone, secondary_contact, secondary_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 				
 				stmt.setString(1, organization.getName()); 
 				stmt.setString(2, organization.getStreetNumbet());	
@@ -509,7 +537,10 @@ public class VolunteerDao {
 				stmt.setString(5, organization.getProvince());
 				stmt.setString(6, organization.getCountry());
 				stmt.setString(7, organization.getPostCode());
-				stmt.setString(8, organization.getPhone());									
+				stmt.setString(8, organization.getPrimaryContact());	
+				stmt.setString(9, organization.getPrimaryPhone());
+				stmt.setString(10, organization.getSecondaryContact());
+				stmt.setString(11, organization.getSecondaryPhone());
 				
 				stmt.execute();
 				success = true;
@@ -533,7 +564,8 @@ public class VolunteerDao {
 	public void updateOrganization(Organization organization){		
 		try{
 			stmt = con.prepareStatement("UPDATE organizations SET name=?, street_number=?, street=?, city=?, "
-					+ "province=?,postal_code=?, phone=? WHERE organization_ID=?");
+					+ "province=?,postal_code=?, primary_contact=?, primary_phone=?, secondary_contact=?, "
+					+ "secondary_phone=? WHERE organization_ID=?");
 			
 			stmt.setString(1, organization.getName());
 			stmt.setString(2, organization.getStreetNumbet());
@@ -541,8 +573,11 @@ public class VolunteerDao {
 			stmt.setString(4, organization.getCity());
 			stmt.setString(5, organization.getProvince());
 			stmt.setString(6, organization.getPostCode());
-			stmt.setString(7, organization.getPhone());
-			stmt.setInt(8, organization.getOrganizationId());			
+			stmt.setString(7, organization.getPrimaryContact());
+			stmt.setString(8, organization.getPrimaryPhone());
+			stmt.setString(9, organization.getSecondaryContact());
+			stmt.setString(10, organization.getSecondaryPhone());
+			stmt.setInt(11, organization.getOrganizationId());			
 			
 			stmt.execute();
 		}catch (SQLException e){
@@ -628,7 +663,10 @@ public class VolunteerDao {
 				organization.setCity(rs.getString("city"));
 				organization.setProvince(rs.getString("province"));
 				organization.setPostCode(rs.getString("postal_code"));
-				organization.setPhone(rs.getString("phone"));
+				organization.setPrimaryContact(rs.getString("primary_contact"));
+				organization.setPrimaryPhone(rs.getString("primary_phone"));
+				organization.setSecondaryContact(rs.getString("secondary_contact"));
+				organization.setSecondaryPhone(rs.getString("secondary_phone"));
 				
 				organizations.add(organization);
 			}			
@@ -754,10 +792,9 @@ public class VolunteerDao {
 		int count = 0;
 		
 		try{
-			stmt = con.prepareStatement("SELECT COUNT(*) as c FROM organizations WHERE UPPER(name) = UPPER(?) AND phone= ?");
+			stmt = con.prepareStatement("SELECT COUNT(*) as c FROM organizations WHERE UPPER(name) = UPPER(?)");
 			stmt.setString(1, organization.getName());
-			stmt.setString(2, organization.getPhone());
-		
+
 			rs = stmt.executeQuery();
 			rs.first();
 			
