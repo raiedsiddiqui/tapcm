@@ -8,69 +8,15 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Tapestry Volunteer Appointment MyOscar Authentication</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
-		<link rel="shortcut icon" href="${pageContext.request.contextPath}/resources/images/favicon.ico" type="image/x-icon" />
+<%@include file="volunteer_head.jsp" %>
 
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
-
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
-		
-		<!-- CUSTOM CSS -->
-	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
-	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" /> 
-     
-
-	  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
-	<!-- 	CUSTOM CSS END -->
-		
-		<style type="text/css">
-		html,body{
-			height:100%;
-		}
-		.content{
-/*			overflow-x:auto;
-		overflow-y:auto;*/	
-			border-radius:5px;
-			-moz-border-radius:5px;
-			-webkit-border-radius:5px;
-			-o-border-radius:5px;
-			-ms-border-radius:5px;
-
-		}
-		.content a{
-			color:#ffffff;
-		}
-		textarea{
-			width:90%;
-			margin-right:10px;
-		}
-		textarea { height: auto; width:auto }
-		
-		.modal-backdrop{
-			z-index:0;
-		}
-		
-		.lightbox{
-			z-index:1;
-		}
-		.thumbnail{
-			width:320px;
-		}
-		
-	</style>
 		
 </head>
 <body>
 <div id="headerholder">	
 <%@include file="subNavi.jsp" %>
 </div>
-<!-- 	breadcrumb START-->	
+<!-- 	breadcrumb START
 	<div id="crumbs"> 
 		<ul>
 			<li> <a href="<c:url value="/"/>">Appointments</a> </li>
@@ -89,10 +35,47 @@
 		</ul>
 
 	</div>
-<!-- 	breadcrumb END-->	
+ 	breadcrumb END-->	
 
-<h2>MyOscar Authentication</h2> 
+<h2>PHR Authentication</h2> 
 
+<div class="row">
+	<div class="col-md-6">
+		<h3>Client</h3>
+	</div>
+</div>
+<div class="row form-group">
+	<div class="col-md-6">
+		<label>First Name:</label>
+		<input type="text" clas="form-control" id="client_first_name" name="client_first_name" value="${patient.firstName}"/>
+	</div>
+	<div class="col-md-6">
+		<label>Last Name:</label>
+		<input type="text" clas="form-control" id="client_last_name" name="client_last_name" value="${patient.lastName}"/>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-6">
+		<h3>Volunteer</h3>
+	</div>
+</div>
+<div class="row form-group">
+	<div class="col-md-6">
+		<label>First Name:</label>
+		<input type="text" clas="form-control" id="volunteer_first_name" name="volunteer_first_name" value="${vFirstName}"/>
+	</div>
+	<div class="col-md-6">
+		<label>Last Name:</label>
+		<input type="text" clas="form-control" d="volunteer_last_name" name="volunteer_last_name" value="${vLastName}"/>
+	</div>
+</div>
+
+<div class="row">
+<input class="btn lgbtn pull-r" type="submit" value="Authenticate" />
+<!-- removed class="completevisitbtn"
+ --></div>
+
+<!-- 
 <table width = "1020">
 	<tr>
 		<input type="textarea" style="width: 1200px; height: 80px;" value="${termsInfo }">
@@ -138,10 +121,12 @@
 						<tr>
 							<td>&nbsp</td>
 						</tr>
-						<tr><!--  
+						<tr> -->
+
+						<!--  
 							<td><a href="<c:url value="/authenticate_myoscar/${patient.volunteer}?patientId=${patient.patientID}"/>" role="button" class="btn btn-primary pull-right lgbtn">Authenticate </a></td>
 						-->
-							<td>
+<!-- 							<td>
 								<input class="completevisitbtn btn btn-primary pull-right" type="submit" value="Authenticate" />
 							</td>
 						</tr>
@@ -151,7 +136,7 @@
 			</tr>
 		</table>
 	</tr>
-</table>
+</table> -->
   
 </body>
 </html>

@@ -175,7 +175,7 @@
 			<p class="pageheader">Pending Completion</p>
 			<c:forEach items="${pending_appointments}" var="pa">
 				<div class="pname">
-					<button type="button" class="pendingappt btn-lg btn-block cbutton">${pa.patient} <span class="app-date">${pa.date}</span> <span class="tright"> ${pa.time}</button>
+					<button type="button" class="pendingappt btn-lg btn-block pbutton">${pa.patient} <span class="app-date">${pa.date}</span> <span class="tright"> ${pa.time}</button>
 				</div>
 			</c:forEach>
 		</div>

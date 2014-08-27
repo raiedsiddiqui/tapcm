@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Tapestry Volunteer Add Alerts, KeyObservation for Appointment</title>
+<title>KeyObservation</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <%@include file="volunteer_head.jsp" %>
 	<!-- 	CUSTOM CSS END -->
@@ -52,7 +52,7 @@
 <div id="headerholder">	
 <%@include file="subNavi.jsp" %>
 </div>
-<!-- 	breadcrumb START-->	
+<!-- 	breadcrumb START
 	<div id="crumbs"> 
 		<ul>
 			<li> <a href="<c:url value="/"/>">Appointments</a> </li>
@@ -70,7 +70,8 @@
 			<li><a href="">${appointment.date}</a></li>
 			<li><a href=""><b>Alerts and Key Observations</b></a></li>
 		</ul>
-		
+	</div>
+	breadcrumb END-->
 <!-- Message display 
 	<div id="visitandbook" class="span12 btn-group">
 			<c:if test="${not empty patient.notes}">
@@ -82,19 +83,35 @@
 			<a href="" role="button" class="btn btn-primary pull-right lgbtn" >Submit</a>
 	</div>	
 	-->
+<div class="row">
+	<div class="col-md-6">
+		<c:if test="${not empty patient}">
+			<c:choose>
+				<c:when test="${not empty patient.preferredName}">
+					<p class="patientname">${patient.preferredName}</p>
+				</c:when>
+				<c:otherwise>
+					<p class="patientname">${patient.displayName}</p>
+				</c:otherwise>
+			</c:choose>
+		</c:if>
+		<span class="surveycomp">${appointment.date}</span>
 	</div>
+
 	<div id="new_narrative">
 		<c:if test="${not empty newNarrative}">					
 			<div class ="alert alert-info"><spring:message code="message_newNarrative"/></div>
 		</c:if>	
 		
 		<c:if test="${not appointment.hasNarrative}">
-			<a href="<c:url value="/new_narrative"/>"><h2><button type="submit">Narrrative</button></h2></a> 
+			<a href="<c:url value="/new_narrative"/>"><h2><button class="btn lgbtn pull-right" type="submit">Narrrative</button></h2></a> 
 		</c:if>  
 	</div>
-<!-- 	breadcrumb END-->	
+</div>
+
+	
 	<form id="alertAndKeyObservationfrm" action="<c:url value="/saveAlertsAndKeyObservations"/>" method="post">
-		<div class="row">
+		<!-- <div class="row">
 			<div class="col-md-12">
 				<h2>Alerts</h2>
 			</div>
@@ -106,9 +123,9 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<input type="textarea" id="visitAlerts" class="form-control" rows="8" cols="100" name="alerts"/><br/>
+				<input type="textarea" id="visitAlerts" class="form-control" name="alerts"/><br/>
 			</div>
-		</div>
+		</div> -->
 		<div class="row">
 			<div class="col-md-12">
 				<h2>Key Observations</h2>
@@ -123,13 +140,14 @@
 
 		<div class="row">
 			<div class="col-md-12">
-				<input id="visitAlerts" type="textarea" class="form-control" rows="8" cols="100" name="keyObservations"/><br/>
+				<input id="visitAlerts" type="textarea" class="form-control" name="keyObservations"/><br/>
 			</div>
 		</div>
 
 		<div class="row">
 			<div class="col-md-12">
-				<button type="submit" align="right">Submit</button><input type="button" class="btn btn-primary" value="Cancel" onclick="javascript:history.go(-1)">
+				<input type="button" class="btn btn-primary pull-left" value="Cancel" onclick="javascript:history.go(-1)">
+				<button class="pull-right btn lgbtn" type="submit">Submit</button>
 			</div>
 		</div>
 	</form>

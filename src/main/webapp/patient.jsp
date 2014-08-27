@@ -39,7 +39,7 @@
 				<span class="surveycomp">${appointment.date}</span>
 			</div>
 			<div class="col-md-6">
-				<a href="<c:url value="/goMyOscarAuthenticate/${appointment.appointmentID}"/>" role="button" class="btn pull-right lgbtn">Authenticate MyOscar</a>
+				<a href="<c:url value="/goMyOscarAuthenticate/${appointment.appointmentID}"/>" role="button" class="btn pull-right lgbtn">Authenticate PHR</a>
 
 				<c:if test="${not empty appointment}">
 					<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn pull-right lgbtn">Visit Complete</a>

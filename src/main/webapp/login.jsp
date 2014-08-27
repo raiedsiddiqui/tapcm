@@ -6,7 +6,7 @@
 		<title>Tapestry</title>
   		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <%@include file="volunteer/volunteer_head.jsp" %>
-
+    <link rel="shortcut icon" href="/resources/images/favicon.ico" />
  	</head>
  	<body>
   <div id="headerholder"> 
