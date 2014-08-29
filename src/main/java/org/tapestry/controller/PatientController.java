@@ -67,7 +67,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private MessageDao messageDao;
 	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
-//   	private PictureDao pictureDao;
 	
    	//Mail-related settings;
    	private Properties props;
@@ -114,8 +113,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		messageDao = new MessageDao(DB, UN, PW);
 		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
 		surveyResultDao = new SurveyResultDao(DB, UN, PW);
-//		pictureDao = new PictureDao(DB, UN, PW);
-		
+
 		//Mail-related settings
 		final String username = mailUser;
 		final String password = mailPassword;
@@ -425,6 +423,17 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		
 		List<SurveyResult> surveys = surveyResultDao.getSurveysByPatientID(id);
 		model.addAttribute("surveys", surveys);
+		
+		HttpSession session = request.getSession();
+		User loggedInUser = Utils.getLoggedInUser(request);
+		
+ 		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		else
+		{
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
+		}
 		
 		return "/admin/display_client";
 	}
