@@ -190,10 +190,10 @@ public class TapestryController{
 		//get volunteer Id from login user		
 		int volunteerId= volunteerDao.getVolunteerIdByUsername(loggedInUser.getUsername());
 		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(volunteerId);		
-	
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-		model.addAttribute("unread", unreadMessages);
 		model.addAttribute("clients", clients);
+		
+		setUnreadMessage(request, model);
+		
 		return "volunteer/client";
 	}
 	
@@ -226,8 +226,8 @@ public class TapestryController{
 	
 	@RequestMapping(value="/manage_users", method=RequestMethod.POST)
 	public String searchOnUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model,
-			SecurityContextHolderAwareRequestWrapper request){
-	
+			SecurityContextHolderAwareRequestWrapper request)
+	{			
 		String name = request.getParameter("searchName");		
 		List<User> userList = userDao.getUsersByPartialName(name);		
 		model.addAttribute("users", userList);
@@ -236,6 +236,8 @@ public class TapestryController{
 			model.addAttribute("failed", true);
 		}		
 		model.addAttribute("searchName", name);
+		
+		setUnreadMessage(request, model);
 		
 		return "admin/manage_users";
 	}
@@ -336,8 +338,8 @@ public class TapestryController{
 	
 		User loggedInUser = getLoggedInUser(request);
 		model.addAttribute("vol", loggedInUser);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-		model.addAttribute("unread", unreadMessages);
+		setUnreadMessage(request, model);
+		
 		if (errorsPresent != null)
 			model.addAttribute("errors", errorsPresent);
 		if(success != null)
@@ -392,10 +394,8 @@ public class TapestryController{
 		
 		if (!(m.isRead()))
 			messageDao.markAsRead(id);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
-
-		model.addAttribute("unread", unreadMessages);
 		model.addAttribute("message", m);
+		setUnreadMessage(request, model);
 		
 		if (request.isUserInRole("ROLE_USER"))
 			return "/volunteer/view_message";
@@ -420,8 +420,7 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/send_message", method=RequestMethod.POST)
-	public String sendMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-	
+	public String sendMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		User loggedInUser = getLoggedInUser(request);
 		Message m = new Message();
 		
@@ -458,8 +457,7 @@ public class TapestryController{
 				messageDao.sendMessage(m);
 			}
 		}
-		else{ //Send to one person
-			
+		else{ //Send to one person			
 			String[] recipients = request.getParameterValues("recipient");
 			if(recipients != null) {
 				for (String recipientIDAsString: recipients){ //Annoyingly, the request comes as strings
@@ -488,7 +486,7 @@ public class TapestryController{
 						}
 					}
 				}
-			} else {
+			} else {				
 				return "redirect:/inbox?failure=true";
 			}
 		}
@@ -500,6 +498,7 @@ public class TapestryController{
 	public String deleteMessage(SecurityContextHolderAwareRequestWrapper request, 
 			@RequestParam(value="isRead", required=true) boolean isRead, @PathVariable("msgID") int id, ModelMap model)
 	{//if an unread message is deleted, unread indicator should be modified
+		System.out.println("hi===" + isRead);
 		if (!isRead){
 			HttpSession session = request.getSession();
 			if (session.getAttribute("unread_messages") != null)

@@ -11,9 +11,12 @@ import javax.servlet.http.HttpSession;
 
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
+import org.springframework.ui.ModelMap;
 import org.tapestry.controller.Utils;
 import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Patient;
+import org.tapestry.objects.User;
+import org.tapestry.dao.MessageDao;
 import org.tapestry.dao.PatientDao;
 
 public class MisUtils {
@@ -260,6 +263,21 @@ public class MisUtils {
 		} catch (Exception e){
 			System.out.println("something wrong with myoscar server");
 			e.printStackTrace();
+		}
+	}
+	
+	public static void setUnreadMsg(HttpSession session, SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model, MessageDao messageDao){		
+		if (session == null)
+			session = request.getSession();
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		else
+		{
+			User loggedInUser = Utils.getLoggedInUser(request);
+			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			model.addAttribute("unread", unreadMessages);
 		}
 	}
 	

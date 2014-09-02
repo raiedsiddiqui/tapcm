@@ -153,6 +153,9 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		} 		
 		model.addAttribute("searchName", name);
 		model.addAttribute("volunteers", volunteers);
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "/admin/view_volunteers";
 	}
 	
@@ -174,6 +177,9 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		}
 
 		model.addAttribute("organizations", organizations);
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		return "/admin/add_volunteer";
 	}
@@ -229,6 +235,10 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		//get all messages		
 		List<Message> messages = messageDao.getAllMessagesForRecipient(Utils.getLoggedInUserId(request));
 		model.addAttribute("messages", messages);		
+		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		return "/admin/display_volunteer";
 	}	
@@ -357,7 +367,10 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		model.addAttribute("wednesdayNull", wednesdayNull);
 		model.addAttribute("thursdayNull", thursdayNull);
 		model.addAttribute("fridayNull", fridayNull);
-		model.addAttribute("organizations", organizations);
+		model.addAttribute("organizations", organizations);		
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 				
 		return "/admin/modify_volunteer";
 	}
@@ -657,20 +670,15 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		HttpSession session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
-			model.addAttribute("unread", session.getAttribute("unread_messages"));
-		else
-		{
-			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-			model.addAttribute("unread", unreadMessages);
-		}
+			model.addAttribute("unread", session.getAttribute("unread_messages"));		
 			
 		return "/admin/view_activityLogs";
 	}
 		
 	//display all activity logs for selected volunteer
 	@RequestMapping(value="/view_activity_admin", method=RequestMethod.POST)
-	public String viewActivityBySelectedVolunteerByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
-		
+	public String viewActivityBySelectedVolunteerByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		String strVId = request.getParameter("search_volunteer");		
 		List<Activity> activities = new ArrayList<Activity>();
 		
@@ -686,6 +694,10 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		model.addAttribute("activityLogs", activities);	
 		model.addAttribute("volunteers", volunteers);	
 		model.addAttribute("selectedVolunteer", strVId);
+		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 			
 		return "/admin/view_activityLogs";
 	}
@@ -697,7 +709,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		List<Activity> activities = new ArrayList<Activity>();
 		activities = activityDao.getAllActivitiesForVolunteer(volunteerId);
 					
-			//check if there is message should be displayed
+		//check if there is message should be displayed
 		if (session.getAttribute("ActivityMessage") != null)
 		{
 			String message = session.getAttribute("ActivityMessage").toString();
@@ -716,12 +728,18 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			}			
 		}
 		model.addAttribute("activityLogs", activities);	
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 			
 		return "/volunteer/view_activityLogs";
 	}
 		
 	@RequestMapping(value="/new_activity", method=RequestMethod.GET)
-	public String newActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
+	public String newActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "/volunteer/new_activityLogs";
 	}
 		
@@ -763,7 +781,8 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		activityDao.logActivity(activity);
 			
 		//update view activity page with new record		
-		session.setAttribute("ActivityMessage", "C");
+		session.setAttribute("ActivityMessage", "C");		
+		
 		return "redirect:/view_activity";
 	}	
 		
@@ -783,9 +802,12 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	public String modifyActivityLog(SecurityContextHolderAwareRequestWrapper request, 
 			@PathVariable("activityId") int id, ModelMap model){
 		Activity activity = new Activity();
-		activity = activityDao.getActivityLogById(id);
-			
+		activity = activityDao.getActivityLogById(id);			
 		model.addAttribute("activityLog", activity);
+		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 			
 		return "/volunteer/modify_activityLog";
 	}
@@ -885,12 +907,18 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		} 		
 		model.addAttribute("searchName", name);
 		model.addAttribute("organizations", organizations);	
+		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "/admin/view_organizations";
 	}
 	
 	@RequestMapping(value="/new_organization", method=RequestMethod.GET)
 	public String newOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "/admin/add_organization";
 	}
 	
@@ -916,7 +944,11 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		{
 			HttpSession session = request.getSession();
 			session.setAttribute("organizatioMessage", "C");							
-		}			
+		}		
+		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "redirect:/view_organizations";			
 	}	
 	
