@@ -67,7 +67,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private MessageDao messageDao;
 	private SurveyTemplateDao surveyTemplateDao;
    	private SurveyResultDao surveyResultDao;
-//   	private PictureDao pictureDao;
 	
    	//Mail-related settings;
    	private Properties props;
@@ -114,8 +113,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		messageDao = new MessageDao(DB, UN, PW);
 		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
 		surveyResultDao = new SurveyResultDao(DB, UN, PW);
-//		pictureDao = new PictureDao(DB, UN, PW);
-		
+
 		//Mail-related settings
 		final String username = mailUser;
 		final String password = mailPassword;
@@ -235,12 +233,16 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	}
    	
    	@RequestMapping(value="/edit_patient/{id}", method=RequestMethod.GET)
-	public String editPatientForm(@PathVariable("id") int patientID, ModelMap model){   		
+	public String editPatientForm(@PathVariable("id") int patientID,SecurityContextHolderAwareRequestWrapper request, ModelMap model){   		
 		Patient p = patientDao.getPatientByID(patientID);		
 		model.addAttribute("patient", p);		
 		
 		List<Volunteer> volunteers = volunteerDao.getAllVolunteers();			
 		model.addAttribute("volunteers", volunteers);	
+		
+		HttpSession session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)		
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		return "/admin/edit_patient"; //Why this one requires a slash when none of the others do, I do not know.
 	}
@@ -273,8 +275,12 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			model.addAttribute("updatePatientSuccessfully",true);
 		}
 		else
-			model.addAttribute("misMatchedVolunteer",true);				
-
+			model.addAttribute("misMatchedVolunteer",true);		
+		
+		HttpSession session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)		
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
         loadPatientsAndVolunteers(model);
         
 		return "/admin/manage_patients";
@@ -302,10 +308,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		if (session.getAttribute("logged_in_volunteer") != null)
 			volunteerId = Integer.parseInt(session.getAttribute("logged_in_volunteer").toString());
 		else
-			volunteerId = Utils.getVolunteerByLoginUser(request, volunteerDao);
-		
-		int userId = u.getUserID();
-		
+			volunteerId = Utils.getVolunteerByLoginUser(request, volunteerDao);		
 		//Make sure that the user is actually responsible for the patient in question
 		int volunteerForPatient = patient.getVolunteer();
 		if (!(volunteerId == patient.getVolunteer()) && !(volunteerId == patient.getPartner()))
@@ -316,8 +319,10 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			return "redirect:/403";
 		}
 		model.addAttribute("patient", patient);
-		int unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
-		model.addAttribute("unread", unreadMessages);
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));		
+
 		ArrayList<SurveyResult> completedSurveyResultList = surveyResultDao.getCompletedSurveysByPatientID(id);
 		ArrayList<SurveyResult> incompleteSurveyResultList = surveyResultDao.getIncompleteSurveysByPatientID(id);
 		Collections.sort(completedSurveyResultList);
@@ -345,8 +350,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		else 
 			sb.append(patient.getDisplayName());
 		
-		activityDao.addUserLog(sb.toString(), u);	
-				
+		activityDao.addUserLog(sb.toString(), u);					
 		//save selected appointmentId in the session for other screen, like narrative		
 		session.setAttribute("appointmentId", appointmentId);
 		session.setAttribute("patientId", id);
@@ -357,18 +361,12 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	@RequestMapping(value="/view_clients_admin", method=RequestMethod.GET)
 	public String viewPatientsFromAdmin(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		HttpSession session = request.getSession();
-		User loggedInUser = Utils.getLoggedInUser(request);
 		
 		List<Patient> patients = MisUtils.getAllPatientsWithFullInfos(patientDao, request);
 		model.addAttribute("patients", patients);
 		
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
-		else
-		{
-			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-			model.addAttribute("unread", unreadMessages);
-		}
 		
 		return "/admin/view_clients";
 	}
@@ -377,12 +375,15 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	@RequestMapping(value="/view_clients_admin", method=RequestMethod.POST)
 	public String viewPatientsBySelectedName(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		String name = request.getParameter("searchName");
+		HttpSession session = request.getSession();
 		List<Patient> patients = new ArrayList<Patient>();
 		
 		patients = patientDao.getPatientssByPartialName(name);			
 		model.addAttribute("searchName", name);	 
 		model.addAttribute("patients", patients);
 		
+		if (session.getAttribute("unread_messages") != null)		
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "/admin/view_clients";		
 	}
 	
@@ -398,8 +399,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 				patient = p;
 				break;
 			}
-		}		
-		
+		}				
 		model.addAttribute("patient", patient);
 		
 		int totalSurveys = surveyTemplateDao.countSurveyTemplate();
@@ -426,6 +426,9 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		List<SurveyResult> surveys = surveyResultDao.getSurveysByPatientID(id);
 		model.addAttribute("surveys", surveys);
 		
+		HttpSession session = request.getSession();				
+ 		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));				
 		return "/admin/display_client";
 	}
 	

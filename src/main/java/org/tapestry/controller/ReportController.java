@@ -50,6 +50,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.ColumnText;
+import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
@@ -504,7 +505,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		buildPDF(report, response);
 	
 		return null;
-	}	
+	}
 	
 	private void buildPDF(Report report, HttpServletResponse response){		
 		String patientName = report.getPatient().getFirstName() + " " + report.getPatient().getLastName();
@@ -512,39 +513,10 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		try {
 			Document document = new Document();
 			document.setPageSize(PageSize.A4);
-			document.setMargins(36, 36, 36, 36);
+			document.setMargins(36, 36, 60, 36);
 			document.setMarginMirroring(true);
 			response.setHeader("Content-Disposition", "outline;filename=\"" +orignalFileName+ "\"");
 			PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
-
-//			ReportHeader event = new ReportHeader();
-//			writer.setPageEvent(event);			
-			
-			document.open();
-	            
-			Image imageFhs = Image.getInstance("webapps/tapestry/resources/images/fhs.png");
-			imageFhs.scalePercent(25f);
-			imageFhs.setAbsolutePosition(450, PageSize.A4.getHeight() - imageFhs.getScaledHeight());	
-			document.add(imageFhs);	            
-	            
-			Image imageLogo = Image.getInstance("webapps/tapestry/resources/images/logo.png"); 
-			imageLogo.scalePercent(25f);
-			imageLogo.setAbsolutePosition(50, PageSize.A4.getHeight()-imageFhs.getScaledHeight());	            
-
-			document.add(imageLogo);
-	            
-			Image imageDegroote = Image.getInstance("webapps/tapestry/resources/images/degroote.png");
-			imageDegroote.scalePercent(25f);
-			imageDegroote.setAbsolutePosition(250, PageSize.A4.getHeight() - imageFhs.getScaledHeight());	
-			document.add(imageDegroote);
-	            
-			document.add(new Phrase("    "));
-			document.add(new Phrase("    "));
-			document.add(new Phrase("    "));
-			document.add(new Phrase("    "));
-			document.add(new Phrase("    "));
-	            
-			//tapestry report		        
 			//Font setup
 			//white font			
 			Font wbLargeFont = new Font(Font.FontFamily.HELVETICA  , 20, Font.BOLD);
@@ -553,17 +525,13 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			wMediumFont.setColor(BaseColor.WHITE);
 			//red font
 			Font rbFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD);
-			rbFont.setColor(BaseColor.RED);
-			
+			rbFont.setColor(BaseColor.RED);			
 			Font rmFont = new Font(Font.FontFamily.HELVETICA, 16);
-			rmFont.setColor(BaseColor.RED);
-			
+			rmFont.setColor(BaseColor.RED);			
 			Font rFont = new Font(Font.FontFamily.HELVETICA, 20);
-			rFont.setColor(BaseColor.RED);
-		        
+			rFont.setColor(BaseColor.RED);		        
 			Font rMediumFont = new Font(Font.FontFamily.HELVETICA, 12);
-			rMediumFont.setColor(BaseColor.RED);
-		        
+			rMediumFont.setColor(BaseColor.RED);		        
 			Font rSmallFont = new Font(Font.FontFamily.HELVETICA, 8);
 			rSmallFont.setColor(BaseColor.RED);
 			//green font
@@ -579,29 +547,46 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			Font iSmallFont = new Font(Font.FontFamily.HELVETICA , 9, Font.ITALIC );
 			Font ibMediumFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLDITALIC);
 			Font bmFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
-			Font blFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD);
-		
+			Font blFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD);	
+			//set multiple images as header
+			List<Image> imageHeader = new ArrayList<Image>();      	
+	            
+			Image imageLogo = Image.getInstance("webapps/tapestry/resources/images/logo.png"); 
+			imageLogo.scalePercent(25f);
+			imageHeader.add(imageLogo);			
+				            
+			Image imageDegroote = Image.getInstance("webapps/tapestry/resources/images/degroote.png");
+			imageDegroote.scalePercent(25f);
+			imageHeader.add(imageDegroote);	
+			
+			Image imageFhs = Image.getInstance("webapps/tapestry/resources/images/fhs.png");
+			imageFhs.scalePercent(25f);	
+			imageHeader.add(imageFhs);
+						
+			ReportHeader event = new ReportHeader();
+			event.setHeader(imageHeader);
+			writer.setPageEvent(event);			
+			
+			document.open(); 
 			//Patient info
 			PdfPTable table = new PdfPTable(2);
 			table.setWidthPercentage(100);
-	        
-			float[] columWidths = {1f, 2f};
-			table.setWidths(columWidths);
+			table.setWidths(new float[]{1f, 2f});
 			
-			PdfPCell cell;
-			
-			cell = new PdfPCell(new Phrase(patientName, sbFont));
+			PdfPCell cell = new PdfPCell(new Phrase(patientName, sbFont));
 			cell.setBorderWidthTop(1f);
 			cell.setBorderWidthLeft(1f);
 			cell.setBorderWidthBottom(0);
 			cell.setBorderWidthRight(0);		
+			cell.setPadding(5);
 			table.addCell(cell);
 	            
 			cell = new PdfPCell(new Phrase("Address: 11 hunter Street S, Hamilton, On" + report.getPatient().getAddress(), sbFont));
 			cell.setBorderWidthTop(1f);
 			cell.setBorderWidthRight(1f);
 			cell.setBorderWidthLeft(0);
-			cell.setBorderWidthBottom(0);	            
+			cell.setBorderWidthBottom(0);	 
+			cell.setPadding(5);
 			table.addCell(cell);
 		     
 			cell = new PdfPCell(new Phrase("MRP: David Chan", sbFont));
@@ -609,7 +594,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			cell.setBorderWidthTop(0);	          
 			cell.setBorderWidthBottom(0);
 			cell.setBorderWidthRight(0);
-		        
+			cell.setPadding(5);
 			table.addCell(cell);
 		        
 			cell = new PdfPCell( new Phrase("Date of visit: " + report.getAppointment().getDate(), sbFont));
@@ -617,26 +602,30 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			cell.setBorderWidthTop(0);
 			cell.setBorderWidthLeft(0);
 			cell.setBorderWidthBottom(0);
+			cell.setPadding(5);
 			table.addCell(cell);
 		        
 			cell = new PdfPCell(new Phrase("Time: " + report.getAppointment().getTime(), sbFont));
 			cell.setBorderWidthLeft(1f);
 			cell.setBorderWidthBottom(1f);
 			cell.setBorderWidthTop(0);
-			cell.setBorderWidthRight(0);		        
+			cell.setBorderWidthRight(0);	
+			cell.setPadding(5);
 			table.addCell(cell);
 		        
 			cell = new PdfPCell(new Phrase("Visit: " + report.getAppointment().getStrType(), sbFont));
 			cell.setBorderWidthRight(1f);
 			cell.setBorderWidthBottom(1f);
 			cell.setBorderWidthTop(0);
-			cell.setBorderWidthLeft(0);	          
+			cell.setBorderWidthLeft(0);	  
+			cell.setPadding(5);
 			table.addCell(cell);
-		        
+	        
 			document.add(table);		   	        
 			//Patient Info	
 			table = new PdfPTable(1);
 			table.setWidthPercentage(100);
+//			cell = new PdfPCell(new Phrase("TAPESTRY REPORT: --- " + report.getPatient().getBod(), blFont));
 			cell = new PdfPCell(new Phrase("TAPESTRY REPORT: --- (0000-00-00)", blFont));
 			cell.setBorder(0);
 			table.addCell(cell);
@@ -652,15 +641,16 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 				cell = new PdfPCell(new Phrase(report.getPatientGoals().get(i).toString()));
 				table.addCell(cell);
 			}	            
-			document.add(table);	           
+			document.add(table);			
 			//alert
 			table = new PdfPTable(1);
 			table.setWidthPercentage(100);
-	            
+			float[] cWidths = {1f, 18f};
+		            
 			Phrase comb = new Phrase(); 
 			comb.add(new Phrase("     ALERT :", rbFont));
 			comb.add(new Phrase(" Consider Case Review wirh IP-TEAM", wbLargeFont));	    
-			cell.addElement(comb);
+			cell.addElement(comb);	
 			cell.setBackgroundColor(BaseColor.BLACK);	           
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -668,11 +658,12 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			List<String> alerts = report.getAlerts(); 
 	         	            
 			for (int i =0; i<alerts.size(); i++){
-				cell = new PdfPCell(new Phrase(" . " + alerts.get(i).toString(), rmFont));
+				cell = new PdfPCell(new Phrase(" . " + alerts.get(i).toString(), rmFont));		
+				cell.setPadding(3);
 				table.addCell(cell);
 			}
 			document.add(table);
-	            
+			document.add(new Phrase("    "));   
 			//Key observation
 			table = new PdfPTable(1);
 			table.setWidthPercentage(100);
@@ -686,8 +677,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	            
 			cell = new PdfPCell(new Phrase(report.getAppointment().getKeyObservation()));
 			table.addCell(cell);
-			document.add(table);	           
-	            
+			document.add(table);
 			//Plan
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
@@ -707,20 +697,18 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			for (int i = 1; i<= pList.size(); i++){
 				pMap.put(String.valueOf(i), pList.get(i-1));
 			}
-	    		
 			for (Map.Entry<String, String> entry : pMap.entrySet()) {
 				cell = new PdfPCell(new Phrase(entry.getKey()));
+				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 				table.addCell(cell);	            	
 	            	
 				cell = new PdfPCell(new Phrase(entry.getValue()));
 				table.addCell(cell); 
-			}	                        
-	            
-			float[] cWidths = {1f, 18f};
-			table.setWidths(cWidths);
+			}			
+			table.setWidths(new float[]{1f, 18f});
 			document.add(table);
-			document.add(new Phrase("    "));
-	           
+			document.add(new Phrase("    "));	           
 			//Additional Information
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
@@ -761,9 +749,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			float[] aWidths = {24f, 3f};
 			table.setWidths(aWidths);
 			document.add(table);
-			document.add(new Phrase("    "));
-	            
-//			document.newPage();
+			document.newPage();
 			//Summary of Tapestry tools
 			table = new PdfPTable(3);
 			table.setWidthPercentage(100);
@@ -928,8 +914,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			table.addCell(cell);
 	            
 			////Mobility
-			PdfPTable nest_table1 = new PdfPTable(1);
-			
+			PdfPTable nest_table1 = new PdfPTable(1);			
 			cell = new PdfPCell(new Phrase("Mobility ", mFont));	               
 			cell.setVerticalAlignment(Element.ALIGN_TOP);		         
 			cell.setBorderWidthLeft(0);
@@ -940,8 +925,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	            
 			cell = new PdfPCell(new Phrase("Walking 2.0 km ", sFont));	               
 			cell.setVerticalAlignment(Element.ALIGN_TOP);	   
-			cell.setBorder(0);
-	            
+			cell.setBorder(0);	            
 			nest_table1.addCell(cell);
 	            
 			cell = new PdfPCell(new Phrase("Walking 0.5 km ", sFont));	               
@@ -960,8 +944,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			cell.setBorderWidthRight(0);	
 			nest_table1.addCell(cell);
 	            
-			PdfPTable nest_table2 = new PdfPTable(1);
-	            
+			PdfPTable nest_table2 = new PdfPTable(1);	            
 			cell = new PdfPCell(new Phrase(" ", mFont));	               
 			cell.setVerticalAlignment(Element.ALIGN_TOP);
 			cell.setBorderWidthLeft(0);
@@ -1045,8 +1028,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			table.addCell(cell);
 	            
 			document.add(table);
-			document.add(new Phrase("    "));
-	            
+			document.add(new Phrase("    "));	            
 			//Tapestry Questions
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
@@ -1065,11 +1047,9 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	            
 				cell = new PdfPCell(new Phrase(entry.getValue(), sFont));
 				table.addCell(cell); 
-			}
-	           
+			}	           
 			table.setWidths(cWidths);
 			document.add(table);
-
 			//Volunteer Information
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
@@ -1081,18 +1061,24 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			table.addCell(cell);
 	            
 			cell = new PdfPCell(new Phrase("1", bmFont));
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
 	            
 			cell = new PdfPCell(new Phrase(report.getAppointment().getVolunteer(), ibMediumFont));
 			table.addCell(cell);
 	            
 			cell = new PdfPCell(new Phrase("2", bmFont));
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
 	            
 			cell = new PdfPCell(new Phrase(report.getAppointment().getPartner(), ibMediumFont));
 			table.addCell(cell);
 	            
 			cell = new PdfPCell(new Phrase("V", gbMediumFont));
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			table.addCell(cell);
 	            
 			cell = new PdfPCell(new Phrase(report.getAppointment().getComments(), gbMediumFont));
@@ -1109,37 +1095,41 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	}
 	
 	class ReportHeader extends PdfPageEventHelper {
-		String header;
+		List<Image> header;
 		PdfTemplate total;
 		
-		public void setHeader(String header){
+		public void setHeader(List<Image> header){
 			this.header = header;
 		}
 		
 		public void onOpenDocument(PdfWriter writer, Document document){
-			total = writer.getDirectContent().createAppearance(30, 16);
+			total = writer.getDirectContent().createAppearance(10, 16);
 		}
 		
 		public void onEndPage(PdfWriter writer, Document document){
 			PdfPTable table = new PdfPTable(3);
-            try {
-                table.setWidths(new int[]{24, 24, 2});
-                table.setTotalWidth(527);
+            try
+            { 
+            	table.setTotalWidth(527);
                 table.setLockedWidth(true);
-                table.getDefaultCell().setFixedHeight(20);
+                table.getDefaultCell().setFixedHeight(header.get(2).getScaledHeight());
                 table.getDefaultCell().setBorder(0);
-    //            table.getDefaultCell().setBorder(Rectangle.BOTTOM);
-                table.addCell(header);
-                table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
-                table.addCell(String.format("Page %d of", writer.getPageNumber()));
-                PdfPCell cell = new PdfPCell(Image.getInstance(total));
-                cell.setBorder(Rectangle.BOTTOM);
-                table.addCell(cell);
-                table.writeSelectedRows(0, -1, 34, 803, writer.getDirectContent());
                 
+                table.addCell(header.get(0));
+                table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);                
+                table.addCell(header.get(1));
+                table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER);
+                table.addCell(header.get(2));
+                table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT);
+                //set page number
+//                table.addCell(String.format("Page %d of", writer.getPageNumber()));
+//                PdfPCell cell = new PdfPCell(Image.getInstance(total));
+//                cell.setBorder(0);    
+//                table.addCell(cell);
+                table.writeSelectedRows(0, -1, 34, 823, writer.getDirectContent());  
             }
-            catch(DocumentException de) {
-                throw new ExceptionConverter(de);
+            catch (Exception e){
+
             }
 		}
 		

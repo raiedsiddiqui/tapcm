@@ -125,7 +125,8 @@ public class SurveyController{
 	}	
 
 	@RequestMapping(value="/search_survey", method=RequestMethod.POST)
-	public String searchSurvey(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+	public String searchSurvey(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, 
+			SecurityContextHolderAwareRequestWrapper request){
 		
 		String title = request.getParameter("searchTitle");		
 		List<SurveyTemplate>  surveyTemplateList = surveyTemplateDao.getSurveyTemplatesByPartialTitle(title);
@@ -137,6 +138,9 @@ public class SurveyController{
 		}		 
 		
 		model.addAttribute("searchTitle", title);
+		HttpSession session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		return "admin/manage_survey";
 	}
@@ -154,6 +158,10 @@ public class SurveyController{
         if(failed != null) {
         	model.addAttribute("failed", true);
         }
+        HttpSession session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+        
 		return "admin/manage_surveys";
 	}
    	
@@ -187,6 +195,9 @@ public class SurveyController{
    				model.addAttribute("hideClients", true);
    			}
    		}
+   		HttpSession session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
    		
 		return "/admin/assign_survey";
 	} 
@@ -275,6 +286,10 @@ public class SurveyController{
 	   		model.addAttribute("surveyTemplates", sTemplates);
 	   		model.addAttribute("patients", patients);
    		}
+   		
+   		HttpSession session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "admin/assign_survey";
 	}
    
@@ -510,6 +525,10 @@ public class SurveyController{
 
    		model.addAttribute("results", displayedResults);
    		model.addAttribute("id", id);
+   		HttpSession session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+   		
    		return "/admin/view_survey_results";
    	}
    	
@@ -554,7 +573,7 @@ public class SurveyController{
    		} catch (Exception e) {
    			e.printStackTrace();
    		}
-   		
+   		   		
    		return "admin/manage_survey";
    	}
    	

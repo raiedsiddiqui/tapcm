@@ -241,15 +241,9 @@ public class AppointmentController{
    		model.addAttribute("pendingAppointments", allPendingAppointments);   		
    		model.addAttribute("patients", allPatients);
    		
-   		HttpSession session = request.getSession();
-		User loggedInUser = Utils.getLoggedInUser(request);
+   		HttpSession  session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
-		else
-		{
-			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
-			model.addAttribute("unread", unreadMessages);
-		}
    		
    		if(appointmentBooked != null)
    			model.addAttribute("success", appointmentBooked);
@@ -301,8 +295,7 @@ public class AppointmentController{
    	
    	@RequestMapping(value="/display_appointment/{appointmentID}", method=RequestMethod.GET)
    	public String displayAppointment(@PathVariable("appointmentID") int id, 
-   			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-   		
+   			SecurityContextHolderAwareRequestWrapper request, ModelMap model){   		
    		Appointment appointment = appointmentDao.getAppointmentById(id);
    		model.addAttribute("appointment", appointment);
    		
@@ -337,13 +330,16 @@ public class AppointmentController{
    	@RequestMapping(value="/book_appointment", method=RequestMethod.GET)
 	public String goAddAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
    		List<Patient> patients = new ArrayList<Patient>();
+   		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
    		
    		if (request.isUserInRole("ROLE_USER"))
    		{
    			int loggedInVolunteer = MisUtils.getLoggedInVolunteerId(request);
-   			patients = patientDao.getPatientsForVolunteer(loggedInVolunteer);
-   			model.addAttribute("patients", patients);
+   			patients = patientDao.getPatientsForVolunteer(loggedInVolunteer);   			
    			
+   			model.addAttribute("patients", patients);
    			return "/volunteer/volunteer_book_appointment";
    		}
    		else
@@ -558,6 +554,9 @@ public class AppointmentController{
 	
 	@RequestMapping(value="/go_scheduler", method=RequestMethod.GET)
 	public String goScheduler( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		return "/admin/go_scheduler";
 	}
@@ -573,6 +572,10 @@ public class AppointmentController{
 		model.addAttribute("patients",patients);
 		model.addAttribute("allvolunteers",allVolunteers);		
 		model.addAttribute("matcheList", matchList);
+		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 	
 		return "/admin/view_scheduler";
 	}
@@ -602,7 +605,10 @@ public class AppointmentController{
 		//save volunteers id in the session
 		HttpSession  session = request.getSession();	
 		session.setAttribute("volunteerId", volunteerId);
-		session.setAttribute("partnerId", partnerId);		
+		session.setAttribute("partnerId", partnerId);				
+	
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 
 		return "/admin/schedule_appointment";
 	}
@@ -678,6 +684,9 @@ public class AppointmentController{
 		model.addAttribute("volunteerTwo",v2);
 		model.addAttribute("patients", patients);
 		model.addAttribute("selectedPatient", patientId);
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		return "/admin/manage_appointments";		
 	}
@@ -714,6 +723,10 @@ public class AppointmentController{
 					model.addAttribute("matcheList",matchList);	
 			}
 		}		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
 		return "/admin/view_scheduler";
 	}
 	
@@ -819,6 +832,9 @@ public class AppointmentController{
 		model.addAttribute("appointment", appt);
 		model.addAttribute("patient", patient);		
 		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
 		return "/volunteer/add_alerts_keyObservation";
 	}
 	
@@ -887,7 +903,9 @@ public class AppointmentController{
 		model.addAttribute("appointment", appt);
 		model.addAttribute("patient", patient);
 		model.addAttribute("plans", planDef);
-		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "/volunteer/add_plan";
 	}
 	
@@ -901,7 +919,7 @@ public class AppointmentController{
 	@RequestMapping(value="/savePlans", method=RequestMethod.POST)
 	public String savePlans(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		
-		int patientId = getPatientId(request);
+//		int patientId = getPatientId(request);
 		int appointmentId = getAppointmentId(request);
 		
 		StringBuffer sb = new StringBuffer();		
@@ -968,12 +986,15 @@ public class AppointmentController{
 		String firstName = vName.substring(0, index);
 		String lastName = vName.substring(index);
 		
-		String termsInfo = MisUtils.getMyOscarAuthenticationInfo();
+//		String termsInfo = MisUtils.getMyOscarAuthenticationInfo();
 		
 		model.addAttribute("patient", patient);
 		model.addAttribute("vFirstName", firstName);
 		model.addAttribute("vLastName", lastName);
-		model.addAttribute("termsInfo", termsInfo);			
+//		model.addAttribute("termsInfo", termsInfo);	
+	
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		return "/volunteer/client_myoscar_authentication";
 	}
@@ -982,8 +1003,9 @@ public class AppointmentController{
 	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
 		
 		Appointment appointment = appointmentDao.getAppointmentById(id);
-//		int unreadMessages = messageDao.countUnreadMessagesForRecipient(appointment.getVolunteerID());
-//		model.addAttribute("unread", unreadMessages);		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		Patient patient = patientDao.getPatientByID(appointment.getPatientID());
 		model.addAttribute("appointment", appointment);
@@ -1006,6 +1028,10 @@ public class AppointmentController{
 		if (appt.getType() == 0)
 		{//first visit						
 			System.out.println("in complete visit, for first visit and and go to alert and keyObservation");
+			HttpSession  session = request.getSession();
+			if (session.getAttribute("unread_messages") != null)
+				model.addAttribute("unread", session.getAttribute("unread_messages"));
+			
 			return "/volunteer/add_alerts_keyObservation";			
 		}
 		else
@@ -1338,6 +1364,8 @@ public class AppointmentController{
 			}			
 		}
 		
+		MisUtils.setUnreadMsg(session, request, model, messageDao);
+		
 		model.addAttribute("narratives", narratives);	
 		return "/volunteer/view_narrative";
 	}
@@ -1357,6 +1385,8 @@ public class AppointmentController{
 		narrative.setEditDate(editDate);
 		
 		model.addAttribute("narrative", narrative);	
+		
+		MisUtils.setUnreadMsg(null, request, model, messageDao);
 		
 		return "/volunteer/modify_narrative";
 	}
