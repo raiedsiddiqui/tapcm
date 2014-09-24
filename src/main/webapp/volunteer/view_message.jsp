@@ -59,7 +59,7 @@
 				<div class="well">
 					<p>From: ${message.sender}</p>
 					<p>${message.text}</p>
-					<a href="<c:url value="/delete_message/${message.messageID}"/>" class="btn btn-danger">Delete</a>
+					<a href="<c:url value="/delete_message/${message.messageID}?isRead=true"/>" class="btn btn-danger">Delete</a>
 					<button onclick="document.getElementById('replyForm').style.display='block'" class="btn btn-primary">Reply</button>
 				</div>
 			</div>
@@ -67,7 +67,7 @@
 	</div>
 
 	<div id="replyForm" style="display:none;" class="span12">
-		<form id="reply" action="<c:url value="/reply_to/${message.messageID}"/>" method="POST">
+		<form id="reply" action="<c:url value="/reply_to/${message.messageID}"/>" method="post">
 			<label>Message:</label>
 			<textarea name="msgBody"></textarea><br/>
 			<input type="submit" class="btn btn-primary" value="Send"/>

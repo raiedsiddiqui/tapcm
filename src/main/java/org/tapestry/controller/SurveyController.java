@@ -14,10 +14,12 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -32,11 +34,17 @@ import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyQuestion;
-import org.tapestry.dao.ActivityDao;
-import org.tapestry.dao.AppointmentDao;
-import org.tapestry.dao.PatientDao;
-import org.tapestry.dao.SurveyResultDao;
-import org.tapestry.dao.SurveyTemplateDao;
+import org.tapestry.dao.ActivityDAO;
+import org.tapestry.dao.ActivityDAOImpl;
+//import org.tapestry.dao.ActivityDao;
+import org.tapestry.dao.AppointmentDAO;
+import org.tapestry.dao.AppointmentDAOImpl;
+import org.tapestry.dao.PatientDAO;
+import org.tapestry.dao.PatientDAOImpl;
+import org.tapestry.dao.SurveyResultDAO;
+import org.tapestry.dao.SurveyResultDAOImpl;
+import org.tapestry.dao.SurveyTemplateDAO;
+import org.tapestry.dao.SurveyTemplateDAOImpl;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.DisplayedSurveyResult;
 import org.tapestry.objects.Patient;
@@ -58,43 +66,76 @@ public class SurveyController{
 	private Map<String, String> config;
 	private Yaml yaml;
 	
-	private SurveyResultDao surveyResultDao;
-	private SurveyTemplateDao surveyTemplateDao;
-	private PatientDao patientDao;
-	private AppointmentDao appointmentDao;
-	private ActivityDao activityDao;
+	private SurveyResultDAO surveyResultDao = getSurveyResultDAO();
+	private SurveyTemplateDAO surveyTemplateDao = getSurveyTemplateDAO();
+	private PatientDAO patientDao = getPatientDAO();
+	private AppointmentDAO appointmentDao = getAppointmentDAO();
+	private ActivityDAO activityDao = getActivityDAO();
 	
 	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
    	 */
    	@PostConstruct
    	public void readDatabaseConfig(){
-   		String DB = "";
-   		String UN = "";
-   		String PW = "";
+ 
 		try{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
 			yaml = new Yaml();
 			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-			DB = config.get("url");
-			UN = config.get("username");
-			PW = config.get("password");
+			
 		} catch (IOException e) {
 			System.out.println("Error reading from config file");
 			System.out.println(e.toString());
 		}
-		surveyResultDao = new SurveyResultDao(DB, UN, PW);
-		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
-		patientDao = new PatientDao(DB, UN, PW);
-		activityDao = new ActivityDao(DB, UN, PW);
-		appointmentDao = new AppointmentDao(DB, UN, PW);
-
    	}
+   	
+   	public DataSource getDataSource() {
+    	try{
+			dbConfigFile = new ClassPathResource("tapestry.yaml");
+			yaml = new Yaml();
+			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
+			String url = config.get("url");
+			String username = config.get("username");
+			String password = config.get("password");
+			
+			DriverManagerDataSource dataSource = new DriverManagerDataSource();
+	        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+	        dataSource.setUrl(url);
+	        dataSource.setUsername(username);
+	        dataSource.setPassword(password);
+	         
+	        return dataSource;		
+	        
+		} catch (IOException e) {			
+			e.printStackTrace();			
+			return null;
+		}
+    }
+    
+    public ActivityDAO getActivityDAO(){
+    	return new ActivityDAOImpl(getDataSource());
+    }
+    
+    public SurveyTemplateDAO getSurveyTemplateDAO(){
+    	return new SurveyTemplateDAOImpl(getDataSource());
+    }
+    
+    public SurveyResultDAO getSurveyResultDAO(){
+    	return new SurveyResultDAOImpl(getDataSource());
+    }
+    
+    public AppointmentDAO getAppointmentDAO(){
+    	return new AppointmentDAOImpl(getDataSource());
+    }
+    
+    public PatientDAO getPatientDAO(){
+    	return new PatientDAOImpl(getDataSource());
+    }
    	
 	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
 	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
+		List<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
 		model.addAttribute("survey_templates", surveyTemplateList);
 		if (deleteFailed != null)
 			model.addAttribute("failed", deleteFailed);
@@ -147,13 +188,13 @@ public class SurveyController{
    	
    	@RequestMapping(value="/manage_surveys", method=RequestMethod.GET)
 	public String manageSurveys(@RequestParam(value="failed", required=false) String failed, ModelMap model, HttpServletRequest request){
-   		ArrayList<SurveyResult> surveyResultList = surveyResultDao.getAllSurveyResults();
+   		List<SurveyResult> surveyResultList = surveyResultDao.getAllSurveyResults();
 		model.addAttribute("surveys", surveyResultList);
-		ArrayList<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
+		List<SurveyTemplate> surveyTemplateList = surveyTemplateDao.getAllSurveyTemplates();
 		model.addAttribute("survey_templates", surveyTemplateList);
 		
 		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResultList, surveyTemplateList);
-	    ArrayList<Patient> patientList = patientDao.getAllPatients();
+	    List<Patient> patientList = patientDao.getAllPatients();
         model.addAttribute("patients", patientList);
         if(failed != null) {
         	model.addAttribute("failed", true);
@@ -300,8 +341,8 @@ public class SurveyController{
 		if(patients == null) {
 			return "redirect:/manage_surveys?failed=true";
 		}
-		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
-   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+		List<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+   		List<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
    		TapestrySurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
    		int surveyId = Integer.parseInt(request.getParameter("surveyID"));
 		SurveyTemplate st = surveyTemplateDao.getSurveyTemplateByID(surveyId);
@@ -352,7 +393,7 @@ public class SurveyController{
  	
    	@RequestMapping(value="/delete_survey_template/{surveyID}", method=RequestMethod.GET)
    	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model){   		
-   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResultsBySurveyId(id);  		
+   		List<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResultsBySurveyId(id);  		
    		
    		if(surveyResults.isEmpty()) {
    			surveyTemplateDao.deleteSurveyTemplate(id);
@@ -394,8 +435,8 @@ public class SurveyController{
    	@RequestMapping(value="/show_survey/{resultID}", method=RequestMethod.GET)
    	public ModelAndView showSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {   		   		
    		ModelAndView redirectAction = null;
-   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
-		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+   		List<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+		List<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		SurveyTemplate surveyTemplate = surveyTemplateDao.getSurveyTemplateByID(surveyResult.getSurveyID());
 		
@@ -429,8 +470,8 @@ public class SurveyController{
    	public String saveAndExit(@PathVariable("resultID") int id, HttpServletRequest request) throws Exception
 	{
    		boolean isComplete = Boolean.parseBoolean(request.getParameter("survey_completed"));
-   		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
-		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+   		List<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+		List<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
 		
 		TapestrySurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
 		PHRSurvey currentSurvey = surveys.getSurvey(Integer.toString(id));
@@ -503,8 +544,8 @@ public class SurveyController{
    	@RequestMapping(value="/delete_survey/{resultID}", method=RequestMethod.GET)
    	public String deleteSurvey(@PathVariable("resultID") int id, HttpServletRequest request){
    		surveyResultDao.deleteSurvey(id);
-		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
-   		ArrayList<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
+		List<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+   		List<SurveyTemplate> surveyTemplates = surveyTemplateDao.getAllSurveyTemplates();
    		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
    		return "redirect:/manage_surveys";
    	}
@@ -613,7 +654,7 @@ public class SurveyController{
    	}
    	
    	//void duplicating survey in result sheet
-   	private boolean isExistInSurveyResultList(ArrayList<SurveyResult> surveyResults, int surveyTemplateId, int patientId){
+   	private boolean isExistInSurveyResultList(List<SurveyResult> surveyResults, int surveyTemplateId, int patientId){
    		boolean exist = false;
    		int sId = 0;
    		int pId = 0;
@@ -627,10 +668,10 @@ public class SurveyController{
    		return exist;
    	}
    	
-   	private void assignSurveysToClient(ArrayList<SurveyTemplate> surveyTemplates, int[] patientIds, 
+   	private void assignSurveysToClient(List<SurveyTemplate> surveyTemplates, int[] patientIds, 
    			SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
 		
-		ArrayList<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
+		List<SurveyResult> surveyResults = surveyResultDao.getAllSurveyResults();
 		
    		TapestrySurveyMap surveys = DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
    		SurveyResult sr;
@@ -660,6 +701,7 @@ public class SurveyController{
 					blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
 					sr.setResults(SurveyAction.updateSurveyResult(blankSurvey));
 					String documentId = surveyResultDao.assignSurvey(sr);
+					System.out.println("documentId is ===== "+ documentId);
 					blankSurvey.setDocumentId(documentId);
 					surveys.addSurvey(blankSurvey);
 					specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
@@ -669,7 +711,7 @@ public class SurveyController{
    	}
    	
   	private void addSurveyTemplate(String[] surveyId,List<SurveyTemplate> allSurveyTemplates, 
-   			ArrayList<SurveyTemplate> selectedSurveyTemplates){
+   			List<SurveyTemplate> selectedSurveyTemplates){
    		int surveyTemplateId;
    		for (int i = 0; i < surveyId.length; i ++)
    		{  						
@@ -682,7 +724,7 @@ public class SurveyController{
    		}
    	}
    	
-   	private void assignSurveysToClient(ArrayList<SurveyTemplate> selectSurveyTemplats, int[] patientIds,
+   	private void assignSurveysToClient(List<SurveyTemplate> selectSurveyTemplats, int[] patientIds,
    			SecurityContextHolderAwareRequestWrapper request,ModelMap model) 
    					throws JAXBException, DatatypeConfigurationException, Exception{
    		try

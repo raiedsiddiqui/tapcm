@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
@@ -25,12 +26,20 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.tapestry.dao.ActivityDao;
-import org.tapestry.dao.MessageDao;
-import org.tapestry.dao.PatientDao;
-import org.tapestry.dao.PictureDao;
-import org.tapestry.dao.UserDao;
-import org.tapestry.dao.VolunteerDao;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.tapestry.dao.ActivityDAO;
+import org.tapestry.dao.ActivityDAOImpl;
+import org.tapestry.dao.MessageDAO;
+import org.tapestry.dao.MessageDAOImpl;
+import org.tapestry.dao.PatientDAO;
+import org.tapestry.dao.PatientDAOImpl;
+import org.tapestry.dao.PictureDAO;
+import org.tapestry.dao.PictureDAOImpl;
+import org.tapestry.dao.UserDAO;
+import org.tapestry.dao.UserDAOImpl;
+import org.tapestry.dao.VolunteerDAO;
+import org.tapestry.dao.VolunteerDAOImpl;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.Organization;
 import org.tapestry.objects.Patient;
@@ -39,15 +48,7 @@ import org.tapestry.objects.User;
 import org.tapestry.objects.UserLog;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.IOException;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-
+import javax.sql.DataSource;
 
 /**
 * Main controller class
@@ -68,12 +69,12 @@ public class TapestryController{
 	private Map<String, String> config;
 	private Yaml yaml;
 		
-	private UserDao userDao;
-   	private PatientDao patientDao;   	
-   	private MessageDao messageDao;
-   	private PictureDao pictureDao;   
-   	private ActivityDao activityDao;
-   	private VolunteerDao volunteerDao;
+	private UserDAO userDao = getUserDAO();
+   	private PatientDAO patientDao = getPatientDAO();   	
+   	private MessageDAO messageDao = getMessageDAO();
+   	private PictureDAO pictureDao = getPictureDAO();   
+   	private VolunteerDAO volunteerDao = getVolunteerDAO();
+   	private ActivityDAO activityDao = getActivityDAO();
  
    	//Mail-related settings;
    	private Properties props;
@@ -117,15 +118,6 @@ public class TapestryController{
 			e.printStackTrace();
 		}
 		
-		//Create the DAOs
-		userDao = new UserDao(database, dbUsername, dbPassword);
-		patientDao = new PatientDao(database, dbUsername, dbPassword);		
-		messageDao = new MessageDao(database, dbUsername, dbPassword);
-		pictureDao = new PictureDao(database, dbUsername, dbPassword);
-		activityDao = new ActivityDao(database, dbUsername, dbPassword);
-		volunteerDao = new VolunteerDao(database, dbUsername, dbPassword);
-		
-		
 		//Mail-related settings
 		final String username = mailUser;
 		final String password = mailPassword;
@@ -143,7 +135,56 @@ public class TapestryController{
 		props.setProperty("mail.smtp.starttls.enable", useTLS);
 		props.setProperty("mail.user", mailUser);
 		props.setProperty("mail.password", mailPassword);
-   	}
+   	}   	
+   	
+    public DataSource getDataSource() {
+    	try{
+			dbConfigFile = new ClassPathResource("tapestry.yaml");
+			yaml = new Yaml();
+			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
+			String url = config.get("url");
+			String username = config.get("username");
+			String password = config.get("password");
+			
+			DriverManagerDataSource dataSource = new DriverManagerDataSource();
+	        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+	        dataSource.setUrl(url);
+	        dataSource.setUsername(username);
+	        dataSource.setPassword(password);
+	         
+	        return dataSource;		
+	        
+		} catch (IOException e) {
+			logger.error("Error reading from config file");
+			e.printStackTrace();
+			
+			return null;
+		}
+    }
+    
+    public ActivityDAO getActivityDAO(){
+    	return new ActivityDAOImpl(getDataSource());
+    }
+    
+    public UserDAO getUserDAO(){
+    	return new UserDAOImpl(getDataSource());
+    }
+    
+    public MessageDAO getMessageDAO(){
+    	return new MessageDAOImpl(getDataSource());
+    }
+    
+    public PictureDAO getPictureDAO()
+    {
+    	return new PictureDAOImpl(getDataSource());
+    }
+    public VolunteerDAO getVolunteerDAO(){
+    	return new VolunteerDAOImpl(getDataSource());
+    }
+    
+    public PatientDAO getPatientDAO(){
+    	return new PatientDAOImpl(getDataSource());
+    }
    	
    	//Everything below this point is a RequestMapping
 	@RequestMapping(value="/login", method=RequestMethod.GET)
@@ -189,7 +230,7 @@ public class TapestryController{
 		User loggedInUser = getLoggedInUser(request);
 		//get volunteer Id from login user		
 		int volunteerId= volunteerDao.getVolunteerIdByUsername(loggedInUser.getUsername());
-		ArrayList<Patient> clients = patientDao.getPatientsForVolunteer(volunteerId);		
+		List<Patient> clients = patientDao.getPatientsForVolunteer(volunteerId);		
 		model.addAttribute("clients", clients);
 		
 		setUnreadMessage(request, model);
@@ -203,10 +244,10 @@ public class TapestryController{
 		setUnreadMessage(request, model);
 		HttpSession session = request.getSession();
 		
-		ArrayList<User> userList = userDao.getAllUsers();
+		List<User> userList = userDao.getAllUsers();
 		model.addAttribute("users", userList);
-		model.addAttribute("active", userDao.countActiveUsers());
-		model.addAttribute("total", userDao.countAllUsers());
+//		model.addAttribute("active", userDao.countActiveUsers());
+//		model.addAttribute("total", userDao.countAllUsers());
 		if(failed != null) {
 			model.addAttribute("failed", true);
 		}
@@ -344,7 +385,7 @@ public class TapestryController{
 			model.addAttribute("errors", errorsPresent);
 		if(success != null)
 			model.addAttribute("success", true);
-		ArrayList<Picture> pics = pictureDao.getPicturesForUser(loggedInUser.getUserID());
+		List<Picture> pics = pictureDao.getPicturesForUser(loggedInUser.getUserID());
 		model.addAttribute("pictures", pics);
 		return "/volunteer/profile";
 	}
@@ -367,14 +408,14 @@ public class TapestryController{
 			
 		if (request.isUserInRole("ROLE_USER"))
 		{
-			ArrayList<User> administrators = userDao.getAllUsersWithRole("ROLE_ADMIN");
+			List<User> administrators = userDao.getAllUsersWithRole("ROLE_ADMIN");
 			model.addAttribute("administrators", administrators);
 			
 			return "/volunteer/inbox";
 		} 
 		else
 		{			
-			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");			
+			List<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");			
 			model.addAttribute("volunteers", volunteers);
 			
 			return "/admin/inbox";
@@ -429,7 +470,7 @@ public class TapestryController{
 		m.setText(request.getParameter("msgBody"));
 		
 		if (request.getParameter("isAnnouncement") != null && request.getParameter("isAnnouncement").equals("true")){ //Sound to all volunteers
-			ArrayList<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+			List<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
 			
 			for (User u: volunteers){
 				m.setSubject("ANNOUNCEMENT: " + request.getParameter("msgSubject"));
@@ -497,8 +538,7 @@ public class TapestryController{
 	@RequestMapping(value="/delete_message/{msgID}", method=RequestMethod.GET)
 	public String deleteMessage(SecurityContextHolderAwareRequestWrapper request, 
 			@RequestParam(value="isRead", required=true) boolean isRead, @PathVariable("msgID") int id, ModelMap model)
-	{//if an unread message is deleted, unread indicator should be modified
-		System.out.println("hi===" + isRead);
+	{//if an unread message is deleted, unread indicator should be modified				
 		if (!isRead){
 			HttpSession session = request.getSession();
 			if (session.getAttribute("unread_messages") != null)
@@ -642,13 +682,33 @@ public class TapestryController{
 		return "/admin/user_logs";
 	}
 	
-	@RequestMapping(value="/pdf_generator", method=RequestMethod.POST)
-	public String generatePdfReport(HttpServletRequest req, ModelMap model) throws IOException, ServletException{
+	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
+	public String uploadPicture(MultipartHttpServletRequest request){
+
+		User loggedInUser = Utils.getLoggedInUser(request);
+		MultipartFile pic = request.getFile("pic");
 		
+		pictureDao.uploadPicture(pic, loggedInUser.getUserID(), true);				
+
+		activityDao.addUserLog(loggedInUser.getName() +" uploaded picture for profile", loggedInUser);
 		
-		return "adfja";
+		return "redirect:/profile";
 	}
-	
+
+	@RequestMapping(value="/upload_picture_for_patient/{patientID}", method=RequestMethod.POST)
+	public String uploadPicture(@PathVariable("patientID") int id, MultipartHttpServletRequest request){
+		User loggedInUser = Utils.getLoggedInUser(request);
+
+		MultipartFile pic = request.getFile("pic");
+		
+		Patient p = patientDao.getPatientByID(id);
+		pictureDao.uploadPicture(pic, id, false);
+
+		activityDao.addUserLog(loggedInUser.getName() + " uploaded picture for " + p.getDisplayName(), loggedInUser);
+		
+		return "redirect:/patient/" + id;
+	}
+		
 	private void setUnreadMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		HttpSession session = request.getSession();
 		User loggedInUser = Utils.getLoggedInUser(request);

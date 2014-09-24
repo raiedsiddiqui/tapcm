@@ -15,8 +15,7 @@ public class Patient{
 	private String clinic;
 	private String mrp; // family doctor
 	private String city;
-	private String homePhone;
-	private String availability;
+	private String homePhone;	
 	private String alerts;
 	private String myoscarVerified;
 	private int partner; // another volunteer(two volunteers should be assigned per visit)
@@ -57,15 +56,7 @@ public class Patient{
 	public void setPartner(int partner) {
 		this.partner = partner;
 	}
-
-	public String getAvailability() {
-		return availability;
-	}
-
-	public void setAvailability(String availability) {
-		this.availability = availability;
-	}
-
+	
 	public String getBod() {
 		return bod;
 	}

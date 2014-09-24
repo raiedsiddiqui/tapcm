@@ -24,8 +24,7 @@ CREATE TABLE IF NOT EXISTS patients (
 	email VARCHAR(50),
 	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
 	notes TEXT,
-	alerts TEXT,
-	availability VARCHAR(255),
+	alerts TEXT,	
 	clinic VARCHAR(255),
 	myoscar_verified TINYINT(1) NOT NULL, /* 0--not authenticated, 1--authenticated*/
 	volunteer2 TINYINT UNSIGNED NOT NULL,/* Same as user_ID */
@@ -108,7 +107,7 @@ CREATE TABLE IF NOT EXISTS messages (
 
 CREATE TABLE IF NOT EXISTS pictures (
     picture_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    pic VARCHAR(255), /* path to picture file */
+    path VARCHAR(255), /* path to picture file */
     owner SMALLINT, /* the ID of the user or patient the picture belongs to */
     owner_is_user BOOLEAN, /* 1 if the value of owner refers to a user, 0 if a patient */
     PRIMARY KEY (picture_ID)

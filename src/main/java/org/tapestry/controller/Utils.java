@@ -21,8 +21,8 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
-import org.tapestry.dao.NarrativeDao;
-import org.tapestry.dao.VolunteerDao;
+
+//import org.tapestry.dao.VolunteerDao;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 import org.yaml.snakeyaml.Yaml;
@@ -39,9 +39,8 @@ public class Utils {
 		static String useTLS = "";
 		static String useAuth = "";
 		static String mailAddress="";
-		
-		static NarrativeDao narrativeDao = null;   		
-   		static VolunteerDao volunteerDao = null;
+	  		
+//   		static VolunteerDao volunteerDao = null;
    		
 		
 	public static void setDatabaseConfig(){   	
@@ -553,21 +552,7 @@ public class Utils {
 		return clinics.get(code);		
 	}
 	
-	public static int getVolunteerByLoginUser(SecurityContextHolderAwareRequestWrapper request, VolunteerDao vDao){
-		int volunteerId=0;
-		User user = getLoggedInUser(request);
-		
-		String role = user.getRole();
-		
-		if ((!Utils.isNullOrEmpty(role)) && ("ROLE_USER".equals(role)))
-		{
-			String username = user.getUsername();
-			volunteerId = vDao.getVolunteerIdByUsername(username);
-		}
-		
-		return volunteerId;
-	}
-	
+
 	/**
 	 * get index of day of week by Date from calendar
 	 * @param day

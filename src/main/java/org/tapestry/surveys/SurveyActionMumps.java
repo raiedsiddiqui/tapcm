@@ -1,7 +1,7 @@
 package org.tapestry.surveys;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.QuestionAnswerPair;
@@ -31,7 +31,7 @@ public class SurveyActionMumps {
 		}
 	}
 	
-	public static TapestryPHRSurvey toPhrSurvey(ArrayList<SurveyTemplate> surveyTemplates, SurveyResult surveyResult) throws SurveyException
+	public static TapestryPHRSurvey toPhrSurvey(List<SurveyTemplate> surveyTemplates, SurveyResult surveyResult) throws SurveyException
 	{
 		SurveyTemplate st = new SurveyTemplate();
 		for (SurveyTemplate tempTemplate : surveyTemplates)
@@ -62,7 +62,7 @@ public class SurveyActionMumps {
 
 			for (String answer : qaPair.answers)
 			{
-				SurveyAnswer mAnswer = new SurveyAnswerString(answer);
+				SurveyAnswer mAnswer = new SurveyAnswerString(answer);				
 				mQuestion.getAnswers().add(mAnswer);
 			}
 			

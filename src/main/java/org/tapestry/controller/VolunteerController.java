@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -15,8 +16,11 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
@@ -26,19 +30,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import org.tapestry.controller.utils.MisUtils;
-import org.tapestry.dao.ActivityDao;
-import org.tapestry.dao.AppointmentDao;
-import org.tapestry.dao.MessageDao;
-import org.tapestry.dao.UserDao;
-import org.tapestry.dao.VolunteerDao;
+import org.tapestry.dao.ActivityDAO;
+import org.tapestry.dao.ActivityDAOImpl;
+import org.tapestry.dao.AppointmentDAO;
+import org.tapestry.dao.AppointmentDAOImpl;
+import org.tapestry.dao.MessageDAO;
+import org.tapestry.dao.MessageDAOImpl;
+import org.tapestry.dao.UserDAO;
+import org.tapestry.dao.UserDAOImpl;
+import org.tapestry.dao.VolunteerDAO;
+import org.tapestry.dao.VolunteerDAOImpl;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 import org.tapestry.objects.Organization;
+import org.yaml.snakeyaml.Yaml;
 
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Document;
@@ -59,38 +68,35 @@ public class VolunteerController {
 	
 protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	
-	private VolunteerDao volunteerDao = null;
-	private AppointmentDao appointmentDao = null;
-	private UserDao userDao = null;
-	private ActivityDao activityDao = null;
-	private MessageDao messageDao = null;
+	private VolunteerDAO volunteerDao = getVolunteerDAO();
+	private AppointmentDAO appointmentDao = getAppointmentDAO();
+	private UserDAO userDao = getUserDAO();
+	private ActivityDAO activityDao = getActivityDAO();
+	private MessageDAO messageDao = getMessageDAO();
 	
-//	private Properties props;
+	private Properties props;
    	private String mailAddress = "";
    	private Session session;
+   	
+   	private ClassPathResource dbConfigFile;
+	private Map<String, String> config;
+	private Yaml yaml;
 	
 	@PostConstruct
 	public void readDatabaseConfig(){
 		Utils.setDatabaseConfig();
 		
 		Properties props = System.getProperties();
-		String DB = props.getProperty("db");
-		String UN = props.getProperty("un");
-		String PW = props.getProperty("pwd");
+	
 		String mailHost = "";
    		String mailUser = "";
    		String mailPassword = "";
    		String mailPort = "";
    		String useTLS = "";
-   		String useAuth = "";
-				
+   		String useAuth = "";				
 		
-		volunteerDao = new VolunteerDao(DB, UN, PW);		
-		appointmentDao = new AppointmentDao(DB, UN, PW);
-		activityDao = new ActivityDao(DB, UN, PW);
-		messageDao = new MessageDao(DB, UN, PW);
-		userDao = new UserDao(DB, UN, PW);
-		
+	
+			
 		//Mail-related settings
 		final String username = mailUser;
 		final String password = mailPassword;
@@ -107,9 +113,53 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		props.setProperty("mail.smtp.auth", useAuth);
 		props.setProperty("mail.smtp.starttls.enable", useTLS);
 		props.setProperty("mail.user", mailUser);
-		props.setProperty("mail.password", mailPassword);
-		
+		props.setProperty("mail.password", mailPassword);		
 	}
+	
+	public DataSource getDataSource() {
+    	try{
+    		
+			dbConfigFile = new ClassPathResource("tapestry.yaml");
+			yaml = new Yaml();
+			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
+			String url = config.get("url");
+			String username = config.get("username");
+			String password = config.get("password");
+			
+			DriverManagerDataSource dataSource = new DriverManagerDataSource();
+	        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+	        dataSource.setUrl(url);
+	        dataSource.setUsername(username);
+	        dataSource.setPassword(password);
+	         
+	        return dataSource;		
+	        
+		} catch (IOException e) {
+			logger.error("Error reading from config file");
+			e.printStackTrace();
+			
+			return null;
+		}
+    }
+    
+    public ActivityDAO getActivityDAO(){
+    	return new ActivityDAOImpl(getDataSource());
+    }
+    public UserDAO getUserDAO(){
+    	return new UserDAOImpl(getDataSource());
+    }
+    
+    public MessageDAO getMessageDAO(){
+    	return new MessageDAOImpl(getDataSource());
+    }
+    
+    public AppointmentDAO getAppointmentDAO(){
+    	return new AppointmentDAOImpl(getDataSource());
+    }
+    public VolunteerDAO getVolunteerDAO(){
+    	return new VolunteerDAOImpl(getDataSource());
+    }
+	
 	//display all volunteers
 	@RequestMapping(value="/view_volunteers", method=RequestMethod.GET)
 	public String getAllVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
@@ -502,6 +552,20 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 
 		boolean success = userDao.createUser(user);
 				
+//		if (success){
+////			sendMessageToInbox(String subject, String msg, int sender, int recipient)
+//			String subject = "Welcome to Tapestry";
+//			
+//			sb = new StringBuffer();
+//			sb.append("Thank you for volunteering with Tapestry. Your account has been successfully created.\n");
+//			sb.append("Your username and password are as follows:\n");
+//			sb.append("Username: ");
+//			sb.append(user.getUsername());
+//			sb.append("\n");
+//			sb.append("Password: password\n\n");
+//			
+//			String msg = sb.toString();
+//		}
 		if (mailAddress != null && success){
 			try{
 				MimeMessage message = new MimeMessage(session);
@@ -705,7 +769,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	@RequestMapping(value="/view_activity", method=RequestMethod.GET)
 	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		HttpSession  session = request.getSession();		
-		int volunteerId = getLoggedInVolunteerId(request);	
+		int volunteerId = MisUtils.getLoggedInVolunteerId(request);	
 		List<Activity> activities = new ArrayList<Activity>();
 		activities = activityDao.getAllActivitiesForVolunteer(volunteerId);
 					
@@ -746,7 +810,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	@RequestMapping(value="/add_activity", method=RequestMethod.POST)
 	public String addActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		HttpSession  session = request.getSession();		
-		int volunteerId = getLoggedInVolunteerId(request);	
+		int volunteerId = MisUtils.getLoggedInVolunteerId(request);	
 			
 		Volunteer volunteer = volunteerDao.getVolunteerById(volunteerId);
 		int organizationId = volunteer.getOrganizationId();
@@ -819,7 +883,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		Activity activity = new Activity();
 			
 		HttpSession  session = request.getSession();		
-		int volunteerId = getLoggedInVolunteerId(request);	
+		int volunteerId = MisUtils.getLoggedInVolunteerId(request);	
 			
 		if (!Utils.isNullOrEmpty(request.getParameter("activityId")))
 		{
@@ -838,20 +902,25 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			if (!Utils.isNullOrEmpty(request.getParameter("activityStartTime")))
 				startTime = request.getParameter("activityStartTime");
 			
+			System.out.println("start time === " + startTime);
+			
 			if (startTime.length() < 6)//format 
 				activity.setStartTime(date +" " + startTime + ":00"); 
 			else
 				activity.setStartTime(date +" " + startTime); 
+			
+			System.out.println("after start time === " + activity.getStartTime());
 				
 			String endTime = null;
 			if (!Utils.isNullOrEmpty(request.getParameter("activityEndTime")))
 				endTime = request.getParameter("activityEndTime");
 				
+			System.out.println("end time === " + endTime);
 			if (endTime.length() < 6)//format
 				activity.setEndTime(date + " " + endTime + ":00");
 			else
 				activity.setEndTime(date + " " + endTime);
-				
+			System.out.println("after end time === " + activity.getEndTime());
 			String desc = null;
 			desc = request.getParameter("activityDesc");
 			if (!Utils.isNullOrEmpty(desc))
@@ -1020,16 +1089,14 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		return null;
 	}	
-		
-	private int getLoggedInVolunteerId(SecurityContextHolderAwareRequestWrapper request)
-	{			
-		int volunteerId = MisUtils.getLoggedInVolunteerId(request);
-		
-		if (volunteerId == 0)
-			volunteerId = Utils.getVolunteerByLoginUser(request, volunteerDao);
-						
-			
-		return volunteerId;
-	}
+	
+	private void sendMessageToInbox(String subject, String msg, int sender, int recipient){	
+		Message m = new Message();
+		m.setRecipient(recipient);
+		m.setSenderID(sender);
+		m.setText(msg);
+		m.setSubject(subject);
+		messageDao.sendMessage(m);
+}
 
 }

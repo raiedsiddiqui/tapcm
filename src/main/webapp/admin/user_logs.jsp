@@ -31,11 +31,11 @@
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
-			<h2>Activity Log <button class="btn btn-primary pull-right" onclick="printTable()" style="margin-right:25px;">Print</button></h2>
+			<h2>User Log <button class="btn btn-primary pull-right" onclick="printTable()" style="margin-right:25px;">Print</button></h2>
 			<div class="row-fluid">
 				<form action="user_logs" method="post">
 					<fieldset>
-						<legend>Search Logs</legend>
+					<!--  <legend>Search Logs</legend>-->	
 						<label>Name:</label>
 						<input type="text" name="name" required/>
 						<input class="btn btn-primary" type="submit" value="Search" />

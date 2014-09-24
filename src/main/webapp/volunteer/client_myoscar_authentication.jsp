@@ -38,7 +38,7 @@
  	breadcrumb END-->	
 
 <h2>PHR Authentication</h2> 
-
+<form method="post" id="myoscarAuthentication-form" action="<c:url value="/authenticate_myoscar/${patient.volunteer}?patientId=${patient.patientID}"/>">
 <div class="row">
 	<div class="col-md-6">
 		<h3>Client</h3>
@@ -72,6 +72,7 @@
 
 <div class="row">
 <input class="btn lgbtn pull-r" type="submit" value="Authenticate" />
+</form>
 <!-- removed class="completevisitbtn"
  --></div>
 

@@ -6,26 +6,22 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.annotation.PostConstruct;
-import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -34,15 +30,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.tapestry.controller.utils.MisUtils;
-import org.tapestry.dao.ActivityDao;
-import org.tapestry.dao.AppointmentDao;
-import org.tapestry.dao.MessageDao;
-import org.tapestry.dao.NarrativeDao;
-import org.tapestry.dao.PatientDao;
-import org.tapestry.dao.UserDao;
-import org.tapestry.dao.SurveyResultDao;
-import org.tapestry.dao.SurveyTemplateDao;
-import org.tapestry.dao.VolunteerDao;
+import org.tapestry.dao.ActivityDAO;
+import org.tapestry.dao.ActivityDAOImpl;
+import org.tapestry.dao.AppointmentDAO;
+import org.tapestry.dao.AppointmentDAOImpl;
+import org.tapestry.dao.MessageDAO;
+import org.tapestry.dao.MessageDAOImpl;
+import org.tapestry.dao.NarrativeDAO;
+import org.tapestry.dao.NarrativeDAOImpl;
+import org.tapestry.dao.PatientDAO;
+import org.tapestry.dao.PatientDAOImpl;
+import org.tapestry.dao.SurveyResultDAOImpl;
+import org.tapestry.dao.SurveyTemplateDAOImpl;
+import org.tapestry.dao.UserDAO;
+import org.tapestry.dao.SurveyResultDAO;
+import org.tapestry.dao.SurveyTemplateDAO;
+import org.tapestry.dao.UserDAOImpl;
+import org.tapestry.dao.VolunteerDAO;
+import org.tapestry.dao.VolunteerDAOImpl;
 import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
@@ -58,7 +63,6 @@ import org.tapestry.report.AlertManager;
 import org.tapestry.report.AlertsInReport;
 import org.tapestry.report.CalculationManager;
 import org.tapestry.surveys.ResultParser;
-import org.tapestry.controller.utils.MisUtils;
 import org.yaml.snakeyaml.Yaml;
 
 @Controller
@@ -69,15 +73,15 @@ public class AppointmentController{
 	private Map<String, String> config;
 	private Yaml yaml;
 	
-	private UserDao userDao;
-	private PatientDao patientDao;
-	private AppointmentDao appointmentDao;
-	private ActivityDao activityDao;
-	private VolunteerDao volunteerDao;
-	private MessageDao messageDao;
-	private NarrativeDao narrativeDao;
-	private SurveyResultDao surveyResultDao;
-	private SurveyTemplateDao surveyTemplateDao;
+	private UserDAO userDao = getUserDAO();
+	private PatientDAO patientDao = getPatientDAO();
+	private AppointmentDAO appointmentDao = getAppointmentDAO();
+	private ActivityDAO activityDao = getActivityDAO();
+	private VolunteerDAO volunteerDao = getVolunteerDAO();
+	private MessageDAO messageDao = getMessageDAO();
+	private NarrativeDAO narrativeDao = getNarrativeDAO();
+	private SurveyResultDAO surveyResultDao = getSurveyResultDAO();
+	private SurveyTemplateDAO surveyTemplateDao = getSurveyTemplateDAO();
 	
    	//Mail-related settings;
    	private Properties props;
@@ -88,10 +92,7 @@ public class AppointmentController{
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
    	 */
    	@PostConstruct
-   	public void readDatabaseConfig(){
-   		String DB = "";
-   		String UN = "";
-   		String PW = "";
+   	public void readDatabaseConfig(){   	
    		String mailHost = "";
    		String mailUser = "";
    		String mailPassword = "";
@@ -102,9 +103,7 @@ public class AppointmentController{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
 			yaml = new Yaml();
 			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-			DB = config.get("url");
-			UN = config.get("username");
-			PW = config.get("password");
+		
 			mailHost = config.get("mailHost");
 			mailUser = config.get("mailUser");
 			mailPassword = config.get("mailPassword");
@@ -115,17 +114,7 @@ public class AppointmentController{
 		} catch (IOException e) {
 			System.out.println("Error reading from config file");
 			System.out.println(e.toString());
-		}
-		userDao = new UserDao(DB, UN, PW);
-		patientDao = new PatientDao(DB, UN, PW);
-		appointmentDao = new AppointmentDao(DB, UN, PW);
-		activityDao = new ActivityDao(DB, UN, PW);
-		volunteerDao = new VolunteerDao(DB, UN, PW);
-		messageDao = new MessageDao(DB, UN, PW);
-		narrativeDao = new NarrativeDao(DB, UN, PW);
-		surveyResultDao = new SurveyResultDao(DB, UN, PW);
-		surveyTemplateDao = new SurveyTemplateDao(DB, UN, PW);
-		
+		}	
 		//Mail-related settings
 		final String username = mailUser;
 		final String password = mailPassword;
@@ -144,7 +133,65 @@ public class AppointmentController{
 		props.setProperty("mail.user", mailUser);
 		props.setProperty("mail.password", mailPassword);
    	}
+    public DataSource getDataSource() {
+    	try{
+			dbConfigFile = new ClassPathResource("tapestry.yaml");
+			yaml = new Yaml();
+			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
+			String url = config.get("url");
+			String username = config.get("username");
+			String password = config.get("password");
+			
+			DriverManagerDataSource dataSource = new DriverManagerDataSource();
+	        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+	        dataSource.setUrl(url);
+	        dataSource.setUsername(username);
+	        dataSource.setPassword(password);
+	         
+	        return dataSource;		
+	        
+		} catch (IOException e) {
+			logger.error("Error reading from config file");
+			e.printStackTrace();
+			
+			return null;
+		}
+    }
+    
+    public ActivityDAO getActivityDAO(){
+    	return new ActivityDAOImpl(getDataSource());
+    }
+    
+    public UserDAO getUserDAO(){
+    	return new UserDAOImpl(getDataSource());
+    }
+    
+    public MessageDAO getMessageDAO(){
+    	return new MessageDAOImpl(getDataSource());
+    }
+    
+    public NarrativeDAO getNarrativeDAO(){
+    	return new NarrativeDAOImpl(getDataSource());
+    }
+    
+    public SurveyTemplateDAO getSurveyTemplateDAO(){
+    	return new SurveyTemplateDAOImpl(getDataSource());
+    }
+    
+    public SurveyResultDAO getSurveyResultDAO(){
+    	return new SurveyResultDAOImpl(getDataSource());
+    }
+    public AppointmentDAO getAppointmentDAO(){
+    	return new AppointmentDAOImpl(getDataSource());
+    }
    	
+    public VolunteerDAO getVolunteerDAO(){
+    	return new VolunteerDAOImpl(getDataSource());
+    }    
+    
+    public PatientDAO getPatientDAO(){
+    	return new PatientDAOImpl(getDataSource());
+    }
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
 	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, 
@@ -152,6 +199,7 @@ public class AppointmentController{
 			@RequestParam(value="patientId", required=false) Integer patientId, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		int unreadMessages;			
+		List<Appointment> remindingAppointments = new ArrayList<Appointment>();
 		HttpSession session = request.getSession();
 			
 		if (request.isUserInRole("ROLE_USER"))
@@ -164,8 +212,8 @@ public class AppointmentController{
 			int volunteerId = volunteerDao.getVolunteerIdByUsername(username);		
 		
 			session.setAttribute("logged_in_volunteer", volunteerId);
-			ArrayList<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);
-			ArrayList<Message> announcements = messageDao.getAnnouncementsForUser(userId);
+			List<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);
+			List<Message> announcements = messageDao.getAnnouncementsForUser(userId);
 			
 			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
 			List<Appointment> pendingAppointments = new ArrayList<Appointment>();
@@ -205,6 +253,10 @@ public class AppointmentController{
 			
 			if (noMachedTime != null)
 				model.addAttribute("noMachedTime", noMachedTime);
+			
+			remindingAppointments = appointmentDao.getRemindingAppointmentList(volunteerId, -2);			
+			model.addAttribute("reminding_appointments", remindingAppointments);
+
 				
 			return "volunteer/index";
 		}
@@ -218,6 +270,9 @@ public class AppointmentController{
 			session.setAttribute("unread_messages", unreadMessages);
 			
 			model.addAttribute("name", loggedInUser.getName());
+			
+			remindingAppointments = appointmentDao.getRemindingAppointmentList(0, -2);			
+			model.addAttribute("appointments", remindingAppointments);
 
 			return "admin/index";
 		}
@@ -231,8 +286,8 @@ public class AppointmentController{
    			@RequestParam(value="noMachedTime", required=false) String noMatchedMsg,
    			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
    		
-   		ArrayList<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
-   		ArrayList<Patient> allPatients = patientDao.getAllPatients();  		
+   		List<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
+   		List<Patient> allPatients = patientDao.getAllPatients();  		
    		List<Appointment> allPastAppointments = appointmentDao.getAllPastAppointments();
    		List<Appointment> allPendingAppointments = appointmentDao.getAllPendingAppointments();
    
@@ -263,6 +318,7 @@ public class AppointmentController{
    		String clientLastName = request.getParameter("client_last_name");
    		String volunteerFirstName = request.getParameter("volunteer_first_name");
    		String volunteerLastName = request.getParameter("volunteer_last_name");
+   		int volunteerUserId = volunteerDao.getUserIdByVolunteerId(id);
    		
    		StringBuffer sb = new StringBuffer();
    		String subject = "MyOscar Authentication";   		
@@ -280,7 +336,7 @@ public class AppointmentController{
    		String message = sb.toString();
    		
    		//send message to Central Admin
-   		sendMessageToInbox(subject, message, id, centralAdminId);
+   		sendMessageToInbox(subject, message, volunteerUserId, centralAdminId);
    		
    		HttpSession session = request.getSession();
    		if (session.getAttribute("appointmentId") != null)
@@ -628,9 +684,6 @@ public class AppointmentController{
 		
 		Patient p = patientDao.getPatientByID(Integer.parseInt(patientId));
 		
-		String pAvailability = p.getAvailability();
-		List<String> pList = new ArrayList<String>(Arrays.asList(pAvailability.split(",")));		
-		
 		//check if two volunteers are same persons
 		if (volunteerId1.equals(volunteerId2))
 			model.addAttribute("sameVolunteer",true);
@@ -655,8 +708,8 @@ public class AppointmentController{
 				{
 					for(String a2 : aVolunteer2)
 					{
-						if ( (!a1.contains("non")) && (a1.equals(a2)) && (pList.contains(a1)))
-						{//find matched available time for both volunteers	and selected patient
+						if ( (!a1.contains("non")) && (a1.equals(a2)) )
+						{//find matched available time for both volunteers
 							availability = new Availability();								
 							availability.setvDisplayName(v1.getDisplayName());
 							availability.setvPhone(v1.getHomePhone());
@@ -768,8 +821,8 @@ public class AppointmentController{
 		if (appointmentDao.createAppointment(appointment))
 		{
 			Patient patient = patientDao.getPatientByID(patientId);	
-			String logginUser = request.getUserPrincipal().getName();	
-			User user = Utils.getLoggedInUser(request);
+			String logginUser = request.getUserPrincipal().getName();				
+			User user = Utils.getLoggedInUser(request);			
 			int userId = user.getUserID();
 						
 			//send message to both volunteers
@@ -1085,9 +1138,6 @@ public class AppointmentController{
 		if ((appointments != null)&& (appointments.size()>0))
 			isFirst = false;
 		
-		
-		System.out.println("patient Id is === "+ patientId);
-		System.out.println("is first visit === "+ isFirst);
 		return isFirst;
 		
 	}
@@ -1526,324 +1576,324 @@ public class AppointmentController{
 		return appointmentId;
 	}
 	
-	private void generateReport(int patientId, int appointmentId){
-		
-		Patient patient = patientDao.getPatientByID(patientId);
-		//call web service to get patient info from myoscar
-		String userName = "carolchou.test";
-		try{
-			PersonTransfer3 personInMyoscar = ClientManager.getClientByUsername(userName);
-			StringBuffer sb = new StringBuffer();
-			if (personInMyoscar.getStreetAddress1() != null)
-				sb.append(personInMyoscar.getStreetAddress1());
-			String city = personInMyoscar.getCity();
-			if (city != null)
-			{
-				sb.append(", ");
-				sb.append(city);
-				patient.setCity(city);
-			}
-			
-			if (personInMyoscar.getProvince() != null)
-			{
-				sb.append(", ");
-				sb.append(personInMyoscar.getProvince());
-			}
-			
-			patient.setAddress(sb.toString());
-			
-			if (personInMyoscar.getBirthDate() != null)
-			{
-				Calendar birthDay = personInMyoscar.getBirthDate();
-				patient.setBod(Utils.getDateByCalendar(birthDay));
-			}
-			
-		} catch (Exception e){
-			System.err.println("Have some problems when calling myoscar web service");
-			
-		}
-		
-		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
-		Report report = new Report();		
-		
-		//Plan and Key Observations
-		String keyObservation = appointmentDao.getKeyObservationByAppointmentId(appointmentId);
-		String plan = appointmentDao.getPlanByAppointmentId(appointmentId);
-		appointment.setKeyObservation(keyObservation);
-		appointment.setPlans(plan);
-		
-		List<String> pList = new ArrayList<String>();
-		if (!Utils.isNullOrEmpty(plan))
-			pList = Arrays.asList(plan.split(","));		
-		
-		Map<String, String> pMap = new TreeMap<String, String>();
-		
-		for (int i = 1; i<= pList.size(); i++){
-			pMap.put(String.valueOf(i), pList.get(i-1));
-		}
-		
-//		model.addAttribute("patient", patient);
-//		model.addAttribute("appointment", appointment);
-//		model.addAttribute("plans", pMap);
-				
-		//Survey---  goals setting
-		List<SurveyResult> surveyResultList = surveyResultDao.getCompletedSurveysByPatientID(patientId);
-		SurveyResult healthGoalsSurvey = new SurveyResult();
-		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
-		SurveyResult nutritionSurvey = new SurveyResult();
-		SurveyResult rAPASurvey = new SurveyResult();
-		SurveyResult mobilitySurvey = new SurveyResult();
-		SurveyResult socialLifeSurvey = new SurveyResult();
-		SurveyResult generalHealthySurvey = new SurveyResult();
-		SurveyResult memorySurvey = new SurveyResult();
-		SurveyResult carePlanSurvey = new SurveyResult();
-		
-		
-		for(SurveyResult survey: surveyResultList){
-			int surveyId = survey.getSurveyID();
-			
-			if (surveyId == 10)//Goal Setting survey
-				healthGoalsSurvey = survey;
-			
-			if (surveyId == 11)//Daily life activity survey
-				dailyLifeActivitySurvey = survey;
-			
-			if (surveyId == 7)//Nutrition
-				nutritionSurvey = survey;
-			
-			if (surveyId == 12)//RAPA survey
-				rAPASurvey = survey;
-			
-			if (surveyId == 16)//Mobility survey
-				mobilitySurvey = survey;
-			
-			if (surveyId == 8) //Social Life(Duke Index of Social Support)
-				socialLifeSurvey = survey;
-			
-			if (surveyId == 9) //General Health(Edmonton Frail Scale)
-				generalHealthySurvey = survey;
-			
-			if (surveyId == 14) //Memory Survey
-				memorySurvey = survey;
-			
-			if (surveyId == 15) //Care Plan/Advanced_Directive survey
-				carePlanSurvey = survey;
-		}
-		
-		String xml;
-		//Healthy Goals
-   		try{
-   			xml = new String(healthGoalsSurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-   		
-   		LinkedHashMap<String, String> mHealthGoalsSurvey = ResultParser.getResults(xml);
-   		List<String> qList = new ArrayList<String>();
-   		List<String> questionTextList = new ArrayList<String>();
-   		questionTextList = ResultParser.getSurveyQuestions(xml);
-   		//get answer list
-		qList = MisUtils.getQuestionList(mHealthGoalsSurvey);   
-		
-   		Map<String, String> sMap = new TreeMap<String, String>();
-   		sMap = MisUtils.getSurveyContentMap(questionTextList, qList);
-   		
-  		report.setHealthGoals(sMap);
-   		
-   		//Additional Information
-  		//Memory
-   		try{
-   			xml = new String(memorySurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-   		
-   		LinkedHashMap<String, String> mMemorySurvey = ResultParser.getResults(xml);
-   		qList = new ArrayList<String>();
-   		questionTextList = new ArrayList<String>();
-   		questionTextList = ResultParser.getSurveyQuestions(xml);
-   		
-   		//only keep the second and forth question text in the list
-   		List<String> displayQuestionTextList = new ArrayList<String>();
-   		displayQuestionTextList.add(questionTextList.get(1));
-   		displayQuestionTextList.add(questionTextList.get(3));
-   		
-   		displayQuestionTextList = MisUtils.removeRedundantFromQuestionText(displayQuestionTextList, "of 2");
-   	
-   		//get answer list
-		qList = MisUtils.getQuestionListForMemorySurvey(mMemorySurvey);   					
-   		sMap = new TreeMap<String, String>(); 	
-   		
-   		//Care Plan/Advanced_Directive
-   		try{
-   			xml = new String(carePlanSurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-   		
-   		LinkedHashMap<String, String> mCarePlanSurvey = ResultParser.getResults(xml);
-
-   		questionTextList = new ArrayList<String>();
-   		questionTextList = ResultParser.getSurveyQuestions(xml);
-   		
-   		//take 3 question text from the list
-   		for (int i = 1; i <= 3; i++)
-   			displayQuestionTextList.add(questionTextList.get(i));
-   		
-   		displayQuestionTextList = MisUtils.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");
-   		
-   		//get answer list   		
-   		qList.addAll(MisUtils.getQuestionList(mCarePlanSurvey));   	
-   		
-   		sMap = MisUtils.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
-   		report.setAdditionalInfos(sMap);	  			
-   			
-   			
-   		//Daily Life Activities
-   		try{
-   			xml = new String(dailyLifeActivitySurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-   		
-   		LinkedHashMap<String, String> mDailyLifeActivitySurvey = ResultParser.getResults(xml);
-   		questionTextList = new ArrayList<String>();
-   		questionTextList = ResultParser.getSurveyQuestions(xml);   		
-   		
-   		qList = new ArrayList<String>();
-   		qList = MisUtils.getQuestionList(mDailyLifeActivitySurvey);
-   		
-   		//last question in Daily life activity survey is about falling stuff
-   		List<String> lAlert = new ArrayList<String>();
-   		String fallingQA = qList.get(qList.size() -1);
-   		if (fallingQA.contains("yes")||fallingQA.contains("fall"))
-   			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);   		
-   		   		
-   		sMap = new TreeMap<String, String>();
-   		sMap = MisUtils.getSurveyContentMap(questionTextList, qList);
-   		
-   		report.setDailyActivities(sMap);   		
-   		
- 		//General Healthy Alert
-   		try{
-   			xml = new String(generalHealthySurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-		
-		LinkedHashMap<String, String> mGeneralHealthySurvey = ResultParser.getResults(xml);
-		qList = new ArrayList<String>();   		
-   		//get answer list
-		qList = MisUtils.getQuestionList(mGeneralHealthySurvey);
-		
-		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
-		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert);
-		
-		//Social Life Alert
-		try{
-   			xml = new String(socialLifeSurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-		
-		LinkedHashMap<String, String> mSocialLifeSurvey = ResultParser.getResults(xml);
-		qList = new ArrayList<String>();   		
-   		//get answer list
-		qList = MisUtils.getQuestionList(mSocialLifeSurvey);
-		
-		int socialLifeScore = CalculationManager.getScoreByQuestionsList(qList);
-		lAlert = AlertManager.getSocialLifeAlerts(socialLifeScore, lAlert);
-   		
-   		//Nutrition Alerts   		
-   		try{
-   			xml = new String(nutritionSurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-   		
-   		LinkedHashMap<String, String> mNutritionSurvey = ResultParser.getResults(xml);
-   		qList = new ArrayList<String>();   		
-   		//get answer list
-		qList = MisUtils.getQuestionList(mNutritionSurvey);  
-
-		//get scores for nutrition survey based on answer list
-		int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
-		
-		//high nutrition risk alert
-		Map<String, String> nAlert = new TreeMap<String, String>();
-		lAlert = AlertManager.getNutritionAlerts(nutritionScore, lAlert, qList);
-		
-		//set alerts in report bean
-		if (nAlert != null && nAlert.size()>0)	
-			report.setAlerts(lAlert);
-		else
-			report.setAlerts(null);
-		
-		//RAPA Alert
-		try{
-   			xml = new String(rAPASurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-   		
-   		LinkedHashMap<String, String> mRAPASurvey = ResultParser.getResults(xml);
-   		qList = new ArrayList<String>();   		
-   		//get answer list
-		qList = MisUtils.getQuestionList(mRAPASurvey);  		
-
-		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
-		if (rAPAScore < 6)
-			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
-		
-		//Mobility Alerts
-		try{
-   			xml = new String(mobilitySurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-		
-		LinkedHashMap<String, String> mMobilitySurvey = ResultParser.getResults(xml);
-   		Map<String, String> qMap = MisUtils.getQuestionMap(mMobilitySurvey);  
-   		   		
-   		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);   
-		
-		//send message to MyOscar test
+//	private void generateReport(int patientId, int appointmentId){
+//		
+//		Patient patient = patientDao.getPatientByID(patientId);
+//		//call web service to get patient info from myoscar
+//		String userName = "carolchou.test";
 //		try{
-//			Long lll = ClientManager.sentMessageToPatientInMyOscar(new Long(15231), "Message From Tapestry", "Hello");
-//			System.out.println("lll is === "+ lll);
+//			PersonTransfer3 personInMyoscar = ClientManager.getClientByUsername(userName);
+//			StringBuffer sb = new StringBuffer();
+//			if (personInMyoscar.getStreetAddress1() != null)
+//				sb.append(personInMyoscar.getStreetAddress1());
+//			String city = personInMyoscar.getCity();
+//			if (city != null)
+//			{
+//				sb.append(", ");
+//				sb.append(city);
+//				patient.setCity(city);
+//			}
+//			
+//			if (personInMyoscar.getProvince() != null)
+//			{
+//				sb.append(", ");
+//				sb.append(personInMyoscar.getProvince());
+//			}
+//			
+//			patient.setAddress(sb.toString());
+//			
+//			if (personInMyoscar.getBirthDate() != null)
+//			{
+//				Calendar birthDay = personInMyoscar.getBirthDate();
+//				patient.setBod(Utils.getDateByCalendar(birthDay));
+//			}
 //			
 //		} catch (Exception e){
-//			System.out.println("something wrong with myoscar server");
-//			e.printStackTrace();
+//			System.err.println("Have some problems when calling myoscar web service");
+//			
 //		}
-		
-		
-		report.setAlerts(lAlert);
-		//end of alert
-		
-		//get volunteer information
-		String volunteer = appointment.getVolunteer();
-		String partner = appointment.getPartner();
-		String comments = appointment.getComments();
-				
-		Map<String, String> vMap = new TreeMap<String, String>();
-		
-		if (!Utils.isNullOrEmpty(volunteer))
-			vMap.put(" 1", volunteer);
-		else
-			vMap.put(" 1", "");
-		
-		if (!Utils.isNullOrEmpty(partner))
-			vMap.put(" 2", partner);
-		else
-			vMap.put(" 2", "");
-		
-		if (!Utils.isNullOrEmpty(comments))
-			vMap.put(" C", comments);					
-		else
-			vMap.put(" C", " ");
-		
-		report.setVolunteerInformations(vMap);
-	}
+//		
+//		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
+//		Report report = new Report();		
+//		
+//		//Plan and Key Observations
+//		String keyObservation = appointmentDao.getKeyObservationByAppointmentId(appointmentId);
+//		String plan = appointmentDao.getPlanByAppointmentId(appointmentId);
+//		appointment.setKeyObservation(keyObservation);
+//		appointment.setPlans(plan);
+//		
+//		List<String> pList = new ArrayList<String>();
+//		if (!Utils.isNullOrEmpty(plan))
+//			pList = Arrays.asList(plan.split(","));		
+//		
+//		Map<String, String> pMap = new TreeMap<String, String>();
+//		
+//		for (int i = 1; i<= pList.size(); i++){
+//			pMap.put(String.valueOf(i), pList.get(i-1));
+//		}
+//		
+////		model.addAttribute("patient", patient);
+////		model.addAttribute("appointment", appointment);
+////		model.addAttribute("plans", pMap);
+//				
+//		//Survey---  goals setting
+//		List<SurveyResult> surveyResultList = surveyResultDao.getCompletedSurveysByPatientID(patientId);
+//		SurveyResult healthGoalsSurvey = new SurveyResult();
+//		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
+//		SurveyResult nutritionSurvey = new SurveyResult();
+//		SurveyResult rAPASurvey = new SurveyResult();
+//		SurveyResult mobilitySurvey = new SurveyResult();
+//		SurveyResult socialLifeSurvey = new SurveyResult();
+//		SurveyResult generalHealthySurvey = new SurveyResult();
+//		SurveyResult memorySurvey = new SurveyResult();
+//		SurveyResult carePlanSurvey = new SurveyResult();
+//		
+//		
+//		for(SurveyResult survey: surveyResultList){
+//			int surveyId = survey.getSurveyID();
+//			
+//			if (surveyId == 10)//Goal Setting survey
+//				healthGoalsSurvey = survey;
+//			
+//			if (surveyId == 11)//Daily life activity survey
+//				dailyLifeActivitySurvey = survey;
+//			
+//			if (surveyId == 7)//Nutrition
+//				nutritionSurvey = survey;
+//			
+//			if (surveyId == 12)//RAPA survey
+//				rAPASurvey = survey;
+//			
+//			if (surveyId == 16)//Mobility survey
+//				mobilitySurvey = survey;
+//			
+//			if (surveyId == 8) //Social Life(Duke Index of Social Support)
+//				socialLifeSurvey = survey;
+//			
+//			if (surveyId == 9) //General Health(Edmonton Frail Scale)
+//				generalHealthySurvey = survey;
+//			
+//			if (surveyId == 14) //Memory Survey
+//				memorySurvey = survey;
+//			
+//			if (surveyId == 15) //Care Plan/Advanced_Directive survey
+//				carePlanSurvey = survey;
+//		}
+//		
+//		String xml;
+//		//Healthy Goals
+//   		try{
+//   			xml = new String(healthGoalsSurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//   		
+//   		LinkedHashMap<String, String> mHealthGoalsSurvey = ResultParser.getResults(xml);
+//   		List<String> qList = new ArrayList<String>();
+//   		List<String> questionTextList = new ArrayList<String>();
+//   		questionTextList = ResultParser.getSurveyQuestions(xml);
+//   		//get answer list
+//		qList = MisUtils.getQuestionList(mHealthGoalsSurvey);   
+//		
+//   		Map<String, String> sMap = new TreeMap<String, String>();
+//   		sMap = MisUtils.getSurveyContentMap(questionTextList, qList);
+//   		
+//  		report.setHealthGoals(sMap);
+//   		
+//   		//Additional Information
+//  		//Memory
+//   		try{
+//   			xml = new String(memorySurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//   		
+//   		LinkedHashMap<String, String> mMemorySurvey = ResultParser.getResults(xml);
+//   		qList = new ArrayList<String>();
+//   		questionTextList = new ArrayList<String>();
+//   		questionTextList = ResultParser.getSurveyQuestions(xml);
+//   		
+//   		//only keep the second and forth question text in the list
+//   		List<String> displayQuestionTextList = new ArrayList<String>();
+//   		displayQuestionTextList.add(questionTextList.get(1));
+//   		displayQuestionTextList.add(questionTextList.get(3));
+//   		
+//   		displayQuestionTextList = MisUtils.removeRedundantFromQuestionText(displayQuestionTextList, "of 2");
+//   	
+//   		//get answer list
+//		qList = MisUtils.getQuestionListForMemorySurvey(mMemorySurvey);   					
+//   		sMap = new TreeMap<String, String>(); 	
+//   		
+//   		//Care Plan/Advanced_Directive
+//   		try{
+//   			xml = new String(carePlanSurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//   		
+//   		LinkedHashMap<String, String> mCarePlanSurvey = ResultParser.getResults(xml);
+//
+//   		questionTextList = new ArrayList<String>();
+//   		questionTextList = ResultParser.getSurveyQuestions(xml);
+//   		
+//   		//take 3 question text from the list
+//   		for (int i = 1; i <= 3; i++)
+//   			displayQuestionTextList.add(questionTextList.get(i));
+//   		
+//   		displayQuestionTextList = MisUtils.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");
+//   		
+//   		//get answer list   		
+//   		qList.addAll(MisUtils.getQuestionList(mCarePlanSurvey));   	
+//   		
+//   		sMap = MisUtils.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
+//   		report.setAdditionalInfos(sMap);	  			
+//   			
+//   			
+//   		//Daily Life Activities
+//   		try{
+//   			xml = new String(dailyLifeActivitySurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//   		
+//   		LinkedHashMap<String, String> mDailyLifeActivitySurvey = ResultParser.getResults(xml);
+//   		questionTextList = new ArrayList<String>();
+//   		questionTextList = ResultParser.getSurveyQuestions(xml);   		
+//   		
+//   		qList = new ArrayList<String>();
+//   		qList = MisUtils.getQuestionList(mDailyLifeActivitySurvey);
+//   		
+//   		//last question in Daily life activity survey is about falling stuff
+//   		List<String> lAlert = new ArrayList<String>();
+//   		String fallingQA = qList.get(qList.size() -1);
+//   		if (fallingQA.contains("yes")||fallingQA.contains("fall"))
+//   			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);   		
+//   		   		
+//   		sMap = new TreeMap<String, String>();
+//   		sMap = MisUtils.getSurveyContentMap(questionTextList, qList);
+//   		
+//   		report.setDailyActivities(sMap);   		
+//   		
+// 		//General Healthy Alert
+//   		try{
+//   			xml = new String(generalHealthySurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//		
+//		LinkedHashMap<String, String> mGeneralHealthySurvey = ResultParser.getResults(xml);
+//		qList = new ArrayList<String>();   		
+//   		//get answer list
+//		qList = MisUtils.getQuestionList(mGeneralHealthySurvey);
+//		
+//		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
+//		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert);
+//		
+//		//Social Life Alert
+//		try{
+//   			xml = new String(socialLifeSurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//		
+//		LinkedHashMap<String, String> mSocialLifeSurvey = ResultParser.getResults(xml);
+//		qList = new ArrayList<String>();   		
+//   		//get answer list
+//		qList = MisUtils.getQuestionList(mSocialLifeSurvey);
+//		
+//		int socialLifeScore = CalculationManager.getScoreByQuestionsList(qList);
+//		lAlert = AlertManager.getSocialLifeAlerts(socialLifeScore, lAlert);
+//   		
+//   		//Nutrition Alerts   		
+//   		try{
+//   			xml = new String(nutritionSurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//   		
+//   		LinkedHashMap<String, String> mNutritionSurvey = ResultParser.getResults(xml);
+//   		qList = new ArrayList<String>();   		
+//   		//get answer list
+//		qList = MisUtils.getQuestionList(mNutritionSurvey);  
+//
+//		//get scores for nutrition survey based on answer list
+//		int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
+//		
+//		//high nutrition risk alert
+//		Map<String, String> nAlert = new TreeMap<String, String>();
+//		lAlert = AlertManager.getNutritionAlerts(nutritionScore, lAlert, qList);
+//		
+//		//set alerts in report bean
+//		if (nAlert != null && nAlert.size()>0)	
+//			report.setAlerts(lAlert);
+//		else
+//			report.setAlerts(null);
+//		
+//		//RAPA Alert
+//		try{
+//   			xml = new String(rAPASurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//   		
+//   		LinkedHashMap<String, String> mRAPASurvey = ResultParser.getResults(xml);
+//   		qList = new ArrayList<String>();   		
+//   		//get answer list
+//		qList = MisUtils.getQuestionList(mRAPASurvey);  		
+//
+//		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
+//		if (rAPAScore < 6)
+//			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
+//		
+//		//Mobility Alerts
+//		try{
+//   			xml = new String(mobilitySurvey.getResults(), "UTF-8");
+//   		} catch (Exception e) {
+//   			xml = "";
+//   		}
+//		
+//		LinkedHashMap<String, String> mMobilitySurvey = ResultParser.getResults(xml);
+//   		Map<String, String> qMap = MisUtils.getQuestionMap(mMobilitySurvey);  
+//   		   		
+//   		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);   
+//		
+//		//send message to MyOscar test
+////		try{
+////			Long lll = ClientManager.sentMessageToPatientInMyOscar(new Long(15231), "Message From Tapestry", "Hello");
+////			System.out.println("lll is === "+ lll);
+////			
+////		} catch (Exception e){
+////			System.out.println("something wrong with myoscar server");
+////			e.printStackTrace();
+////		}
+//		
+//		
+//		report.setAlerts(lAlert);
+//		//end of alert
+//		
+//		//get volunteer information
+//		String volunteer = appointment.getVolunteer();
+//		String partner = appointment.getPartner();
+//		String comments = appointment.getComments();
+//				
+//		Map<String, String> vMap = new TreeMap<String, String>();
+//		
+//		if (!Utils.isNullOrEmpty(volunteer))
+//			vMap.put(" 1", volunteer);
+//		else
+//			vMap.put(" 1", "");
+//		
+//		if (!Utils.isNullOrEmpty(partner))
+//			vMap.put(" 2", partner);
+//		else
+//			vMap.put(" 2", "");
+//		
+//		if (!Utils.isNullOrEmpty(comments))
+//			vMap.put(" C", comments);					
+//		else
+//			vMap.put(" C", " ");
+//		
+//		report.setVolunteerInformations(vMap);
+//	}
 	
 }

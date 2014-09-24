@@ -352,7 +352,7 @@ public class DoSurveyAction
 		return surveyAnswers;
 	}
 	
-	public static TapestrySurveyMap getSurveyMapAndStoreInSession(HttpServletRequest request, ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates)
+	public static TapestrySurveyMap getSurveyMapAndStoreInSession(HttpServletRequest request, List<SurveyResult> surveyResults, List<SurveyTemplate> surveyTemplates)
 	{
 		TapestrySurveyMap userSurveys = (TapestrySurveyMap) request.getSession().getAttribute("session_survey_list");
 
@@ -371,7 +371,7 @@ public class DoSurveyAction
 		return userSurveys;
 	}
 	
-	public static List<TapestryPHRSurvey> getSurveyResultsList(ArrayList<SurveyResult> surveyResults, ArrayList<SurveyTemplate> surveyTemplates)
+	public static List<TapestryPHRSurvey> getSurveyResultsList(List<SurveyResult> surveyResults, List<SurveyTemplate> surveyTemplates)
 	{
 		List<TapestryPHRSurvey> results = new ArrayList<TapestryPHRSurvey>();
 

@@ -16,8 +16,8 @@ import org.tapestry.controller.Utils;
 import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
-import org.tapestry.dao.MessageDao;
-import org.tapestry.dao.PatientDao;
+import org.tapestry.dao.MessageDAO;
+import org.tapestry.dao.PatientDAO;
 
 public class MisUtils {
 
@@ -33,7 +33,7 @@ public class MisUtils {
 	}
 	
 	//all patient's info are from tapestry DB + myoscar DB
-	public static List<Patient> getAllPatientsWithFullInfos(PatientDao patientDao, SecurityContextHolderAwareRequestWrapper request){
+	public static List<Patient> getAllPatientsWithFullInfos(PatientDAO patientDao, SecurityContextHolderAwareRequestWrapper request){
 				
 		List<Patient> patients = patientDao.getAllPatients();
 		HttpSession session = request.getSession();
@@ -267,7 +267,7 @@ public class MisUtils {
 	}
 	
 	public static void setUnreadMsg(HttpSession session, SecurityContextHolderAwareRequestWrapper request, 
-			ModelMap model, MessageDao messageDao){		
+			ModelMap model, MessageDAO messageDao){		
 		if (session == null)
 			session = request.getSession();
 		
