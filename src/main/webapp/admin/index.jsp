@@ -22,7 +22,7 @@
 		<%@include file="navbar.jsp" %>
 		<!-- Button trigger modal -->
 		
-		<h4 align="right">Welcome, ${name}    </h4>	
+		<h4 align="left">Welcome, ${name}    </h4>	
 		<c:choose>
 			<c:when test="${appointments.size()>0}">
 		     	<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalReminder">Coming Appointments</button>

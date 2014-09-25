@@ -65,13 +65,14 @@
 	</div> -->
 <!-- 	breadcrumb END-->	
 	
-	<div class="container">				
+	<div class="container">		
+	<h4 align="left">Welcome, ${name}</h4>			
 		<c:choose>
 			<c:when test="${reminding_appointments.size()>0}">
 		     	<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalReminder">Coming Appointments</button>
 		    </c:when>	   
 		</c:choose>	
- 		<h4 align="left">Welcome, ${name}</h4>		
+ 			
 
 	<c:if test="${not empty announcements}">
 		<div class="row-fluid">
