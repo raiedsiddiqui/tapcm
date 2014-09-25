@@ -233,10 +233,11 @@
                 		<div class="row animated bounceInLeft">
                 			<div class="col-md-4">
 	                			<input id="surveyback" class="tleft btn" type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();">
+	                		<div id="eq5dcopyright" style="float:left"></div>
 	                		</div>
-
 	                		
 
+	                	
 	                		<div class="col-md-4">
 		                		<c:if test="${not hideObservernote}">
 		                			<a href="#modalObserverNotes" data-toggle="modal" id="observernote">Observer Notes</a>

@@ -71,7 +71,8 @@
 		     	<button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalReminder">Coming Appointments</button>
 		    </c:when>	   
 		</c:choose>	
- 		<h4 align="right">Welcome, ${name}</h4>		
+ 		<h4 align="left">Welcome, ${name}</h4>		
+
 	<c:if test="${not empty announcements}">
 		<div class="row-fluid">
 			<div class="span12">
