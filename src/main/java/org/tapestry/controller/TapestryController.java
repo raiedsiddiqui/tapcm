@@ -16,6 +16,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
@@ -46,6 +47,7 @@ import org.tapestry.objects.Patient;
 import org.tapestry.objects.Picture;
 import org.tapestry.objects.User;
 import org.tapestry.objects.UserLog;
+import org.tapestry.service.ActivityService;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.sql.DataSource;
@@ -64,12 +66,14 @@ import javax.sql.DataSource;
 @Controller
 public class TapestryController{
 	protected static Logger logger = Logger.getLogger(TapestryController.class);
+//	@Autowired 
+//	private ActivityService activityService;
 	
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
 	private Yaml yaml;
 		
-	private UserDAO userDao = getUserDAO();
+	private UserDAO userDao =  getUserDAO();
    	private PatientDAO patientDao = getPatientDAO();   	
    	private MessageDAO messageDao = getMessageDAO();
    	private PictureDAO pictureDao = getPictureDAO();   
@@ -86,9 +90,7 @@ public class TapestryController{
    	 */
    	@PostConstruct
    	public void readConfig(){
-   		String database = "";
-   		String dbUsername = "";
-   		String dbPassword = "";
+   		
    		String mailHost = "";
    		String mailUser = "";
    		String mailPassword = "";
@@ -99,9 +101,7 @@ public class TapestryController{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
 			yaml = new Yaml();
 			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-			database = config.get("url");
-			dbUsername = config.get("username");
-			dbPassword = config.get("password");
+		
 			mailHost = config.get("mailHost");
 			mailUser = config.get("mailUser");
 			mailPassword = config.get("mailPassword");
@@ -189,6 +189,7 @@ public class TapestryController{
    	//Everything below this point is a RequestMapping
 	@RequestMapping(value="/login", method=RequestMethod.GET)
 	public String login(@RequestParam(value="usernameChanged", required=false) Boolean usernameChanged, ModelMap model){
+		System.out.println("hello Tapestry");
 		if (usernameChanged != null)
 			model.addAttribute("usernameChanged", usernameChanged);
 		return "login";
@@ -202,6 +203,7 @@ public class TapestryController{
 		StringBuffer sb = new StringBuffer();
 		sb.append(u.getName());
 		sb.append(" logged in");
+//		activityService.createUserLog(sb.toString(), u);
 		activityDao.addUserLog(sb.toString(), u);
 		
 		return "redirect:/";

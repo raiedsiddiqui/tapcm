@@ -2,12 +2,12 @@ package org.tapestry.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.Patient;
@@ -17,12 +17,12 @@ import org.tapestry.objects.Patient;
  * 
  * lxie
  */
-public class PatientDAOImpl implements PatientDAO {
-	private JdbcTemplate jdbcTemplate;
+public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 	
 	public PatientDAOImpl(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+		setDataSource(dataSource);
     }
+	
 	@Override
 	public Patient getPatientByID(int id) {
 		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
@@ -30,7 +30,7 @@ public class PatientDAOImpl implements PatientDAO {
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE p.patient_ID=?";
 		
-		return jdbcTemplate.queryForObject(sql, new Object[]{id}, new PatientMapper());
+		return getJdbcTemplate().queryForObject(sql, new Object[]{id}, new PatientMapper());
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class PatientDAOImpl implements PatientDAO {
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID ORDER BY p.patient_ID DESC LIMIT 1";
 		
-		return jdbcTemplate.queryForObject(sql, new PatientMapper());
+		return getJdbcTemplate().queryForObject(sql, new PatientMapper());
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class PatientDAOImpl implements PatientDAO {
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID ";
 		
-		return jdbcTemplate.query(sql, new PatientMapper());
+		return getJdbcTemplate().query(sql, new PatientMapper());
 	}
 
 	@Override
@@ -62,18 +62,18 @@ public class PatientDAOImpl implements PatientDAO {
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE p.volunteer=? OR p.volunteer2=? ";
 		
-		return jdbcTemplate.query(sql, new Object[]{volunteerId, volunteerId}, new PatientMapper());
+		return getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new PatientMapper());
 	}
 
 	@Override
-	public List<Patient> getPatientssByPartialName(String partialName) {	
+	public List<Patient> getPatientsByPartialName(String partialName) {	
 		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname FROM patients "
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE UPPER(p.firstname) "
 				+ "LIKE UPPER('%" + partialName + "%') OR UPPER(p.lastname) LIKE UPPER('%" + partialName + "%') ";
 		
-		return jdbcTemplate.query(sql, new Object[]{partialName}, new PatientMapper());
+		return getJdbcTemplate().query(sql, new PatientMapper());
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class PatientDAOImpl implements PatientDAO {
 		String sql = "INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
 				+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, username) VALUES (?, ?, ?, ?,"
 				+ " ?, ?, ?, ?, ?, ?, ?)";
-		jdbcTemplate.update(sql, p.getFirstName(),  p.getLastName(), p.getPreferredName(), p.getVolunteer(), p.getGender(),
+		getJdbcTemplate().update(sql, p.getFirstName(),  p.getLastName(), p.getPreferredName(), p.getVolunteer(), p.getGender(),
 				p.getNotes(), p.getPartner(), p.getAlerts(), p.getMyoscarVerified(), p.getClinic(), "tapestry_patient");
 	}
 
@@ -89,7 +89,7 @@ public class PatientDAOImpl implements PatientDAO {
 	public void updatePatient(Patient p) {
 		String sql = "UPDATE patients SET firstname=?, lastname=?, preferredname=?, volunteer=?, "
 				+ "gender=?, notes=?, clinic=?, myoscar_verified=?, alerts=?, volunteer2=? WHERE patient_ID=?";
-		jdbcTemplate.update(sql, p.getFirstName(),  p.getLastName(), p.getPreferredName(), p.getVolunteer(), p.getGender(),
+		getJdbcTemplate().update(sql, p.getFirstName(),  p.getLastName(), p.getPreferredName(), p.getVolunteer(), p.getGender(),
 				p.getNotes(), p.getClinic(), p.getMyoscarVerified(), p.getAlerts(), p.getPartner(), p.getPatientID());
 
 	}
@@ -97,7 +97,7 @@ public class PatientDAOImpl implements PatientDAO {
 	@Override
 	public void deletePatientWithId(int id) {
 		String sql = "DELETE FROM patients WHERE patient_ID=?";
-		jdbcTemplate.update(sql, id);
+		getJdbcTemplate().update(sql, id);
 	}
 	
 	class PatientMapper implements RowMapper<Patient> {

@@ -11,38 +11,37 @@ import java.util.List;
  * lxie
  */
 
-
-
 import javax.sql.DataSource;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.User;
 
-public class UserDAOImpl implements UserDAO {
-	private JdbcTemplate jdbcTemplate;
-	
+public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
+
 	public UserDAOImpl(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+ 		setDataSource(dataSource);
     }
+
 	@Override
 	public int countActiveUsers() {
 		String sql = "SELECT COUNT(*) as c FROM users WHERE enabled=1";		
-		return jdbcTemplate.queryForInt(sql);	
+		return getJdbcTemplate().queryForInt(sql);	
 	}
 
 	@Override
 	public int countAdministrators() {
 		String sql = "SELECT COUNT(*) as c FROM users WHERE role=ROLE_ADMIN";		
-		return jdbcTemplate.queryForInt(sql);
+		return getJdbcTemplate().queryForInt(sql);
 	}
 
 	@Override
 	public int countAllUsers() {
 		String sql = "SELECT COUNT(*) as c FROM users";		
-		return jdbcTemplate.queryForInt(sql);
+		return getJdbcTemplate().queryForInt(sql);
 	}
 	
 	/**
@@ -53,7 +52,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public User getUserByID(int id) {
 		String sql = "SELECT * FROM users WHERE user_ID=?";		
-		return jdbcTemplate.queryForObject(sql, new Object[]{id}, new UserMapper());	
+		return getJdbcTemplate().queryForObject(sql, new Object[]{id}, new UserMapper());	
 	}
 
 	/**
@@ -64,7 +63,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public User getUserByUsername(String username) {		
 		String sql = "SELECT * FROM users WHERE username=?";		
-		return jdbcTemplate.queryForObject(sql, new Object[]{username}, new UserMapper());	
+		return getJdbcTemplate().queryForObject(sql, new Object[]{username}, new UserMapper());	
 	}
 
 	/**
@@ -76,13 +75,13 @@ public class UserDAOImpl implements UserDAO {
 		boolean success = false;	
 		String sql = "SELECT * FROM users WHERE UPPER(username) LIKE UPPER(?)";
 		
-		List<User> user = jdbcTemplate.query(sql, new Object[]{u.getUsername()}, new UserMapper());
+		List<User> user = getJdbcTemplate().query(sql, new Object[]{u.getUsername()}, new UserMapper());
 		
 		if (user.size() == 0)
 		{
 			sql = "INSERT INTO users (username, name, password, role, email,"
 					+ " phone_number, site, organization, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)";
-			jdbcTemplate.update(sql, u.getUsername(), u.getName(), u.getPassword(), u.getRole(), u.getEmail(),
+			getJdbcTemplate().update(sql, u.getUsername(), u.getName(), u.getPassword(), u.getRole(), u.getEmail(),
 				u.getPhoneNumber(), u.getSite(), u.getOrganization());
 		
 			success = true;
@@ -98,7 +97,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void modifyUser(User u) {
 		String sql = "UPDATE users SET username=?, name=?, email=? WHERE user_ID=?";
-		jdbcTemplate.update(sql,u.getUsername(), u.getName(), u.getEmail(), u.getUserID());
+		getJdbcTemplate().update(sql,u.getUsername(), u.getName(), u.getEmail(), u.getUserID());
 	}
 
 	/**
@@ -108,7 +107,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void removeUserWithID(int id) {
 		String sql = "DELETE FROM users WHERE user_ID=?";
-		jdbcTemplate.update(sql, id);
+		getJdbcTemplate().update(sql, id);
 
 	}
 	
@@ -120,7 +119,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void disableUserWithID(int id) {
 		String sql = "UPDATE users SET enabled=0 WHERE user_ID=?";
-		jdbcTemplate.update(sql, id);
+		getJdbcTemplate().update(sql, id);
 	}
 
 	/**
@@ -131,7 +130,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void enableUserWithID(int id) {
 		String sql = "UPDATE users SET enabled=1 WHERE user_ID=?";
-		jdbcTemplate.update(sql, id);
+		getJdbcTemplate().update(sql, id);
 
 	}
 
@@ -142,7 +141,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public List<User> getAllUsers() {
 		String sql = "SELECT * FROM users";
-		List <User> users = jdbcTemplate.query(sql, new UserMapper());
+		List <User> users = getJdbcTemplate().query(sql, new UserMapper());
 		
 		return users;
 	}
@@ -154,7 +153,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public List<User> getUsersByPartialName(String partialName) {
 		String sql = "SELECT * FROM users WHERE UPPER(name) LIKE UPPER('%" + partialName + "%')";
-		List<User> users = jdbcTemplate.query(sql, new UserMapper());
+		List<User> users = getJdbcTemplate().query(sql, new UserMapper());
 		
 		return users;
 	}
@@ -167,7 +166,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public List<User> getAllUsersWithRole(String role) {
 		String sql = "SELECT * FROM users WHERE role=?";		
-		List<User> users = jdbcTemplate.query(sql, new Object[]{role}, new UserMapper());
+		List<User> users = getJdbcTemplate().query(sql, new Object[]{role}, new UserMapper());
 		
 		return users;
 	}
@@ -180,7 +179,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public List<User> getAllActiveUsersWithRole(String role) {
 		String sql = "SELECT * FROM users WHERE role=? AND enabled=1";
-		List<User> users = jdbcTemplate.query(sql, new Object[]{role}, new UserMapper());
+		List<User> users = getJdbcTemplate().query(sql, new Object[]{role}, new UserMapper());
 		
 		return users;
 	}
@@ -196,7 +195,7 @@ public class UserDAOImpl implements UserDAO {
 		String hashedPassword = enc.encodePassword(pwd, null);
 		
 		String sql = "SELECT password FROM users WHERE user_ID=?";
-		User user = jdbcTemplate.queryForObject(sql, new Object[]{id}, new RowMapper<User>() {
+		User user = getJdbcTemplate().queryForObject(sql, new Object[]{id}, new RowMapper<User>() {
 			 
             @Override
             public User mapRow(ResultSet rs, int rowNumber) throws SQLException {
@@ -216,7 +215,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public void setPasswordForUser(int id, String pwd) {
 		String sql = "UPDATE users SET password=? WHERE user_ID=?";
-		jdbcTemplate.update(sql, pwd, id);
+		getJdbcTemplate().update(sql, pwd, id);
 
 	}
 
@@ -228,7 +227,7 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public List<Integer> getVolunteerCoordinatorByOrganizationId(int id) {
 		String sql = "SELECT * FROM users WHERE organization=? AND role ='ROLE_LOCAL_ADMIN'";
-		List<User> users = jdbcTemplate.query(sql, new Object[]{id}, new UserMapper());
+		List<User> users = getJdbcTemplate().query(sql, new Object[]{id}, new UserMapper());
 		
 		List<Integer> coordinatorIds = new ArrayList<Integer>();
 		for(User u: users)

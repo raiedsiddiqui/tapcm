@@ -11,31 +11,30 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.web.multipart.MultipartFile;
-import org.tapestry.controller.Utils;
 import org.tapestry.objects.Picture;
-import org.tapestry.objects.User;
 
-public class PictureDAOImpl implements PictureDAO {
+public class PictureDAOImpl extends JdbcDaoSupport implements PictureDAO {
 	private String uploadDir;
-	private JdbcTemplate jdbcTemplate;
-	
+		
 	public PictureDAOImpl(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+		setDataSource(dataSource);
     }
+
 	@Override
 	public List<Picture> getPicturesForUser(int userID) {
 		String sql = "SELECT * FROM pictures WHERE owner=? and owner_is_user=1";
-		List<Picture> pics = jdbcTemplate.query(sql, new Object[]{userID}, new PictureMapper());
+		List<Picture> pics = getJdbcTemplate().query(sql, new Object[]{userID}, new PictureMapper());
 		return pics;
 	}
 
 	@Override
 	public List<Picture> getPicturesForPatient(int patientID) {		
 		String sql = "SELECT * FROM pictures WHERE owner=? and owner_is_user=0";
-		List<Picture> pics = jdbcTemplate.query(sql, new Object[]{patientID}, new PictureMapper());
+		List<Picture> pics = getJdbcTemplate().query(sql, new Object[]{patientID}, new PictureMapper());
 		return pics;
 	}
 
@@ -52,7 +51,7 @@ public class PictureDAOImpl implements PictureDAO {
     		pic.transferTo(f);    
     		
     		String sql = "INSERT INTO pictures (pic, owner, owner_is_user) values (?,?,?)";
-    		jdbcTemplate.update(sql, uploadFilename, owner, isUser);    		
+    		getJdbcTemplate().update(sql, uploadFilename, owner, isUser);    		
     		
     	} catch (IOException ie) {
     		System.out.println("Error: Could not write file to disk");
@@ -71,7 +70,7 @@ public class PictureDAOImpl implements PictureDAO {
 	@Override
 	public void removePicture(int pictureID) {		
 		String sql = "DELETE FROM pictures WHERE picture_ID=?";
-		jdbcTemplate.update(sql, pictureID);
+		getJdbcTemplate().update(sql, pictureID);
 
 	}
 	

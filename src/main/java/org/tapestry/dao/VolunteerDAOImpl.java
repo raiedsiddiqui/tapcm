@@ -6,8 +6,9 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.tapestry.objects.Organization;
 import org.tapestry.objects.Volunteer;
 
@@ -16,17 +17,17 @@ import org.tapestry.objects.Volunteer;
  * 
  * lxie
  */
-public class VolunteerDAOImpl implements VolunteerDAO {
-	private JdbcTemplate jdbcTemplate;
+public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 	
 	public VolunteerDAOImpl(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+		setDataSource(dataSource);
     }
+
 	@Override
 	public List<Volunteer> getAllVolunteers() {
 		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o "
 				+ "ON v.organization=o.organization_ID ORDER BY v.firstname DESC";
-		return jdbcTemplate.query(sql, new VolunteerMapper());
+		return getJdbcTemplate().query(sql, new VolunteerMapper());
 	}
 
 	@Override
@@ -34,7 +35,7 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o "
 				+ "ON v.organization=o.organization_ID WHERE "
 				+ "v.availability='1non,2non,3non,4non,5non' ORDER BY v.firstname DESC";
-		return jdbcTemplate.query(sql, new VolunteerMapper());
+		return getJdbcTemplate().query(sql, new VolunteerMapper());
 	}
 
 	@Override
@@ -42,35 +43,35 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o ON v.organization=o.organization_ID WHERE "
 				+ "UPPER(v.firstname) LIKE UPPER('%" + partialName + "%') OR UPPER(v.lastname) LIKE UPPER('%" + partialName + "%') "
 				+ "OR UPPER(v.preferredname) LIKE UPPER('%" + partialName + "%') ORDER BY v.firstname DESC";
-		return jdbcTemplate.query(sql, new VolunteerMapper());
+		return getJdbcTemplate().query(sql, new VolunteerMapper());
 	}
 
 	@Override
 	public List<Volunteer> getAllVolunteersByOrganization(int id) {
 		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o "
 				+ "ON v.organization=o.organization_ID WHERE o.organization=? ORDER BY v.firstname DESC";
-		return jdbcTemplate.query(sql, new Object[]{id}, new VolunteerMapper());
+		return getJdbcTemplate().query(sql, new Object[]{id}, new VolunteerMapper());
 	}
 
 	@Override
 	public Volunteer getVolunteerById(int id) {
 		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o "
 				+ "ON v.organization=o.organization_ID WHERE v.volunteer_ID = ?";
-		return jdbcTemplate.queryForObject(sql, new Object[]{id}, new VolunteerMapper());
+		return getJdbcTemplate().queryForObject(sql, new Object[]{id}, new VolunteerMapper());
 	}
 
 	@Override
 	public int getVolunteerIdByUsername(String username) {
 		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o "
 				+ "ON v.organization=o.organization_ID WHERE v.username = ? ORDER BY v.firstname DESC";
-		Volunteer vol = jdbcTemplate.queryForObject(sql, new Object[]{username}, new VolunteerMapper());
+		Volunteer vol = getJdbcTemplate().queryForObject(sql, new Object[]{username}, new VolunteerMapper());
 		return vol.getVolunteerId();
 	}
 
 	@Override
 	public List<String> getAllExistUsernames() {
 		String sql = "SELECT username FROM volunteers";
-		return  jdbcTemplate.queryForList(sql, String.class);
+		return  getJdbcTemplate().queryForList(sql, String.class);
 	}
 
 	@Override
@@ -80,7 +81,7 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 				+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
 				+ " availability, street_number, password, organization) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		jdbcTemplate.update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getStreet(), volunteer.getUserName(),
+		getJdbcTemplate().update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getStreet(), volunteer.getUserName(),
 				volunteer.getEmail(),volunteer.getExperienceLevel(), volunteer.getCity(), volunteer.getProvince(), volunteer.getHomePhone(),
 				volunteer.getCellPhone(), volunteer.getPostalCode(), volunteer.getCountry(), volunteer.getEmergencyContact(), 
 				volunteer.getAptNumber(), volunteer.getNotes(), volunteer.getAvailability(), volunteer.getStreetNumber(), 				
@@ -96,7 +97,7 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 				+ "postal_code=?, country=?, emergency_contact=?, emergency_phone=?, appartment=?, "
 				+ "notes=?, availability=?, street_number=?, password=?, organization=? WHERE volunteer_ID=?";
 		
-		jdbcTemplate.update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getUserName(), volunteer.getStreet(), 
+		getJdbcTemplate().update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getUserName(), volunteer.getStreet(), 
 				volunteer.getEmail(), volunteer.getExperienceLevel(), volunteer.getCity(), volunteer.getProvince(), volunteer.getHomePhone(),
 				volunteer.getCellPhone(), volunteer.getPostalCode(), volunteer.getCountry(), volunteer.getEmergencyContact(), 
 				volunteer.getAptNumber(), volunteer.getNotes(), volunteer.getAvailability(), volunteer.getStreetNumber(), 				
@@ -106,13 +107,13 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 	@Override
 	public void deleteVolunteerById(int id) {
 		String sql = "DELETE FROM volunteers WHERE volunteer_ID=?";
-		jdbcTemplate.update(sql, new Object[]{id});
+		getJdbcTemplate().update(sql, new Object[]{id});
 	}
 
 	@Override
 	public int countAllVolunteers() {
 		String sql = "SELECT COUNT(*) as c FROM volunteers";
-		return jdbcTemplate.queryForInt(sql);
+		return getJdbcTemplate().queryForInt(sql);
 	}
 
 	@Override
@@ -126,25 +127,25 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 		String sql = "SELECT users.user_ID FROM users INNER JOIN volunteers ON "
 				+ "users.username = volunteers.username WHERE volunteers.volunteer_ID = ?";
 		
-		return jdbcTemplate.queryForInt(sql, new Object[]{volunteerId});		 
+		return getJdbcTemplate().queryForInt(sql, new Object[]{volunteerId});		 
 	}
 
 	@Override
 	public List<Organization> getAllOrganizations() {
 		String sql = "SELECT * FROM organizations ORDER BY name DESC ";
-		return jdbcTemplate.query(sql, new OrganizationMapper());
+		return getJdbcTemplate().query(sql, new OrganizationMapper());
 	}
 
 	@Override
 	public Organization getOrganizationById(int id) {
 		String sql = "SELECT * FROM organizations WHERE organization_ID = ? ORDER BY name DESC ";
-		return jdbcTemplate.queryForObject(sql, new Object[]{id}, new OrganizationMapper());
+		return getJdbcTemplate().queryForObject(sql, new Object[]{id}, new OrganizationMapper());
 	}
 
 	@Override
 	public List<Organization> getOrganizationsByName(String partialName) {
 		String sql = "SELECT * FROM organizations WHERE UPPER(name) LIKE UPPER('%" + partialName + "%')";
-		return jdbcTemplate.query(sql, new OrganizationMapper());
+		return getJdbcTemplate().query(sql, new OrganizationMapper());
 	}
 
 	@Override
@@ -152,7 +153,7 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 		String sql = "INSERT INTO organizations (name, street_number, street, city, province,"
 				+ "country, postal_code, primary_contact, primary_phone, secondary_contact, secondary_phone) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		jdbcTemplate.update(sql, organization.getName(), organization.getStreetNumbet(), organization.getStreetName(),
+		getJdbcTemplate().update(sql, organization.getName(), organization.getStreetNumbet(), organization.getStreetName(),
 				organization.getCity(), organization.getProvince(), organization.getCountry(), organization.getPostCode(), 
 				organization.getPrimaryContact(), organization.getPrimaryPhone(), organization.getSecondaryContact(),
 				organization.getSecondaryPhone());
@@ -165,7 +166,7 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 		String sql = "UPDATE organizations SET name=?, street_number=?, street=?, city=?, "
 				+ "province=?,postal_code=?, primary_contact=?, primary_phone=?, secondary_contact=?, "
 				+ "secondary_phone=? WHERE organization_ID=?";
-		jdbcTemplate.update(sql, organization.getName(), organization.getStreetNumbet(), organization.getStreetName(),
+		getJdbcTemplate().update(sql, organization.getName(), organization.getStreetNumbet(), organization.getStreetName(),
 				organization.getCity(), organization.getProvince(), organization.getCountry(), organization.getPostCode(), 
 				organization.getPrimaryContact(), organization.getPrimaryPhone(), organization.getSecondaryContact(),
 				organization.getSecondaryPhone(), organization.getOrganizationId());
@@ -175,7 +176,7 @@ public class VolunteerDAOImpl implements VolunteerDAO {
 	@Override
 	public void deleteOrganizationById(int id) {
 		String sql = "DELETE FROM organizations WHERE organization_ID=?";
-		jdbcTemplate.update(sql, id);
+		getJdbcTemplate().update(sql, id);
 
 	}
 	

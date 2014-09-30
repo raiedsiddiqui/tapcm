@@ -6,39 +6,38 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.tapestry.dao.ActivityDAOImpl.ActivityMapper;
-import org.tapestry.dao.ActivityDAOImpl.DetailedActivityMapper;
-import org.tapestry.objects.Activity;
 import org.tapestry.objects.Message;
-import org.tapestry.objects.UserLog;
+
 /**
  * An implementation of the MessageDAO interface.
  * 
  * lxie
  */
 
-public class MessageDAOImpl implements MessageDAO {
-	private JdbcTemplate jdbcTemplate;
+public class MessageDAOImpl extends JdbcDaoSupport implements MessageDAO {
 	
 	public MessageDAOImpl(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+ 		setDataSource(dataSource);
     }
+
 	@Override
 	public List<Message> getAllMessagesForRecipient(int recipient) {
 		String sql = "SELECT messages.message_ID, messages.sender, messages.recipient, messages.msg,"
 				+ " messages.subject, messages.msgRead, messages.sent, users.name "
 				+ "FROM messages INNER JOIN users ON messages.sender = users.user_ID WHERE messages.recipient=?";
 		
-		List<Message> messages = jdbcTemplate.query(sql, new Object[]{recipient}, new MessageMapper());			
+		List<Message> messages = getJdbcTemplate().query(sql, new Object[]{recipient}, new MessageMapper());			
 		return messages;
 	}
 
 	@Override
 	public int countUnreadMessagesForRecipient(int recipient) {		
 		String sql = "SELECT COUNT(*) as total FROM messages WHERE recipient=? and msgRead=0";
-		return jdbcTemplate.queryForInt(sql, new Object[]{recipient});	
+		return getJdbcTemplate().queryForInt(sql, new Object[]{recipient});	
 	}
 
 	@Override
@@ -47,26 +46,26 @@ public class MessageDAOImpl implements MessageDAO {
 				+ "messages.msgRead, messages.sent, messages.recipient, users.name "
 				+ "FROM messages INNER JOIN users ON messages.sender = users.user_ID WHERE message_ID=?";
 		
-		return jdbcTemplate.queryForObject(sql, new Object[]{id}, new MessageMapper());			
+		return getJdbcTemplate().queryForObject(sql, new Object[]{id}, new MessageMapper());			
 	}
 
 	@Override
 	public void markAsRead(int id) {
 		String sql = "UPDATE messages SET msgRead=1 WHERE message_ID=?";
-		jdbcTemplate.update(sql,id);
+		getJdbcTemplate().update(sql,id);
 
 	}
 
 	@Override
 	public void sendMessage(Message m) {
 		String sql = "INSERT INTO messages (recipient, sender, msg, subject) VALUES (?,?,?,?)";
-		jdbcTemplate.update(sql, m.getRecipient(), m.getSenderID(), m.getText() ,m.getSubject());
+		getJdbcTemplate().update(sql, m.getRecipient(), m.getSenderID(), m.getText() ,m.getSubject());
 	}
 
 	@Override
 	public void deleteMessage(int id) {
 		String sql = "DELETE FROM messages WHERE message_ID=?";
-		jdbcTemplate.update(sql, id);
+		getJdbcTemplate().update(sql, id);
 
 	}
 
@@ -75,7 +74,7 @@ public class MessageDAOImpl implements MessageDAO {
 		String sql= "SELECT messages.message_ID,  messages.sender, messages.recipient, messages.msg, messages.subject,"
 				+ " messages.msgRead, messages.sent, users.name FROM messages INNER JOIN users ON messages.sender = users.user_ID "
 				+ "WHERE recipient=? AND msgRead=0 AND subject LIKE 'ANNOUNCEMENT:%'";
-		List<Message> messages = jdbcTemplate.query(sql, new Object[]{userID}, new MessageMapper());			
+		List<Message> messages = getJdbcTemplate().query(sql, new Object[]{userID}, new MessageMapper());			
 		return messages;
 	}
 	

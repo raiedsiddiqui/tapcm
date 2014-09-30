@@ -44,7 +44,7 @@ public interface PatientDAO {
 	 * @param partialName
 	 * @return
 	 */
-	public List<Patient> getPatientssByPartialName(String partialName);
+	public List<Patient> getPatientsByPartialName(String partialName);
 	
 	/**
 	* Saves a patient in the database

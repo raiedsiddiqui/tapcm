@@ -153,7 +153,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
     	return new MessageDAOImpl(getDataSource());
     }
     
-    public AppointmentDAO getAppointmentDAO(){
+    public AppointmentDAO getAppointmentDAO(){    	
     	return new AppointmentDAOImpl(getDataSource());
     }
     public VolunteerDAO getVolunteerDAO(){
@@ -550,22 +550,8 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		user.setEmail(volunteer.getEmail());
 		user.setOrganization(volunteer.getOrganizationId());		
 
-		boolean success = userDao.createUser(user);
-				
-//		if (success){
-////			sendMessageToInbox(String subject, String msg, int sender, int recipient)
-//			String subject = "Welcome to Tapestry";
-//			
-//			sb = new StringBuffer();
-//			sb.append("Thank you for volunteering with Tapestry. Your account has been successfully created.\n");
-//			sb.append("Your username and password are as follows:\n");
-//			sb.append("Username: ");
-//			sb.append(user.getUsername());
-//			sb.append("\n");
-//			sb.append("Password: password\n\n");
-//			
-//			String msg = sb.toString();
-//		}
+		boolean success = userDao.createUser(user);				
+
 		if (mailAddress != null && success){
 			try{
 				MimeMessage message = new MimeMessage(session);
@@ -953,14 +939,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 				model.addAttribute("organizationCreated", true);
 				session.removeAttribute("organizatioMessage");
 			}
-//			else if ("D".equals(message)){
-//				model.addAttribute("volunteerDeleted", true);
-//				session.removeAttribute("volunteerMessage");
-//			}
-//			else if ("U".equals(message)){
-//				model.addAttribute("volunteerUpdate", true);
-//				session.removeAttribute("volunteerMessage");
-//			}			
+	
 		}		
 		return "/admin/view_organizations";
 	}
@@ -1036,7 +1015,6 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 
 	        try {
 	        	   // step 1
-//	            Document document = new Document();
 	            Document document = new Document(PageSize.A5.rotate());
 	            response.setHeader("Content-Disposition", "outline;filename=\"" +orignalFileName+ "\"");
 	            // step 2
@@ -1097,6 +1075,6 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		m.setText(msg);
 		m.setSubject(subject);
 		messageDao.sendMessage(m);
-}
+	}
 
 }

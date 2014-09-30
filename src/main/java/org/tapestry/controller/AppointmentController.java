@@ -83,56 +83,6 @@ public class AppointmentController{
 	private SurveyResultDAO surveyResultDao = getSurveyResultDAO();
 	private SurveyTemplateDAO surveyTemplateDao = getSurveyTemplateDAO();
 	
-   	//Mail-related settings;
-   	private Properties props;
-   	private String mailAddress = "";
-   	private Session session;
-	
-	/**
-   	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
-   	 */
-   	@PostConstruct
-   	public void readDatabaseConfig(){   	
-   		String mailHost = "";
-   		String mailUser = "";
-   		String mailPassword = "";
-   		String mailPort = "";
-   		String useTLS = "";
-   		String useAuth = "";
-		try{
-			dbConfigFile = new ClassPathResource("tapestry.yaml");
-			yaml = new Yaml();
-			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-		
-			mailHost = config.get("mailHost");
-			mailUser = config.get("mailUser");
-			mailPassword = config.get("mailPassword");
-			mailAddress = config.get("mailFrom");
-			mailPort = config.get("mailPort");
-			useTLS = config.get("mailUsesTLS");
-			useAuth = config.get("mailRequiresAuth");
-		} catch (IOException e) {
-			System.out.println("Error reading from config file");
-			System.out.println(e.toString());
-		}	
-		//Mail-related settings
-		final String username = mailUser;
-		final String password = mailPassword;
-		props = System.getProperties();
-		session = Session.getDefaultInstance(props, 
-				 new javax.mail.Authenticator() {
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username, password);
-					}
-		  		});
-		props.setProperty("mail.smtp.host", mailHost);
-		props.setProperty("mail.smtp.socketFactory.port", mailPort);
-		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		props.setProperty("mail.smtp.auth", useAuth);
-		props.setProperty("mail.smtp.starttls.enable", useTLS);
-		props.setProperty("mail.user", mailUser);
-		props.setProperty("mail.password", mailPassword);
-   	}
     public DataSource getDataSource() {
     	try{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
@@ -157,7 +107,7 @@ public class AppointmentController{
 			return null;
 		}
     }
-    
+   
     public ActivityDAO getActivityDAO(){
     	return new ActivityDAOImpl(getDataSource());
     }
@@ -181,8 +131,9 @@ public class AppointmentController{
     public SurveyResultDAO getSurveyResultDAO(){
     	return new SurveyResultDAOImpl(getDataSource());
     }
-    public AppointmentDAO getAppointmentDAO(){
+    public AppointmentDAO getAppointmentDAO(){    	
     	return new AppointmentDAOImpl(getDataSource());
+    	//    	return new AppointmentDAOImpl();
     }
    	
     public VolunteerDAO getVolunteerDAO(){
@@ -192,6 +143,7 @@ public class AppointmentController{
     public PatientDAO getPatientDAO(){
     	return new PatientDAOImpl(getDataSource());
     }
+    
 	@RequestMapping(value="/", method=RequestMethod.GET)
 	//Note that messageSent is Boolean, not boolean, to allow it to be null
 	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, 
@@ -473,52 +425,42 @@ public class AppointmentController{
 				int volunteer2UserId = volunteerDao.getUserIdByVolunteerId(p.getPartner());							
 										
 				//send message to both volunteers
-				if (mailAddress != null){					
-					//content of message
-					sb = new StringBuffer();
-					sb.append(logginUser);
-					sb.append(" has booked an appointment for ");
-					sb.append(p.getFirstName());
-					sb.append(" ");
-					sb.append(p.getLastName());
-					sb.append( " at ");
-					sb.append(time);
-					sb.append(" on ");
-					sb.append(date);
-					sb.append(".\n");
-					sb.append("This appointment is awaiting confirmation.");
+				//content of message
+				sb = new StringBuffer();
+				sb.append(logginUser);
+				sb.append(" has booked an appointment for ");
+				sb.append(p.getFirstName());
+				sb.append(" ");
+				sb.append(p.getLastName());
+				sb.append( " at ");
+				sb.append(time);
+				sb.append(" on ");
+				sb.append(date);
+				sb.append(".\n");
+				sb.append("This appointment is awaiting confirmation.");
+				
+				String msg = sb.toString();
+				
+				if (request.isUserInRole("ROLE_ADMIN")) //send message for user login as admin/volunteer coordinator
+				{				
+					sendMessageToInbox(msg, userId, volunteer1UserId);//send message to volunteer1 
+					sendMessageToInbox(msg, userId, volunteer2UserId);//send message to volunteer2				
+				}
+				else //send message for user login as volunteer
+				{						
+					int organizationId = volunteer1.getOrganizationId();
+					List<Integer> coordinators = userDao.getVolunteerCoordinatorByOrganizationId(organizationId);
 					
-					String msg = sb.toString();
-					
-					if (request.isUserInRole("ROLE_ADMIN")) //send message for user login as admin/volunteer coordinator
-					{				
-						sendMessageToInbox(msg, userId, volunteer1UserId);//send message to volunteer1 
-						sendMessageToInbox(msg, userId, volunteer2UserId);//send message to volunteer2
-				//		sendMessageToInbox(msg, userId, userId);//send message to admin self	
+					if (coordinators != null)
+					{	//send message to all coordinators in the organization						
+						for (int i = 0; i<coordinators.size(); i++)		
+							sendMessageToInbox(msg, volunteer1UserId, coordinators.get(i).intValue());			
 					}
-					else //send message for user login as volunteer
-					{						
-						int organizationId = volunteer1.getOrganizationId();
-						List<Integer> coordinators = userDao.getVolunteerCoordinatorByOrganizationId(organizationId);
-						
-						if (coordinators != null)
-						{	//send message to all coordinators in the organization						
-							for (int i = 0; i<coordinators.size(); i++)		
-								sendMessageToInbox(msg, volunteer1UserId, coordinators.get(i).intValue());			
-						}
-						else{
-							System.out.println("Can't find any coordinator in organization id# " + organizationId);
-							logger.error("Can't find any coordinator in organization id# " + organizationId);
-						}
-						
-				//		sendMessageToInbox(msg, volunteer1UserId, volunteer1UserId);//send message to volunteer his/her self
-					}						
-				}
-				else  //send mail if mail address is null
-				{
-					System.out.println("Email address not set");
-					logger.error("Email address not set");
-				}
+					else{
+						System.out.println("Can't find any coordinator in organization id# " + organizationId);
+						logger.error("Can't find any coordinator in organization id# " + organizationId);
+					}
+				}						
 				
 				//after saving appointment in DB  
 				if (request.isUserInRole("ROLE_ADMIN"))
@@ -826,31 +768,25 @@ public class AppointmentController{
 			int userId = user.getUserID();
 						
 			//send message to both volunteers
-			if (mailAddress != null){		
-				StringBuffer sb = new StringBuffer();
-				
-				sb.append(logginUser);
-				sb.append(" has booked an appointment for ");
-				sb.append(patient.getFirstName());
-				sb.append(" ");
-				sb.append(patient.getLastName());
-				sb.append( " at ");
-				sb.append(time);
-				sb.append(" on ");
-				sb.append(date);
-				sb.append(".\n");
-				sb.append("This appointment is awaiting confirmation.");
-				
-				String msg = sb.toString();
-				
-				sendMessageToInbox(msg, userId, volunteerId); //send message to volunteer
-				sendMessageToInbox(msg, userId, partnerId); //send message to volunteer
-				sendMessageToInbox(msg, userId, userId); //send message to admin her/his self					
-			}
-			else {
-				System.out.println("Email address not set");
-				logger.error("Email address not set");
-			}
+			StringBuffer sb = new StringBuffer();
+			
+			sb.append(logginUser);
+			sb.append(" has booked an appointment for ");
+			sb.append(patient.getFirstName());
+			sb.append(" ");
+			sb.append(patient.getLastName());
+			sb.append( " at ");
+			sb.append(time);
+			sb.append(" on ");
+			sb.append(date);
+			sb.append(".\n");
+			sb.append("This appointment is awaiting confirmation.");
+			
+			String msg = sb.toString();
+			
+			sendMessageToInbox(msg, userId, volunteerId); //send message to volunteer
+			sendMessageToInbox(msg, userId, partnerId); //send message to volunteer
+			sendMessageToInbox(msg, userId, userId); //send message to admin her/his self	
 			model.addAttribute("successToCreateAppointment",true);
 		}
 		else

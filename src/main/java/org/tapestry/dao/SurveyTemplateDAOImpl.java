@@ -6,26 +6,26 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
 import org.tapestry.objects.SurveyTemplate;
 
-public class SurveyTemplateDAOImpl implements SurveyTemplateDAO {
-	private JdbcTemplate jdbcTemplate;
-	
+public class SurveyTemplateDAOImpl extends JdbcDaoSupport implements SurveyTemplateDAO {
 	public SurveyTemplateDAOImpl(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
+		setDataSource(dataSource);
     }
+
 	@Override
 	public SurveyTemplate getSurveyTemplateByID(int id) {
 		String sql = "SELECT * FROM surveys WHERE survey_ID=?";
-		return jdbcTemplate.queryForObject(sql, new Object[]{id}, new SurveyTemplateMapper());
+		return getJdbcTemplate().queryForObject(sql, new Object[]{id}, new SurveyTemplateMapper());
 	}
 
 	@Override
 	public List<SurveyTemplate> getAllSurveyTemplates() {
 		String sql = "SELECT * FROM surveys ORDER BY priority DESC";
-		List<SurveyTemplate> surveyTemplates = jdbcTemplate.query(sql, new SurveyTemplateMapper());
+		List<SurveyTemplate> surveyTemplates = getJdbcTemplate().query(sql, new SurveyTemplateMapper());
 		
 		return surveyTemplates;
 	}
@@ -33,7 +33,7 @@ public class SurveyTemplateDAOImpl implements SurveyTemplateDAO {
 	@Override
 	public List<SurveyTemplate> getSurveyTemplatesByPartialTitle(String partialTitle) {
 		String sql = "SELECT * FROM surveys WHERE UPPER(title) LIKE UPPER('%" + partialTitle + "%')";
-		List<SurveyTemplate> surveyTemplates = jdbcTemplate.query(sql, new SurveyTemplateMapper());
+		List<SurveyTemplate> surveyTemplates = getJdbcTemplate().query(sql, new SurveyTemplateMapper());
 		
 		return surveyTemplates;
 	}
@@ -41,20 +41,20 @@ public class SurveyTemplateDAOImpl implements SurveyTemplateDAO {
 	@Override
 	public void uploadSurveyTemplate(SurveyTemplate st) {
 		String sql = "INSERT INTO surveys (title, type, contents, priority, description) values (?,?,?,?,?)";
-		jdbcTemplate.update(sql, st.getTitle(), st.getType(), st.getContents(), st.getPriority(), st.getDescription());
+		getJdbcTemplate().update(sql, st.getTitle(), st.getType(), st.getContents(), st.getPriority(), st.getDescription());
 	}
 
 	@Override
 	public void deleteSurveyTemplate(int id) {
 		String sql = "DELETE FROM surveys WHERE survey_ID=?";
-		jdbcTemplate.update(sql, id);
+		getJdbcTemplate().update(sql, id);
 
 	}
 
 	@Override
 	public int countSurveyTemplate() {
 		String sql = "SELECT COUNT(*) as c FROM surveys";
-		return jdbcTemplate.queryForInt(sql);
+		return getJdbcTemplate().queryForInt(sql);
 	}
 	
 	class SurveyTemplateMapper implements RowMapper<SurveyTemplate> {

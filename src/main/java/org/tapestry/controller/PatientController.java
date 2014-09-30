@@ -104,7 +104,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private MessageDAO messageDao = getMessageDAO();
 	private SurveyTemplateDAO surveyTemplateDao = getSurveyTemplateDAO();
    	private SurveyResultDAO surveyResultDao = getSurveyResultDAO();
-   	
+      	
    	public DataSource getDataSource() {
     	try{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
@@ -129,7 +129,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			return null;
 		}
     }
-    
+   
     public ActivityDAO getActivityDAO(){
     	return new ActivityDAOImpl(getDataSource());
     }
@@ -148,6 +148,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
     
     public AppointmentDAO getAppointmentDAO(){
     	return new AppointmentDAOImpl(getDataSource());
+    	//   	return new AppointmentDAOImpl();
     }
     
     public VolunteerDAO getVolunteerDAO(){
@@ -404,7 +405,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		HttpSession session = request.getSession();
 		List<Patient> patients = new ArrayList<Patient>();
 		
-		patients = patientDao.getPatientssByPartialName(name);			
+		patients = patientDao.getPatientsByPartialName(name);			
 		model.addAttribute("searchName", name);	 
 		model.addAttribute("patients", patients);
 		

@@ -126,6 +126,7 @@ public class SurveyController{
     
     public AppointmentDAO getAppointmentDAO(){
     	return new AppointmentDAOImpl(getDataSource());
+    	//  	return new AppointmentDAOImpl();
     }
     
     public PatientDAO getPatientDAO(){
@@ -281,7 +282,7 @@ public class SurveyController{
 	   		{
 	   			String name = request.getParameter("searchPatientName");   			
 	   			
-	   			patients = patientDao.getPatientssByPartialName(name);			
+	   			patients = patientDao.getPatientsByPartialName(name);			
 	   			model.addAttribute("searchPatientName", name);	 
 	   			
 	   		}
