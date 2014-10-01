@@ -47,7 +47,7 @@ import org.tapestry.objects.Patient;
 import org.tapestry.objects.Picture;
 import org.tapestry.objects.User;
 import org.tapestry.objects.UserLog;
-import org.tapestry.service.ActivityService;
+//import org.tapestry.service.ActivityManager;
 import org.yaml.snakeyaml.Yaml;
 
 import javax.sql.DataSource;
@@ -188,8 +188,7 @@ public class TapestryController{
    	
    	//Everything below this point is a RequestMapping
 	@RequestMapping(value="/login", method=RequestMethod.GET)
-	public String login(@RequestParam(value="usernameChanged", required=false) Boolean usernameChanged, ModelMap model){
-		System.out.println("hello Tapestry");
+	public String login(@RequestParam(value="usernameChanged", required=false) Boolean usernameChanged, ModelMap model){		
 		if (usernameChanged != null)
 			model.addAttribute("usernameChanged", usernameChanged);
 		return "login";

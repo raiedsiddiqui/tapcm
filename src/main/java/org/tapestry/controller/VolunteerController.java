@@ -347,7 +347,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
 				volunteer.setNotes(request.getParameter("notes"));
 			if (!Utils.isNullOrEmpty(request.getParameter("organization")))
-				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
+				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));		
 								
 			String strAvailableTime = getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
