@@ -53,7 +53,14 @@
 		<a href = "<c:url value="/out_book_appointment"/>" class="btn btn-default" data-dismiss="modal">Cancel</a>  
         <button id="bookAppt" data-loading-text="Loading..." type="submit" value="Book" form="book-appointment-form" class="btn btn-primary">Book</button>
       </div>
-</div>
+	</div>
+
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script>window.jQuery||document.write('<script src="tests/jquery.2.0.0.js"><\/script>')</script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.date.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/picker.time.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/lib/legacy.js"></script>
 <script type="text/javascript">
 $(function(){
 		
