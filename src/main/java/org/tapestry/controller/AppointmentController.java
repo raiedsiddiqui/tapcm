@@ -742,7 +742,7 @@ public class AppointmentController{
 		
 		appointment.setVolunteerID(volunteerId);
 		appointment.setPatientID(patientId);
-//		appointment.setPartner(String.valueOf(partnerId));
+
 		appointment.setPartnerId(partnerId);
 		
 		//get Date and time for appointment		
@@ -1190,7 +1190,7 @@ public class AppointmentController{
 		for (Volunteer v: list)
 		{	//get volunteer's available time
 			availableTime = v.getAvailability();
-			
+			System.out.println("volunteer's name is === "+ v.getFirstName() + "  and available time is ===   " + availableTime);
 			if (availableTime.contains(time))
 				vList.add(v);
 		}

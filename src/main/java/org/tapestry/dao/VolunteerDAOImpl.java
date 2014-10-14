@@ -36,7 +36,7 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 	public List<Volunteer> getVolunteersWithAvailability() {
 		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o "
 				+ "ON v.organization=o.organization_ID WHERE "
-				+ "v.availability='1non,2non,3non,4non,5non' ORDER BY v.firstname DESC";
+				+ "v.availability <> '1non,2non,3non,4non,5non' ORDER BY v.firstname DESC";
 		return getJdbcTemplate().query(sql, new VolunteerMapper());
 	}
 
