@@ -7,7 +7,6 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
 	<title>Book Appointment</title>	
-	<%@include file="../volunteer/volunteer_head.jsp" %>
 
 </head>
 <body>
