@@ -17,8 +17,9 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
@@ -29,16 +30,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-import org.tapestry.dao.ActivityDAO;
-import org.tapestry.dao.ActivityDAOImpl;
-import org.tapestry.dao.MessageDAO;
-import org.tapestry.dao.MessageDAOImpl;
 import org.tapestry.dao.PatientDAO;
 import org.tapestry.dao.PatientDAOImpl;
-import org.tapestry.dao.PictureDAO;
-import org.tapestry.dao.PictureDAOImpl;
-import org.tapestry.dao.UserDAO;
-import org.tapestry.dao.UserDAOImpl;
 import org.tapestry.dao.VolunteerDAO;
 import org.tapestry.dao.VolunteerDAOImpl;
 import org.tapestry.objects.Message;
@@ -47,10 +40,12 @@ import org.tapestry.objects.Patient;
 import org.tapestry.objects.Picture;
 import org.tapestry.objects.User;
 import org.tapestry.objects.UserLog;
-//import org.tapestry.service.ActivityManager;
+import org.tapestry.service.ActivityManager;
+import org.tapestry.service.MessageManager;
+import org.tapestry.service.PictureManager;
+import org.tapestry.service.UserManager;
 import org.yaml.snakeyaml.Yaml;
 
-import javax.sql.DataSource;
 
 /**
 * Main controller class
@@ -66,25 +61,30 @@ import javax.sql.DataSource;
 @Controller
 public class TapestryController{
 	protected static Logger logger = Logger.getLogger(TapestryController.class);
-//	@Autowired 
-//	private ActivityService activityService;
 	
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
 	private Yaml yaml;
-		
-	private UserDAO userDao =  getUserDAO();
-   	private PatientDAO patientDao = getPatientDAO();   	
-   	private MessageDAO messageDao = getMessageDAO();
-   	private PictureDAO pictureDao = getPictureDAO();   
+
+   	private PatientDAO patientDao = getPatientDAO();   
    	private VolunteerDAO volunteerDao = getVolunteerDAO();
-   	private ActivityDAO activityDao = getActivityDAO();
+   	public ApplicationContext ctx;// =  new ClassPathXmlApplicationContext("spring-beans.xml");
+   	
+   	@Autowired
+   	private ActivityManager activityManager;
+   	
+   	@Autowired
+   	private UserManager userManager;
+   	@Autowired
+	private MessageManager messageManager;
+   	@Autowired
+   	private PictureManager pictureManager;
  
    	//Mail-related settings;
    	private Properties props;
    	private String mailAddress = "";
    	private Session session;
-   	
+
    	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
    	 */
@@ -135,56 +135,18 @@ public class TapestryController{
 		props.setProperty("mail.smtp.starttls.enable", useTLS);
 		props.setProperty("mail.user", mailUser);
 		props.setProperty("mail.password", mailPassword);
-   	}   	
-   	
-    public DataSource getDataSource() {
-    	try{
-			dbConfigFile = new ClassPathResource("tapestry.yaml");
-			yaml = new Yaml();
-			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-			String url = config.get("url");
-			String username = config.get("username");
-			String password = config.get("password");
-			
-			DriverManagerDataSource dataSource = new DriverManagerDataSource();
-	        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-	        dataSource.setUrl(url);
-	        dataSource.setUsername(username);
-	        dataSource.setPassword(password);
-	         
-	        return dataSource;		
-	        
-		} catch (IOException e) {
-			logger.error("Error reading from config file");
-			e.printStackTrace();
-			
-			return null;
-		}
-    }
-    
-    public ActivityDAO getActivityDAO(){
-    	return new ActivityDAOImpl(getDataSource());
-    }
-    
-    public UserDAO getUserDAO(){
-    	return new UserDAOImpl(getDataSource());
-    }
-    
-    public MessageDAO getMessageDAO(){
-    	return new MessageDAOImpl(getDataSource());
-    }
-    
-    public PictureDAO getPictureDAO()
-    {
-    	return new PictureDAOImpl(getDataSource());
-    }
-    public VolunteerDAO getVolunteerDAO(){
-    	return new VolunteerDAOImpl(getDataSource());
-    }
+   	}  
+  
+    public VolunteerDAO getVolunteerDAO(){ 
+    	ApplicationContext ctx = new ClassPathXmlApplicationContext("spring-beans.xml");
+    	return (VolunteerDAOImpl) ctx.getBean("volunteerDAOImpl");  
+    }    
     
     public PatientDAO getPatientDAO(){
-    	return new PatientDAOImpl(getDataSource());
+    	ApplicationContext ctx = new ClassPathXmlApplicationContext("spring-beans.xml");
+    	return (PatientDAOImpl) ctx.getBean("patientDAOImpl");  
     }
+
    	
    	//Everything below this point is a RequestMapping
 	@RequestMapping(value="/login", method=RequestMethod.GET)
@@ -202,8 +164,8 @@ public class TapestryController{
 		StringBuffer sb = new StringBuffer();
 		sb.append(u.getName());
 		sb.append(" logged in");
-//		activityService.createUserLog(sb.toString(), u);
-		activityDao.addUserLog(sb.toString(), u);
+		
+		activityManager.addUserLog(sb.toString(), u);
 		
 		return "redirect:/";
 	}
@@ -221,7 +183,7 @@ public class TapestryController{
 		StringBuffer sb = new StringBuffer();
 		sb.append(u.getName());
 		sb.append(" logged out");
-		activityDao.addUserLog(sb.toString(), u);
+		activityManager.addUserLog(sb.toString(), u);
 
 		return "confirm-logout";
 	}
@@ -245,7 +207,7 @@ public class TapestryController{
 		setUnreadMessage(request, model);
 		HttpSession session = request.getSession();
 		
-		List<User> userList = userDao.getAllUsers();
+		List<User> userList = userManager.getAllUsers();
 		model.addAttribute("users", userList);
 //		model.addAttribute("active", userDao.countActiveUsers());
 //		model.addAttribute("total", userDao.countAllUsers());
@@ -271,7 +233,7 @@ public class TapestryController{
 			SecurityContextHolderAwareRequestWrapper request)
 	{			
 		String name = request.getParameter("searchName");		
-		List<User> userList = userDao.getUsersByPartialName(name);		
+		List<User> userList = userManager.getUsersByPartialName(name);		
 		model.addAttribute("users", userList);
 	
 		if(failed != null) {
@@ -308,7 +270,7 @@ public class TapestryController{
 		u.setPhoneNumber(request.getParameter("phonenumber"));
 		u.setSite(request.getParameter("site"));		
 		
-		boolean success = userDao.createUser(u);
+		boolean success = userManager.createUser(u);
 		if (mailAddress != null && success){
 			try{
 				MimeMessage message = new MimeMessage(session);
@@ -341,36 +303,36 @@ public class TapestryController{
 
 	@RequestMapping(value="/remove_user/{user_id}", method=RequestMethod.GET)
 	public String removeUser(@PathVariable("user_id") int id){
-		userDao.removeUserWithID(id);
+		userManager.removeUserWithID(id);
 		return "redirect:/manage_users";
 	}
 	
 	@RequestMapping(value="/disable_user/{user_id}", method=RequestMethod.GET)
 	public String disableUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request){
-		userDao.disableUserWithID(id);
+		userManager.disableUserWithID(id);
 		
-		User u = userDao.getUserByID(id);
+		User u = userManager.getUserByID(id);
 		User loggedInUser = getLoggedInUser(request);
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" disable ");
 		sb.append(u.getName());
-		activityDao.addUserLog(sb.toString(), loggedInUser);		
+		activityManager.addUserLog(sb.toString(), loggedInUser);		
 		
 		return "redirect:/manage_users";
 	}
 
 	@RequestMapping(value="/enable_user/{user_id}", method=RequestMethod.GET)
 	public String enableUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request){
-		userDao.enableUserWithID(id);
+		userManager.enableUserWithID(id);
 		
-		User u = userDao.getUserByID(id);
+		User u = userManager.getUserByID(id);
 		User loggedInUser = getLoggedInUser(request);
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" enable ");
 		sb.append(u.getName());
-		activityDao.addUserLog(sb.toString(), loggedInUser);		
+		activityManager.addUserLog(sb.toString(), loggedInUser);		
 		
 		return "redirect:/manage_users";
 	}
@@ -386,7 +348,7 @@ public class TapestryController{
 			model.addAttribute("errors", errorsPresent);
 		if(success != null)
 			model.addAttribute("success", true);
-		List<Picture> pics = pictureDao.getPicturesForUser(loggedInUser.getUserID());
+		List<Picture> pics = pictureManager.getPicturesForUser(loggedInUser.getUserID());
 		model.addAttribute("pictures", pics);
 		return "/volunteer/profile";
 	}
@@ -403,20 +365,20 @@ public class TapestryController{
 		if (messageFailed != null)
 			model.addAttribute("failure", messageFailed);
 		
-		messages = messageDao.getAllMessagesForRecipient(userId);
+		messages = messageManager.getAllMessagesForRecipient(userId);
 		model.addAttribute("messages", messages);		
 		setUnreadMessage(request, model);
 			
 		if (request.isUserInRole("ROLE_USER"))
 		{
-			List<User> administrators = userDao.getAllUsersWithRole("ROLE_ADMIN");
+			List<User> administrators = userManager.getAllUsersWithRole("ROLE_ADMIN");
 			model.addAttribute("administrators", administrators);
 			
 			return "/volunteer/inbox";
 		} 
 		else
 		{			
-			List<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");			
+			List<User> volunteers = userManager.getAllUsersWithRole("ROLE_USER");			
 			model.addAttribute("volunteers", volunteers);
 			
 			return "/admin/inbox";
@@ -429,13 +391,13 @@ public class TapestryController{
 		int userId = loggedInUser.getUserID();
 		
 		Message m;		
-		m = messageDao.getMessageByID(id);		
+		m = messageManager.getMessageByID(id);		
 		
 		if (!(m.getRecipient() == userId))
 			return "redirect:/403";
 		
 		if (!(m.isRead()))
-			messageDao.markAsRead(id);
+			messageManager.markAsRead(id);
 		model.addAttribute("message", m);
 		setUnreadMessage(request, model);
 		
@@ -451,12 +413,12 @@ public class TapestryController{
 		int userId = loggedInUser.getUserID();
 		Message m;
 		
-		m = messageDao.getMessageByID(id);		
+		m = messageManager.getMessageByID(id);		
 
 		if (!(m.getRecipient() == userId))
 			return "redirect:/403";
 		
-		messageDao.markAsRead(id);
+		messageManager.markAsRead(id);
 		
 		return "redirect:/";
 	}
@@ -471,13 +433,13 @@ public class TapestryController{
 		m.setText(request.getParameter("msgBody"));
 		
 		if (request.getParameter("isAnnouncement") != null && request.getParameter("isAnnouncement").equals("true")){ //Sound to all volunteers
-			List<User> volunteers = userDao.getAllUsersWithRole("ROLE_USER");
+			List<User> volunteers = userManager.getAllUsersWithRole("ROLE_USER");
 			
 			for (User u: volunteers){
 				m.setSubject("ANNOUNCEMENT: " + request.getParameter("msgSubject"));
 				m.setRecipient(u.getUserID());
 				
-				User recipient = userDao.getUserByID(u.getUserID());
+				User recipient = userManager.getUserByID(u.getUserID());
 				
 				if (mailAddress != null){
 					try{
@@ -496,7 +458,7 @@ public class TapestryController{
 						System.out.println(e.toString());
 					}
 				}
-				messageDao.sendMessage(m);
+				messageManager.sendMessage(m);
 			}
 		}
 		else{ //Send to one person			
@@ -506,9 +468,9 @@ public class TapestryController{
 					int recipientID = Integer.parseInt(recipientIDAsString);
 					m.setRecipient(recipientID);
 					m.setSubject(request.getParameter("msgSubject"));
-					messageDao.sendMessage(m);
+					messageManager.sendMessage(m);
 					
-					User recipient = userDao.getUserByID(recipientID);
+					User recipient = userManager.getUserByID(recipientID);
 					
 					if (mailAddress != null){
 						try{
@@ -552,25 +514,25 @@ public class TapestryController{
 			}
 		}
 			
-		messageDao.deleteMessage(id);
+		messageManager.deleteMessage(id);
 		return "redirect:/inbox";
 	}
 	
 	@RequestMapping(value="/reply_to/{msgID}", method=RequestMethod.POST)
 	public String replyToMessage(@PathVariable("msgID") int id, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
-		Message oldMsg = messageDao.getMessageByID(id);
+		Message oldMsg = messageManager.getMessageByID(id);
 		Message newMsg = new Message();
 		//Reverse sender and recipient
 		
-		User recipient = userDao.getUserByID(oldMsg.getSenderID());
-		int newRecipient = userDao.getUserByID(oldMsg.getRecipient()).getUserID();		
+		User recipient = userManager.getUserByID(oldMsg.getSenderID());
+		int newRecipient = userManager.getUserByID(oldMsg.getRecipient()).getUserID();		
 		
 		newMsg.setSenderID(newRecipient);
 		newMsg.setRecipient(oldMsg.getSenderID());
 		newMsg.setText(request.getParameter("msgBody"));
 		newMsg.setSubject("RE: " + oldMsg.getSubject());
 		
-		messageDao.sendMessage(newMsg);
+		messageManager.sendMessage(newMsg);
 		
 		if (mailAddress != null){
 			try{
@@ -608,7 +570,7 @@ public class TapestryController{
 		u.setUsername(request.getParameter("volUsername"));
 		u.setName(request.getParameter("volName"));
 		u.setEmail(request.getParameter("volEmail"));
-		userDao.modifyUser(u);
+		userManager.modifyUser(u);
 		if (!(currentUsername.equals(u.getUsername())))
 			return "redirect:/login?usernameChanged=true";
 		else
@@ -626,7 +588,7 @@ public class TapestryController{
 			if (!newPassword.equals(confirmPassword)){
 				return "redirect:/profile?error=confirm";
 			}
-			if (!userDao.userHasPassword(userID, currentPassword)){
+			if (!userManager.userHasPassword(userID, currentPassword)){
 				return "redirect:/profile?error=current";
 			}
 			target = "redirect:/profile?success=true";
@@ -637,29 +599,29 @@ public class TapestryController{
 		}
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
 		String hashedPassword = enc.encodePassword(newPassword, null);
-		userDao.setPasswordForUser(userID, hashedPassword);
+		userManager.setPasswordForUser(userID, hashedPassword);
 		
-		User whosePwdChanged = userDao.getUserByID(userID);
+		User whosePwdChanged = userManager.getUserByID(userID);
 		User loggedInUser = getLoggedInUser(request);
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" Changed password for ");
 		sb.append(whosePwdChanged.getName());
-		activityDao.addUserLog(sb.toString(), loggedInUser);		
+		activityManager.addUserLog(sb.toString(), loggedInUser);		
 	
 		return target;
 	}
 	
 	@RequestMapping(value="/remove_picture/{id}", method=RequestMethod.GET)
 	public String removePicture(@PathVariable("id") int pictureID){
-		pictureDao.removePicture(pictureID);
+		pictureManager.removePicture(pictureID);
 		return "redirect:/profile";
 	}
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.GET)
 	public String viewUserLogs(@PathVariable("page") int page, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		List<UserLog> logs = activityDao.getUserLogsPage((page - 1) * 20, 20);
-		int count = activityDao.countEntries();
+		List<UserLog> logs = activityManager.getUserLogs((page - 1) * 20, 20);
+		int count = activityManager.count();
 		
 		model.addAttribute("numPages", count / 20 + 1);
 		model.addAttribute("logs", logs);
@@ -674,7 +636,7 @@ public class TapestryController{
 		List<UserLog> logs = new ArrayList<UserLog>();
 		String name = request.getParameter("name");
 		
-		logs = activityDao.getUserLogsByPartialName(name);
+		logs = activityManager.getUserLogsByPartialName(name);
 
 		model.addAttribute("logs", logs);
 		
@@ -689,9 +651,9 @@ public class TapestryController{
 		User loggedInUser = Utils.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
 		
-		pictureDao.uploadPicture(pic, loggedInUser.getUserID(), true);				
+		pictureManager.uploadPicture(pic, loggedInUser.getUserID(), true);				
 
-		activityDao.addUserLog(loggedInUser.getName() +" uploaded picture for profile", loggedInUser);
+		activityManager.addUserLog(loggedInUser.getName() +" uploaded picture for profile", loggedInUser);
 		
 		return "redirect:/profile";
 	}
@@ -703,9 +665,9 @@ public class TapestryController{
 		MultipartFile pic = request.getFile("pic");
 		
 		Patient p = patientDao.getPatientByID(id);
-		pictureDao.uploadPicture(pic, id, false);
+		pictureManager.uploadPicture(pic, id, false);
 
-		activityDao.addUserLog(loggedInUser.getName() + " uploaded picture for " + p.getDisplayName(), loggedInUser);
+		activityManager.addUserLog(loggedInUser.getName() + " uploaded picture for " + p.getDisplayName(), loggedInUser);
 		
 		return "redirect:/patient/" + id;
 	}
@@ -717,7 +679,7 @@ public class TapestryController{
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		else
 		{
-			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			int unreadMessages = messageManager.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
 		}
 	}
@@ -735,7 +697,7 @@ public class TapestryController{
 			name = request.getUserPrincipal().getName();	
 					
 			if (name != null){			
-				loggedInUser = userDao.getUserByUsername(name);								
+				loggedInUser = userManager.getUserByUsername(name);								
 				session.setAttribute("loggedInUser", loggedInUser);	
 			}
 		}

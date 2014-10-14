@@ -20,6 +20,9 @@ import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -62,6 +65,11 @@ import org.tapestry.objects.Volunteer;
 import org.tapestry.report.AlertManager;
 import org.tapestry.report.AlertsInReport;
 import org.tapestry.report.CalculationManager;
+import org.tapestry.service.ActivityManager;
+import org.tapestry.service.AppointmentManager;
+import org.tapestry.service.MessageManager;
+import org.tapestry.service.NarrativeManager;
+import org.tapestry.service.UserManager;
 import org.tapestry.surveys.ResultParser;
 import org.yaml.snakeyaml.Yaml;
 
@@ -72,16 +80,24 @@ public class AppointmentController{
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
 	private Yaml yaml;
-	
-	private UserDAO userDao = getUserDAO();
 	private PatientDAO patientDao = getPatientDAO();
-	private AppointmentDAO appointmentDao = getAppointmentDAO();
-	private ActivityDAO activityDao = getActivityDAO();
 	private VolunteerDAO volunteerDao = getVolunteerDAO();
-	private MessageDAO messageDao = getMessageDAO();
-	private NarrativeDAO narrativeDao = getNarrativeDAO();
+
 	private SurveyResultDAO surveyResultDao = getSurveyResultDAO();
 	private SurveyTemplateDAO surveyTemplateDao = getSurveyTemplateDAO();
+	private ApplicationContext ctx;
+	@Autowired
+   	private ActivityManager activityManager;
+	@Autowired
+   	private UserManager userManager;
+	@Autowired
+	private MessageManager messageManager;
+	@Autowired
+	private NarrativeManager narrativeManager;
+	@Autowired
+	private AppointmentManager appointmentManager;
+	
+	
 	
     public DataSource getDataSource() {
     	try{
@@ -107,40 +123,24 @@ public class AppointmentController{
 			return null;
 		}
     }
-   
-    public ActivityDAO getActivityDAO(){
-    	return new ActivityDAOImpl(getDataSource());
-    }
-    
-    public UserDAO getUserDAO(){
-    	return new UserDAOImpl(getDataSource());
-    }
-    
-    public MessageDAO getMessageDAO(){
-    	return new MessageDAOImpl(getDataSource());
-    }
-    
-    public NarrativeDAO getNarrativeDAO(){
-    	return new NarrativeDAOImpl(getDataSource());
-    }
     
     public SurveyTemplateDAO getSurveyTemplateDAO(){
-    	return new SurveyTemplateDAOImpl(getDataSource());
+   	return new SurveyTemplateDAOImpl(getDataSource());
+//    	return (SurveyTemplateDAOImpl) ctx.getBean("surveyTemplateDAOImpl");  
     }
     
     public SurveyResultDAO getSurveyResultDAO(){
     	return new SurveyResultDAOImpl(getDataSource());
+ //   	return (SurveyResultDAOImpl) ctx.getBean("surveyResultDAOImpl");  
     }
-    public AppointmentDAO getAppointmentDAO(){    	
-    	return new AppointmentDAOImpl(getDataSource());
-    	//    	return new AppointmentDAOImpl();
-    }
-   	
+    	
     public VolunteerDAO getVolunteerDAO(){
     	return new VolunteerDAOImpl(getDataSource());
+  //  	return (VolunteerDAOImpl) ctx.getBean("volunteerDAOImpl");  
     }    
     
     public PatientDAO getPatientDAO(){
+ //   	return (PatientDAOImpl) ctx.getBean("patientDAOImpl");  
     	return new PatientDAOImpl(getDataSource());
     }
     
@@ -165,15 +165,15 @@ public class AppointmentController{
 		
 			session.setAttribute("logged_in_volunteer", volunteerId);
 			List<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);
-			List<Message> announcements = messageDao.getAnnouncementsForUser(userId);
+			List<Message> announcements = messageManager.getAnnouncementsForUser(userId);
 			
 			List<Appointment> approvedAppointments = new ArrayList<Appointment>();
 			List<Appointment> pendingAppointments = new ArrayList<Appointment>();
 			List<Appointment> declinedAppointments = new ArrayList<Appointment>();
 			if(patientId != null) {				
-				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
-				pendingAppointments = appointmentDao.getAllPendingAppointmentsForPatient(patientId, volunteerId);
-				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
+				approvedAppointments = appointmentManager.getAllApprovedAppointmentsForPatient(patientId, volunteerId);
+				pendingAppointments = appointmentManager.getAllPendingAppointmentsForPatient(patientId, volunteerId);
+				declinedAppointments = appointmentManager.getAllDeclinedAppointmentsForPatient(patientId, volunteerId);
 				
 				Patient patient = patientDao.getPatientByID(patientId);
 				model.addAttribute("patient", patient);
@@ -183,9 +183,9 @@ public class AppointmentController{
 			} 
 			else 
 			{
-				approvedAppointments = appointmentDao.getAllApprovedAppointmentsForVolunteer(volunteerId);				
-				pendingAppointments = appointmentDao.getAllPendingAppointmentsForVolunteer(volunteerId);
-				declinedAppointments = appointmentDao.getAllDeclinedAppointmentsForVolunteer(volunteerId);						
+				approvedAppointments = appointmentManager.getAllApprovedAppointmentsForVolunteer(volunteerId);				
+				pendingAppointments = appointmentManager.getAllPendingAppointmentsForVolunteer(volunteerId);
+				declinedAppointments = appointmentManager.getAllDeclinedAppointmentsForVolunteer(volunteerId);						
 			}
 			
 			model.addAttribute("approved_appointments", approvedAppointments);
@@ -194,7 +194,7 @@ public class AppointmentController{
 			model.addAttribute("name", loggedInUser.getName());
 			model.addAttribute("patients", patientsForUser);
 			
-			unreadMessages = messageDao.countUnreadMessagesForRecipient(userId);
+			unreadMessages = messageManager.countUnreadMessagesForRecipient(userId);
 			model.addAttribute("unread", unreadMessages);	
 			//save unreadMessages in sesion
 			session.setAttribute("unread_messages", unreadMessages);
@@ -206,7 +206,7 @@ public class AppointmentController{
 			if (noMachedTime != null)
 				model.addAttribute("noMachedTime", noMachedTime);
 			
-			remindingAppointments = appointmentDao.getRemindingAppointmentList(volunteerId, -2);			
+			remindingAppointments = appointmentManager.getRemindingAppointmentList(volunteerId, -2);			
 			model.addAttribute("reminding_appointments", remindingAppointments);
 
 				
@@ -216,14 +216,14 @@ public class AppointmentController{
 		{			
 			User loggedInUser = Utils.getLoggedInUser(request);			
 			
-			unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			unreadMessages = messageManager.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
 			//save unreadMessages in sesion
 			session.setAttribute("unread_messages", unreadMessages);
 			
 			model.addAttribute("name", loggedInUser.getName());
 			
-			remindingAppointments = appointmentDao.getRemindingAppointmentList(0, -2);			
+			remindingAppointments = appointmentManager.getRemindingAppointmentList(0, -2);			
 			model.addAttribute("appointments", remindingAppointments);
 
 			return "admin/index";
@@ -238,10 +238,10 @@ public class AppointmentController{
    			@RequestParam(value="noMachedTime", required=false) String noMatchedMsg,
    			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
    		
-   		List<Appointment> allAppointments = appointmentDao.getAllAppointments();  	   		
+   		List<Appointment> allAppointments = appointmentManager.getAllAppointments();  	   		
    		List<Patient> allPatients = patientDao.getAllPatients();  		
-   		List<Appointment> allPastAppointments = appointmentDao.getAllPastAppointments();
-   		List<Appointment> allPendingAppointments = appointmentDao.getAllPendingAppointments();
+   		List<Appointment> allPastAppointments = appointmentManager.getAllPastAppointments();
+   		List<Appointment> allPendingAppointments = appointmentManager.getAllPendingAppointments();
    
    		model.addAttribute("appointments", allAppointments);
    		model.addAttribute("pastAppointments", allPastAppointments);   		
@@ -304,7 +304,7 @@ public class AppointmentController{
    	@RequestMapping(value="/display_appointment/{appointmentID}", method=RequestMethod.GET)
    	public String displayAppointment(@PathVariable("appointmentID") int id, 
    			SecurityContextHolderAwareRequestWrapper request, ModelMap model){   		
-   		Appointment appointment = appointmentDao.getAppointmentById(id);
+   		Appointment appointment = appointmentManager.getAppointmentById(id);
    		model.addAttribute("appointment", appointment);
    		
    		int patientId = appointment.getPatientID();
@@ -318,15 +318,15 @@ public class AppointmentController{
    		int volunteer2Id = appointment.getPartnerId();
    		int appointmentId = appointment.getAppointmentID();
    		
-   		List<Narrative> v1Narratives = narrativeDao.getNarrativesByVolunteer(volunteer1Id, patientId, appointmentId);
+   		List<Narrative> v1Narratives = narrativeManager.getNarrativesByVolunteer(volunteer1Id, patientId, appointmentId);
    		if (v1Narratives.size() > 0)
    			model.addAttribute("narratives1", v1Narratives);
    		
-   		List<Narrative> v2Narratives = narrativeDao.getNarrativesByVolunteer(volunteer2Id, patientId, appointmentId); 
+   		List<Narrative> v2Narratives = narrativeManager.getNarrativesByVolunteer(volunteer2Id, patientId, appointmentId); 
    		if (v2Narratives.size() > 0)
    			model.addAttribute("narratives2", v2Narratives);   	
    		   		
-   		List<Activity> activities = activityDao.getDetailedLog(patientId, appointmentId);   		   		   		   		
+   		List<Activity> activities = activityManager.getActivities(patientId, appointmentId);   		   		   		   		
    		model.addAttribute("activities", activities);
    		   		
 		if (request.isUserInRole("ROLE_ADMIN"))
@@ -416,7 +416,7 @@ public class AppointmentController{
 				a.setType(1);//follow up
 			
 			//save new appointment in DB and send message 
-			if (appointmentDao.createAppointment(a))
+			if (appointmentManager.createAppointment(a))
 			{			
 				String logginUser = request.getUserPrincipal().getName();	
 				User user = Utils.getLoggedInUser(request);
@@ -449,7 +449,7 @@ public class AppointmentController{
 				else //send message for user login as volunteer
 				{						
 					int organizationId = volunteer1.getOrganizationId();
-					List<Integer> coordinators = userDao.getVolunteerCoordinatorByOrganizationId(organizationId);
+					List<Integer> coordinators = userManager.getVolunteerCoordinatorByOrganizationId(organizationId);
 					
 					if (coordinators != null)
 					{	//send message to all coordinators in the organization						
@@ -523,7 +523,7 @@ public class AppointmentController{
 	
 	@RequestMapping(value="/delete_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String deleteAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
-		appointmentDao.deleteAppointment(id);
+		appointmentManager.deleteAppointment(id);
 		if(request.isUserInRole("ROLE_USER")) {
 			return "redirect:/";
 		} else {
@@ -533,13 +533,13 @@ public class AppointmentController{
 	
 	@RequestMapping(value="/approve_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String approveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
-		appointmentDao.approveAppointment(id);
+		appointmentManager.approveAppointment(id);
 		return "redirect:/manage_appointments";
 	}
 	
 	@RequestMapping(value="/decline_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String unapproveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
-		appointmentDao.declineAppointment(id);
+		appointmentManager.declineAppointment(id);
 		return "redirect:/manage_appointments";
 	}
 	
@@ -760,7 +760,7 @@ public class AppointmentController{
 			appointment.setType(1);//follow up
 				
 		//save new appointment in DB and send message 
-		if (appointmentDao.createAppointment(appointment))
+		if (appointmentManager.createAppointment(appointment))
 		{
 			Patient patient = patientDao.getPatientByID(patientId);	
 			String logginUser = request.getUserPrincipal().getName();				
@@ -806,7 +806,7 @@ public class AppointmentController{
 	@RequestMapping(value="/open_alerts_keyObservations/{appointmentId}", method=RequestMethod.GET)
 	public String openAlertsAndKeyObservations(@PathVariable("appointmentId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
-		Appointment appt = appointmentDao.getAppointmentById(id);
+		Appointment appt = appointmentManager.getAppointmentById(id);
 		
 		int patientId = appt.getPatientID();
 		Patient patient = patientDao.getPatientByID(patientId);
@@ -840,10 +840,10 @@ public class AppointmentController{
 		String alerts = request.getParameter("alerts");
 		String keyObservations = request.getParameter("keyObservations");
 		
-		appointmentDao.addAlertsAndKeyObservations(appointmentId, alerts, keyObservations);
+		appointmentManager.addAlertsAndKeyObservations(appointmentId, alerts, keyObservations);
 		
 		int patientId = getPatientId(request);		
-		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);		
+		Appointment appointment = appointmentManager.getAppointmentById(appointmentId);		
 		
 		if (completedAllSurveys(patientId))
 			return "redirect:/open_plan/" + appointmentId ;	
@@ -884,7 +884,7 @@ public class AppointmentController{
 	public String openPlan(@PathVariable("appointmentId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		List<String> planDef = Utils.getPlanDefinition();				
-		Appointment appt = appointmentDao.getAppointmentById(id);
+		Appointment appt = appointmentManager.getAppointmentById(id);
 		
 		int patientId = appt.getPatientID();
 		Patient patient = patientDao.getPatientByID(patientId);
@@ -927,7 +927,7 @@ public class AppointmentController{
 			sb.append(request.getParameter("planSpecify"));
 		}
 				
-		appointmentDao.addPlans(appointmentId, sb.toString());
+		appointmentManager.addPlans(appointmentId, sb.toString());
 		//generate report for patient 
 	//	generateReport(patientId, appointmentId);	
 		
@@ -964,7 +964,7 @@ public class AppointmentController{
 		HttpSession session = request.getSession();
 		session.setAttribute("appointmentId", id);
 		
-		Appointment appt = appointmentDao.getAppointmentById(id);
+		Appointment appt = appointmentManager.getAppointmentById(id);
 		
 		int patientId = appt.getPatientID();
 		Patient patient = patientDao.getPatientByID(patientId);
@@ -991,7 +991,7 @@ public class AppointmentController{
 	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
 	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
 		
-		Appointment appointment = appointmentDao.getAppointmentById(id);
+		Appointment appointment = appointmentManager.getAppointmentById(id);
 		HttpSession  session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
@@ -1006,9 +1006,9 @@ public class AppointmentController{
 	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
 //		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
 		//set visit alert as comments in DB
-		appointmentDao.completeAppointment(id, request.getParameter("visitAlerts"));
+		appointmentManager.completeAppointment(id, request.getParameter("visitAlerts"));
 		
-		Appointment appt = appointmentDao.getAppointmentById(id);
+		Appointment appt = appointmentManager.getAppointmentById(id);
 		int patientId = appt.getPatientID();
 		Patient patient = patientDao.getPatientByID(patientId);
 		model.addAttribute("patient", patient);
@@ -1069,7 +1069,7 @@ public class AppointmentController{
 	
 	private boolean isFirstVisit(int patientId){
 		boolean isFirst = true;
-		List<Appointment> appointments = appointmentDao.getAllApprovedAppointmentsForPatient(patientId);	
+		List<Appointment> appointments = appointmentManager.getAllApprovedAppointmentsForPatient(patientId);	
 		
 		if ((appointments != null)&& (appointments.size()>0))
 			isFirst = false;
@@ -1095,7 +1095,7 @@ public class AppointmentController{
 			m.setSenderID(sender);
 			m.setText(msg);
 			m.setSubject("New Appointment");
-			messageDao.sendMessage(m);
+			messageManager.sendMessage(m);
 	}
 	
 	//this is a temporary method for sending message only into Inbox
@@ -1105,7 +1105,7 @@ public class AppointmentController{
 			m.setSenderID(sender);
 			m.setText(msg);
 			m.setSubject(subject);
-			messageDao.sendMessage(m);
+			messageManager.sendMessage(m);
 	}
 
 	/**	 send message into Inbox and email account too	
@@ -1333,7 +1333,7 @@ public class AppointmentController{
 		HttpSession  session = request.getSession();					
 		int loggedInVolunteerId = MisUtils.getLoggedInVolunteerId(request);
 		
-		narratives = narrativeDao.getAllNarrativesByUser(loggedInVolunteerId);		
+		narratives = narrativeManager.getAllNarrativesByUser(loggedInVolunteerId);		
 
 		//check if there is message should be displayed
 		if (session.getAttribute("narrativeMessage") != null)
@@ -1350,7 +1350,7 @@ public class AppointmentController{
 			}			
 		}
 		
-		MisUtils.setUnreadMsg(session, request, model, messageDao);
+		MisUtils.setUnreadMsg(session, request, model, messageManager);
 		
 		model.addAttribute("narratives", narratives);	
 		return "/volunteer/view_narrative";
@@ -1360,7 +1360,7 @@ public class AppointmentController{
 	@RequestMapping(value="/modify_narrative/{narrativeId}", method=RequestMethod.GET)
 	public String modifyNarrative(SecurityContextHolderAwareRequestWrapper request, 
 				@PathVariable("narrativeId") int id, ModelMap model){		
-		Narrative narrative = narrativeDao.getNarrativeById(id);			
+		Narrative narrative = narrativeManager.getNarrativeById(id);			
 		
 		//set Date format for editDate
 		String editDate = narrative.getEditDate();
@@ -1372,7 +1372,7 @@ public class AppointmentController{
 		
 		model.addAttribute("narrative", narrative);	
 		
-		MisUtils.setUnreadMsg(null, request, model, messageDao);
+		MisUtils.setUnreadMsg(null, request, model, messageManager);
 		
 		return "/volunteer/modify_narrative";
 	}
@@ -1381,7 +1381,7 @@ public class AppointmentController{
 	public String newNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		int appointmentId = getAppointmentId(request);
 		
-		Appointment appt = appointmentDao.getAppointmentById(appointmentId);
+		Appointment appt = appointmentManager.getAppointmentById(appointmentId);
 		
 		int patientId = appt.getPatientID();
 		Patient patient = patientDao.getPatientByID(patientId);
@@ -1403,7 +1403,7 @@ public class AppointmentController{
 			narrativeId = request.getParameter("narrativeId").toString();	
 			iNarrativeId = Integer.parseInt(narrativeId);
 			
-			narrative = narrativeDao.getNarrativeById(iNarrativeId);
+			narrative = narrativeManager.getNarrativeById(iNarrativeId);
 						
 			String title = null;
 			if (request.getParameter("mNarrativeTitle") != null){
@@ -1426,7 +1426,7 @@ public class AppointmentController{
 				logger.error("Narrative ID can not be null");
 			}
 			
-			narrativeDao.updateNarrative(narrative);			
+			narrativeManager.updateNarrative(narrative);			
 			session.setAttribute("narrativeMessage","U");
 		}		
 		
@@ -1459,9 +1459,9 @@ public class AppointmentController{
 		narrative.setAppointmentId(appointmentId);
 		
 		//add new narrative in narrative table in DB
-		narrativeDao.addNarrative(narrative);
+		narrativeManager.addNarrative(narrative);
 		//set complete narrative in Appointment table in DB
-		appointmentDao.completeNarrative(appointmentId);		
+		appointmentManager.completeNarrative(appointmentId);		
 		
 		HttpSession session = request.getSession();
 		session.setAttribute("newNarrative", true);
@@ -1473,7 +1473,7 @@ public class AppointmentController{
 	public String deleteNarrativeById(@PathVariable("narrativeId") int id, 
 				SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		
-		narrativeDao.deleteNarrativeById(id);
+		narrativeManager.deleteNarrativeById(id);
 				
 		HttpSession  session = request.getSession();		
 		session.setAttribute("narrativeMessage","D");

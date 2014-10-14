@@ -19,6 +19,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
@@ -47,6 +50,10 @@ import org.tapestry.objects.Message;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 import org.tapestry.objects.Organization;
+import org.tapestry.service.ActivityManager;
+import org.tapestry.service.AppointmentManager;
+import org.tapestry.service.MessageManager;
+import org.tapestry.service.UserManager;
 import org.yaml.snakeyaml.Yaml;
 
 import com.itextpdf.text.DocumentException;
@@ -69,10 +76,16 @@ public class VolunteerController {
 protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	
 	private VolunteerDAO volunteerDao = getVolunteerDAO();
-	private AppointmentDAO appointmentDao = getAppointmentDAO();
-	private UserDAO userDao = getUserDAO();
-	private ActivityDAO activityDao = getActivityDAO();
-	private MessageDAO messageDao = getMessageDAO();
+//	private AppointmentDAO appointmentDao = getAppointmentDAO();
+	public ApplicationContext ctx;
+	@Autowired
+   	private ActivityManager activityManager;
+	@Autowired
+   	private UserManager userManager;
+	@Autowired
+	private MessageManager messageManager;
+	@Autowired
+	private AppointmentManager appointmentManager;
 	
 	private Properties props;
    	private String mailAddress = "";
@@ -81,6 +94,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
    	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
 	private Yaml yaml;
+	
 	
 	@PostConstruct
 	public void readDatabaseConfig(){
@@ -93,9 +107,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
    		String mailPassword = "";
    		String mailPort = "";
    		String useTLS = "";
-   		String useAuth = "";				
-		
-	
+   		String useAuth = "";			
 			
 		//Mail-related settings
 		final String username = mailUser;
@@ -115,49 +127,11 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		props.setProperty("mail.user", mailUser);
 		props.setProperty("mail.password", mailPassword);		
 	}
-	
-	public DataSource getDataSource() {
-    	try{
-    		
-			dbConfigFile = new ClassPathResource("tapestry.yaml");
-			yaml = new Yaml();
-			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-			String url = config.get("url");
-			String username = config.get("username");
-			String password = config.get("password");
-			
-			DriverManagerDataSource dataSource = new DriverManagerDataSource();
-	        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-	        dataSource.setUrl(url);
-	        dataSource.setUsername(username);
-	        dataSource.setPassword(password);
-	         
-	        return dataSource;		
-	        
-		} catch (IOException e) {
-			logger.error("Error reading from config file");
-			e.printStackTrace();
-			
-			return null;
-		}
-    }
-    
-    public ActivityDAO getActivityDAO(){
-    	return new ActivityDAOImpl(getDataSource());
-    }
-    public UserDAO getUserDAO(){
-    	return new UserDAOImpl(getDataSource());
-    }
-    
-    public MessageDAO getMessageDAO(){
-    	return new MessageDAOImpl(getDataSource());
-    }
-    
-    public AppointmentDAO getAppointmentDAO(){    	
-    	return new AppointmentDAOImpl(getDataSource());
-    }
-    public VolunteerDAO getVolunteerDAO(){
-    	return new VolunteerDAOImpl(getDataSource());
+
+	private VolunteerDAO getVolunteerDAO(){
+    //	return new VolunteerDAOImpl(getDataSource());
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("spring-beans.xml");
+    	return (VolunteerDAOImpl)ctx.getBean("volunteerDAOImpl");
     }
 	
 	//display all volunteers
@@ -270,20 +244,20 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		//get all completed appointments
 		List<Appointment> appointments = new ArrayList<Appointment>();		
-		appointments = appointmentDao.getAllCompletedAppointmentsForVolunteer(id);	
+		appointments = appointmentManager.getAllCompletedAppointmentsForVolunteer(id);	
 		model.addAttribute("completedVisits", appointments);
 		
 		//get all upcoming appointments
 		appointments = new ArrayList<Appointment>();		
-		appointments = appointmentDao.getAllUpcomingAppointmentsForVolunteer(id);
+		appointments = appointmentManager.getAllUpcomingAppointmentsForVolunteer(id);
 		model.addAttribute("upcomingVisits", appointments);
 		
 		//get all activities
-		List<Activity> activities = activityDao.getAllActivitiesForVolunteer(id);		
+		List<Activity> activities = activityManager.getActivitiesForVolunteer(id);		
 		model.addAttribute("activityLogs", activities);
 		
 		//get all messages		
-		List<Message> messages = messageDao.getAllMessagesForRecipient(Utils.getLoggedInUserId(request));
+		List<Message> messages = messageManager.getAllMessagesForRecipient(Utils.getLoggedInUserId(request));
 		model.addAttribute("messages", messages);		
 		
 		HttpSession  session = request.getSession();
@@ -521,7 +495,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	
 
 	private void modifyUser(Volunteer volunteer){				
-		User user = userDao.getUserByUsername(volunteer.getUserName());
+		User user = userManager.getUserByUsername(volunteer.getUserName());
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append(volunteer.getFirstName());
@@ -530,10 +504,10 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		user.setName(sb.toString());
 			
 		user.setEmail(volunteer.getEmail());
-		userDao.modifyUser(user);
+		userManager.modifyUser(user);
 		
 		//update password
-		userDao.setPasswordForUser(user.getUserID(), volunteer.getPassword());		
+		userManager.setPasswordForUser(user.getUserID(), volunteer.getPassword());		
 	}
 	
 	private void addUser(Volunteer volunteer){		
@@ -550,7 +524,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		user.setEmail(volunteer.getEmail());
 		user.setOrganization(volunteer.getOrganizationId());		
 
-		boolean success = userDao.createUser(user);				
+		boolean success = userManager.createUser(user);				
 
 		if (mailAddress != null && success){
 			try{
@@ -702,13 +676,13 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		User loggedInUser = Utils.getLoggedInUser(request);
 		
 		if(request.isUserInRole("ROLE_ADMIN")) {
-			activities = activityDao.getAllActivitiesForAdmin();
+			activities = activityManager.getActivitiesForAdmin();
 			volunteers = volunteerDao.getAllVolunteers();
 		}
 		else if (request.isUserInRole("ROLE_LOCAL_ADMIN"))
 		{
 			int organizationId = loggedInUser.getOrganization();
-			activities = activityDao.getAllActivitiesForLocalAdmin(organizationId);
+			activities = activityManager.getActivitiesForLocalAdmin(organizationId);
 			volunteers = volunteerDao.getAllVolunteersByOrganization(organizationId);
 		}
 			
@@ -734,7 +708,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		
 		if (!Utils.isNullOrEmpty(strVId))
 		{
-			activities = activityDao.getAllActivitiesForVolunteer(Integer.parseInt(strVId));		
+			activities = activityManager.getActivitiesForVolunteer(Integer.parseInt(strVId));		
 				
 			if (activities.size() == 0 )  
 				model.addAttribute("emptyActivityLogs", true);				
@@ -757,7 +731,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		HttpSession  session = request.getSession();		
 		int volunteerId = MisUtils.getLoggedInVolunteerId(request);	
 		List<Activity> activities = new ArrayList<Activity>();
-		activities = activityDao.getAllActivitiesForVolunteer(volunteerId);
+		activities = activityManager.getActivitiesForVolunteer(volunteerId);
 					
 		//check if there is message should be displayed
 		if (session.getAttribute("ActivityMessage") != null)
@@ -828,7 +802,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			
 		activity.setEndTime(endTime);
 			
-		activityDao.logActivity(activity);
+		activityManager.logActivity(activity);
 			
 		//update view activity page with new record		
 		session.setAttribute("ActivityMessage", "C");		
@@ -840,7 +814,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	public String deleteActivityById(@PathVariable("activityId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 				
-		activityDao.deleteActivityById(id);	
+		activityManager.deleteActivity(id);	
 					
 		HttpSession  session = request.getSession();		
 		session.setAttribute("ActivityMessage", "D");		
@@ -852,7 +826,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 	public String modifyActivityLog(SecurityContextHolderAwareRequestWrapper request, 
 			@PathVariable("activityId") int id, ModelMap model){
 		Activity activity = new Activity();
-		activity = activityDao.getActivityLogById(id);			
+		activity = activityManager.getActivity(id);			
 		model.addAttribute("activityLog", activity);
 		
 		HttpSession  session = request.getSession();
@@ -876,7 +850,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 			activityId = request.getParameter("activityId");
 			iActivityId = Integer.parseInt(activityId);
 				
-			activity = activityDao.getActivityLogById(iActivityId);
+			activity = activityManager.getActivity(iActivityId);
 			activity.setVolunteer(String.valueOf(volunteerId));
 				
 			String date = null;
@@ -913,7 +887,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 				activity.setDescription(desc);						
 		}
 			
-		activityDao.updateActivity(activity);
+		activityManager.updateActivity(activity);
 			
 		session.setAttribute("ActivityMessage","U");
 		return "redirect:/view_activity";	
@@ -1074,7 +1048,7 @@ protected static Logger logger = Logger.getLogger(VolunteerController.class);
 		m.setSenderID(sender);
 		m.setText(msg);
 		m.setSubject(subject);
-		messageDao.sendMessage(m);
+		messageManager.sendMessage(m);
 	}
 
 }

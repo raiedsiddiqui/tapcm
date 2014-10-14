@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
 import org.tapestry.objects.Organization;
 import org.tapestry.objects.Volunteer;
 
@@ -17,8 +18,9 @@ import org.tapestry.objects.Volunteer;
  * 
  * lxie
  */
+@Repository
 public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
-	
+	@Autowired
 	public VolunteerDAOImpl(DataSource dataSource) {
 		setDataSource(dataSource);
     }
@@ -100,7 +102,7 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 		getJdbcTemplate().update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getUserName(), volunteer.getStreet(), 
 				volunteer.getEmail(), volunteer.getExperienceLevel(), volunteer.getCity(), volunteer.getProvince(), volunteer.getHomePhone(),
 				volunteer.getCellPhone(), volunteer.getPostalCode(), volunteer.getCountry(), volunteer.getEmergencyContact(), 
-				volunteer.getAptNumber(), volunteer.getNotes(), volunteer.getAvailability(), volunteer.getStreetNumber(), 				
+				volunteer.getEmergencyPhone(), volunteer.getAptNumber(), volunteer.getNotes(), volunteer.getAvailability(), volunteer.getStreetNumber(), 				
 				volunteer.getPassword(), volunteer.getOrganizationId(), volunteer.getVolunteerId());		
 	}
 

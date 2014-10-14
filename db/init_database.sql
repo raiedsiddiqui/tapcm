@@ -175,8 +175,18 @@ CREATE TABLE IF NOT EXISTS report(
 	key_observations TEXT,
 	plan TEXT,
 	
-	PRIMARY KEY (report_ID)	
-	
+	PRIMARY KEY (report_ID)		
+);
+
+CREATE TABLE IF NOT EXISTS narratives_archived (
+    narrative_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    title VARCHAR(50) NOT NULL,
+    contents TEXT,
+    edit_Date TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP, /*edit_Date represents the last edit date*/    
+    volunteer SMALLINT UNSIGNED NOT NULL,
+    patient_ID SMALLINT UNSIGNED NOT NULL,
+    appointment SMALLINT UNSIGNED NOT NULL,
+    PRIMARY KEY (narrative_ID)
 );
 
 COMMIT;

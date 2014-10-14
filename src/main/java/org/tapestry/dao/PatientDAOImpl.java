@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import org.tapestry.controller.Utils;
 import org.tapestry.objects.Patient;
 
@@ -17,8 +18,9 @@ import org.tapestry.objects.Patient;
  * 
  * lxie
  */
+@Repository
 public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
-	
+	@Autowired
 	public PatientDAOImpl(DataSource dataSource) {
 		setDataSource(dataSource);
     }

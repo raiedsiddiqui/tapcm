@@ -16,7 +16,7 @@ import org.tapestry.controller.Utils;
 import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.User;
-import org.tapestry.dao.MessageDAO;
+import org.tapestry.service.MessageManager;
 import org.tapestry.dao.PatientDAO;
 
 public class MisUtils {
@@ -267,7 +267,7 @@ public class MisUtils {
 	}
 	
 	public static void setUnreadMsg(HttpSession session, SecurityContextHolderAwareRequestWrapper request, 
-			ModelMap model, MessageDAO messageDao){		
+			ModelMap model, MessageManager messageDao){		
 		if (session == null)
 			session = request.getSession();
 		

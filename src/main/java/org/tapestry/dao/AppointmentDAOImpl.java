@@ -10,6 +10,7 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
 import org.tapestry.objects.Appointment;
 
 /**
@@ -17,8 +18,10 @@ import org.tapestry.objects.Appointment;
  * 
  * lxie
  */
+@Repository
 public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO {
 	
+	@Autowired
 	public AppointmentDAOImpl(DataSource dataSource) {
 		setDataSource(dataSource);
     }

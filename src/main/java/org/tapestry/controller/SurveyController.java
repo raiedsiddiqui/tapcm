@@ -18,6 +18,9 @@ import javax.sql.DataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -39,18 +42,24 @@ import org.tapestry.dao.ActivityDAOImpl;
 //import org.tapestry.dao.ActivityDao;
 import org.tapestry.dao.AppointmentDAO;
 import org.tapestry.dao.AppointmentDAOImpl;
+import org.tapestry.dao.MessageDAO;
+import org.tapestry.dao.MessageDAOImpl;
 import org.tapestry.dao.PatientDAO;
 import org.tapestry.dao.PatientDAOImpl;
 import org.tapestry.dao.SurveyResultDAO;
 import org.tapestry.dao.SurveyResultDAOImpl;
 import org.tapestry.dao.SurveyTemplateDAO;
 import org.tapestry.dao.SurveyTemplateDAOImpl;
+import org.tapestry.dao.VolunteerDAO;
+import org.tapestry.dao.VolunteerDAOImpl;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.DisplayedSurveyResult;
 import org.tapestry.objects.Patient;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
 import org.tapestry.objects.User;
+import org.tapestry.service.ActivityManager;
+import org.tapestry.service.AppointmentManager;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.ResultParser;
 import org.tapestry.surveys.SurveyFactory;
@@ -69,9 +78,12 @@ public class SurveyController{
 	private SurveyResultDAO surveyResultDao = getSurveyResultDAO();
 	private SurveyTemplateDAO surveyTemplateDao = getSurveyTemplateDAO();
 	private PatientDAO patientDao = getPatientDAO();
-	private AppointmentDAO appointmentDao = getAppointmentDAO();
-	private ActivityDAO activityDao = getActivityDAO();
-	
+//	private AppointmentDAO appointmentDao = getAppointmentDAO();
+	public ApplicationContext ctx;// = new ClassPathXmlApplicationContext("spring-beans.xml");
+	@Autowired
+   	private ActivityManager activityManager;
+	@Autowired
+	private AppointmentManager appointmentManager;
 	/**
    	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
    	 */
@@ -111,22 +123,13 @@ public class SurveyController{
 			return null;
 		}
     }
-    
-    public ActivityDAO getActivityDAO(){
-    	return new ActivityDAOImpl(getDataSource());
-    }
-    
+   
     public SurveyTemplateDAO getSurveyTemplateDAO(){
     	return new SurveyTemplateDAOImpl(getDataSource());
     }
     
     public SurveyResultDAO getSurveyResultDAO(){
     	return new SurveyResultDAOImpl(getDataSource());
-    }
-    
-    public AppointmentDAO getAppointmentDAO(){
-    	return new AppointmentDAOImpl(getDataSource());
-    	//  	return new AppointmentDAOImpl();
     }
     
     public PatientDAO getPatientDAO(){
@@ -357,6 +360,9 @@ public class SurveyController{
             sr.setPatientID(Integer.parseInt(patients[i]));
           //if requested survey that's already done
     		if (specificSurveys.size() < template.getMaxInstances())
+    		    
+    		    
+    		   	
     		{
     			TapestryPHRSurvey blankSurvey = (TapestryPHRSurvey)template;
     			blankSurvey.setQuestions(new ArrayList<SurveyQuestion>());// make blank survey
@@ -428,7 +434,7 @@ public class SurveyController{
 		else 
 			sb.append(p.getDisplayName());
 	
-		activityDao.addUserLog(sb.toString(), u);
+		activityManager.addUserLog(sb.toString(), u);
 		
 		return "redirect:/show_survey/" + id;
 	}
@@ -479,11 +485,11 @@ public class SurveyController{
 		
 		//For activity logging purposes
 		HttpSession session = request.getSession();
-//		User currentUser = userDao.getUserByUsername(request.getRemoteUser());
 		User currentUser = (User)session.getAttribute("loggedInUser");	
+		
 		SurveyResult surveyResult = surveyResultDao.getSurveyResultByID(id);
 		Patient currentPatient = patientDao.getPatientByID(surveyResult.getPatientID());
-		Appointment appointment = appointmentDao.getAppointmentByMostRecentIncomplete(currentPatient.getPatientID());
+		Appointment appointment = appointmentManager.getAppointmentByMostRecentIncomplete(currentPatient.getPatientID());
 		
 		StringBuffer sb;
 		if (isComplete) {
@@ -509,7 +515,7 @@ public class SurveyController{
 			else
 				sb.append( currentPatient.getDisplayName());
 			
-			activityDao.addUserLog(sb.toString(), currentUser);
+			activityManager.addUserLog(sb.toString(), currentUser);
 		}
 		
 		if (!currentSurvey.isComplete())
@@ -528,7 +534,7 @@ public class SurveyController{
 			else 
 				sb.append( currentPatient.getDisplayName());
 		
-			activityDao.addUserLog(sb.toString(), currentUser);
+			activityManager.addUserLog(sb.toString(), currentUser);
 		}
 		
 		if (request.isUserInRole("ROLE_ADMIN")){

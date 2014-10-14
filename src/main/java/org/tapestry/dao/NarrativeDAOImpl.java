@@ -9,10 +9,17 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import org.tapestry.objects.Narrative;
-
+/**
+ * An implementation of the NarrativeDAO interface.
+ * 
+ * lxie
+ */
+@Repository
 public class NarrativeDAOImpl extends JdbcDaoSupport implements NarrativeDAO {
 	
+	@Autowired
 	public NarrativeDAOImpl(DataSource dataSource) {
 		setDataSource(dataSource);
     }

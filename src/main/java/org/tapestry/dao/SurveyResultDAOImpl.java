@@ -4,21 +4,30 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+
 import javax.sql.DataSource;
 
 import org.tapestry.objects.SurveyResult;
 
+/**
+ * An implementation of the SurveyResultDAO interface.
+ * 
+ * lxie
+ */
 
+@Repository
 public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultDAO {
-	
+	@Autowired
 	public SurveyResultDAOImpl(DataSource dataSource) {
 		setDataSource(dataSource);
     }

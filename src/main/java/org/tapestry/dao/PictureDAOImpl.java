@@ -14,12 +14,21 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 import org.tapestry.objects.Picture;
 
+/**
+ * An implementation of the PictureDAO interface.
+ * 
+ * lxie
+ */
+
+@Repository
 public class PictureDAOImpl extends JdbcDaoSupport implements PictureDAO {
 	private String uploadDir;
 		
+	@Autowired
 	public PictureDAOImpl(DataSource dataSource) {
 		setDataSource(dataSource);
     }

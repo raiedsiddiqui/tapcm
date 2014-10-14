@@ -24,6 +24,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.oscarehr.myoscar_server.ws.PersonTransfer3;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
@@ -35,17 +38,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.SurveyQuestion;
-
 import org.tapestry.controller.utils.MisUtils;
-import org.tapestry.dao.ActivityDAO;
-import org.tapestry.dao.ActivityDAOImpl;
 import org.tapestry.dao.AppointmentDAO;
 import org.tapestry.dao.AppointmentDAOImpl;
-import org.tapestry.dao.MessageDAO;
-import org.tapestry.dao.MessageDAOImpl;
 import org.tapestry.dao.PatientDAO;
 import org.tapestry.dao.PatientDAOImpl;
-//import org.tapestry.dao.PictureDao;
 import org.tapestry.dao.SurveyResultDAO;
 import org.tapestry.dao.SurveyResultDAOImpl;
 import org.tapestry.dao.SurveyTemplateDAO;
@@ -66,6 +63,9 @@ import org.tapestry.report.AlertManager;
 import org.tapestry.report.AlertsInReport;
 import org.tapestry.report.CalculationManager;
 import org.tapestry.report.ScoresInReport;
+import org.tapestry.service.ActivityManager;
+import org.tapestry.service.AppointmentManager;
+import org.tapestry.service.MessageManager;
 import org.tapestry.surveys.DoSurveyAction;
 import org.tapestry.surveys.ResultParser;
 import org.tapestry.surveys.SurveyFactory;
@@ -96,16 +96,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 	private ClassPathResource dbConfigFile;
 	private Map<String, String> config;
 	private Yaml yaml;
-
-	private PatientDAO patientDao = getPatientDAO();
-	private AppointmentDAO appointmentDao = getAppointmentDAO();
-	private ActivityDAO activityDao = getActivityDAO();
-	private VolunteerDAO volunteerDao = getVolunteerDAO();
-	private MessageDAO messageDao = getMessageDAO();
-	private SurveyTemplateDAO surveyTemplateDao = getSurveyTemplateDAO();
-   	private SurveyResultDAO surveyResultDao = getSurveyResultDAO();
-      	
-   	public DataSource getDataSource() {
+  	public DataSource getDataSource() {
     	try{
 			dbConfigFile = new ClassPathResource("tapestry.yaml");
 			yaml = new Yaml();
@@ -129,14 +120,20 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			return null;
 		}
     }
-   
-    public ActivityDAO getActivityDAO(){
-    	return new ActivityDAOImpl(getDataSource());
-    }
-    
-    public MessageDAO getMessageDAO(){
-    	return new MessageDAOImpl(getDataSource());
-    }
+
+	private PatientDAO patientDao = getPatientDAO();
+//	private AppointmentDAO appointmentDao = getAppointmentDAO();
+	private VolunteerDAO volunteerDao = getVolunteerDAO();
+
+	private SurveyTemplateDAO surveyTemplateDao = getSurveyTemplateDAO();
+   	private SurveyResultDAO surveyResultDao = getSurveyResultDAO();
+   	public ApplicationContext ctx;// = new ClassPathXmlApplicationContext("spring-beans.xml");
+   	@Autowired
+   	private ActivityManager activityManager;  	
+   	@Autowired
+	private MessageManager messageManager;
+   	@Autowired 
+   	private AppointmentManager appointmentManager;
     
     public SurveyTemplateDAO getSurveyTemplateDAO(){
     	return new SurveyTemplateDAOImpl(getDataSource());
@@ -146,11 +143,6 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
     	return new SurveyResultDAOImpl(getDataSource());
     }
     
-    public AppointmentDAO getAppointmentDAO(){
-    	return new AppointmentDAOImpl(getDataSource());
-    	//   	return new AppointmentDAOImpl();
-    }
-    
     public VolunteerDAO getVolunteerDAO(){
     	return new VolunteerDAOImpl(getDataSource());
     }
@@ -158,6 +150,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
     public PatientDAO getPatientDAO(){
     	return new PatientDAOImpl(getDataSource());
     }
+
    	
    	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
 	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
@@ -167,7 +160,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		else
 		{
-			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
+			int unreadMessages = messageManager.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
 		}	
 		loadPatientsAndVolunteers(model);
@@ -357,7 +350,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		List<SurveyTemplate> surveyList = surveyTemplateDao.getAllSurveyTemplates();		
 	
 		List<Patient> patientsForUser = patientDao.getPatientsForVolunteer(volunteerId);						
-		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
+		Appointment appointment = appointmentManager.getAppointmentById(appointmentId);
 		
 		model.addAttribute("appointment", appointment);
 		model.addAttribute("patients", patientsForUser);
@@ -377,7 +370,7 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		else 
 			sb.append(patient.getDisplayName());
 		
-		activityDao.addUserLog(sb.toString(), u);					
+		activityManager.addUserLog(sb.toString(), u);					
 		//save selected appointmentId in the session for other screen, like narrative		
 		session.setAttribute("appointmentId", appointmentId);
 		session.setAttribute("patientId", id);
@@ -442,12 +435,12 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 		model.addAttribute("volunteer2", volunteer2Name);
 				
 		List<Appointment> appointments = new ArrayList<Appointment>();
-		appointments = appointmentDao.getAllUpcommingAppointmentForPatient(id);
+		appointments = appointmentManager.getAllUpcommingAppointmentForPatient(id);
 				
 		model.addAttribute("upcomingVisits", appointments);
 		
 		appointments = new ArrayList<Appointment>();		
-		appointments = appointmentDao.getAllCompletedAppointmentsForPatient(id);
+		appointments = appointmentManager.getAllCompletedAppointmentsForPatient(id);
 		model.addAttribute("completedVisits", appointments);
 		
 		List<SurveyResult> surveys = surveyResultDao.getSurveysByPatientID(id);
@@ -515,15 +508,15 @@ protected static Logger logger = Logger.getLogger(AppointmentController.class);
 			
 		}
 				
-		Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
+		Appointment appointment = appointmentManager.getAppointmentById(appointmentId);
 		Report report = new Report();		
 		ScoresInReport scores = new ScoresInReport();
 		
 		report.setPatient(patient);
 		
 		//Plan and Key Observations
-		String keyObservation = appointmentDao.getKeyObservationByAppointmentId(appointmentId);
-		String plan = appointmentDao.getPlanByAppointmentId(appointmentId);
+		String keyObservation = appointmentManager.getKeyObservationByAppointmentId(appointmentId);
+		String plan = appointmentManager.getPlanByAppointmentId(appointmentId);
 		appointment.setKeyObservation(keyObservation);
 		appointment.setPlans(plan);
 		

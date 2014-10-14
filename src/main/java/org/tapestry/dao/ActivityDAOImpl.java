@@ -4,10 +4,12 @@ import java.util.List;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.tapestry.controller.Utils;
@@ -20,14 +22,13 @@ import org.tapestry.objects.UserLog;
  * 
  * lxie
  */
-@Service
+@Repository
 public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
-
 	@Autowired
 	public ActivityDAOImpl(DataSource dataSource) {
-	    setDataSource(dataSource);
-	}
-
+		setDataSource(dataSource);
+    }
+ 
 	@Override
 	public List<Activity> getAllActivitiesForVolunteer(int volunteer) {			
 		String sql = "SELECT DATE(activities.event_timestamp) AS date, activities.description, "

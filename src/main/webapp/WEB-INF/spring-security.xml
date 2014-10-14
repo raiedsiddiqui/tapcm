@@ -12,19 +12,26 @@
 	http://www.springframework.org/schema/security/spring-security-3.0.3.xsd">	
 	<!-- telling container to take care of annotations stuff -->  
 	 <context:annotation-config />  
- 
+	 <context:component-scan  base-package="org.tapestry.dao" />
+ 	 <context:component-scan  base-package="org.tapestry.service" />
+	 
    	<beans:bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<beans:property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<beans:property name="url" value="jdbc:mysql://localhost:3306/survey_app" />
 		<beans:property name="username" value="root" />
 		<beans:property name="password" value="root" />
-	</beans:bean>
-	
+	</beans:bean>	
 	
 	<beans:bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">  
 		<beans:property name="dataSource" ref="dataSource"/>  
 	</beans:bean>  
-
+	
+	<beans:bean id="transactionManager"  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+   		<beans:property name="dataSource" ref="dataSource" />
+  	</beans:bean>
+  	
+  	
+	
 	<http auto-config="true">
 		<intercept-url pattern="/admin/*" access="ROLE_ADMIN" />
 		<intercept-url pattern="/surveys/*" access="ROLE_ADMIN" />

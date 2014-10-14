@@ -4,6 +4,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.stereotype.Repository;
+import org.tapestry.controller.Utils;
+import org.tapestry.objects.User;
 
 /**
  * An implementation of the UserDAO interface.
@@ -11,17 +20,9 @@ import java.util.List;
  * lxie
  */
 
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
-import org.tapestry.controller.Utils;
-import org.tapestry.objects.User;
-
+@Repository
 public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
-
+	@Autowired
 	public UserDAOImpl(DataSource dataSource) {
  		setDataSource(dataSource);
     }
@@ -62,7 +63,7 @@ public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
 	*/
 	@Override
 	public User getUserByUsername(String username) {		
-		String sql = "SELECT * FROM users WHERE username=?";		
+		String sql = "SELECT * FROM users WHERE username=?";
 		return getJdbcTemplate().queryForObject(sql, new Object[]{username}, new UserMapper());	
 	}
 

@@ -9,9 +9,18 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import org.tapestry.objects.SurveyTemplate;
 
+/**
+ * An implementation of the SurveyTemplateDAO interface.
+ * 
+ * lxie
+ */
+
+@Repository
 public class SurveyTemplateDAOImpl extends JdbcDaoSupport implements SurveyTemplateDAO {
+	@Autowired
 	public SurveyTemplateDAOImpl(DataSource dataSource) {
 		setDataSource(dataSource);
     }

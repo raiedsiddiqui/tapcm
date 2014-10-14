@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import org.tapestry.objects.Message;
 
 /**
@@ -17,9 +18,9 @@ import org.tapestry.objects.Message;
  * 
  * lxie
  */
-
+@Repository
 public class MessageDAOImpl extends JdbcDaoSupport implements MessageDAO {
-	
+	@Autowired
 	public MessageDAOImpl(DataSource dataSource) {
  		setDataSource(dataSource);
     }
