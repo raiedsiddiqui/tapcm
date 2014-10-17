@@ -14,7 +14,7 @@
  	<tx:annotation-driven />  
 	<context:component-scan base-package="org.tapestry.dao" />
 	<context:component-scan base-package="org.tapestry.service" />
- 
+	 
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 	    destroy-method="close">
 	    <property name="driverClassName" value="com.mysql.jdbc.Driver" />
@@ -22,7 +22,7 @@
 	    <property name="username" value="root" />
 	    <property name="password" value="root" />
 	</bean>
-	
+		
 	<bean id="transactionManager"  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 	    <property name="dataSource" ref="dataSource" />
 	</bean>

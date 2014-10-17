@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.tapestry.controller.Utils;
+import org.tapestry.utils.Utils;
 import org.tapestry.objects.Patient;
 
 /**

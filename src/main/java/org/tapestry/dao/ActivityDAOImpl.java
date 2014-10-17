@@ -4,15 +4,13 @@ import java.util.List;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.tapestry.controller.Utils;
+import org.tapestry.utils.Utils;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.User;
 import org.tapestry.objects.UserLog;

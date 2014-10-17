@@ -14,6 +14,7 @@ import org.tapestry.objects.Appointment;
 public class AppointmentManagerImpl implements AppointmentManager {
 	@Autowired
 	private AppointmentDAO appointmentDao;
+	
 	@Override
 	public List<Appointment> getAllAppointments() {
 		return appointmentDao.getAllAppointments();

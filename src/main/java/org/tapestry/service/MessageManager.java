@@ -8,7 +8,7 @@ import org.tapestry.objects.Message;
 
 /**
  * service for Model Message
- * @author lxie *
+ * @author lxie 
  */
 @Service
 public interface MessageManager {

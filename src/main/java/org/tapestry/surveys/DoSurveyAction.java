@@ -47,7 +47,7 @@ import org.survey_component.data.SurveyQuestion;
 import org.survey_component.data.answer.SurveyAnswer;
 import org.survey_component.data.answer.SurveyAnswerFactory;
 import org.survey_component.source.SurveyParseException;
-import org.tapestry.controller.Utils;
+import org.tapestry.utils.Utils;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
 

@@ -1,6 +1,5 @@
-package org.tapestry.controller;
+package org.tapestry.utils;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,76 +9,19 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TimeZone;
-
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.time.DateFormatUtils;
 
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 
-//import org.tapestry.dao.VolunteerDao;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
-import org.yaml.snakeyaml.Yaml;
 
 public class Utils {
-	
-		static String DB = "";
-		static String UN = "";
-		static String PW = "";
-		static String mailHost = "";
-		static String mailUser = "";
-		static String mailPassword = "";
-		static String mailPort = "";
-		static String useTLS = "";
-		static String useAuth = "";
-		static String mailAddress="";
-	  		
-//   		static VolunteerDao volunteerDao = null;
-   		
-		
-	public static void setDatabaseConfig(){   	
-   		
-		try{
-			ClassPathResource dbConfigFile = new ClassPathResource("tapestry.yaml");
-			Yaml yaml = new Yaml();
-			Map<String, String> config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-			DB = config.get("url");
-			UN = config.get("username");
-			PW = config.get("password");
-			mailHost = config.get("mailHost");
-			mailUser = config.get("mailUser");
-			mailPassword = config.get("mailPassword");
-			mailAddress = config.get("mailFrom");
-			mailPort = config.get("mailPort");
-			useTLS = config.get("mailUsesTLS");
-			useAuth = config.get("mailRequiresAuth");
-		} catch (IOException e) {
-			System.out.println("Error: reading from config file");
-			System.out.println(e.toString());
-		}
-		
-		Properties props = System.getProperties();
-		
-		props.setProperty("db", DB);
-		props.setProperty("un", UN);
-		props.setProperty("pwd", PW);
-		
-		
-		props.setProperty("mail.smtp.host", mailHost);
-		props.setProperty("mail.smtp.socketFactory.port", mailPort);
-		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		props.setProperty("mail.smtp.auth", useAuth);
-		props.setProperty("mail.smtp.starttls.enable", useTLS);
-		props.setProperty("mail.user", mailUser);
-		props.setProperty("mail.password", mailPassword);
-		
-		}
 	
 	public static String timeFormat(String time){
 		String hour = null;

@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 import org.tapestry.objects.User;
+import org.tapestry.objects.UserLog;
 
 /**
- * service for Model User
+ * service for Model User, Activity
  * @author lxie *
  */
 public interface UserManager {
@@ -44,5 +45,34 @@ public interface UserManager {
 	public void setPasswordForUser(int id, String pwd);
 	@Transactional
 	public List<Integer> getVolunteerCoordinatorByOrganizationId(int id);
+	
+	/**
+	 * 
+	 * @param start
+	 * @param n
+	 * @return a list of userLogs
+	 */
+	@Transactional
+	public List<UserLog> getUserLogs(int start, int n);
+	/**
+	 * log user activity with description
+	 * @param description
+	 * @param user
+	 */
+	@Transactional
+	public void addUserLog(String description, User user);
+	/**
+	 * 
+	 * @param partialName
+	 * @return a list of userLogs 
+	 */
+	@Transactional
+	public List<UserLog> getUserLogsByPartialName(String partialName);
+	/**
+	 * 
+	 * @return number of user logs
+	 */
+	@Transactional
+	public int count();
 
 }

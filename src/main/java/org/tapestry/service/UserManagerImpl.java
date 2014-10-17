@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.tapestry.dao.ActivityDAO;
 import org.tapestry.dao.UserDAO;
 import org.tapestry.objects.User;
+import org.tapestry.objects.UserLog;
 
 /**
  * Implementation for service UserManager
@@ -15,6 +17,8 @@ import org.tapestry.objects.User;
 public class UserManagerImpl implements UserManager {
 	@Autowired
 	private UserDAO userDao;
+	@Autowired
+	private ActivityDAO activityDAO;
 	
 	@Override
 	public int countActiveUsers() {
@@ -54,19 +58,16 @@ public class UserManagerImpl implements UserManager {
 	@Override
 	public void removeUserWithID(int id) {
 		userDao.removeUserWithID(id);
-
 	}
 
 	@Override
 	public void disableUserWithID(int id) {
 		userDao.disableUserWithID(id);
-
 	}
 
 	@Override
 	public void enableUserWithID(int id) {
 		userDao.enableUserWithID(id);
-
 	}
 
 	@Override
@@ -103,5 +104,24 @@ public class UserManagerImpl implements UserManager {
 	public List<Integer> getVolunteerCoordinatorByOrganizationId(int id) {		
 		return userDao.getVolunteerCoordinatorByOrganizationId(id);
 	}
+	
+	@Override
+	public List<UserLog> getUserLogs(int start, int n) {		
+		return activityDAO.getUserLogsPage(start, n);
+	}
 
+	@Override
+	public void addUserLog(String description, User user) {		
+		activityDAO.addUserLog(description, user);		
+	}
+
+	@Override
+	public List<UserLog> getUserLogsByPartialName(String partialName) {		
+		return activityDAO.getUserLogsByPartialName(partialName);
+	}
+
+	@Override
+	public int count() {		
+		return activityDAO.countEntries();
+	}
 }

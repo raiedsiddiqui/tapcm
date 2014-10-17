@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.Iterator;
 
-import org.tapestry.controller.Utils;
+import org.tapestry.utils.Utils;
 
 public class AlertManager {
 	public static List<String> getNutritionAlerts(int scores, List<String> alerts, List<String> qList){
