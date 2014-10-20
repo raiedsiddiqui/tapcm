@@ -119,12 +119,7 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 		
 		return getJdbcTemplate().queryForInt(sql);				
 	}
-
-	 /**
-     * Returns a list of n items starting at start
-     * @param start The position in the log to start at
-     * @param n The number of items to return
-     */
+	
 	@Override
 	public List<Activity> getPage(int start, int n) {
 		//Returns a list of n items starting at start

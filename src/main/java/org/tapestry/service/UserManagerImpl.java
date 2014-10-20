@@ -101,7 +101,7 @@ public class UserManagerImpl implements UserManager {
 	}
 
 	@Override
-	public List<Integer> getVolunteerCoordinatorByOrganizationId(int id) {		
+	public List<User> getVolunteerCoordinatorByOrganizationId(int id) {		
 		return userDao.getVolunteerCoordinatorByOrganizationId(id);
 	}
 	

@@ -44,7 +44,7 @@ public interface UserManager {
 	@Transactional
 	public void setPasswordForUser(int id, String pwd);
 	@Transactional
-	public List<Integer> getVolunteerCoordinatorByOrganizationId(int id);
+	public List<User> getVolunteerCoordinatorByOrganizationId(int id);
 	
 	/**
 	 * 

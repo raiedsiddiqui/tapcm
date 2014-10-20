@@ -314,7 +314,7 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 	public boolean createAppointment(Appointment a) {		
 		String sql = "INSERT INTO appointments (volunteer, patient, date_time, partner, status, type) values (?,?,?,?,?, ?)";
 		getJdbcTemplate().update(sql, a.getVolunteerID(),a.getPatientID(), a.getDate() + " " + a.getTime(), a.getPartnerId(), 
-				"Awaiting Approval", a.getType());
+				a.getStatus(), a.getType());
 		
 		return true;
 	}

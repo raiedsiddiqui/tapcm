@@ -12,22 +12,99 @@ import org.tapestry.objects.User;
 */
 @Service
 public interface UserDAO {
-
+	/**
+	 * Count all active users
+	 * @return
+	 */
 	public int countActiveUsers();
+	/**
+	 * Count all Admins
+	 * @return
+	 */
 	public int countAdministrators();
+	/**	 * 
+	 * @return number of Users
+	 */
 	public int countAllUsers();
+	/**
+	 * 
+	 * @param id
+	 * @return a user by id
+	 */
 	public User getUserByID(int id);
+	/**
+	 * 
+	 * @param username
+	 * @return a user by username
+	 */
 	public User getUserByUsername(String username);
+	/**
+	 * Add a new user
+	 * @param u
+	 * @return
+	 */
 	public boolean createUser(User u);
+	/**
+	 * Modify a user
+	 * @param u
+	 */
 	public void modifyUser(User u);
+	/**
+	 * Delete a use by id
+	 * @param id
+	 */
 	public void removeUserWithID(int id);
+	/**
+	 * Disable a user by id
+	 * @param id
+	 */
 	public void disableUserWithID(int id);
+	/**
+	 * Enable a user by id
+	 * @param id
+	 */
 	public void enableUserWithID(int id);
+	/**
+	 * 
+	 * @return a list of Users
+	 */
 	public List<User> getAllUsers();
+	/**
+	 * 
+	 * @param partialName
+	 * @return a list of users who's name contains partialName
+	 */
 	public List<User> getUsersByPartialName(String partialName);
+	/**
+	 * 
+	 * @param role
+	 * @return a list of user by selected role
+	 */
 	public List<User> getAllUsersWithRole(String role);
+	/**
+	 * 
+	 * @param role
+	 * @return a list of active user by selected role
+	 */
 	public List<User> getAllActiveUsersWithRole(String role);
+	/**
+	 * Check if user has password
+	 * @param id
+	 * @param pwd
+	 * @return
+	 */
 	public boolean userHasPassword(int id, String pwd);
+	/**
+	 * Set password for a user
+	 * @param id
+	 * @param pwd
+	 */
 	public void setPasswordForUser(int id, String pwd);
-	public List<Integer> getVolunteerCoordinatorByOrganizationId(int id);
+	/**
+	 * 
+	 * @param id
+	 * @return a list of central Admin by selected organization
+	 */
+	public List<User> getVolunteerCoordinatorByOrganizationId(int id);
+	
 }

@@ -1,38 +1,23 @@
 package org.tapestry.controller;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-
-import javax.annotation.PostConstruct;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.tapestry.utils.MisUtils;
 import org.tapestry.utils.Utils;
 import org.tapestry.objects.Activity;
@@ -41,7 +26,6 @@ import org.tapestry.objects.Availability;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.Narrative;
 import org.tapestry.objects.Patient;
-import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 import org.tapestry.objects.Organization;
@@ -51,20 +35,10 @@ import org.tapestry.service.PatientManager;
 import org.tapestry.service.SurveyManager;
 import org.tapestry.service.UserManager;
 import org.tapestry.service.VolunteerManager;
-import org.yaml.snakeyaml.Yaml;
-
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.Phrase;
 
 @Controller
 public class VolunteerController {
-	protected static Logger logger = Logger.getLogger(VolunteerController.class);	
-	
+	protected static Logger logger = Logger.getLogger(VolunteerController.class);		
 	@Autowired
    	private UserManager userManager;
 	@Autowired
@@ -77,66 +51,7 @@ public class VolunteerController {
 	private PatientManager patientManager;
 	@Autowired
 	private SurveyManager surveyManager;
-	
-	private Properties props;
-   	private String mailAddress = "";
-   	private Session session;
-   	private ClassPathResource dbConfigFile;
-	private Map<String, String> config;
-	private Yaml yaml;
    	
-   	/**
-   	 * Reads the file /WEB-INF/classes/db.yaml and gets the values contained therein
-   	 */
-   	@PostConstruct
-   	public void readConfig(){
-   		
-   		String mailHost = "";
-   		String mailUser = "";
-   		String mailPassword = "";
-   		String mailPort = "";
-   		String useTLS = "";
-   		String useAuth = "";
-		try{
-			dbConfigFile = new ClassPathResource("tapestry.yaml");
-			yaml = new Yaml();
-			config = (Map<String, String>) yaml.load(dbConfigFile.getInputStream());
-		
-			mailHost = config.get("mailHost");
-			mailUser = config.get("mailUser");
-			mailPassword = config.get("mailPassword");
-			mailAddress = config.get("mailFrom");
-			mailPort = config.get("mailPort");
-			useTLS = config.get("mailUsesTLS");
-			useAuth = config.get("mailRequiresAuth");
-			
-		} catch (IOException e) {
-			System.out.println("Error reading from config file");
-			System.out.println(e.toString());
-			
-			logger.error("Error reading from config file");
-			e.printStackTrace();
-		}
-		
-		//Mail-related settings
-		final String username = mailUser;
-		final String password = mailPassword;
-		props = System.getProperties();
-		session = Session.getDefaultInstance(props, 
-				 new javax.mail.Authenticator() {
-					protected PasswordAuthentication getPasswordAuthentication() {
-						return new PasswordAuthentication(username, password);
-					}
-		  		});
-		props.setProperty("mail.smtp.host", mailHost);
-		props.setProperty("mail.smtp.socketFactory.port", mailPort);
-		props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		props.setProperty("mail.smtp.auth", useAuth);
-		props.setProperty("mail.smtp.starttls.enable", useTLS);
-		props.setProperty("mail.user", mailUser);
-		props.setProperty("mail.password", mailPassword);
-   	}  
-	
 	//display all volunteers
 	@RequestMapping(value="/view_volunteers", method=RequestMethod.GET)
 	public String getAllVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
@@ -326,13 +241,40 @@ public class VolunteerController {
 			if (!Utils.isNullOrEmpty(request.getParameter("organization")))
 				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));		
 								
-			String strAvailableTime = getAvailableTime(request);
+			String strAvailableTime = MisUtils.getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
 			boolean success = volunteerManager.addVolunteer(volunteer);			
 			//save in the table users
 			if (success)
-				addUser(volunteer);	
+			{
+				User user = new User();
+				StringBuffer sb = new StringBuffer();
+				sb.append(volunteer.getFirstName());
+				sb.append(" ");
+				sb.append(volunteer.getLastName());
+				user.setName(sb.toString());
+				user.setUsername(volunteer.getUserName());
+				user.setRole("ROLE_USER");
+						
+				user.setPassword(volunteer.getPassword());
+				user.setEmail(volunteer.getEmail());
+				user.setOrganization(volunteer.getOrganizationId());		
+
+				success = userManager.createUser(user);			
+				
+//				sb = new StringBuffer();
+//				sb.append("Thank you for volunteering with Tapestry. Your account has been successfully created.\n");
+//				sb.append("Your username and password are as follows:\n");
+//				sb.append("Username: ");
+//				sb.append(user.getUsername());
+//				sb.append("\n");
+//				sb.append("Password: password\n\n");
+//				String msg = sb.toString();
+//				String subject = "Welcome to Tapestry";
+//				
+//				MisUtils.sendMessageByEmail(user,subject, msg);					
+			}
 			else{
 				model.addAttribute("volunteerExist", true);
 				return "/admin/add_volunteer";	
@@ -402,11 +344,9 @@ public class VolunteerController {
 		return "/admin/modify_volunteer";
 	}
 	
-	//update 
 	@RequestMapping(value="/update_volunteer/{volunteerId}", method=RequestMethod.POST)
 	public String updateVolunteer(SecurityContextHolderAwareRequestWrapper request, 
 			@PathVariable("volunteerId") int id, ModelMap model){		
-		
 		HttpSession  session = request.getSession();
 		Volunteer volunteer;
 			
@@ -469,14 +409,14 @@ public class VolunteerController {
 		if (!Utils.isNullOrEmpty(request.getParameter("organization")))
 			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
 			
-		String strAvailableTime = getAvailableTime(request);		
+		String strAvailableTime = MisUtils.getAvailableTime(request);		
 		
 		volunteer.setAvailability(strAvailableTime);
 			
 		volunteerManager.updateVolunteer(volunteer);
 			
 		//update users table as well
-		modifyUser(volunteer);
+		MisUtils.modifyUser(volunteer, userManager);
 		
 		session.setAttribute("volunteerMessage","U");
 		return "redirect:/view_volunteers";
@@ -485,194 +425,15 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/delete_volunteer/{volunteerId}", method=RequestMethod.GET)
 	public String deleteVolunteerById(@PathVariable("volunteerId") int id, 
-				SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		
+				SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		volunteerManager.deleteVolunteerById(id);
 				
 		HttpSession  session = request.getSession();		
 		session.setAttribute("volunteerMessage", "D");		
 	
-		return "redirect:/view_volunteers";
-		
-	}
-	
+		return "redirect:/view_volunteers";		
+	}	
 
-	private void modifyUser(Volunteer volunteer){				
-		User user = userManager.getUserByUsername(volunteer.getUserName());
-		
-		StringBuffer sb = new StringBuffer();
-		sb.append(volunteer.getFirstName());
-		sb.append(" ");
-		sb.append(volunteer.getLastName());
-		user.setName(sb.toString());
-			
-		user.setEmail(volunteer.getEmail());
-		userManager.modifyUser(user);
-		
-		//update password
-		userManager.setPasswordForUser(user.getUserID(), volunteer.getPassword());		
-	}
-	
-	private void addUser(Volunteer volunteer){		
-		User user = new User();
-		StringBuffer sb = new StringBuffer();
-		sb.append(volunteer.getFirstName());
-		sb.append(" ");
-		sb.append(volunteer.getLastName());
-		user.setName(sb.toString());
-		user.setUsername(volunteer.getUserName());
-		user.setRole("ROLE_USER");
-				
-		user.setPassword(volunteer.getPassword());
-		user.setEmail(volunteer.getEmail());
-		user.setOrganization(volunteer.getOrganizationId());		
-
-		boolean success = userManager.createUser(user);				
-
-
-		
-		
-		if (mailAddress != null && success){
-			try{
-				MimeMessage message = new MimeMessage(session);
-				message.setFrom(new InternetAddress(mailAddress));
-				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(user.getEmail()));
-				message.setSubject("Welcome to Tapestry");
-				
-				sb = new StringBuffer();
-				sb.append("Thank you for volunteering with Tapestry. Your account has been successfully created.\n");
-				sb.append("Your username and password are as follows:\n");
-				sb.append("Username: ");
-				sb.append(user.getUsername());
-				sb.append("\n");
-				sb.append("Password: password\n\n");
-
-				message.setText(sb.toString());
-				System.out.println(sb.toString());
-				System.out.println("Sending...");
-				Transport.send(message);
-				System.out.println("Email sent containing credentials to " + user.getEmail());
-			} catch (MessagingException e) {
-				System.out.println("Error: Could not send email");
-				System.out.println(e.toString());
-			}
-		}
-					
-	}
-	
-	private String getAvailableTime(SecurityContextHolderAwareRequestWrapper request)
-	{			
-		String strAvailableTime = "";
-		List<String> availability = new ArrayList<String>();
-		String mondayNull = request.getParameter("mondayNull");
-		String tuesdayNull = request.getParameter("tuesdayNull");
-		String wednesdayNull = request.getParameter("wednesdayNull");
-		String thursdayNull = request.getParameter("thursdayNull");
-		String fridayNull = request.getParameter("fridayNull");		
-		String from1, from2, to1, to2;		
-		
-		//get availability for Monday
-		if (!"non".equals(mondayNull))
-		{
-			from1 = request.getParameter("monFrom1");		
-			from2 = request.getParameter("monFrom2");
-			to1 = request.getParameter("monTo1");
-			to2 = request.getParameter("monTo2");
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("1non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);
-			}
-		}
-		else
-			availability.add("1non");		
-		
-		//get availability for Tuesday
-		if(!"non".equals(tuesdayNull))
-		{
-			from1 = request.getParameter("tueFrom1");
-			from2 = request.getParameter("tueFrom2");
-			to1 = request.getParameter("tueTo1");
-			to2 = request.getParameter("tueTo2");		
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("2non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);				
-				availability = Utils.getAvailablePeriod(from2, to2, availability);
-			}
-		}
-		else
-			availability.add("2non");
-		
-		//get availability for Wednesday
-		if (!"non".equals(wednesdayNull))
-		{
-			from1 = request.getParameter("wedFrom1");
-			from2 = request.getParameter("wedFrom2");
-			to1 = request.getParameter("wedTo1");
-			to2 = request.getParameter("wedTo2");
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("3non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);					
-			}
-		}
-		else
-			availability.add("3non");
-		
-		//get availability for Thursday
-		if (!"non".equals(thursdayNull))
-		{
-			from1 = request.getParameter("thuFrom1");
-			from2 = request.getParameter("thuFrom2");
-			to1 = request.getParameter("thuTo1");
-			to2 = request.getParameter("thuTo2");
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("4non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);	
-			}
-		}
-		else
-			availability.add("4non");
-		
-		//get availability for Friday
-		if(!"non".equals(fridayNull))
-		{			
-			from1 = request.getParameter("friFrom1");
-			from2 = request.getParameter("friFrom2");
-			to1 = request.getParameter("friTo1");
-			to2 = request.getParameter("friTo2");	
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("5non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);
-			}
-		}
-		else
-			availability.add("5non");
-	
-		//convert arrayList to string for matching data type in DB
-		if (availability != null)
-			strAvailableTime=StringUtils.collectionToCommaDelimitedString(availability);	
-		
-		return strAvailableTime;
-	}
-	
 	//Activity in Volunteer
 	//display all activity input by volunteers
 	@RequestMapping(value="/view_activity_admin", method=RequestMethod.GET)
@@ -867,32 +628,26 @@ public class VolunteerController {
 			String startTime = null;
 			if (!Utils.isNullOrEmpty(request.getParameter("activityStartTime")))
 				startTime = request.getParameter("activityStartTime");
-			
-			System.out.println("start time === " + startTime);
-			
+									
 			if (startTime.length() < 6)//format 
 				activity.setStartTime(date +" " + startTime + ":00"); 
 			else
 				activity.setStartTime(date +" " + startTime); 
-			
-			System.out.println("after start time === " + activity.getStartTime());
 				
 			String endTime = null;
 			if (!Utils.isNullOrEmpty(request.getParameter("activityEndTime")))
 				endTime = request.getParameter("activityEndTime");
-				
-			System.out.println("end time === " + endTime);
+							
 			if (endTime.length() < 6)//format
 				activity.setEndTime(date + " " + endTime + ":00");
 			else
 				activity.setEndTime(date + " " + endTime);
-			System.out.println("after end time === " + activity.getEndTime());
+			
 			String desc = null;
 			desc = request.getParameter("activityDesc");
 			if (!Utils.isNullOrEmpty(desc))
 				activity.setDescription(desc);						
-		}
-			
+		}			
 		volunteerManager.updateActivity(activity);
 			
 		session.setAttribute("ActivityMessage","U");
@@ -918,8 +673,7 @@ public class VolunteerController {
 			if ("C".equals(message)){
 				model.addAttribute("organizationCreated", true);
 				session.removeAttribute("organizatioMessage");
-			}
-	
+			}	
 		}		
 		return "/admin/view_organizations";
 	}
@@ -952,8 +706,7 @@ public class VolunteerController {
 	
 	//create a new volunteer and save in the table of volunteers and users in the DB
 	@RequestMapping(value="/add_organization", method=RequestMethod.POST)
-	public String addOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){					
-		
+	public String addOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		Organization organization = new Organization();
 			
 		organization.setName(request.getParameter("name").trim());
@@ -979,83 +732,6 @@ public class VolunteerController {
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "redirect:/view_organizations";			
 	}	
-	
-	
-	@RequestMapping(value="/view_pdf", method=RequestMethod.GET)
-	public String viewPDF(HttpServletResponse response) throws DocumentException, IOException{
-		
-		return "/admin/pdf_generator";
-	}
-	
-	@RequestMapping(value="/go_pdf", method=RequestMethod.GET)
-	@ResponseBody
-	public String goPDF(HttpServletResponse response) throws DocumentException, IOException{	
-
-	       String orignalFileName="reportTest.pdf";
-
-	        try {
-	        	   // step 1
-	            Document document = new Document(PageSize.A5.rotate());
-	            response.setHeader("Content-Disposition", "outline;filename=\"" +orignalFileName+ "\"");
-	            // step 2
-	            PdfWriter.getInstance(document, response.getOutputStream());
-
-	            // step 3
-	            document.open();
-	            // step 4
-	            PdfPTable table = new PdfPTable(2);
-	            // a long phrase
-	            Phrase p = new Phrase(
-	                "Dr. iText or: How I Learned to Stop Worrying and Love PDF.");
-	            PdfPCell cell = new PdfPCell(p);
-	            // the prhase is wrapped
-	            table.addCell("wrap");
-	            cell.setNoWrap(false);
-	            table.addCell(cell);
-	            // the phrase isn't wrapped
-	            table.addCell("no wrap");
-	            cell.setNoWrap(true);
-	            table.addCell(cell);
-	            // a long phrase with newlines
-	            p = new Phrase(
-	                "Dr. iText or:\nHow I Learned to Stop Worrying\nand Love PDF.");
-	            cell = new PdfPCell(p);
-	            // the phrase fits the fixed height
-	            table.addCell("fixed height (more than sufficient)");
-	            cell.setFixedHeight(72f);
-	            table.addCell(cell);
-	            // the phrase doesn't fit the fixed height
-	            table.addCell("fixed height (not sufficient)");
-	            cell.setFixedHeight(36f);
-	            table.addCell(cell);
-	            // The minimum height is exceeded
-	            table.addCell("minimum height");
-	            cell = new PdfPCell(new Phrase("Dr. iText"));
-	            cell.setMinimumHeight(36f);
-	            table.addCell(cell);
-	            // The last row is extended
-	            table.setExtendLastRow(true);
-	            table.addCell("extend last row");
-	            table.addCell(cell);
-	            document.add(table);
-	            // step 5
-	           
-	            document.close();
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-		
-		return null;
-	}	
-	
-	private void sendMessageToInbox(String subject, String msg, int sender, int recipient){	
-		Message m = new Message();
-		m.setRecipient(recipient);
-		m.setSenderID(sender);
-		m.setText(msg);
-		m.setSubject(subject);
-		messageManager.sendMessage(m);
-	}
 	
 	//==================== Appointment ==============================//
 	@RequestMapping(value="/", method=RequestMethod.GET)
@@ -1202,7 +878,7 @@ public class VolunteerController {
    		String message = sb.toString();
    		
    		//send message to Central Admin
-   		sendMessageToInbox(subject, message, volunteerUserId, centralAdminId);
+   		MisUtils.sendMessageToInbox(subject, message, volunteerUserId, centralAdminId, messageManager);
    		
    		HttpSession session = request.getSession();
    		if (session.getAttribute("appointmentId") != null)
@@ -1266,7 +942,7 @@ public class VolunteerController {
    		}
    		else
    		{
-   			patients = getPatients();
+   			patients = MisUtils.getPatients(request, patientManager);
    	   		model.addAttribute("patients", patients);
    	   		
    			return "/admin/admin_book_appointment";	 
@@ -1282,8 +958,8 @@ public class VolunteerController {
    	}
    	
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
-	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		
+	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		User user = MisUtils.getLoggedInUser(request, userManager);		
 		int patientId = Integer.parseInt(request.getParameter("patient"));	
 		String noMatchedMsg="";			
 		Patient p = patientManager.getPatientByID(patientId);
@@ -1316,24 +992,38 @@ public class VolunteerController {
 		}
 		String availability = sb.toString();		
 		
-		if ((isAvailableForVolunteer(availability, vAvailability)) && (isAvailableForVolunteer(availability, pAvailability)))
+		if ((MisUtils.isAvailableForVolunteer(availability, vAvailability)) && 
+				(MisUtils.isAvailableForVolunteer(availability, pAvailability)))
 		{	//both volunteers are available, go to create an appointment for patient and send message to admin and volunteers
 			a.setVolunteerID(p.getVolunteer());
 			a.setPartnerId(p.getPartner());
 			a.setPatientID(p.getPatientID());
+			a.setPatient(p.getFirstName() + " " + p.getLastName());
 			a.setDate(date);
 			a.setTime(time);
 			
-			if (isFirstVisit(patientId))
+			if (MisUtils.isFirstVisit(patientId, appointmentManager))
 				a.setType(0);//first visit
 			else
 				a.setType(1);//follow up
 			
+			if ("ROLE_USER".equalsIgnoreCase(user.getRole()))
+				a.setStatus("Awaiting Approval");
+			else
+				a.setStatus("Approved");
+			
 			//save new appointment in DB and send message 
 			if (appointmentManager.createAppointment(a))
 			{			
-				String logginUser = request.getUserPrincipal().getName();	
-				User user = Utils.getLoggedInUser(request);
+				//log activity				
+				sb = new StringBuffer();
+				sb.append(user.getName());
+				sb.append(" has booked an appointment for client ");
+				sb.append(a.getPatient());
+				sb.append(" on ");
+				sb.append(a.getDate());
+				userManager.addUserLog(sb.toString(), user);
+				
 				int userId = user.getUserID();	
 				int volunteer1UserId = volunteerManager.getUserIdByVolunteerId(p.getVolunteer());	
 				int volunteer2UserId = volunteerManager.getUserIdByVolunteerId(p.getPartner());							
@@ -1341,7 +1031,7 @@ public class VolunteerController {
 				//send message to both volunteers
 				//content of message
 				sb = new StringBuffer();
-				sb.append(logginUser);
+				sb.append(user);
 				sb.append(" has booked an appointment for ");
 				sb.append(p.getFirstName());
 				sb.append(" ");
@@ -1357,18 +1047,18 @@ public class VolunteerController {
 				
 				if (request.isUserInRole("ROLE_ADMIN")) //send message for user login as admin/volunteer coordinator
 				{				
-					sendMessageToInbox(msg, userId, volunteer1UserId);//send message to volunteer1 
-					sendMessageToInbox(msg, userId, volunteer2UserId);//send message to volunteer2				
+					MisUtils.sendMessageToInbox(msg, userId, volunteer1UserId, messageManager);//send message to volunteer1 
+					MisUtils.sendMessageToInbox(msg, userId, volunteer2UserId, messageManager);//send message to volunteer2				
 				}
 				else //send message for user login as volunteer
 				{						
 					int organizationId = volunteer1.getOrganizationId();
-					List<Integer> coordinators = userManager.getVolunteerCoordinatorByOrganizationId(organizationId);
+					List<User> coordinators = userManager.getVolunteerCoordinatorByOrganizationId(organizationId);
 					
 					if (coordinators != null)
 					{	//send message to all coordinators in the organization						
 						for (int i = 0; i<coordinators.size(); i++)		
-							sendMessageToInbox(msg, volunteer1UserId, coordinators.get(i).intValue());			
+							MisUtils.sendMessageToInbox(msg, volunteer1UserId, coordinators.get(i).getUserID(), messageManager);			
 					}
 					else{
 						System.out.println("Can't find any coordinator in organization id# " + organizationId);
@@ -1390,7 +1080,7 @@ public class VolunteerController {
 					return "redirect:/?booked=false";	
 			}
 		}		
-		else if (!(isAvailableForVolunteer(availability, vAvailability)))
+		else if (!(MisUtils.isAvailableForVolunteer(availability, vAvailability)))
 		{
 			sb = new StringBuffer();
 			
@@ -1476,10 +1166,10 @@ public class VolunteerController {
 	//display scheduler page
 	@RequestMapping(value="/view_scheduler", method=RequestMethod.GET)
 	public String viewScheduler( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		List<Patient> patients = getPatients();		
-		List<Volunteer> allVolunteers = getAllVolunteers();
+		List<Patient> patients = MisUtils.getPatients(request, patientManager);	
+		List<Volunteer> allVolunteers = MisUtils.getAllVolunteers(volunteerManager);
 		
-		List<Availability> matchList = getAllMatchedPairs(allVolunteers, allVolunteers);
+		List<Availability> matchList = MisUtils.getAllMatchedPairs(allVolunteers, allVolunteers);
 		
 		model.addAttribute("patients",patients);
 		model.addAttribute("allvolunteers",allVolunteers);		
@@ -1499,7 +1189,7 @@ public class VolunteerController {
 			@RequestParam(value="time", required=false) String time, 			
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		
-		List<Patient> patients = getPatients();		
+		List<Patient> patients = MisUtils.getPatients(request, patientManager);		
 	
 		//get volunteers's name		
 		String vName = volunteerManager.getVolunteerNameById(volunteerId);
@@ -1528,8 +1218,8 @@ public class VolunteerController {
 	//load match time for both selected volunteers  /view_matchTime
 	@RequestMapping(value="/view_matchTime", method=RequestMethod.POST)
 	public String viewMatchAvailablities( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
-		List<Patient> patients = getPatients();		
-		List<Volunteer> volunteers = getAllVolunteers();
+		List<Patient> patients = MisUtils.getPatients(request, patientManager);		
+		List<Volunteer> volunteers = MisUtils.getAllVolunteers(volunteerManager);
 		
 		String patientId = request.getParameter("patient");
 		String volunteerId1 = request.getParameter("volunteer1");		
@@ -1549,7 +1239,7 @@ public class VolunteerController {
 			String v2Level = v2.getExperienceLevel();
 				
 			// matching rule is Beginner can only be paired with Experienced
-			if(!isMatched(v1Level, v2Level))
+			if(!MisUtils.isMatched(v1Level, v2Level))
 				model.addAttribute("misMatchedVolunteer",true);
 			else
 			{
@@ -1573,7 +1263,7 @@ public class VolunteerController {
 							availability.setpDisplayName(v2.getDisplayName());
 							availability.setpPhone(v2.getHomePhone());
 							availability.setpEmail(v2.getEmail());				
-							availability.setMatchedTime(formatMatchTime(a1));
+							availability.setMatchedTime(MisUtils.formatMatchTime(a1));
 							availability.setvId(Integer.parseInt(volunteerId1));
 							availability.setpId(Integer.parseInt(volunteerId2));
 							availability.setPatientId(Integer.parseInt(patientId));
@@ -1615,17 +1305,17 @@ public class VolunteerController {
 		sb.append(time);
 		String date_time = sb.toString();
 		
-		List<Volunteer> volunteers = getAllVolunteers();	
+		List<Volunteer> volunteers = MisUtils.getAllVolunteers(volunteerManager);	
 		if (volunteers.size() == 0)
 			model.addAttribute("noAvailableTime",true);	
 		else
 		{
-			List<Volunteer> availableVolunteers = getAllMatchedVolunteers(volunteers, date_time);
+			List<Volunteer> availableVolunteers = MisUtils.getAllMatchedVolunteers(volunteers, date_time);
 			if (availableVolunteers.size() == 0)
 				model.addAttribute("noAvailableVolunteers",true);	
 			else
 			{
-				List<Availability> matchList = getAllAvailablilities(availableVolunteers, date_time, day);
+				List<Availability> matchList = MisUtils.getAllAvailablilities(availableVolunteers, date_time, day);
 				if (matchList.size() == 0)
 					model.addAttribute("noFound",true);	
 				else
@@ -1642,9 +1332,9 @@ public class VolunteerController {
 	@RequestMapping(value="/schedule_appointment", method=RequestMethod.POST)
 	public String createAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		//set up appointment
-		Appointment appointment = new Appointment();
-		
+		Appointment appointment = new Appointment();		
 		int patientId = Integer.parseInt(request.getParameter("patient"));
+		User user = MisUtils.getLoggedInUser(request, userManager);		
 		
 		//retrieve volunteers id from session
 		HttpSession  session = request.getSession();			
@@ -1668,23 +1358,26 @@ public class VolunteerController {
 		appointment.setDate(date);
 		appointment.setTime(time);		
 		
-		if (isFirstVisit(patientId))
+		//set up Type
+		if (MisUtils.isFirstVisit(patientId, appointmentManager))
 			appointment.setType(0);//first visit
 		else
 			appointment.setType(1);//follow up
+		//set up Status
+		if ("ROLE_USER".equalsIgnoreCase(user.getRole()))
+			appointment.setStatus("Awaiting Approval");
+		else
+			appointment.setStatus("Approved");
 				
 		//save new appointment in DB and send message 
 		if (appointmentManager.createAppointment(appointment))
 		{
-			Patient patient = patientManager.getPatientByID(patientId);	
-			String logginUser = request.getUserPrincipal().getName();				
-			User user = Utils.getLoggedInUser(request);			
+			Patient patient = patientManager.getPatientByID(patientId);						
 			int userId = user.getUserID();
 						
 			//send message to both volunteers
-			StringBuffer sb = new StringBuffer();
-			
-			sb.append(logginUser);
+			StringBuffer sb = new StringBuffer();			
+			sb.append(user.getName());
 			sb.append(" has booked an appointment for ");
 			sb.append(patient.getFirstName());
 			sb.append(" ");
@@ -1693,30 +1386,23 @@ public class VolunteerController {
 			sb.append(time);
 			sb.append(" on ");
 			sb.append(date);
-			sb.append(".\n");
+			sb.append(".\n");			
 			sb.append("This appointment is awaiting confirmation.");
 			
 			String msg = sb.toString();
 			
-			sendMessageToInbox(msg, userId, volunteerId); //send message to volunteer
-			sendMessageToInbox(msg, userId, partnerId); //send message to volunteer
-			sendMessageToInbox(msg, userId, userId); //send message to admin her/his self	
+			MisUtils.sendMessageToInbox(msg, userId, volunteerId, messageManager); //send message to volunteer
+			MisUtils.sendMessageToInbox(msg, userId, partnerId, messageManager); //send message to volunteer
+			MisUtils.sendMessageToInbox(msg, userId, userId, messageManager); //send message to admin her/his self	
 			model.addAttribute("successToCreateAppointment",true);
+			//log activity
+			userManager.addUserLog(sb.toString(), user);
 		}
 		else
-		{
 			model.addAttribute("failedToCreateAppointment",true);
-		}		
 		return "redirect:/manage_appointments";		
-	}
+	}	
 	
-	/**
-	 *  
-	 * @param id appointment Id
-	 * @param request
-	 * @param model
-	 * @return
-	 */
 	@RequestMapping(value="/open_alerts_keyObservations/{appointmentId}", method=RequestMethod.GET)
 	public String openAlertsAndKeyObservations(@PathVariable("appointmentId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
@@ -1741,59 +1427,29 @@ public class VolunteerController {
 		return "/volunteer/add_alerts_keyObservation";
 	}
 	
-	/**
-	 *  
-	 * @param id appointment Id
-	 * @param request
-	 * @param model
-	 * @return
-	 */
 	@RequestMapping(value="/saveAlertsAndKeyObservations", method=RequestMethod.POST)
 	public String saveAlertsAndKeyObservations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		int appointmentId = getAppointmentId(request);		
+		int appointmentId = MisUtils.getAppointmentId(request);		
 		String alerts = request.getParameter("alerts");
 		String keyObservations = request.getParameter("keyObservations");
 		
 		appointmentManager.addAlertsAndKeyObservations(appointmentId, alerts, keyObservations);
 		
-		int patientId = getPatientId(request);		
+		int patientId = MisUtils.getPatientId(request);		
 		Appointment appointment = appointmentManager.getAppointmentById(appointmentId);		
 		
-		if (completedAllSurveys(patientId))
+		if (MisUtils.completedAllSurveys(patientId, surveyManager))
 			return "redirect:/open_plan/" + appointmentId ;	
 		else 
 		{
 			if (!Utils.isNullOrEmpty(appointment.getComments()))
 			{//send alert to MRP	
 				
-			}
-				
+			}				
 			return "redirect:/";	
 		}
-				
-//		if (!Utils.isNullOrEmpty(appointment.getComments()))
-//		{
-//			if (completedAllSurveys(patientId))
-//				return "redirect:/open_plan/" + appointmentId ;	
-//			else //send alert to MRP				
-//				return "redirect:/";
-//		}
-//		else//no alert, no complete surveys
-//		{
-//			if (completedAllSurveys(patientId))
-//				return "redirect:/open_plan/" + appointmentId ;	
-//			else
-//				return "redirect:/";
-//		}
 	}
 	
-	/**
-	 *  
-	 * @param id appointment Id
-	 * @param request
-	 * @param model
-	 * @return
-	 */
 	@RequestMapping(value="/open_plan/{appointmentId}", method=RequestMethod.GET)
 	public String openPlan(@PathVariable("appointmentId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
@@ -1812,18 +1468,9 @@ public class VolunteerController {
 		return "/volunteer/add_plan";
 	}
 	
-	/**
-	 *  
-	 * @param id appointment Id
-	 * @param request
-	 * @param model
-	 * @return
-	 */
 	@RequestMapping(value="/savePlans", method=RequestMethod.POST)
 	public String savePlans(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		
-//		int patientId = getPatientId(request);
-		int appointmentId = getAppointmentId(request);
+		int appointmentId = MisUtils.getAppointmentId(request);
 		
 		StringBuffer sb = new StringBuffer();		
 		sb.append(request.getParameter("plan1"));
@@ -1839,38 +1486,12 @@ public class VolunteerController {
 		{
 			sb.append(",");
 			sb.append(request.getParameter("planSpecify"));
-		}
-				
+		}				
 		appointmentManager.addPlans(appointmentId, sb.toString());
-		//generate report for patient 
-	//	generateReport(patientId, appointmentId);	
-		
-		//Todo: save report as PDF in harddrive
-		
-		//Todo:send copy of report to MRP
-		
-		//send message to patient in MyOscar
-//		Long patientIdInMyOscar = new Long(15231);
-//		try{
-//			Long lll = ClientManager.sentMessageToPatientInMyOscar(patientIdInMyOscar, "Message From Tapestry", "Hello");
-//			System.out.println("lll is === "+ lll);
-//			
-//		} catch (Exception e){
-//			System.out.println("something wrong with myoscar server");
-//			e.printStackTrace();
-//		}
-//		
-		
+	
 		return "redirect:/";
 	}
 	
-	/**
-	 *  
-	 * @param id appointment Id
-	 * @param request
-	 * @param model
-	 * @return
-	 */
 	@RequestMapping(value="/goMyOscarAuthenticate/{appointmentId}", method=RequestMethod.GET)
 	public String openMyOscarAuthenticate(@PathVariable("appointmentId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
@@ -1889,12 +1510,9 @@ public class VolunteerController {
 		String firstName = vName.substring(0, index);
 		String lastName = vName.substring(index);
 		
-//		String termsInfo = MisUtils.getMyOscarAuthenticationInfo();
-		
 		model.addAttribute("patient", patient);
 		model.addAttribute("vFirstName", firstName);
 		model.addAttribute("vLastName", lastName);
-//		model.addAttribute("termsInfo", termsInfo);	
 	
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
@@ -1929,8 +1547,7 @@ public class VolunteerController {
 		model.addAttribute("appointment", appt);	
 		
 		if (appt.getType() == 0)
-		{//first visit						
-			System.out.println("in complete visit, for first visit and and go to alert and keyObservation");
+		{//first visit				
 			HttpSession  session = request.getSession();
 			if (session.getAttribute("unread_messages") != null)
 				model.addAttribute("unread", session.getAttribute("unread_messages"));
@@ -1939,17 +1556,14 @@ public class VolunteerController {
 		}
 		else
 		{//follow up visit			
-			boolean completedAllSurveys = completedAllSurveys(patientId);
+			boolean completedAllSurveys = MisUtils.completedAllSurveys(patientId, surveyManager);
 			if (!Utils.isNullOrEmpty(appt.getComments()))
 			{//has alert
 				if (completedAllSurveys)
-				{System.out.println("in complete visit, for fowllowup visit, there is alert, finish all surveys and and go to Plans");
 					//alert attached to report
-					return "redirect:/open_plan/" + id ;	
-				}
+					return "redirect:/open_plan/" + id ;
 				else
-				{System.out.println("in complete visit, for fowllowup visit,there is alert, not finish all surveys and and go to Home");
-					//todo: send Alert to MRP
+				{					//todo: send Alert to MRP
 					String alerts = appt.getComments();
 					System.out.println("Alert send to MRP in Oscar  === " + alerts);	
 					return "redirect:/";
@@ -1958,247 +1572,14 @@ public class VolunteerController {
 			else
 			{//does not have alert
 				if (completedAllSurveys)
-				{System.out.println("in complete visit, for fowllowup visit,there is no alert, finish all surveys and and go to Plan");
 					return "redirect:/open_plan/" + id ;	
-				}
 				else
-				{System.out.println("in complete visit, for fowllowup visit,there is no alert, not finish all surveys and and go to Home");
 					return "redirect:/";
-				}
 			}
 		}
 	}
 	
-	public boolean completedAllSurveys(int patientId){
-   		boolean completed = false;
-   		
-   		int count = surveyManager.countSurveyTemplate();
-   		List<SurveyResult> completedSurveys = surveyManager.getCompletedSurveysByPatientID(patientId);
-   		
-   		if (count == completedSurveys.size())
-   			completed = true;
-   		
-   		return completed;
-   	}
-	
-	private boolean isFirstVisit(int patientId){
-		boolean isFirst = true;
-		List<Appointment> appointments = appointmentManager.getAllApprovedAppointmentsForPatient(patientId);	
-		
-		if ((appointments != null)&& (appointments.size()>0))
-			isFirst = false;
-		
-		return isFirst;
-		
-	}
-	
-	private boolean isMatched(String level1, String level2){
-		boolean matched = false;
-		if (level1.equals("E") || level2.equals("E"))		
-			matched = true;				
-		else if (level1.equals("I") && level2.equals("I"))
-			matched = true;
-		
-		return matched;
-	}
-	
-	//this is a temporary method for sending message only into Inbox
-	private void sendMessageToInbox(String msg, int sender, int recipient){	
-			Message m = new Message();
-			m.setRecipient(recipient);
-			m.setSenderID(sender);
-			m.setText(msg);
-			m.setSubject("New Appointment");
-			messageManager.sendMessage(m);
-	}
-	
-	private List<Patient> getPatients()
-	{
-		List<Patient> patients = new ArrayList<Patient>();
-		patients = patientManager.getAllPatients();		
-		
-		return patients;
-	}
-	
-	private List<Volunteer> getAllVolunteers(){
-		List<Volunteer> volunteers = new ArrayList<Volunteer>();
-		volunteers = volunteerManager.getVolunteersWithAvailability();		
-		
-		return volunteers;
-	}
-	
-	private List<Availability> getAllAvailablilities(List<Volunteer> list, String time, String day)
-	{		
-		Availability availability;
-		List<Availability> aList = new ArrayList<Availability>();
-		
-		for (Volunteer v: list)
-		{
-			for (Volunteer p: list)
-			{
-				if( (!(v.getVolunteerId()==p.getVolunteerId())) && 
-						(Utils.isMatchVolunteer(v, p)) && ((!isExist(aList,v, p))))
-				{
-					availability = new Availability();
-					availability.setvDisplayName(v.getDisplayName());
-					availability.setvPhone(v.getHomePhone());
-					availability.setvEmail(v.getEmail());
-					availability.setpDisplayName(p.getDisplayName());
-					availability.setpPhone(p.getHomePhone());
-					availability.setpEmail(p.getEmail());		
-					availability.setMatchedTime(formatdateTime(time, day));
-					availability.setvId(v.getVolunteerId());
-					availability.setpId(p.getVolunteerId());
-				      	
-					aList.add(availability);	
-				}
-			}
-		}
-		return aList;
-	}
-	
-	private List<Volunteer> getAllMatchedVolunteers(List<Volunteer> list, String time){		
-		List<Volunteer> vList = new ArrayList<Volunteer>();		
-		String availableTime;
-				
-		for (Volunteer v: list)
-		{	//get volunteer's available time
-			availableTime = v.getAvailability();
-			
-			if (availableTime.contains(time))
-				vList.add(v);
-		}
-		return vList;
-	}
-	
-	private List<Availability> getAllMatchedPairs(List<Volunteer> list1, List<Volunteer> list2){
-		String availability1, availability2;
-		String[] aSet1, aSet2;
-		List<Availability> aList = new ArrayList<Availability>();
-		Availability availability;
-		
-		for (Volunteer v1: list1)
-		{
-			availability1 = v1.getAvailability();				
-			aSet1 = availability1.split(",");	
-			
-			for (Volunteer v2: list2)
-			{
-				if (v1.getVolunteerId()!= v2.getVolunteerId())
-				{		
-					availability2 = v2.getAvailability();		
-					
-					if (Utils.isMatchVolunteer(v1, v2))						
-					{					
-						aSet2  = availability2.split(",");		
-						
-						//find match availability					
-						for(int i = 0; i < aSet1.length; i++)
-						{								
-							for(int j = 0; j <aSet2.length; j++)//
-							{  	//same time, no duplicated
-								if ((!aSet1[i].toString().contains("non")) 
-										&&  (aSet1[i].toString().equals(aSet2[j].toString()))
-										&&	(!isExist(aList, aSet1[i].toString(), v1, v2)))								
-								{	
-									availability = new Availability();
-									availability.setvDisplayName(v1.getDisplayName());
-									availability.setvPhone(v1.getHomePhone());
-									availability.setvEmail(v1.getEmail());
-									availability.setpDisplayName(v2.getDisplayName());
-									availability.setpPhone(v2.getHomePhone());
-									availability.setpEmail(v2.getEmail());								  
-									availability.setMatchedTime(formatMatchTime(aSet1[i].toString()));
-									availability.setvId(v1.getVolunteerId());
-									availability.setpId(v2.getVolunteerId());
-								      	
-									aList.add(availability);	
-								}
-							}
-						}
-					}
-				}		
-			}			
-		}	
-		
-		return aList;
-	}
-	
-	//avoid duplicated element
-	private boolean isExist(List<Availability> list, String time, Volunteer v1, Volunteer v2){
-		Availability a = new Availability();
-		boolean exist = false;
-		time = formatMatchTime(time);		
-		String v1Name = v1.getDisplayName();
-		String v2Name = v2.getDisplayName();
-		
-		for (int i =0; i<list.size(); i++){
-			a = list.get(i);
-			
-			if ((time.equals(a.getMatchedTime())) && ((v1Name.equals(a.getpDisplayName())) && (v2Name.equals(a.getvDisplayName())) ))
-				return true;
-		}
-		return exist;
-	}
-	
-	//avoid duplicate element
-	private boolean isExist(List<Availability> list, Volunteer v1, Volunteer v2){
-		Availability a = new Availability();
-		boolean exist = false;
-		
-		String v1Name = v1.getDisplayName();
-		String v2Name = v2.getDisplayName();
-		
-		for (int i =0; i<list.size(); i++){
-			a = list.get(i);
-			
-			if ((v1Name.equals(a.getpDisplayName())) && (v2Name.equals(a.getvDisplayName())))			
-				return true;
-		}
-		return exist;
-	}
-	
-	private String formatMatchTime(String time){
-		StringBuffer sb = new StringBuffer();
-		
-		Map<String, String> dayMap = new HashMap<String, String>();
-		dayMap.put("1", "Monday");
-		dayMap.put("2", "Tuesday");
-		dayMap.put("3", "Wednesday");
-		dayMap.put("4", "Thursday");
-		dayMap.put("5", "Friday");
-		
-		Map<String, String> timePeriodMap = Utils.getAvailabilityMap();
-		
-		sb.append(dayMap.get(time.substring(0,1)));
-		sb.append("--");
-		sb.append(timePeriodMap.get(time.substring(1)));
-		
-		return sb.toString();
-	}
-	
-	private String formatdateTime(String time, String day){			
-		Map<String, String> timePeriodMap = Utils.getAvailabilityMap();
-		
-		StringBuffer sb = new StringBuffer();
-		sb.append(day);
-		sb.append(" ");
-		sb.append(timePeriodMap.get(time.substring(1)));
-		
-		return sb.toString();
-	}
-	
-	private boolean isAvailableForVolunteer(String appointmentTime, String volunteerAvailability){
-		boolean available = false;
-		String[] availabilityArray = volunteerAvailability.split(",");
-		
-		for(String s: availabilityArray){
-			if (appointmentTime.equals(s))
-				return true;
-		}
-		return available;
-	}
-	
+
 	//narrative 
 	@RequestMapping(value="/view_narratives", method=RequestMethod.GET)
 	public String getNarrativesByUser(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
@@ -2253,7 +1634,7 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/new_narrative", method=RequestMethod.GET)
 	public String newNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
-		int appointmentId = getAppointmentId(request);
+		int appointmentId = MisUtils.getAppointmentId(request);
 		
 		Appointment appt = appointmentManager.getAppointmentById(appointmentId);
 		
@@ -2302,17 +1683,15 @@ public class VolunteerController {
 			
 			volunteerManager.updateNarrative(narrative);			
 			session.setAttribute("narrativeMessage","U");
-		}		
-		
+		}				
 		return "redirect:/view_narratives";
-
 	}
 	
 	//create a new narrative and save it in DB
 	@RequestMapping(value="/add_narrative", method=RequestMethod.POST)
 	public String addNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
-		int patientId = getPatientId(request);
-		int appointmentId = getAppointmentId(request);
+		int patientId = MisUtils.getPatientId(request);
+		int appointmentId = MisUtils.getAppointmentId(request);
 		int loggedInVolunteerId  = MisUtils.getLoggedInVolunteerId(request);		
 		
 		String title = request.getParameter("narrativeTitle");
@@ -2353,38 +1732,5 @@ public class VolunteerController {
 		session.setAttribute("narrativeMessage","D");
 				
 		return "redirect:/view_narratives";
-	}	
-	
-	/*
-	 * get selected patient id which is stored in the session
-	 * when a patient is selected from clients list in the main page	
-	 */
-	private int getPatientId(SecurityContextHolderAwareRequestWrapper request){
-		int patientId = 0;	
-		HttpSession session = request.getSession();
-		
-		
-		if (session.getAttribute("patientId") != null){			
-			patientId = Integer.parseInt(session.getAttribute("patientId").toString());
-		}
-		
-		return patientId;
-	}
-	
-	/*
-	 * get selected appointment id which is stored in the session
-	 *  when an appointment is selected in the main page
-	 */
-	private int getAppointmentId(SecurityContextHolderAwareRequestWrapper request){
-		int appointmentId = 0;		
-		HttpSession session = request.getSession();
-		
-		if (session.getAttribute("appointmentId") != null){			
-			appointmentId = Integer.parseInt(session.getAttribute("appointmentId").toString());
-		}
-		
-		return appointmentId;
-	}
-	
-
+	}		
 }

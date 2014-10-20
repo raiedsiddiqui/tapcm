@@ -226,14 +226,10 @@ public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
 	* @return A User object representing the person
 	*/
 	@Override
-	public List<Integer> getVolunteerCoordinatorByOrganizationId(int id) {
+	public List<User> getVolunteerCoordinatorByOrganizationId(int id) {
 		String sql = "SELECT * FROM users WHERE organization=? AND role ='ROLE_LOCAL_ADMIN'";
-		List<User> users = getJdbcTemplate().query(sql, new Object[]{id}, new UserMapper());
-		
-		List<Integer> coordinatorIds = new ArrayList<Integer>();
-		for(User u: users)
-			coordinatorIds.add(u.getUserID());
-		
+		List<User> coordinatorIds = getJdbcTemplate().query(sql, new Object[]{id}, new UserMapper());		
+	
 		return coordinatorIds;
 	}
 	
