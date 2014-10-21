@@ -91,6 +91,17 @@ public class UserManagerImpl implements UserManager {
 	}
 
 	@Override
+	public List<User> getUsersByGroup(int organizationId) {
+		return userDao.getUsersByGroup(organizationId);
+	}
+	
+
+	@Override
+	public List<User> getGroupedUsersByRole(int organizationId, String role) {
+		return userDao.getGroupedUsersByRole(organizationId, role);
+	}
+	
+	@Override
 	public boolean userHasPassword(int id, String pwd) {		
 		return userDao.userHasPassword(id, pwd);
 	}
@@ -124,4 +135,6 @@ public class UserManagerImpl implements UserManager {
 	public int count() {		
 		return activityDAO.countEntries();
 	}
+
+
 }

@@ -69,6 +69,22 @@ public interface UserDAO {
 	 * @return a list of Users
 	 */
 	public List<User> getAllUsers();
+	
+	/**
+	 * 
+	 * @param organizationId
+	 * @return a list of User who belong to same organization
+	 */
+	public List<User> getUsersByGroup(int organizationId);
+	
+	/**
+	 * 
+	 * @param organizationId
+	 * @param role
+	 * @return
+	 */
+	public List<User> getGroupedUsersByRole(int organizationId, String role);
+	
 	/**
 	 * 
 	 * @param partialName

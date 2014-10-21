@@ -55,4 +55,14 @@ public class PatientManagerImpl implements PatientManager {
 		patientDao.deletePatientWithId(id);
 	}
 
+	@Override
+	public List<Patient> getPatientsByGroup(int organizationId) {		
+		return patientDao.getPatientsByGroup(organizationId);
+	}
+
+	@Override
+	public List<Patient> getGroupedPatientsByName(String partialName, int organizationId) {
+		return patientDao.getGroupedPatientsByName(partialName, organizationId);
+	}
+
 }

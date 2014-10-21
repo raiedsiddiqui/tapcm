@@ -47,6 +47,20 @@ public interface PatientDAO {
 	public List<Patient> getPatientsByPartialName(String partialName);
 	
 	/**
+	 * search by name for a grouped patients
+	 * @param partialName
+	 * @param organizationId
+	 * @return a list of volunteers whose name contain partialName and belong to an organization
+	 */
+	public List<Patient> getGroupedPatientsByName(String partialName, int organizationId);
+	
+	/**
+	* List all the patients group by volunteer's organization in the database
+	* @return An ArrayList of Patient objects
+	*/
+    public List<Patient> getPatientsByGroup(int organizationId);
+	
+	/**
 	* Saves a patient in the database
 	* @param p The Patient object to save
 	*/

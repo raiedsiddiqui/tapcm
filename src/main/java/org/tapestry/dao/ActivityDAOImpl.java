@@ -36,9 +36,7 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 				+ "INNER JOIN volunteers ON activities.volunteer=volunteers.volunteer_ID"
 				+ " WHERE volunteer=?";
 		
-		List<Activity> activities = getJdbcTemplate().query(sql, new Object[]{volunteer}, new ActivityMapper());	
-		
-		return activities;
+		return getJdbcTemplate().query(sql, new Object[]{volunteer}, new ActivityMapper());
 	}
 
 	@Override
@@ -50,9 +48,7 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 				+ "INNER JOIN volunteers ON activities.volunteer=volunteers.volunteer_ID"
 				+ " ORDER BY event_timestamp";
 		
-		List<Activity> activities = getJdbcTemplate().query(sql, new ActivityMapper());		
-		
-		return activities;
+		return getJdbcTemplate().query(sql, new ActivityMapper());
 	}
 
 	@Override
@@ -62,11 +58,9 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 				+ "activities.organization, activities.event_ID, "
 				+ "volunteers.firstname, volunteers.lastname  FROM activities "
 				+ "INNER JOIN volunteers ON activities.volunteer=volunteers.volunteer_ID"
-				+ " WHERE organization = ? ORDER BY event_timestamp";
+				+ " WHERE activities.organization = ? ORDER BY event_timestamp";
 		
-		List<Activity> activities = getJdbcTemplate().query(sql, new Object[]{id}, new ActivityMapper());	
-		
-		return activities;
+		return getJdbcTemplate().query(sql, new Object[]{id}, new ActivityMapper());	
 	}
 	
 	@Override
@@ -77,10 +71,8 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 				+ "volunteers.firstname, volunteers.lastname  FROM activities "
 				+ "INNER JOIN volunteers ON activities.volunteer=volunteers.volunteer_ID"
 				+ " WHERE patient = ? AND appointment = ? ORDER BY event_timestamp";
-		
-		List<Activity> activities = getJdbcTemplate().query(sql, new Object[]{patientId, appointmentId}, new ActivityMapper());	
-		
-		return activities;
+				
+		return getJdbcTemplate().query(sql, new Object[]{patientId, appointmentId}, new ActivityMapper());	
 	}
 
 	@Override
@@ -112,13 +104,6 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 		getJdbcTemplate().update(sql, activity.getDate(), activity.getDescription(),activity.getStartTime(), 
 				activity.getEndTime(), activity.getActivityId());	
 	}
-
-	@Override
-	public int countEntries() {
-		String sql = "SELECT COUNT(log_ID) AS c FROM user_logs";
-		
-		return getJdbcTemplate().queryForInt(sql);				
-	}
 	
 	@Override
 	public List<Activity> getPage(int start, int n) {
@@ -128,9 +113,7 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 				+ " FROM activities INNER JOIN volunteers ON activities.volunteer=volunteers.volunteer_ID"
 				+ " ORDER BY event_timestamp DESC LIMIT ?,?";
 		
-		List<Activity> activities = getJdbcTemplate().query(sql, new Object[]{start,n}, new ActivityMapper());		
-
-		return activities;
+		return getJdbcTemplate().query(sql, new Object[]{start,n}, new ActivityMapper());		
 	}
 
 	@Override
@@ -144,9 +127,8 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 	@Override
 	public List<UserLog> getUserLogsPage(int start, int n) {		
 		String sql = "SELECT * FROM user_logs ORDER BY event_timestamp DESC LIMIT ?,?";		
-		List<UserLog> logs = getJdbcTemplate().query(sql, new Object[]{start,n}, new UserLogMapper());
 		
-		return logs;
+		return getJdbcTemplate().query(sql, new Object[]{start,n}, new UserLogMapper());
 	}
 
 	@Override
@@ -158,9 +140,8 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 	@Override
 	public List<UserLog> getUserLogsByPartialName(String partialName) {		
 		String sql = "SELECT * FROM user_logs WHERE UPPER(user_name) LIKE UPPER('%" + partialName + "%')";
-		List<UserLog> logs = getJdbcTemplate().query(sql, new UserLogMapper());
 
-		return logs;
+		return getJdbcTemplate().query(sql, new UserLogMapper());
 	}
 
 	@Override
@@ -168,6 +149,13 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 		String sql = "DELETE FROM activities WHERE event_ID=?";
 	    getJdbcTemplate().update(sql, id);
 
+	}
+	
+	@Override
+	public int countEntries() {
+		String sql = "SELECT COUNT(log_ID) AS c FROM user_logs";
+		
+		return getJdbcTemplate().queryForInt(sql);				
 	}
 	
 	//RowMapper

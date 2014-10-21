@@ -22,11 +22,20 @@ public interface VolunteerDAO {
      */
 	public List<Volunteer> getVolunteersWithAvailability();
 	
-	/**	 * 
+	/**	 
+	 * search by name
 	 * @param partialName
 	 * @return a list of volunteers whose name contain partialName
 	 */
 	public List<Volunteer> getVolunteersByName(String partialName);
+	
+	/**
+	 * search by name for a grouped volunteer
+	 * @param partialName
+	 * @param organizationId
+	 * @return a list of volunteers whose name contain partialName and belong to an organization
+	 */
+	public List<Volunteer> getGroupedVolunteersByName(String partialName, int organizationId);
 	
 	/**
 	 * 

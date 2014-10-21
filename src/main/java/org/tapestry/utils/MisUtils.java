@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -31,6 +30,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.SurveyQuestion;
 import org.tapestry.utils.Utils;
@@ -138,9 +138,15 @@ public class MisUtils {
 	 * Tapestry DB don't have, for example Age, City and HomePhone, need to get from MyOscar(PHR)
 	 */
 	public static List<Patient> getAllPatientsWithFullInfos(PatientManager patientManager, 
-			SecurityContextHolderAwareRequestWrapper request){				
-		List<Patient> patients = patientManager.getAllPatients();
+			SecurityContextHolderAwareRequestWrapper request){			
+		User user = getLoggedInUser(request);
+		List<Patient> patients;
 		HttpSession session = request.getSession();
+		
+		if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole()))
+			patients = patientManager.getAllPatients();	//For central Admin		
+		else		
+			patients = patientManager.getPatientsByGroup(user.getOrganization());		
 		
 		if (session.getAttribute("allPatientWithFullInfos") != null)
 			patients = (List<Patient>)session.getAttribute("allPatientWithFullInfos");
@@ -277,6 +283,27 @@ public class MisUtils {
 		}
 		return loggedInUser;
 	}
+
+	/**
+	 * get logged in user from session
+	 * @param request
+	 * @return
+	 */
+	public static User getLoggedInUser(SecurityContextHolderAwareRequestWrapper request){
+		HttpSession session = request.getSession();		
+		return (User)session.getAttribute("loggedInUser");
+	}
+	
+	/**
+	 * get logged in user from session
+	 * @param request
+	 * @return
+	 */
+	public static User getLoggedInUser(MultipartHttpServletRequest request){
+		HttpSession session = request.getSession();		
+		return (User)session.getAttribute("loggedInUser");		
+	}
+	
 	/**
 	 * maintain user table as well
 	 * @param volunteer
@@ -830,11 +857,24 @@ public class MisUtils {
    	 * @param patientManager
    	 */
 	public static void loadPatientsAndVolunteers(ModelMap model, VolunteerManager volunteerManager,
-			PatientManager patientManager){
-		List<Volunteer> volunteers = volunteerManager.getAllVolunteers();		
-		model.addAttribute("volunteers", volunteers);
+			PatientManager patientManager, SecurityContextHolderAwareRequestWrapper request ){
+		User user = getLoggedInUser(request);
+		List<Volunteer> volunteers;
+		List<Patient> patientList;
+		int organizationId = user.getOrganization();
 		
-	    List<Patient> patientList = patientManager.getAllPatients();
+		if (request.isUserInRole("ROLE_ADMIN"))
+		{//For central Admin	
+			volunteers = volunteerManager.getAllVolunteers();	
+			patientList = patientManager.getAllPatients();
+		}				
+		else	
+		{// For local Admin/VC
+			volunteers = volunteerManager.getAllVolunteersByOrganization(organizationId);	
+			patientList = patientManager.getPatientsByGroup(organizationId);
+		}
+	
+		model.addAttribute("volunteers", volunteers);	  
         model.addAttribute("patients", patientList);
 	}
 	
@@ -1671,7 +1711,7 @@ public class MisUtils {
 	 */
 	public static void setUnreadMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model, MessageManager messageManager ){
 		HttpSession session = request.getSession();
-		User loggedInUser = Utils.getLoggedInUser(request);
+		User loggedInUser = getLoggedInUser(request);
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		else
@@ -1739,7 +1779,7 @@ public class MisUtils {
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		else
 		{
-			User loggedInUser = Utils.getLoggedInUser(request);
+			User loggedInUser = getLoggedInUser(request);
 			int unreadMessages = messageDao.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
 		}

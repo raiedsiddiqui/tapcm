@@ -24,8 +24,15 @@ public class Patient{
 	private String clinicName;
 	private String address;
 	private String userName; //registered for MyOscar account
-	
-	
+	private int group; //based on volunteer's organization	
+
+	public int getGroup() {
+		return group;
+	}
+
+	public void setGroup(int group) {
+		this.group = group;
+	}
 
 	/**
 	* Empty constructor

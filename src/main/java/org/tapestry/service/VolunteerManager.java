@@ -45,6 +45,15 @@ public interface VolunteerManager {
 	public List<Volunteer> getAllVolunteersByOrganization(int id);
 	
 	/**
+	 * search by name for a grouped volunteer
+	 * @param partialName
+	 * @param organizationId
+	 * @return a list of volunteers whose name contain partialName and belong to an organization
+	 */
+	@Transactional
+	public List<Volunteer> getGroupedVolunteersByName(String partialName, int organizationId);
+	
+	/**
 	 * 
 	 * @param id
 	 * @return a volunteer, whose id is same as given id

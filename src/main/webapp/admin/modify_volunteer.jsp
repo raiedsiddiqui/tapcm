@@ -168,9 +168,9 @@
 								<div class="col-md-4">
 									<label>Experience:</label>
 									<select class="form-control" name="level" form="modify_volunteer">
-										<option value='E' <c:if test="${volunteer.experienceLevel eq 'E'}">selected</c:if>>Experienced</option>
-										<option value='I' <c:if test="${volunteer.experienceLevel eq 'I'}">selected</c:if>>Intermediate</option>
-										<option value='B' <c:if test="${volunteer.experienceLevel eq 'B'}">selected</c:if> >Beginner</option>
+										<option value='E' <c:if test="${volunteer.experienceLevel eq 'Experienced'}">selected</c:if>>Experienced</option>
+										<option value='I' <c:if test="${volunteer.experienceLevel eq 'Intermediate'}">selected</c:if>>Intermediate</option>
+										<option value='B' <c:if test="${volunteer.experienceLevel eq 'Beginer'}">selected</c:if> >Beginner</option>
 									</select>	
 								</div>
 							</div>

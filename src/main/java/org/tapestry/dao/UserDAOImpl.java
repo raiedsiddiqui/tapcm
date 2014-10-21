@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,10 +142,21 @@ public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
 	*/
 	@Override
 	public List<User> getAllUsers() {
-		String sql = "SELECT * FROM users";
-		List <User> users = getJdbcTemplate().query(sql, new UserMapper());
-		
-		return users;
+		String sql = "SELECT * FROM users";		
+		return getJdbcTemplate().query(sql, new UserMapper());
+	}
+	
+	@Override
+	public List<User> getUsersByGroup(int organizationId) {
+		String sql = "SELECT * FROM users WHERE organization=?";		
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new UserMapper());
+	}
+	
+
+	@Override
+	public List<User> getGroupedUsersByRole(int organizationId, String role) {
+		String sql = "SELECT * FROM users WHERE organization=? AND role=?";		
+		return getJdbcTemplate().query(sql, new Object[]{organizationId, role}, new UserMapper());
 	}
 	
 	/**
@@ -256,5 +268,6 @@ public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
 			return u;
 		}
 	}
+
 
 }

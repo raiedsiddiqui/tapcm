@@ -308,18 +308,34 @@ public class TapestryController{
 		model.addAttribute("messages", messages);		
 		MisUtils.setUnreadMessage(request, model, messageManager);
 			
+		List<User> receivers = new ArrayList<User>();
 		if (request.isUserInRole("ROLE_USER"))
-		{
+		{// for volunteer			
 			List<User> administrators = userManager.getVolunteerCoordinatorByOrganizationId(loggedInUser.getOrganization());
 			model.addAttribute("administrators", administrators);
 			
 			return "/volunteer/inbox";
 		} 
-		else
-		{			
-			List<User> volunteers = userManager.getAllUsersWithRole("ROLE_USER");			
-			model.addAttribute("volunteers", volunteers);
+		else if (request.isUserInRole("ROLE_LOCAL_ADMIN"))
+		{// local admin/VC			
+			List<User> centralAdmin = userManager.getAllActiveUsersWithRole("ROLE_ADMIN");
+			receivers.addAll(centralAdmin);
 			
+			List<User> volunteers = userManager.getGroupedUsersByRole(loggedInUser.getOrganization(), "ROLE_USER");	
+			receivers.addAll(volunteers);
+			
+			model.addAttribute("volunteers", receivers);			
+			return "/admin/inbox";
+		}
+		else
+		{// central admin	
+			List<User> localAdmins = userManager.getAllActiveUsersWithRole("ROLE_LOCAL_ADMIN");
+			receivers.addAll(localAdmins);
+			
+			List<User> volunteers = userManager.getAllUsersWithRole("ROLE_USER");	
+			receivers.addAll(volunteers);			
+			
+			model.addAttribute("volunteers", receivers);			
 			return "/admin/inbox";
 		}
 	}
@@ -375,7 +391,7 @@ public class TapestryController{
 		m.setText(request.getParameter("msgBody"));
 		
 		String role = loggedInUser.getRole();
-		if ("ROLE_USER".equals(role))//login user is volunteer
+		if (request.isUserInRole("ROLE_USER"))//login user is volunteer			
 		{	
 			if(recipients != null) {System.out.println("recipients are not null");
 				for (String recipientIDAsString: recipients)
@@ -478,7 +494,7 @@ public class TapestryController{
 	public String updateUser(SecurityContextHolderAwareRequestWrapper request){
 		String currentUsername = request.getUserPrincipal().getName();
 
-		User loggedInUser = Utils.getLoggedInUser(request);
+		User loggedInUser = MisUtils.getLoggedInUser(request);
 		User u = new User();
 		u.setUserID(loggedInUser.getUserID());
 		u.setUsername(request.getParameter("volUsername"));
@@ -562,12 +578,10 @@ public class TapestryController{
 	
 	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
 	public String uploadPicture(MultipartHttpServletRequest request){
-
-		User loggedInUser = Utils.getLoggedInUser(request);
+		User loggedInUser = MisUtils.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
 		
-		pictureManager.uploadPicture(pic, loggedInUser.getUserID(), true);				
-
+		pictureManager.uploadPicture(pic, loggedInUser.getUserID(), true);
 		userManager.addUserLog(loggedInUser.getName() +" uploaded picture for profile", loggedInUser);
 		
 		return "redirect:/profile";
@@ -575,8 +589,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/upload_picture_for_patient/{patientID}", method=RequestMethod.POST)
 	public String uploadPicture(@PathVariable("patientID") int id, MultipartHttpServletRequest request){
-		User loggedInUser = Utils.getLoggedInUser(request);
-
+		User loggedInUser = MisUtils.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
 		
 		Patient p = patientManager.getPatientByID(id);
@@ -589,8 +602,8 @@ public class TapestryController{
 			
 	//===================== Client(patient)  =============================//
    	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
-	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){
-   		User loggedInUser = Utils.getLoggedInUser(request);
+	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){   		
+   		User loggedInUser = MisUtils.getLoggedInUser(request);
    		HttpSession session = request.getSession();
    		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
@@ -599,7 +612,7 @@ public class TapestryController{
 			int unreadMessages = messageManager.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
 		}	
-		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager);
+		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
 
 		return "admin/manage_patients";
 	}
@@ -671,14 +684,14 @@ public class TapestryController{
 		    		}
 			}
 	   		model.addAttribute("createPatientSuccessfully",true);
-	   		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager);
+	   		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
 	   		
 	        return "admin/manage_patients";
 		}
 		else
 		{			
 			model.addAttribute("misMatchedVolunteer",true);
-			MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager);
+			MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
 			
 			return "admin/manage_patients";
 		}
@@ -737,7 +750,7 @@ public class TapestryController{
 		if (session.getAttribute("unread_messages") != null)		
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
-		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager);
+		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
         
 		return "/admin/manage_patients";
 	}
@@ -756,7 +769,7 @@ public class TapestryController{
 				
 		Patient patient = patientManager.getPatientByID(id);
 		//Find the name of the current user
-		User u = Utils.getLoggedInUser(request);
+		User u = MisUtils.getLoggedInUser(request);
 		HttpSession session = request.getSession();
 		
 		int volunteerId =0;
@@ -831,8 +844,13 @@ public class TapestryController{
 		String name = request.getParameter("searchName");
 		HttpSession session = request.getSession();
 		List<Patient> patients = new ArrayList<Patient>();
+		User user = MisUtils.getLoggedInUser(request, userManager);	
 		
-		patients = patientManager.getPatientsByPartialName(name);			
+		if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole()))// for central Admin
+			patients = patientManager.getPatientsByPartialName(name);	
+		else
+			patients = patientManager.getGroupedPatientsByName(name, user.getOrganization());
+	
 		model.addAttribute("searchName", name);	 
 		model.addAttribute("patients", patients);
 		

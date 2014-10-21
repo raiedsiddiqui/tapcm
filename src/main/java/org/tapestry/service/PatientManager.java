@@ -42,16 +42,29 @@ public interface PatientManager {
 	*/
 	@Transactional
     public List<Patient> getPatientsForVolunteer(int volunteer);
+	
+	/**
+	* List all the patients group by volunteer's organization in the database
+	* @return a List of Patient objects
+	*/
+    public List<Patient> getPatientsByGroup(int organizationId);
     
     /**
-	 * 
+	 * search a group of patients by partial name
 	 * get all patients with partialName in firstname or lastname
 	 * @param partialName
 	 * @return
 	 */
 	@Transactional
 	public List<Patient> getPatientsByPartialName(String partialName);
-	
+	/**
+	 * 
+	 * @param partialName
+	 * @param organizationId
+	 * @return
+	 */
+	@Transactional
+	public List<Patient> getGroupedPatientsByName(String partialName, int organizationId);
 	/**
 	* Saves a patient in the database
 	* @param p The Patient object to save

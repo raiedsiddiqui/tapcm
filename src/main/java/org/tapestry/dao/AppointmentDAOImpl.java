@@ -32,13 +32,11 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
     				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
     				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
     				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-    				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-    				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-    				+ " ORDER BY a.date_time DESC";
-		//
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new AppointmentMapper());
-		//		List<Appointment> appointments = getJdbcTemplate().query(sql, new AppointmentMapper());
-		return appointments;
+    				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+    				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+    				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID ORDER BY a.date_time DESC";
+				
+		return getJdbcTemplate().query(sql, new AppointmentMapper());
 	}
 
 	@Override
@@ -47,11 +45,11 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.date_time < CURDATE() ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.date_time < CURDATE() ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new AppointmentMapper());
 	}
 
 	@Override
@@ -60,11 +58,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.date_time>=CURDATE() AND a.completed=0 AND a.status='Awaiting Approval' ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.date_time>=CURDATE() AND a.completed=0 "
+				+ "AND a.status='Awaiting Approval' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new AppointmentMapper());
 	}
 
 	@Override
@@ -73,12 +72,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE (a.volunteer=? OR a.partner=?) AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Approved' "
-				+ "ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE (a.volunteer=? OR a.partner=?) "
+				+ "AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Approved' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -87,12 +86,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE (a.volunteer=? OR a.partner=?) AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Awaiting Approval' "
-				+ "ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE (a.volunteer=? OR a.partner=?) "
+				+ "AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Awaiting Approval' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -101,12 +100,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE (a.volunteer=? OR a.partner=?) AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Declined' "
-				+ "ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE (a.volunteer=? OR a.partner=?) "
+				+ "AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Declined' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -115,11 +114,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE (a.volunteer=? OR a.partner=?) AND a.completed=1 ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE (a.volunteer=? OR a.partner=?) "
+				+ "AND a.completed=1 ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -128,11 +128,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE (a.volunteer=? OR a.partner=?) AND a.date_time>=CURDATE() AND a.completed=0 ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE (a.volunteer=? OR a.partner=?) "
+				+ "AND a.date_time>=CURDATE() AND a.completed=0 ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -141,11 +142,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND a.date_time>=CURDATE() AND a.completed=1 ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND a.date_time>=CURDATE() "
+				+ "AND a.completed=1 ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -154,12 +156,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND (a.volunteer=? OR a.partner=?) AND a.date_time>=CURDATE() AND a.completed=0"
-				+ " AND a.status='Approved' ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{patientId,volunteerId,volunteerId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND (a.volunteer=? OR a.partner=?) "
+				+ "AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Approved' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{patientId,volunteerId,volunteerId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -168,12 +170,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Awaiting Approval'"
-				+ " ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers "
+				+ "AS v1 ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND a.date_time>=CURDATE() "
+				+ "AND a.completed=0 AND a.status='Awaiting Approval' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -182,12 +184,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND (a.volunteer=? OR a.partner=?) AND a.date_time>=CURDATE() AND a.completed=0"
-				+ " AND a.status='Awaiting Approval' ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{patientId,volunteerId,volunteerId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND (a.volunteer=? OR a.partner=?) "
+				+ "AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Awaiting Approval' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{patientId,volunteerId,volunteerId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -196,12 +198,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Declined'"
-				+ " ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND a.date_time>=CURDATE() "
+				+ "AND a.completed=0 AND a.status='Declined' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -210,12 +212,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND (a.volunteer=? OR a.partner=?) AND a.date_time>=CURDATE() AND a.completed=0 "
-				+ "AND a.status='Declined' ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{patientId,volunteerId,volunteerId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND (a.volunteer=? OR a.partner=?) "
+				+ "AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Declined' ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{patientId,volunteerId,volunteerId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -224,11 +226,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND a.date_time>=CURDATE() AND a.completed=0  ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND a.date_time>=CURDATE() "
+				+ "AND a.completed=0  ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -237,11 +240,12 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND a.completed=1  ORDER BY a.date_time DESC";
-		List<Appointment> appointments = getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
-		return appointments;
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND a.completed=1  "
+				+ "ORDER BY a.date_time DESC";
+		
+		return getJdbcTemplate().query(sql, new Object[]{patientId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -250,9 +254,11 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.patient=? AND a.completed=0 AND a.status='Approved' ORDER BY a.date_time ASC LIMIT 1";
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.patient=? AND a.completed=0 "
+				+ "AND a.status='Approved' ORDER BY a.date_time ASC LIMIT 1";
+		
 		return getJdbcTemplate().queryForObject(sql, new Object[]{patientId}, new AppointmentMapper());		
 	}
 
@@ -262,9 +268,9 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE a.appointment_ID=? ORDER BY date_time DESC";
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE a.appointment_ID=? ORDER BY date_time DESC";
 		return getJdbcTemplate().queryForObject(sql, new Object[]{appointmentId}, new AppointmentMapper());		
 	}
 
@@ -274,17 +280,19 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE TIMESTAMPDIFF(DAY, a.date_time, NOW())=? ORDER BY a.date_time DESC";
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE TIMESTAMPDIFF(DAY, a.date_time, NOW())=? "
+				+ "ORDER BY a.date_time DESC";
+		
 		String sql_volunteer = "SELECT a.appointment_ID, a.volunteer, a.patient, DATE(a.date_time) AS appt_date,"
 				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
 				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
 				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
-				+ "p.lastname AS p_lastname FROM appointments AS a INNER JOIN volunteers AS v1 ON a.volunteer=v1.volunteer_ID "
-				+ "INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID INNER JOIN patients AS p ON a.patient=p.patient_ID"
-				+ " WHERE TIMESTAMPDIFF(DAY, a.date_time, NOW())=? AND (a.volunteer=? OR a.partner=?) AND a.status='Approved' "
-				+ "ORDER BY a.date_time DESC";
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE TIMESTAMPDIFF(DAY, a.date_time, NOW())=? "
+				+ "AND (a.volunteer=? OR a.partner=?) AND a.status='Approved' ORDER BY a.date_time DESC";
 		
 		List<Appointment> appointments = new ArrayList<Appointment>();
 		if (id == 0)//for admin
@@ -294,6 +302,47 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 		
 		
 		return appointments;
+	}
+	
+	@Override
+	public List<Appointment> getAppointmentsGroupByOrganization(int organizationId) {
+		String sql = "SELECT a.appointment_ID, a.volunteer, a.patient, DATE(a.date_time) AS appt_date,"
+				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
+				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE v1.organization = ? ORDER BY a.date_time DESC";
+								
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new AppointmentMapper());
+	}
+	
+	@Override
+	public List<Appointment> getPastAppointmentsGroupByOrganization(int organizationId) {
+		String sql = "SELECT a.appointment_ID, a.volunteer, a.patient, DATE(a.date_time) AS appt_date,"
+				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
+				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE v1.organization = ? "
+				+ "AND a.date_time < CURDATE() ORDER BY a.date_time DESC";
+				
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new AppointmentMapper());
+	}
+
+	@Override
+	public List<Appointment> getPendingAppointmentsGroupByOrganization(int organizationId) {
+		String sql = "SELECT a.appointment_ID, a.volunteer, a.patient, DATE(a.date_time) AS appt_date,"
+				+ "TIME(a.date_time) AS appt_time, a.comments, a.status, a.completed, a.contactedAdmin, "
+				+ "a.partner, a.hasNarrative, a.type, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, p.firstname AS p_firstname, "
+				+ "p.lastname AS p_lastname, v1.organization FROM appointments AS a INNER JOIN volunteers AS v1 "
+				+ "ON a.volunteer=v1.volunteer_ID INNER JOIN volunteers AS v2 ON a.partner=v2.volunteer_ID "
+				+ "INNER JOIN patients AS p ON a.patient=p.patient_ID WHERE v1.organization = ? "
+				+ "AND a.date_time>=CURDATE() AND a.completed=0 AND a.status='Awaiting Approval' ORDER BY a.date_time DESC";
+				
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new AppointmentMapper());
 	}
 
 	@Override
@@ -426,11 +475,15 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
     			appointment.setStrType("First Visit");
     		else
     			appointment.setStrType("Follow up Visit");
-		
+    		
+    		if (rs.getInt("organization") != 0)
+    			appointment.setGroup(rs.getInt("organization"));		
 			
 			return appointment;
 		}
 	}
+
 	
+
 
 }

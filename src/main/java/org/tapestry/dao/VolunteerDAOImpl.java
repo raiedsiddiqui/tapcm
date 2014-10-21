@@ -51,9 +51,19 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 	@Override
 	public List<Volunteer> getAllVolunteersByOrganization(int id) {
 		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o "
-				+ "ON v.organization=o.organization_ID WHERE o.organization=? ORDER BY v.firstname DESC";
+				+ "ON v.organization=o.organization_ID WHERE v.organization=? ORDER BY v.firstname DESC";
 		return getJdbcTemplate().query(sql, new Object[]{id}, new VolunteerMapper());
 	}
+
+	@Override
+	public List<Volunteer> getGroupedVolunteersByName(String partialName, int organizationId) {
+		String sql = "SELECT v.*, o.name FROM volunteers AS v INNER JOIN organizations AS o "
+				+ "ON v.organization=o.organization_ID WHERE v.organization=? AND UPPER(v.firstname) LIKE UPPER('%" + partialName + "%') "
+				+ "OR UPPER(v.lastname) LIKE UPPER('%" + partialName + "%') OR UPPER(v.preferredname) LIKE UPPER('%" + partialName + "%') "
+				+"ORDER BY v.firstname DESC";
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new VolunteerMapper());
+	}
+
 
 	@Override
 	public Volunteer getVolunteerById(int id) {

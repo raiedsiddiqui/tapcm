@@ -57,11 +57,15 @@ public class VolunteerController {
 	public String getAllVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		HttpSession  session = request.getSession();	
+		User user = MisUtils.getLoggedInUser(request, userManager);
 		
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
-		volunteers = volunteerManager.getAllVolunteers();		
+		if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole()))
+			volunteers = volunteerManager.getAllVolunteers();	//For central Admin		
+		else		
+			volunteers = volunteerManager.getAllVolunteersByOrganization(user.getOrganization());	// for local Admin
 		model.addAttribute("volunteers", volunteers);	
 		
 		if (session.getAttribute("volunteerMessage") != null)
@@ -88,11 +92,16 @@ public class VolunteerController {
 	@RequestMapping(value="/view_volunteers", method=RequestMethod.POST)
 	public String viewFilteredVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
-				
+		User user = MisUtils.getLoggedInUser(request, userManager);		
 		String name = request.getParameter("searchName");
+		
 		if(!Utils.isNullOrEmpty(name)) {
-			volunteers = volunteerManager.getVolunteersByName(name);			
+			if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole()))
+				volunteers = volunteerManager.getVolunteersByName(name);	//For central Admin		
+			else		
+				volunteers = volunteerManager.getGroupedVolunteersByName(name, user.getOrganization());		//local Admin/VC			
 		} 		
+		
 		model.addAttribute("searchName", name);
 		model.addAttribute("volunteers", volunteers);
 		HttpSession  session = request.getSession();
@@ -175,7 +184,7 @@ public class VolunteerController {
 		model.addAttribute("activityLogs", activities);
 		
 		//get all messages		
-		List<Message> messages = messageManager.getAllMessagesForRecipient(Utils.getLoggedInUserId(request));
+		List<Message> messages = messageManager.getAllMessagesForRecipient(MisUtils.getLoggedInUser(request).getUserID());
 		model.addAttribute("messages", messages);		
 		
 		HttpSession  session = request.getSession();
@@ -292,10 +301,10 @@ public class VolunteerController {
 	public String modifyVolunteer(SecurityContextHolderAwareRequestWrapper request, 
 			@PathVariable("volunteerId") int id, ModelMap model){
 		Volunteer volunteer = new Volunteer();
-		volunteer = volunteerManager.getVolunteerById(id);
-		
+		volunteer = volunteerManager.getVolunteerById(id);		
 		List<Organization> organizations;
 		HttpSession session = request.getSession();
+		
 		if (session.getAttribute("organizations") != null)
 			organizations = (List<Organization>) session.getAttribute("organizations");
 		else 
@@ -440,7 +449,7 @@ public class VolunteerController {
 	public String viewActivityByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
 		List<Activity> activities = new ArrayList<Activity>();
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();		
-		User loggedInUser = Utils.getLoggedInUser(request);
+		User loggedInUser = MisUtils.getLoggedInUser(request);
 		
 		if(request.isUserInRole("ROLE_ADMIN")) {
 			activities = volunteerManager.getActivitiesForAdmin();
@@ -449,7 +458,7 @@ public class VolunteerController {
 		else if (request.isUserInRole("ROLE_LOCAL_ADMIN"))
 		{
 			int organizationId = loggedInUser.getOrganization();
-			activities = volunteerManager.getActivitiesForLocalAdmin(organizationId);
+			activities = volunteerManager.getActivitiesForLocalAdmin(organizationId);			
 			volunteers = volunteerManager.getAllVolunteersByOrganization(organizationId);
 		}
 			
@@ -472,15 +481,22 @@ public class VolunteerController {
 	{		
 		String strVId = request.getParameter("search_volunteer");		
 		List<Activity> activities = new ArrayList<Activity>();
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		
 		if (!Utils.isNullOrEmpty(strVId))
 		{
-			activities = volunteerManager.getActivitiesForVolunteer(Integer.parseInt(strVId));		
-				
+			activities = volunteerManager.getActivitiesForVolunteer(Integer.parseInt(strVId));					
 			if (activities.size() == 0 )  
 				model.addAttribute("emptyActivityLogs", true);				
 		}		
-		List<Volunteer> volunteers = volunteerManager.getAllVolunteers();
+		
+		if(request.isUserInRole("ROLE_ADMIN")) 
+			volunteers = volunteerManager.getAllVolunteers();
+		else
+		{
+			User loggedInUser = MisUtils.getLoggedInUser(request);
+			volunteers = volunteerManager.getAllVolunteersByOrganization(loggedInUser.getOrganization());
+		}
 			
 		model.addAttribute("activityLogs", activities);	
 		model.addAttribute("volunteers", volunteers);	
@@ -746,7 +762,7 @@ public class VolunteerController {
 			
 		if (request.isUserInRole("ROLE_USER"))
 		{
-			User loggedInUser = Utils.getLoggedInUser(request);
+			User loggedInUser = MisUtils.getLoggedInUser(request);
 			String username = loggedInUser.getUsername();	
 			
 			int userId = loggedInUser.getUserID();
@@ -804,7 +820,7 @@ public class VolunteerController {
 		}
 		else if (request.isUserInRole("ROLE_ADMIN") || request.isUserInRole("ROLE_LOCAL_ADMIN"))
 		{			
-			User loggedInUser = Utils.getLoggedInUser(request);			
+			User loggedInUser = MisUtils.getLoggedInUser(request);	
 			
 			unreadMessages = messageManager.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
@@ -827,11 +843,22 @@ public class VolunteerController {
    	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked,
    			@RequestParam(value="noMachedTime", required=false) String noMatchedMsg,
    			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-   		
-   		List<Appointment> allAppointments = appointmentManager.getAllAppointments();  	   		
-   		List<Patient> allPatients = patientManager.getAllPatients();  		
-   		List<Appointment> allPastAppointments = appointmentManager.getAllPastAppointments();
-   		List<Appointment> allPendingAppointments = appointmentManager.getAllPendingAppointments();
+   		User user = MisUtils.getLoggedInUser(request, userManager);
+   		List<Appointment> allAppointments, allPastAppointments, allPendingAppointments;
+   		List<Patient> allPatients;
+   		if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole())){//For central Admin
+   			allAppointments = appointmentManager.getAllAppointments(); 
+   			allPatients = patientManager.getAllPatients(); 
+   			allPastAppointments = appointmentManager.getAllPastAppointments();
+   			allPendingAppointments = appointmentManager.getAllPendingAppointments();
+   		}
+   		else{//For local Admin
+   			int organizationId = user.getOrganization();
+   			allPatients = patientManager.getPatientsByGroup(organizationId); 
+   			allAppointments = appointmentManager.getAppointmentsGroupByOrganization(organizationId);   			
+   			allPastAppointments = appointmentManager.getPastAppointmentsGroupByOrganization(organizationId);
+   			allPendingAppointments = appointmentManager.getPendingAppointmentsGroupByOrganization(organizationId);   			
+   		}   		
    
    		model.addAttribute("appointments", allAppointments);
    		model.addAttribute("pastAppointments", allPastAppointments);   		

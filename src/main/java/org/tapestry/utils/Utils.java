@@ -38,49 +38,6 @@ public class Utils {
 		return time;
 	}
 	
-	public static int getLoggedInUserId(SecurityContextHolderAwareRequestWrapper request ){	
-		int loggedInUserId;
-		HttpSession session = request.getSession();
-		if (session.getAttribute("loggedInUserId") != null){
-			String strLoggedInUserId = session.getAttribute("loggedInUserId").toString();
-			loggedInUserId = Integer.parseInt(strLoggedInUserId);
-		}
-		else
-		{
-			User loggedInUser = getLoggedInUser(request);
-			loggedInUserId = loggedInUser.getUserID();
-			
-			session.setAttribute("loggedInUserId", String.valueOf(loggedInUserId));	
-		}
-		
-		return loggedInUserId;
-	}
-	
-	public static User getLoggedInUser(SecurityContextHolderAwareRequestWrapper request){
-		HttpSession session = request.getSession();
-
-		User loggedInUser = null;
-		//check if loggedInUserId is in the session
-		if (session.getAttribute("loggedInUser") != null) //get loggedInUser from session			
-			loggedInUser = (User)session.getAttribute("loggedInUser");		
-
-		
-		return loggedInUser;
-	}
-	
-	public static User getLoggedInUser(MultipartHttpServletRequest request){
-		HttpSession session = request.getSession();
-
-		User loggedInUser = null;
-		//check if loggedInUserId is in the session
-		if (session.getAttribute("loggedInUser") != null) //get loggedInUser from session			
-			loggedInUser = (User)session.getAttribute("loggedInUser");		
-		
-		return loggedInUser;
-	}
-	
-
-	
 	public static boolean isNullOrEmpty(String str){
 		if (str != null && !str.equals(""))
 			return false;

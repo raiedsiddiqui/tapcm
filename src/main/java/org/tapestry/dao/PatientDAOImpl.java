@@ -28,7 +28,7 @@ public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 	@Override
 	public Patient getPatientByID(int id) {
 		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
-				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname FROM patients "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, v1.organization FROM patients "
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE p.patient_ID=?";
 		
@@ -39,7 +39,7 @@ public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 	public Patient getNewestPatient() {
 		// SELECT * FROM patients ORDER BY patient_ID DESC LIMIT 1
 		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
-				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname FROM patients "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, v1.organization FROM patients "
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID ORDER BY p.patient_ID DESC LIMIT 1";
 		
@@ -49,33 +49,55 @@ public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 	@Override
 	public List<Patient> getAllPatients() {
 		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
-				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname FROM patients "
-				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, v1.organization, v1.organization"
+				+ " FROM patients AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID ";
 		
 		return getJdbcTemplate().query(sql, new PatientMapper());
 	}
 
 	@Override
-	public List<Patient> getPatientsForVolunteer(int volunteerId) {
-		// "SELECT * FROM patients WHERE volunteer=? OR volunteer2=?"
+	public List<Patient> getPatientsForVolunteer(int volunteerId) {		
 		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
-				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname FROM patients "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, v1.organization FROM patients "
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE p.volunteer=? OR p.volunteer2=? ";
 		
 		return getJdbcTemplate().query(sql, new Object[]{volunteerId, volunteerId}, new PatientMapper());
 	}
+	
+	@Override
+	public List<Patient> getPatientsByGroup(int organizationId) {
+		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, v1.organization FROM patients "
+				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
+				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE v1.organization =? ";
+		
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new PatientMapper());
+	}
 
 	@Override
 	public List<Patient> getPatientsByPartialName(String partialName) {	
 		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
-				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname FROM patients "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, v1.organization FROM patients "
 				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE UPPER(p.firstname) "
 				+ "LIKE UPPER('%" + partialName + "%') OR UPPER(p.lastname) LIKE UPPER('%" + partialName + "%') ";
 		
 		return getJdbcTemplate().query(sql, new PatientMapper());
+	}
+	
+
+	@Override
+	public List<Patient> getGroupedPatientsByName(String partialName, int organizationId) {
+		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
+				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, v1.organization FROM patients "
+				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
+				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE (UPPER(p.firstname) "
+				+ "LIKE UPPER('%" + partialName + "%') OR UPPER(p.lastname) LIKE UPPER('%" + partialName + "%')) "
+				+ "AND v1.organization =? ";
+		
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new PatientMapper());
 	}
 
 	@Override
@@ -145,7 +167,8 @@ public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 			sb.append(" ");
 			sb.append(rs.getString("v2_lastname"));
 			patient.setPartnerName(sb.toString());
-			patient.setUserName(rs.getString("username"));//user name in MyOscar			
+			patient.setUserName(rs.getString("username"));//user name in MyOscar		
+			patient.setGroup(rs.getInt("organization")); //group by volunteer's organization			
 			
 			return patient;
 		}
