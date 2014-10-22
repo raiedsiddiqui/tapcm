@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import org.tapestry.utils.Utils;
+import org.tapestry.utils.TapestryHelper;
 import org.tapestry.objects.Patient;
 
 /**
@@ -143,7 +143,7 @@ public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 			//set clinic
 			String clinicCode = rs.getString("clinic");
 			patient.setClinic(clinicCode);
-			patient.setClinicName(Utils.getClinicName(clinicCode));			
+			patient.setClinicName(TapestryHelper.getClinicName(clinicCode));			
 			patient.setVolunteer(rs.getInt("volunteer"));
 			patient.setNotes(rs.getString("notes"));
 			patient.setAlerts(rs.getString("alerts"));	

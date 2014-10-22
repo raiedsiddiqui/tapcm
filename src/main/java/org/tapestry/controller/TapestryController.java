@@ -37,7 +37,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyQuestion;
-import org.tapestry.utils.MisUtils;
+import org.tapestry.utils.TapestryHelper;
 import org.tapestry.utils.Utils;
 import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Appointment;
@@ -99,7 +99,7 @@ public class TapestryController{
    	
    	@PostConstruct
    	public void readConfig(){
-   		MisUtils.readConfig();
+   		TapestryHelper.readConfig();
    	}
    	
    	//Everything below this point is a RequestMapping
@@ -112,7 +112,7 @@ public class TapestryController{
 	
 	@RequestMapping(value="/loginsuccess", method=RequestMethod.GET)
 	public String loginSuccess(SecurityContextHolderAwareRequestWrapper request){				
-		User u = MisUtils.getLoggedInUser(request, userManager);
+		User u = TapestryHelper.getLoggedInUser(request, userManager);
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(u.getName());
@@ -131,7 +131,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
 	public String logout(SecurityContextHolderAwareRequestWrapper request){
-		User u = MisUtils.getLoggedInUser(request, userManager);
+		User u = TapestryHelper.getLoggedInUser(request, userManager);
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append(u.getName());
@@ -143,13 +143,13 @@ public class TapestryController{
 	
 	@RequestMapping(value="/client", method=RequestMethod.GET)
 	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		//get volunteer Id from login user		
 		int volunteerId= volunteerManager.getVolunteerIdByUsername(loggedInUser.getUsername());
 		List<Patient> clients = patientManager.getPatientsForVolunteer(volunteerId);		
 		model.addAttribute("clients", clients);
 		
-		MisUtils.setUnreadMessage(request, model, messageManager);
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
 		
 		return "volunteer/client";
 	}
@@ -157,7 +157,7 @@ public class TapestryController{
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
 	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model,
 			SecurityContextHolderAwareRequestWrapper request){
-		MisUtils.setUnreadMessage(request, model, messageManager);
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
 		HttpSession session = request.getSession();
 		
 		List<User> userList = userManager.getAllUsers();
@@ -192,7 +192,7 @@ public class TapestryController{
 		}		
 		model.addAttribute("searchName", name);
 		
-		MisUtils.setUnreadMessage(request, model, messageManager);
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
 		
 		return "admin/manage_users";
 	}
@@ -232,7 +232,7 @@ public class TapestryController{
 			sb.append("Password: password\n\n");
 			sb.append("We recommend that you change your password as soon as possible due to security reasons");
 			
-			MisUtils.sendMessageByEmail(u, "Welcome to Tapestry", sb.toString());
+			TapestryHelper.sendMessageByEmail(u, "Welcome to Tapestry", sb.toString());
 		}
 		else
 			return "redirect:/manage_users?failed=true";
@@ -251,7 +251,7 @@ public class TapestryController{
 		userManager.disableUserWithID(id);
 		
 		User u = userManager.getUserByID(id);
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" disable ");
@@ -266,7 +266,7 @@ public class TapestryController{
 		userManager.enableUserWithID(id);
 		
 		User u = userManager.getUserByID(id);
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" enable ");
@@ -279,9 +279,9 @@ public class TapestryController{
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
 	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, @RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 	
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		model.addAttribute("vol", loggedInUser);
-		MisUtils.setUnreadMessage(request, model, messageManager);
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
 		
 		if (errorsPresent != null)
 			model.addAttribute("errors", errorsPresent);
@@ -295,7 +295,7 @@ public class TapestryController{
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
 	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent,@RequestParam(value="failure",
 			required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		int userId = loggedInUser.getUserID();
 		List<Message> messages;		
 		
@@ -306,7 +306,7 @@ public class TapestryController{
 		
 		messages = messageManager.getAllMessagesForRecipient(userId);
 		model.addAttribute("messages", messages);		
-		MisUtils.setUnreadMessage(request, model, messageManager);
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
 			
 		List<User> receivers = new ArrayList<User>();
 		if (request.isUserInRole("ROLE_USER"))
@@ -342,7 +342,7 @@ public class TapestryController{
 	
 	@RequestMapping(value="/view_message/{msgID}", method=RequestMethod.GET)
 	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		int userId = loggedInUser.getUserID();
 		
 		Message m;		
@@ -352,9 +352,22 @@ public class TapestryController{
 			return "redirect:/403";
 		
 		if (!(m.isRead()))
-			messageManager.markAsRead(id);
+		{
+			HttpSession session = request.getSession();
+			if (session.getAttribute("unread_messages") != null)
+			{	//mark the mail as read
+				messageManager.markAsRead(id);
+				//update indicator of unread 
+				int iUnRead = Integer.parseInt(session.getAttribute("unread_messages").toString());
+				iUnRead = iUnRead - 1;
+				
+				session.setAttribute("unread_messages", iUnRead);
+				model.addAttribute("unread", iUnRead);
+			}
+			
+		}
 		model.addAttribute("message", m);
-		MisUtils.setUnreadMessage(request, model, messageManager);
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
 		
 		if (request.isUserInRole("ROLE_USER"))
 			return "/volunteer/view_message";
@@ -364,7 +377,7 @@ public class TapestryController{
 	
 	@RequestMapping(value="/dismiss/{announcement}", method=RequestMethod.GET)
 	public String dismissAnnouncement(@PathVariable("announcement") int id, SecurityContextHolderAwareRequestWrapper request){	
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		int userId = loggedInUser.getUserID();
 		Message m;
 		
@@ -380,7 +393,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/send_message", method=RequestMethod.POST)
 	public String sendMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		Message m = new Message();
 		String subject = request.getParameter("msgSubject");
 		String[] recipients = request.getParameterValues("recipient");
@@ -389,8 +402,7 @@ public class TapestryController{
 		m.setSender(loggedInUser.getName());
 		m.setSenderID(loggedInUser.getUserID());
 		m.setText(request.getParameter("msgBody"));
-		
-		String role = loggedInUser.getRole();
+				
 		if (request.isUserInRole("ROLE_USER"))//login user is volunteer			
 		{	
 			if(recipients != null) {System.out.println("recipients are not null");
@@ -402,7 +414,7 @@ public class TapestryController{
 					messageManager.sendMessage(m);
 					
 //					recipient = userManager.getUserByID(recipientID);
-//					MisUtils.sendMessageByEmail(recipient, "Tapestry: New message notification", 
+//					TapestryHelper.sendMessageByEmail(recipient, "Tapestry: New message notification", 
 //							"You have received a message. To review it, log into Tapestry and open your inbox.");				
 				}//end of for loop
 			} //end of if(recipients != null)
@@ -422,7 +434,7 @@ public class TapestryController{
 					messageManager.sendMessage(m);
 					
 //					recipient = userManager.getUserByID(u.getUserID());
-//					MisUtils.sendMessageByEmail(recipient, "Tapestry: New message notification", 
+//					TapestryHelper.sendMessageByEmail(recipient, "Tapestry: New message notification", 
 //							"You have received an announcement. To review it, log into Tapestry and open your inbox.");					
 				}					
 			}
@@ -437,7 +449,7 @@ public class TapestryController{
 						messageManager.sendMessage(m);
 						
 //						recipient = userManager.getUserByID(recipientID);
-//						MisUtils.sendMessageByEmail(recipient, "Tapestry: New message notification", 
+//						TapestryHelper.sendMessageByEmail(recipient, "Tapestry: New message notification", 
 //								"You have received an announcement. To review it, log into Tapestry and open your inbox.");				
 					}//end of for loop
 				} //end of if(recipients != null)
@@ -494,7 +506,7 @@ public class TapestryController{
 	public String updateUser(SecurityContextHolderAwareRequestWrapper request){
 		String currentUsername = request.getUserPrincipal().getName();
 
-		User loggedInUser = MisUtils.getLoggedInUser(request);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
 		User u = new User();
 		u.setUserID(loggedInUser.getUserID());
 		u.setUsername(request.getParameter("volUsername"));
@@ -533,7 +545,7 @@ public class TapestryController{
 		userManager.setPasswordForUser(userID, hashedPassword);
 		
 		User whosePwdChanged = userManager.getUserByID(userID);
-		User loggedInUser = MisUtils.getLoggedInUser(request, userManager);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" Changed password for ");
@@ -557,7 +569,7 @@ public class TapestryController{
 		model.addAttribute("numPages", count / 20 + 1);
 		model.addAttribute("logs", logs);
 		
-		MisUtils.setUnreadMessage(request, model, messageManager);
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
 		
 		return "/admin/user_logs";
 	}
@@ -571,14 +583,14 @@ public class TapestryController{
 
 		model.addAttribute("logs", logs);
 		
-		MisUtils.setUnreadMessage(request, model, messageManager);
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
 		
 		return "/admin/user_logs";
 	}
 	
 	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
 	public String uploadPicture(MultipartHttpServletRequest request){
-		User loggedInUser = MisUtils.getLoggedInUser(request);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
 		
 		pictureManager.uploadPicture(pic, loggedInUser.getUserID(), true);
@@ -589,7 +601,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/upload_picture_for_patient/{patientID}", method=RequestMethod.POST)
 	public String uploadPicture(@PathVariable("patientID") int id, MultipartHttpServletRequest request){
-		User loggedInUser = MisUtils.getLoggedInUser(request);
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
 		
 		Patient p = patientManager.getPatientByID(id);
@@ -603,7 +615,7 @@ public class TapestryController{
 	//===================== Client(patient)  =============================//
    	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
 	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){   		
-   		User loggedInUser = MisUtils.getLoggedInUser(request);
+   		User loggedInUser = TapestryHelper.getLoggedInUser(request);
    		HttpSession session = request.getSession();
    		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
@@ -612,7 +624,7 @@ public class TapestryController{
 			int unreadMessages = messageManager.countUnreadMessagesForRecipient(loggedInUser.getUserID());
 			model.addAttribute("unread", unreadMessages);
 		}	
-		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
+		TapestryHelper.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
 
 		return "admin/manage_patients";
 	}
@@ -628,7 +640,7 @@ public class TapestryController{
 		Volunteer v1 = volunteerManager.getVolunteerById(vId1);
 		Volunteer v2 = volunteerManager.getVolunteerById(vId2);
 		
-		if (Utils.isMatchVolunteer(v1, v2))
+		if (TapestryHelper.isMatchVolunteer(v1, v2))
 		{
 			p.setFirstName(request.getParameter("firstname").trim());
 			p.setLastName(request.getParameter("lastname").trim());
@@ -684,14 +696,14 @@ public class TapestryController{
 		    		}
 			}
 	   		model.addAttribute("createPatientSuccessfully",true);
-	   		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
+	   		TapestryHelper.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
 	   		
 	        return "admin/manage_patients";
 		}
 		else
 		{			
 			model.addAttribute("misMatchedVolunteer",true);
-			MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
+			TapestryHelper.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
 			
 			return "admin/manage_patients";
 		}
@@ -726,7 +738,7 @@ public class TapestryController{
 		Volunteer v1 = volunteerManager.getVolunteerById(vId1);
 		Volunteer v2 = volunteerManager.getVolunteerById(vId2);
 		
-		if (Utils.isMatchVolunteer(v1, v2)){
+		if (TapestryHelper.isMatchVolunteer(v1, v2)){
 			Patient p = new Patient();
 			p.setPatientID(patientID);
 			p.setFirstName(request.getParameter("firstname"));
@@ -750,7 +762,7 @@ public class TapestryController{
 		if (session.getAttribute("unread_messages") != null)		
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
-		MisUtils.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
+		TapestryHelper.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
         
 		return "/admin/manage_patients";
 	}
@@ -769,7 +781,7 @@ public class TapestryController{
 				
 		Patient patient = patientManager.getPatientByID(id);
 		//Find the name of the current user
-		User u = MisUtils.getLoggedInUser(request);
+		User u = TapestryHelper.getLoggedInUser(request);
 		HttpSession session = request.getSession();
 		
 		int volunteerId =0;
@@ -829,7 +841,7 @@ public class TapestryController{
 	public String viewPatientsFromAdmin(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		HttpSession session = request.getSession();
 		
-		List<Patient> patients = MisUtils.getAllPatientsWithFullInfos(patientManager, request);
+		List<Patient> patients = TapestryHelper.getAllPatientsWithFullInfos(patientManager, request);
 		model.addAttribute("patients", patients);
 		
 		if (session.getAttribute("unread_messages") != null)
@@ -844,7 +856,7 @@ public class TapestryController{
 		String name = request.getParameter("searchName");
 		HttpSession session = request.getSession();
 		List<Patient> patients = new ArrayList<Patient>();
-		User user = MisUtils.getLoggedInUser(request, userManager);	
+		User user = TapestryHelper.getLoggedInUser(request, userManager);	
 		
 		if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole()))// for central Admin
 			patients = patientManager.getPatientsByPartialName(name);	
@@ -863,7 +875,7 @@ public class TapestryController{
 	public String displayPatientDetails(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper
 			request, ModelMap model){
 		Patient patient = new Patient();
-		List<Patient> patients  = MisUtils.getAllPatientsWithFullInfos(patientManager, request);
+		List<Patient> patients  = TapestryHelper.getAllPatientsWithFullInfos(patientManager, request);
 		for (Patient p: patients)
 		{
 			if (id == p.getPatientID())
@@ -1017,10 +1029,10 @@ public class TapestryController{
    		List<String> questionTextList = new ArrayList<String>();
    		questionTextList = ResultParser.getSurveyQuestions(xml);
    		//get answer list
-		qList = MisUtils.getQuestionList(mHealthGoalsSurvey);   
+		qList = TapestryHelper.getQuestionList(mHealthGoalsSurvey);   
 		
    		Map<String, String> sMap = new TreeMap<String, String>();
-   		sMap = MisUtils.getSurveyContentMap(questionTextList, qList);
+   		sMap = TapestryHelper.getSurveyContentMap(questionTextList, qList);
    		
   		report.setHealthGoals(sMap);   		
    		//Additional Information
@@ -1040,13 +1052,13 @@ public class TapestryController{
    		if ((questionTextList != null) && (questionTextList.size() > 0))
    		{
    			List<String> displayQuestionTextList = new ArrayList<String>();
-   	   		displayQuestionTextList.add(MisUtils.removeObserverNotes(questionTextList.get(1)));
-   	   		displayQuestionTextList.add(MisUtils.removeObserverNotes(questionTextList.get(3)));
+   	   		displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(1)));
+   	   		displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(3)));
    	   		
-   	   		displayQuestionTextList = MisUtils.removeRedundantFromQuestionText(displayQuestionTextList, "of 2");
+   	   		displayQuestionTextList = TapestryHelper.removeRedundantFromQuestionText(displayQuestionTextList, "of 2");
    	   	
    	   		//get answer list
-   			qList = MisUtils.getQuestionListForMemorySurvey(mMemorySurvey);   
+   			qList = TapestryHelper.getQuestionListForMemorySurvey(mMemorySurvey);   
    			sMap = new TreeMap<String, String>(); 	
    	   		
    	   		//Care Plan/Advanced_Directive
@@ -1065,14 +1077,14 @@ public class TapestryController{
    	   		if ((questionTextList != null)&&(questionTextList.size() > 0))
    	   		{
 	   	   		for (int i = 1; i <= 3; i++)
-	   	   			displayQuestionTextList.add(MisUtils.removeObserverNotes(questionTextList.get(i)));
+	   	   			displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(i)));
 	   	   		
-	   	   		displayQuestionTextList = MisUtils.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");
+	   	   		displayQuestionTextList = TapestryHelper.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");
 	   	   		
 	   	   		//get answer list   		
-	   	   		qList.addAll(MisUtils.getQuestionList(mCarePlanSurvey));   	
+	   	   		qList.addAll(TapestryHelper.getQuestionList(mCarePlanSurvey));   	
 	   	   		
-	   	   		sMap = MisUtils.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
+	   	   		sMap = TapestryHelper.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
 	   	   		report.setAdditionalInfos(sMap);
    	   		}   
    		}
@@ -1089,7 +1101,7 @@ public class TapestryController{
    		questionTextList = ResultParser.getSurveyQuestions(xml);   		
    		   		
    		qList = new ArrayList<String>();
-   		qList = MisUtils.getQuestionList(mDailyLifeActivitySurvey);
+   		qList = TapestryHelper.getQuestionList(mDailyLifeActivitySurvey);
    		
    		//last question in Daily life activity survey is about falling stuff
    		List<String> lAlert = new ArrayList<String>();
@@ -1098,7 +1110,7 @@ public class TapestryController{
    			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);   		
    		   		
    		sMap = new TreeMap<String, String>();
-   		sMap = MisUtils.getSurveyContentMap(questionTextList, qList);
+   		sMap = TapestryHelper.getSurveyContentMap(questionTextList, qList);
    		
    		report.setDailyActivities(sMap);   		
    		
@@ -1112,7 +1124,7 @@ public class TapestryController{
 		LinkedHashMap<String, String> mGeneralHealthySurvey = ResultParser.getResults(xml);
 		qList = new ArrayList<String>();   		
    		//get answer list
-		qList = MisUtils.getQuestionList(mGeneralHealthySurvey);
+		qList = TapestryHelper.getQuestionList(mGeneralHealthySurvey);
 		
 		//get score info for Summary of tapestry tools
 		if ((qList != null)&&(qList.size()>10))
@@ -1157,7 +1169,7 @@ public class TapestryController{
 		LinkedHashMap<String, String> mSocialLifeSurvey = ResultParser.getResults(xml);
 		qList = new ArrayList<String>();   		
    		//get answer list
-		qList = MisUtils.getQuestionList(mSocialLifeSurvey);
+		qList = TapestryHelper.getQuestionList(mSocialLifeSurvey);
 		
 		int socialLifeScore = CalculationManager.getScoreByQuestionsList(qList);
 		lAlert = AlertManager.getSocialLifeAlerts(socialLifeScore, lAlert);
@@ -1181,7 +1193,7 @@ public class TapestryController{
    		LinkedHashMap<String, String> mNutritionSurvey = ResultParser.getResults(xml);
    		qList = new ArrayList<String>();   		
    		//get answer list
-		qList = MisUtils.getQuestionList(mNutritionSurvey);  
+		qList = TapestryHelper.getQuestionList(mNutritionSurvey);  
 
 		//get scores for nutrition survey based on answer list
 		if ((qList != null)&&(qList.size()>0))
@@ -1210,7 +1222,7 @@ public class TapestryController{
    		LinkedHashMap<String, String> mRAPASurvey = ResultParser.getResults(xml);
    		qList = new ArrayList<String>();   		
    		//get answer list
-		qList = MisUtils.getQuestionList(mRAPASurvey);  		
+		qList = TapestryHelper.getQuestionList(mRAPASurvey);  		
 
 		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
 		if (rAPAScore < 6)
@@ -1226,7 +1238,7 @@ public class TapestryController{
    		}
 		
 		LinkedHashMap<String, String> mMobilitySurvey = ResultParser.getResults(xml);
-   		Map<String, String> qMap = MisUtils.getQuestionMap(mMobilitySurvey);  
+   		Map<String, String> qMap = TapestryHelper.getQuestionMap(mMobilitySurvey);  
    		   		
    		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);    		
    		
@@ -1268,7 +1280,7 @@ public class TapestryController{
    	
    		questionTextList = ResultParser.getSurveyQuestions(xml);
    		//get answer list
-		qList = MisUtils.getQuestionList(mGoals);   
+		qList = TapestryHelper.getQuestionList(mGoals);   
 		
 		List<String> gAS = new ArrayList<String>();
 		if ((qList != null) && (qList.size()>0))
@@ -1307,7 +1319,7 @@ public class TapestryController{
 		
 		model.addAttribute("report", report);
 	
-		MisUtils.buildPDF(report, response);
+		TapestryHelper.buildPDF(report, response);
 	
 		return null;
 	}
@@ -1334,7 +1346,7 @@ public class TapestryController{
 	public String manageSurvey(@RequestParam(value="failed", required=false) String failed, Boolean deleteFailed, 
 			ModelMap model, HttpServletRequest request){
 		HttpSession session = request.getSession();
-		List<SurveyTemplate>  surveyTemplateList = MisUtils.getSurveyTemplates(request, surveyManager);		
+		List<SurveyTemplate>  surveyTemplateList = TapestryHelper.getSurveyTemplates(request, surveyManager);		
 		model.addAttribute("survey_templates", surveyTemplateList);
 		
 		if (deleteFailed != null)
@@ -1391,11 +1403,11 @@ public class TapestryController{
 	public String goAssignSurvey(@PathVariable("patientId") int id, SecurityContextHolderAwareRequestWrapper request, 
 			ModelMap model){
  
-   		List<SurveyTemplate> surveyTemplates = MisUtils.getSurveyTemplates(request, surveyManager);		
+   		List<SurveyTemplate> surveyTemplates = TapestryHelper.getSurveyTemplates(request, surveyManager);		
    		//Assign Survey in Survey Mangement, it will load all patients in the table with checkbox for later selection
    		if (id == 0)
    		{
-   			List<Patient> patients  = MisUtils.getAllPatientsWithFullInfos(patientManager, request);
+   			List<Patient> patients  = TapestryHelper.getAllPatientsWithFullInfos(patientManager, request);
    			
    			if(patients == null || surveyTemplates == null)
    				return "redirect:/manage_surveys?failed=true";
@@ -1427,8 +1439,8 @@ public class TapestryController{
    	@RequestMapping(value="/assign_selectedsurvey", method=RequestMethod.POST)
 	public String assignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) 
 			throws JAXBException, DatatypeConfigurationException, Exception{      		
-   		List<SurveyTemplate> sTemplates = MisUtils.getSurveyTemplates(request, surveyManager);		
-   		List<Patient> patients = MisUtils.getPatients(request, patientManager);   	
+   		List<SurveyTemplate> sTemplates = TapestryHelper.getSurveyTemplates(request, surveyManager);		
+   		List<Patient> patients = TapestryHelper.getPatients(request, patientManager);   	
    		ArrayList<SurveyTemplate> selectSurveyTemplats = new ArrayList<SurveyTemplate>();
    		String[] surveyTemplateIds = request.getParameterValues("surveyTemplates"); 
    		int[] patientIds;
@@ -1441,11 +1453,11 @@ public class TapestryController{
    	   		{   
    				if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
 
-   					MisUtils.addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);   
+   					TapestryHelper.addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);   
    					
    	   	   			patientIds = new int[] {Integer.valueOf(hPatient)};
    	   	   			
-   	   	   			MisUtils.assignSurveysToClient(selectSurveyTemplats, patientIds, request, model, surveyManager);   		   	   		 
+   	   	   			TapestryHelper.assignSurveysToClient(selectSurveyTemplats, patientIds, request, model, surveyManager);   		   	   		 
    	   	   		}
    	   	   		else//no survey template has been selected
    	   	   		{
@@ -1474,7 +1486,7 @@ public class TapestryController{
 	   	   		//get survey template list 
 	   	   		if (surveyTemplateIds != null && surveyTemplateIds.length > 0)
 	   	   		{
-	   	   			MisUtils.addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);   
+	   	   			TapestryHelper.addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);   
 	   	   			
 		   	   		if ("true".equalsIgnoreCase(assignToAll))
 		   	   		{//for assign to all clients   			
@@ -1486,7 +1498,7 @@ public class TapestryController{
 		   	   				patient = patients.get(i);
 		   	   				patientIds[i] = patient.getPatientID();
 		   	   			}		   	   			
-		   	   			MisUtils.assignSurveysToClient(selectSurveyTemplats, patientIds, request, model, surveyManager);			
+		   	   			TapestryHelper.assignSurveysToClient(selectSurveyTemplats, patientIds, request, model, surveyManager);			
 		   	   		}
 		   	   		else
 		   	   		{//for selected patients, convert String[] to int[]   			
@@ -1498,7 +1510,7 @@ public class TapestryController{
 		   	   	   			for (int j = 0; j < selectedPatientIds.length; j++){
 		   	   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
 		   	   				}
-		   	   	   	MisUtils.assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request, model, surveyManager);
+		   	   	   	TapestryHelper.assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request, model, surveyManager);
 		   	   			}   			
 		   	   		} 
 	   	   		}

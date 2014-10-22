@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.survey_component.actions.SurveyAction;
 import org.survey_component.data.SurveyQuestion;
 import org.tapestry.utils.Utils;
+//import org.tapestry.utils.MisUtils.ReportHeader;
 import org.tapestry.myoscar.utils.ClientManager;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Availability;
@@ -70,9 +71,13 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
-
-public class MisUtils {			    	
-
+/**
+ * all help functions in Controller for TAP-OA
+ * @author lxie
+ *
+ */
+public class TapestryHelper {
+	
 	//Mail-related settings
    	private static String mailAddress = "";
    	private static Session session;
@@ -130,6 +135,7 @@ public class MisUtils {
 		props.setProperty("mail.password", mailPassword);
    	}  
    	
+  	
    	//=================== Client(Patient) ===========================//
 	/** 
 	 * @param patientManager
@@ -195,8 +201,8 @@ public class MisUtils {
 	 * @param patientManager
 	 * @return a list of Patient
 	 */
-   	public static List<Patient> getPatients(SecurityContextHolderAwareRequestWrapper request, PatientManager patientManager ){
-   		
+   	public static List<Patient> getPatients(SecurityContextHolderAwareRequestWrapper request, PatientManager patientManager )
+   	{
    		HttpSession session = request.getSession();		
 		List<Patient> patients;
 		if (session.getAttribute("patient_list") == null)
@@ -208,6 +214,31 @@ public class MisUtils {
 		}
 		else
 			patients = (List<Patient>)session.getAttribute("patient_list");
+		
+		return patients;	
+   	}
+   	
+	/**
+	 * get patients from session or from DB
+	 * @param request
+	 * @param organizationId
+	 * @param patientManager
+	 * @return a list of Patient
+	 */
+   	public static List<Patient> getPatientsByOrganization(SecurityContextHolderAwareRequestWrapper request, 
+   			PatientManager patientManager, int organizationId )
+   	{   		
+   		HttpSession session = request.getSession();		
+		List<Patient> patients;
+		if (session.getAttribute("grouped_patient_list") == null)
+		{
+			patients = patientManager.getPatientsByGroup(organizationId);			
+			//save in the session
+			if (patients != null && patients.size()>0)
+				session.setAttribute("grouped_patient_list", patients);
+		}
+		else
+			patients = (List<Patient>)session.getAttribute("grouped_patient_list");
 		
 		return patients;	
    	}
@@ -242,7 +273,6 @@ public class MisUtils {
 		}		
 		return appointmentId;
 	}
-	
 	// ======================User/Admin/Volunteer ==============================//
 	/**
 	 * 
@@ -328,8 +358,7 @@ public class MisUtils {
 	 * retrieve all volunteers who has availability set up 
 	 * @return
 	 */
-	public static List<Volunteer> getAllVolunteers(VolunteerManager volunteerManager){
-		
+	public static List<Volunteer> getAllVolunteers(VolunteerManager volunteerManager){		
 		return volunteerManager.getVolunteersWithAvailability();
 	}
 	/**
@@ -482,7 +511,7 @@ public class MisUtils {
 			for (Volunteer p: list)
 			{
 				if( (!(v.getVolunteerId()==p.getVolunteerId())) && 
-						(Utils.isMatchVolunteer(v, p)) && ((!isExist(aList,v, p))))
+						(isMatchVolunteer(v, p)) && ((!isExist(aList,v, p))))
 				{
 					availability = new Availability();
 					availability.setvDisplayName(v.getDisplayName());
@@ -543,7 +572,7 @@ public class MisUtils {
 				{		
 					availability2 = v2.getAvailability();		
 					
-					if (Utils.isMatchVolunteer(v1, v2))						
+					if (isMatchVolunteer(v1, v2))						
 					{					
 						aSet2  = availability2.split(",");		
 						
@@ -639,7 +668,7 @@ public class MisUtils {
 		dayMap.put("4", "Thursday");
 		dayMap.put("5", "Friday");
 		
-		Map<String, String> timePeriodMap = Utils.getAvailabilityMap();
+		Map<String, String> timePeriodMap = getAvailabilityMap();
 		
 		sb.append(dayMap.get(time.substring(0,1)));
 		sb.append("--");
@@ -654,7 +683,7 @@ public class MisUtils {
 	 * @return
 	 */
 	public static String formatdateTime(String time, String day){			
-		Map<String, String> timePeriodMap = Utils.getAvailabilityMap();
+		Map<String, String> timePeriodMap = getAvailabilityMap();
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append(day);
@@ -679,6 +708,101 @@ public class MisUtils {
 		}
 		return available;
 	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public static Map<String, String> getAvailabilityMap(){
+		Map<String, String> map = new HashMap<String, String>();
+		
+		String[] displayTime = {"08:00:00 AM", "08:30:00 AM", "09:00:00 AM","09:30:00 AM", "10:00:00 AM", "10:30:00 AM",
+				"11:00:00 AM","11:30:00 AM", "13:00:00 PM", "13:30:00 PM", "14:00:00 PM", "14:30:00 PM", "15:00:00 PM",
+				"15:30:00 PM", "16:00:00 PM"};
+		
+		for (int i= 1; i <= displayTime.length; i++){
+			map.put(String.valueOf(i), displayTime[i-1]);
+		}
+		
+		return map;
+	}
+	
+	public static void saveAvailability(String availability, ModelMap model){
+		List<String> aList = new ArrayList<String>();		
+		List<String> lMonday = new ArrayList<String>();
+		List<String> lTuesday = new ArrayList<String>();
+		List<String> lWednesday = new ArrayList<String>();
+		List<String> lThursday = new ArrayList<String>();
+		List<String> lFriday = new ArrayList<String>();	
+			
+		Map<String, String> showAvailableTime = getAvailabilityMap();		
+		aList = Arrays.asList(availability.split(","));		
+	
+		for (String l : aList){			
+			if (l.startsWith("1"))
+				lMonday = getFormatedTimeList(l, showAvailableTime, lMonday);									
+			
+			if (l.startsWith("2"))
+				lTuesday = getFormatedTimeList(l, showAvailableTime, lTuesday);									
+
+			if (l.startsWith("3"))
+				lWednesday = getFormatedTimeList(l, showAvailableTime, lWednesday);					
+			
+			if (l.startsWith("4"))
+				lThursday = getFormatedTimeList(l, showAvailableTime, lThursday);	
+						
+			if (l.startsWith("5"))
+				lFriday = getFormatedTimeList(l, showAvailableTime, lFriday);							
+		}	
+		
+		if ((lMonday == null)||(lMonday.size() == 0))
+			lMonday.add("1non");	
+		if ((lTuesday == null)||(lTuesday.size() == 0))
+			lTuesday.add("2non");
+		if ((lWednesday == null)||(lWednesday.size() == 0))
+			lWednesday.add("3non");
+		if ((lThursday == null)||(lThursday.size() == 0))
+			lThursday.add("4non");
+		if ((lFriday == null)||(lFriday.size() == 0))
+			lFriday.add("5non");
+		
+		model.addAttribute("monAvailability", lMonday);		
+		model.addAttribute("tueAvailability", lTuesday);
+		model.addAttribute("wedAvailability", lWednesday);
+		model.addAttribute("thuAvailability", lThursday);
+		model.addAttribute("friAvailability", lFriday);		
+	}
+	
+	public static List<String> getFormatedTimeList(String str, Map<String, String> map, List<String> list){
+		String key;
+		key = str.substring(1);
+		
+		if (!key.equals("non"))
+		{
+			list.add(map.get(key));
+			Utils.sortList(list);
+		}	
+		
+		return list;
+	}
+	
+	public static boolean isMatchVolunteer(Volunteer v1, Volunteer v2){
+		String v1Type = v1.getExperienceLevel();
+		String v2Type = v2.getExperienceLevel();	
+		
+		boolean matched = false;		
+		
+		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type) || "E".equals(v1Type) || "E".equals(v2Type)){
+			matched = true;
+		}
+		else if (( "Intermediate".equals(v1Type) && "Intermediate".equals(v2Type)) ||("I".equals(v1Type) && "I".equals(v2Type)))
+		{
+			matched = true;
+		}
+		
+		return matched;
+	}
+	
 	
 	// ==================== Survey =================================//
 	/**
@@ -848,6 +972,7 @@ public class MisUtils {
 	    
 	    return questionText;
 	}
+
 	
 	// ===================== Mis =================================//
    	/**
@@ -876,6 +1001,25 @@ public class MisUtils {
 	
 		model.addAttribute("volunteers", volunteers);	  
         model.addAttribute("patients", patientList);
+	}
+	
+	/**
+	 * hard coded clinics in a map, when it grows, will store them in the DB.
+	 * @return
+	 */
+	public static Map<String, String> getClinics(){
+		Map<String, String> clinics = new HashMap<String, String>();
+		
+		clinics.put("1", "McMaster Family Practice");
+		clinics.put("2", "Stonechurch Family Health Center");
+		
+		return clinics;		
+	}
+	
+	public static String getClinicName(String code){
+		Map<String, String> clinics = getClinics();
+		
+		return clinics.get(code);		
 	}
 	
 	// =========================== report generator =========================//
@@ -1816,7 +1960,7 @@ public class MisUtils {
 		
 	}
 
-		
 	
 	
+
 }
