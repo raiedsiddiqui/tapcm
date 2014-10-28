@@ -11,7 +11,7 @@ import org.tapestry.objects.UserLog;
 
 /**
  * Implementation for service UserManager
- * @author lxie *
+ * @author lxie 
  */
 @Service
 public class UserManagerImpl implements UserManager {
@@ -134,6 +134,21 @@ public class UserManagerImpl implements UserManager {
 	@Override
 	public int count() {		
 		return activityDAO.countEntries();
+	}
+	
+	@Override
+	public int countEntriesByGroup(int organizationId) {
+		return activityDAO.countEntriesByGroup(organizationId);
+	}
+
+	@Override
+	public List<UserLog> getUserLogsPageByGroup(int start, int n, int organizationId) {
+		return activityDAO.getUserLogsPageByGroup(start, n, organizationId);
+	}
+
+	@Override
+	public List<UserLog> getGroupedUserLogssByPartialName(String partialName, int organizationId) {
+		return activityDAO.getGroupedUserLogssByPartialName(partialName, organizationId);
 	}
 
 

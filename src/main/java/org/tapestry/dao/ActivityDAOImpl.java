@@ -123,27 +123,7 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 		
 		return getJdbcTemplate().queryForObject(sql, new Object[]{activityId}, new DetailedActivityMapper());		
 	}
-
-	@Override
-	public List<UserLog> getUserLogsPage(int start, int n) {		
-		String sql = "SELECT * FROM user_logs ORDER BY event_timestamp DESC LIMIT ?,?";		
-		
-		return getJdbcTemplate().query(sql, new Object[]{start,n}, new UserLogMapper());
-	}
-
-	@Override
-	public void addUserLog(String description, User user) {		
-		String sql = "INSERT INTO user_logs (description,user,user_name) VALUES (?, ?, ?)";
-		getJdbcTemplate().update(sql,description, user.getUserID(), user.getName());
-	}
-
-	@Override
-	public List<UserLog> getUserLogsByPartialName(String partialName) {		
-		String sql = "SELECT * FROM user_logs WHERE UPPER(user_name) LIKE UPPER('%" + partialName + "%')";
-
-		return getJdbcTemplate().query(sql, new UserLogMapper());
-	}
-
+	
 	@Override
 	public void deleteActivityById(int id) {		
 		String sql = "DELETE FROM activities WHERE event_ID=?";
@@ -156,6 +136,52 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 		String sql = "SELECT COUNT(log_ID) AS c FROM user_logs";
 		
 		return getJdbcTemplate().queryForInt(sql);				
+	}
+	
+	@Override
+	public int countEntriesByGroup(int organizationId) {
+		String sql = "SELECT COUNT(log_ID) AS c FROM user_logs AS ul INNER JOIN users AS u ON ul.user=u.user_ID WHERE u.organization=?";
+		return getJdbcTemplate().queryForInt(sql, new Object[]{organizationId});	
+	}
+
+
+	@Override
+	public List<UserLog> getUserLogsPage(int start, int n) {
+		String sql = "SELECT ul.*, u.name FROM user_logs AS ul INNER JOIN users AS u ON ul.user=u.user_ID "
+				+ "ORDER BY ul.event_timestamp DESC LIMIT ?,?";
+		return getJdbcTemplate().query(sql, new Object[]{start,n}, new UserLogMapper());
+	}
+
+	@Override
+	public void addUserLog(String description, User user) {		
+		String sql = "INSERT INTO user_logs (description,user) VALUES (?, ?)";	
+		getJdbcTemplate().update(sql,description, user.getUserID());
+	}
+
+	@Override
+	public List<UserLog> getUserLogsByPartialName(String partialName) {			
+//		String sql = "SELECT ul.event_timestamp, ul.user, ul.description, u.name FROM user_logs AS ul "
+//				+ "INNER JOIN users AS u ON ul.user=u.user_ID WHERE UPPER(u.name) LIKE UPPER('%" + partialName + "%') "
+//				+ "ORDER BY ul.event_timestamp";
+		String sql = "SELECT ul.event_timestamp, ul.user, ul.description, u.name FROM user_logs AS ul "
+				+ "INNER JOIN users AS u ON ul.user=u.user_ID WHERE UPPER(u.name) LIKE UPPER('%" + partialName + "%') "
+				+ "ORDER BY ul.event_timestamp";
+		return getJdbcTemplate().query(sql, new UserLogMapper());
+	}
+
+	@Override
+	public List<UserLog> getUserLogsPageByGroup(int start, int n, int organizationId) {
+		String sql = "SELECT ul.*, u.name FROM user_logs AS ul INNER JOIN users AS u ON ul.user=u.user_ID "
+				+ "WHERE u.organization=? ORDER BY ul.event_timestamp DESC LIMIT ?,?";
+		return getJdbcTemplate().query(sql, new Object[]{organizationId, start, n}, new UserLogMapper());
+	}
+
+	@Override
+	public List<UserLog> getGroupedUserLogssByPartialName(String partialName, int organizationId) {
+		String sql = "SELECT ul.event_timestamp, ul.user, ul.description, u.name FROM user_logs AS ul "
+				+ "INNER JOIN users AS u ON ul.user=u.user_ID WHERE UPPER(u.name) LIKE UPPER('%" + partialName + "%') "
+				+ "AND u.organization=? ORDER BY ul.event_timestamp";
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new UserLogMapper());
 	}
 	
 	//RowMapper
@@ -212,7 +238,7 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 			log.setDate(rs.getString("event_timestamp"));
 			log.setDescription(rs.getString("description"));
 			log.setUserId(rs.getInt("user"));
-			log.setUserName(rs.getString("user_name"));
+			log.setUserName(rs.getString("name"));
 			
 			return log;
 		}

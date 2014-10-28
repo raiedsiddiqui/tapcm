@@ -80,7 +80,7 @@
 		<intercept-url pattern="/open_survey/**" access="ROLE_USER" />
 		<intercept-url pattern="/show_survey/**" access="ROLE_ADMIN, ROLE_USER" />
 		<intercept-url pattern="/save_survey/**" access="ROLE_ADMIN, ROLE_USER" />
-		<intercept-url pattern="/user_logs/**" access="ROLE_ADMIN" />
+		<intercept-url pattern="/user_logs/**" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
 		<intercept-url pattern="/view_survey_results/**" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
 		<intercept-url pattern="/export_csv/**" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN" />
 		<intercept-url pattern="/view_volunteers" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN"/>

@@ -21,11 +21,6 @@ public class PatientManagerImpl implements PatientManager {
 	}
 
 	@Override
-	public Patient getNewestPatient() {
-		return patientDao.getNewestPatient();
-	}
-
-	@Override
 	public List<Patient> getAllPatients() {
 		return patientDao.getAllPatients();
 	}
@@ -41,8 +36,8 @@ public class PatientManagerImpl implements PatientManager {
 	}
 
 	@Override
-	public void createPatient(Patient p) {
-		patientDao.createPatient(p);
+	public int createPatient(Patient p) {
+		return patientDao.createPatient(p);
 	}
 
 	@Override

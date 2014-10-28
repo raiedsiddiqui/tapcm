@@ -178,5 +178,28 @@ public interface UserManager {
 	 */
 	@Transactional
 	public int count();
+	
+	/**
+	 * 
+	 * @param organizationId
+	 * @return number of user logs
+	 */
+	public int countEntriesByGroup(int organizationId);
 
+	/**
+	 * 
+	 * @param start
+	 * @param n
+	 * @param organizationId
+	 * @return
+	 */
+	public List<UserLog> getUserLogsPageByGroup(int start, int n, int organizationId);
+	
+	/**
+	 * 
+	 * @param partialName
+	 * @param organizationId
+	 * @return
+	 */
+	public List<UserLog> getGroupedUserLogssByPartialName(String partialName, int organizationId);
 }

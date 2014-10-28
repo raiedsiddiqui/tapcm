@@ -1,5 +1,7 @@
 package org.tapestry.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -7,8 +9,13 @@ import java.util.List;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.tapestry.utils.TapestryHelper;
 import org.tapestry.objects.Patient;
@@ -19,7 +26,7 @@ import org.tapestry.objects.Patient;
  * lxie
  */
 @Repository
-public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
+public class PatientDAOImpl extends NamedParameterJdbcDaoSupport implements PatientDAO {
 	@Autowired
 	public PatientDAOImpl(DataSource dataSource) {
 		setDataSource(dataSource);
@@ -33,17 +40,6 @@ public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID WHERE p.patient_ID=?";
 		
 		return getJdbcTemplate().queryForObject(sql, new Object[]{id}, new PatientMapper());
-	}
-
-	@Override
-	public Patient getNewestPatient() {
-		// SELECT * FROM patients ORDER BY patient_ID DESC LIMIT 1
-		String sql = "SELECT p.*, v1.firstname AS v1_firstname, v1.lastname AS v1_lastname, "
-				+ "v2.firstname AS v2_firstname, v2.lastname AS v2_lastname, v1.organization FROM patients "
-				+ "AS p INNER JOIN volunteers AS v1 ON p.volunteer=v1.volunteer_ID INNER JOIN "
-				+ "volunteers AS v2 ON p.volunteer2=v2.volunteer_ID ORDER BY p.patient_ID DESC LIMIT 1";
-		
-		return getJdbcTemplate().queryForObject(sql, new PatientMapper());
 	}
 
 	@Override
@@ -86,7 +82,6 @@ public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 		
 		return getJdbcTemplate().query(sql, new PatientMapper());
 	}
-	
 
 	@Override
 	public List<Patient> getGroupedPatientsByName(String partialName, int organizationId) {
@@ -100,13 +95,44 @@ public class PatientDAOImpl extends JdbcDaoSupport implements PatientDAO {
 		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new PatientMapper());
 	}
 
+//	@Override
+//	public void createPatient(Patient p) {	
+//		String sql = "INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
+//				+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, username) VALUES (?, ?, ?, ?,"
+//				+ " ?, ?, ?, ?, ?, ?, ?)";
+//		getJdbcTemplate().update(sql, p.getFirstName(),  p.getLastName(), p.getPreferredName(), p.getVolunteer(), p.getGender(),
+//				p.getNotes(), p.getPartner(), p.getAlerts(), p.getMyoscarVerified(), p.getClinic(), "tapestry_patient");
+//	}
+	
 	@Override
-	public void createPatient(Patient p) {
-		String sql = "INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
-				+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, username) VALUES (?, ?, ?, ?,"
-				+ " ?, ?, ?, ?, ?, ?, ?)";
-		getJdbcTemplate().update(sql, p.getFirstName(),  p.getLastName(), p.getPreferredName(), p.getVolunteer(), p.getGender(),
-				p.getNotes(), p.getPartner(), p.getAlerts(), p.getMyoscarVerified(), p.getClinic(), "tapestry_patient");
+	public int createPatient(final Patient p) {	
+		 final String sql = "INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
+					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, username) VALUES (?, ?, ?, ?,"
+					+ " ?, ?, ?, ?, ?, ?, ?)";
+		  
+		 JdbcTemplate jdbcTemplate = getJdbcTemplate();  
+		 KeyHolder keyHolder = new GeneratedKeyHolder();  
+		  
+		 jdbcTemplate.update(new PreparedStatementCreator() {  
+			 public PreparedStatement createPreparedStatement(Connection con) throws SQLException {  
+				 PreparedStatement ps = con.prepareStatement(sql, new String[]{"patient_ID"});  
+				 
+				 ps.setString(1, p.getFirstName());  
+				 ps.setString(2, p.getLastName());  
+				 ps.setString(3, p.getPreferredName());
+				 ps.setInt(4, p.getVolunteer());
+				 ps.setString(5, p.getGender());
+				 ps.setString(6, p.getNotes());
+				 ps.setInt(7, p.getPartner());
+				 ps.setString(8, p.getAlerts());
+				 ps.setString(9, p.getMyoscarVerified());
+				 ps.setString(10,  p.getClinic());
+				 ps.setString(11, "tapestry_patient");
+			        
+				 return ps;  
+			 }  
+		 }, keyHolder);  		  
+		 return keyHolder.getKey().intValue();  
 	}
 
 	@Override

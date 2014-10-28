@@ -117,16 +117,22 @@ public class VolunteerController {
 		existUserNames = volunteerManager.getAllExistUsernames();
 		model.addAttribute("existUserNames", existUserNames);
 		
-		List<Organization> organizations;
+		List<Organization> organizations = new ArrayList<Organization>();
 		HttpSession session = request.getSession();
 		if (session.getAttribute("organizations") != null)
 			organizations = (List<Organization>) session.getAttribute("organizations");
 		else 
 		{
-			organizations = volunteerManager.getAllOrganizations();
+			if (request.isUserInRole("ROLE_ADMIN"))
+				organizations = volunteerManager.getAllOrganizations();
+			else
+			{
+				int organizationId = TapestryHelper.getLoggedInUser(request, userManager).getOrganization();
+				Organization organization = volunteerManager.getOrganizationById(organizationId);
+				organizations.add(organization);
+			}				
 			session.setAttribute("organizations", organizations);
 		}
-
 		model.addAttribute("organizations", organizations);
 		
 		if (session.getAttribute("unread_messages") != null)
@@ -1067,7 +1073,7 @@ public class VolunteerController {
 				//send message to both volunteers
 				//content of message
 				sb = new StringBuffer();
-				sb.append(user);
+				sb.append(user.getName());
 				sb.append(" has booked an appointment for ");
 				sb.append(p.getFirstName());
 				sb.append(" ");

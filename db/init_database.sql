@@ -71,8 +71,7 @@ CREATE TABLE IF NOT EXISTS user_logs(
 	log_ID INT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED INT allows for 4,294,967,295 logs, which should be enough*/
 	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	description TEXT,
-	user SMALLINT UNSIGNED NOT NULL,
-	user_name VARCHAR(255),
+	user SMALLINT UNSIGNED NOT NULL,	
 	PRIMARY KEY (log_ID)
 );
 

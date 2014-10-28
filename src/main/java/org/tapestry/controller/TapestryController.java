@@ -116,8 +116,7 @@ public class TapestryController{
 
 		StringBuffer sb = new StringBuffer();
 		sb.append(u.getName());
-		sb.append(" logged in");
-		
+		sb.append(" logged in");		
 		userManager.addUserLog(sb.toString(), u);
 		
 		return "redirect:/";
@@ -199,6 +198,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/add_user", method=RequestMethod.POST)
 	public String addUser(SecurityContextHolderAwareRequestWrapper request){
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		//Add a new user
 		User u = new User();
 		
@@ -233,6 +233,13 @@ public class TapestryController{
 			sb.append("We recommend that you change your password as soon as possible due to security reasons");
 			
 			TapestryHelper.sendMessageByEmail(u, "Welcome to Tapestry", sb.toString());
+			
+			//log creating new user
+			sb = new StringBuffer();
+			sb.append(loggedInUser.getName());
+			sb.append("has created a new user, whose name is ");
+			sb.append(u.getName());
+			userManager.addUserLog(sb.toString(), loggedInUser);
 		}
 		else
 			return "redirect:/manage_users?failed=true";
@@ -241,8 +248,16 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/remove_user/{user_id}", method=RequestMethod.GET)
-	public String removeUser(@PathVariable("user_id") int id){
+	public String removeUser(SecurityContextHolderAwareRequestWrapper request, @PathVariable("user_id") int id){
 		userManager.removeUserWithID(id);
+		
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has removed the user, ");
+		sb.append(userManager.getUserByID(id).getName());
+		userManager.addUserLog(sb.toString(), loggedInUser);
+		
 		return "redirect:/manage_users";
 	}
 	
@@ -325,7 +340,7 @@ public class TapestryController{
 			receivers.addAll(volunteers);
 			
 			model.addAttribute("volunteers", receivers);			
-			return "/admin/inbox";
+//			return "/admin/inbox";
 		}
 		else
 		{// central admin	
@@ -336,15 +351,16 @@ public class TapestryController{
 			receivers.addAll(volunteers);			
 			
 			model.addAttribute("volunteers", receivers);			
-			return "/admin/inbox";
+//			return "/admin/inbox";
 		}
+		
+		return "/admin/inbox";
 	}
 	
 	@RequestMapping(value="/view_message/{msgID}", method=RequestMethod.GET)
 	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
-		int userId = loggedInUser.getUserID();
-		
+		int userId = loggedInUser.getUserID();		
 		Message m;		
 		m = messageManager.getMessageByID(id);		
 		
@@ -363,8 +379,7 @@ public class TapestryController{
 				
 				session.setAttribute("unread_messages", iUnRead);
 				model.addAttribute("unread", iUnRead);
-			}
-			
+			}			
 		}
 		model.addAttribute("message", m);
 		TapestryHelper.setUnreadMessage(request, model, messageManager);
@@ -379,8 +394,7 @@ public class TapestryController{
 	public String dismissAnnouncement(@PathVariable("announcement") int id, SecurityContextHolderAwareRequestWrapper request){	
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		int userId = loggedInUser.getUserID();
-		Message m;
-		
+		Message m;		
 		m = messageManager.getMessageByID(id);		
 
 		if (!(m.getRecipient() == userId))
@@ -513,7 +527,7 @@ public class TapestryController{
 		u.setName(request.getParameter("volName"));
 		u.setEmail(request.getParameter("volEmail"));
 		userManager.modifyUser(u);
-		
+				
 		if (!(currentUsername.equals(u.getUsername())))
 			return "redirect:/login?usernameChanged=true";
 		else
@@ -563,9 +577,23 @@ public class TapestryController{
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.GET)
 	public String viewUserLogs(@PathVariable("page") int page, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		List<UserLog> logs = userManager.getUserLogs((page - 1) * 20, 20);
-		int count = userManager.count();
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
+		int organizationId = loggedInUser.getOrganization();
 		
+		List<UserLog> logs = new ArrayList<UserLog>();
+		int count = 0;
+		
+		if (request.isUserInRole("ROLE_AMIN"))
+		{
+			logs = userManager.getUserLogs((page - 1) * 20, 20);
+			count = userManager.count();
+		}
+		else
+		{
+			logs = userManager.getUserLogsPageByGroup((page - 1) * 20, 20, organizationId);			
+			count = userManager.countEntriesByGroup(organizationId);
+		}
+				
 		model.addAttribute("numPages", count / 20 + 1);
 		model.addAttribute("logs", logs);
 		
@@ -577,9 +605,13 @@ public class TapestryController{
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.POST)
 	public String viewFilteredUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
 		List<UserLog> logs = new ArrayList<UserLog>();
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		String name = request.getParameter("name");
 		
-		logs = userManager.getUserLogsByPartialName(name);
+		if (request.isUserInRole("ROLE_ADMIN"))
+			logs = userManager.getUserLogsByPartialName(name);
+		else
+			logs = userManager.getGroupedUserLogssByPartialName(name, loggedInUser.getOrganization());
 
 		model.addAttribute("logs", logs);
 		
@@ -644,9 +676,8 @@ public class TapestryController{
 		{
 			p.setFirstName(request.getParameter("firstname").trim());
 			p.setLastName(request.getParameter("lastname").trim());
-			if(request.getParameter("preferredname") != "") {
+			if(request.getParameter("preferredname") != "") 
 				p.setPreferredName(request.getParameter("preferredname").trim());
-			}		
 			p.setVolunteer(vId1);
 			p.setPartner(vId2);		
 			p.setMyoscarVerified(request.getParameter("myoscar_verified"));		
@@ -655,10 +686,7 @@ public class TapestryController{
 			p.setAlerts(request.getParameter("alerts"));
 			p.setClinic(request.getParameter("clinic"));
 			
-			patientManager.createPatient(p);
-			
-			Patient newPatient = patientManager.getNewestPatient();
-			
+			int newPatientID = patientManager.createPatient(p);			
 			//Auto assign all existing surveys
 			List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
 	   		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();
@@ -672,13 +700,10 @@ public class TapestryController{
 				TapestryPHRSurvey template = surveyFactory.getSurveyTemplate(st);
 					SurveyResult sr = new SurveyResult();
 		            sr.setSurveyID(st.getSurveyID());
-		            sr.setPatientID(newPatient.getPatientID());
-		            
+		            sr.setPatientID(newPatientID);		            
 		            //set today as startDate
-		            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		        	String startDate = sdf.format(new Date());            
-		            
-		            sr.setStartDate(startDate);
+		            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");		        	
+		            sr.setStartDate(sdf.format(new Date()));
 		          //if requested survey that's already done
 		    		if (specificSurveys.size() < template.getMaxInstances())
 		    		{
@@ -691,9 +716,7 @@ public class TapestryController{
 		    			specificSurveys = surveys.getSurveyListById(Integer.toString(st.getSurveyID())); //reload
 		    		}
 		    		else
-		    		{
 		    			return "redirect:/manage_patients";
-		    		}
 			}
 	   		model.addAttribute("createPatientSuccessfully",true);
 	   		TapestryHelper.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
@@ -710,7 +733,7 @@ public class TapestryController{
 	}
    	
    	@RequestMapping(value="/edit_patient/{id}", method=RequestMethod.GET)
-	public String editPatientForm(@PathVariable("id") int patientID,SecurityContextHolderAwareRequestWrapper request, ModelMap model){   		
+	public String editPatientForm(@PathVariable("id") int patientID,SecurityContextHolderAwareRequestWrapper request, ModelMap model){   
 		Patient p = patientManager.getPatientByID(patientID);		
 		if("Male".equalsIgnoreCase(p.getGender()))
 			p.setGender("M");
@@ -1360,8 +1383,7 @@ public class TapestryController{
 
 	@RequestMapping(value="/search_survey", method=RequestMethod.POST)
 	public String searchSurvey(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, 
-			SecurityContextHolderAwareRequestWrapper request){
-		
+			SecurityContextHolderAwareRequestWrapper request){		
 		String title = request.getParameter("searchTitle");		
 		List<SurveyTemplate>  surveyTemplateList = surveyManager.getSurveyTemplatesByPartialTitle(title);
 		
@@ -1380,15 +1402,30 @@ public class TapestryController{
 	}
    	
    	@RequestMapping(value="/manage_surveys", method=RequestMethod.GET)
-	public String manageSurveys(@RequestParam(value="failed", required=false) String failed, ModelMap model, HttpServletRequest request){
-   		List<SurveyResult> surveyResultList = surveyManager.getAllSurveyResults();
+	public String manageSurveys(@RequestParam(value="failed", required=false) String failed, ModelMap model, 
+			SecurityContextHolderAwareRequestWrapper request)
+   	{
+   		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+   		int organizationId = loggedInUser.getOrganization();
+   		List<Patient> patientList = new ArrayList<Patient>();
+   		List<SurveyResult> surveyResultList = new ArrayList<SurveyResult>();
+   		if (request.isUserInRole("ROLE_ADMIN"))
+   		{
+   			patientList = patientManager.getAllPatients();
+   			surveyResultList = surveyManager.getAllSurveyResults();
+   		}
+   		else
+   		{
+   			patientList = patientManager.getPatientsByGroup(organizationId);
+   			surveyResultList = surveyManager.getAllSurveyResults();
+   		}
+   		
 		model.addAttribute("surveys", surveyResultList);
 		List<SurveyTemplate> surveyTemplateList = surveyManager.getAllSurveyTemplates();
 		model.addAttribute("survey_templates", surveyTemplateList);
-		
-		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResultList, surveyTemplateList);
-	    List<Patient> patientList = patientManager.getAllPatients();
-        model.addAttribute("patients", patientList);
+		model.addAttribute("patients", patientList);
+		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResultList, surveyTemplateList);	    
+        
         if(failed != null) {
         	model.addAttribute("failed", true);
         }
