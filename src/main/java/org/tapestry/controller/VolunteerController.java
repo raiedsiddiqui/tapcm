@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
@@ -144,8 +145,7 @@ public class VolunteerController {
 	//display detail of a volunteer
 	@RequestMapping(value="/display_volunteer/{volunteerId}", method=RequestMethod.GET)
 	public String displayVolunteer(SecurityContextHolderAwareRequestWrapper request, 
-				@PathVariable("volunteerId") int id, ModelMap model){
-		
+				@PathVariable("volunteerId") int id, ModelMap model){		
 		//get volunteer by id
 		Volunteer volunteer = new Volunteer();
 		volunteer = volunteerManager.getVolunteerById(id);
@@ -167,8 +167,7 @@ public class VolunteerController {
 			sb.append(volunteer.getStreet());
 		sb.append(",");
 		
-		volunteer.setAddress(sb.toString());		
-		
+		volunteer.setAddress(sb.toString());				
 		model.addAttribute("volunteer", volunteer);
 		
 		//set availability
@@ -202,8 +201,7 @@ public class VolunteerController {
 	
 	//create a new volunteer and save in the table of volunteers and users in the DB
 	@RequestMapping(value="/add_volunteer", method=RequestMethod.POST)
-	public String addVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
-		
+	public String addVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){				
 		String username = request.getParameter("username").trim();
 		List<String> uList = volunteerManager.getAllExistUsernames();
 		
@@ -214,8 +212,7 @@ public class VolunteerController {
 		}
 		else
 		{
-			Volunteer volunteer = new Volunteer();
-			
+			Volunteer volunteer = new Volunteer();			
 			volunteer.setFirstName(request.getParameter("firstname").trim());
 			volunteer.setLastName(request.getParameter("lastname").trim());
 			volunteer.setEmail(request.getParameter("email").trim());	
@@ -259,12 +256,21 @@ public class VolunteerController {
 			String strAvailableTime = TapestryHelper.getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
-			boolean success = volunteerManager.addVolunteer(volunteer);			
+			boolean success = volunteerManager.addVolunteer(volunteer);				
+			
+	   		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+			StringBuffer sb = new StringBuffer();
+			sb.append(loggedInUser.getName());
+			sb.append(" has added an new volunteer, ");
+			sb.append(volunteer.getFirstName());
+			sb.append(" ");
+			sb.append(volunteer.getLastName());
+			userManager.addUserLog(sb.toString(), loggedInUser);
 			//save in the table users
 			if (success)
 			{
 				User user = new User();
-				StringBuffer sb = new StringBuffer();
+				sb = new StringBuffer();
 				sb.append(volunteer.getFirstName());
 				sb.append(" ");
 				sb.append(volunteer.getLastName());
@@ -432,6 +438,15 @@ public class VolunteerController {
 			
 		//update users table as well
 		TapestryHelper.modifyUser(volunteer, userManager);
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has modified the volunteer, ");
+		sb.append(volunteer.getFirstName());
+		sb.append(" ");
+		sb.append(volunteer.getLastName());
+		userManager.addUserLog(sb.toString(), loggedInUser);
 		
 		session.setAttribute("volunteerMessage","U");
 		return "redirect:/view_volunteers";
@@ -575,7 +590,7 @@ public class VolunteerController {
 		activity.setDate(date);		
 		activity.setOrganizationId(organizationId);
 			
-			//format start_Time and end_Time to match data type in DB
+		//format start_Time and end_Time to match data type in DB
 		StringBuffer sb = new StringBuffer();
 		sb.append(date);
 		sb.append(" ");
@@ -587,11 +602,16 @@ public class VolunteerController {
 		sb.append(date);
 		sb.append(" ");
 		sb.append(endTime);
-		endTime = sb.toString();
-			
+		endTime = sb.toString();			
 		activity.setEndTime(endTime);
 			
 		volunteerManager.logActivity(activity);
+		//add log
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has added an activity ");		
+		userManager.addUserLog(sb.toString(), loggedInUser);
 			
 		//update view activity page with new record		
 		session.setAttribute("ActivityMessage", "C");		
@@ -601,9 +621,15 @@ public class VolunteerController {
 		
 	@RequestMapping(value="/delete_activity/{activityId}", method=RequestMethod.GET)
 	public String deleteActivityById(@PathVariable("activityId") int id, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-				
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model){				
 		volunteerManager.deleteActivity(id);	
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has deleted the acitiviy #  ");
+		sb.append(id);		
+		userManager.addUserLog(sb.toString(), loggedInUser);
 					
 		HttpSession  session = request.getSession();		
 		session.setAttribute("ActivityMessage", "D");		
@@ -671,6 +697,14 @@ public class VolunteerController {
 				activity.setDescription(desc);						
 		}			
 		volunteerManager.updateActivity(activity);
+		
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has modified the acitiviy #  ");
+		sb.append(activity.getActivityId());				
+		userManager.addUserLog(sb.toString(), loggedInUser);
 			
 		session.setAttribute("ActivityMessage","U");
 		return "redirect:/view_activity";	
@@ -743,13 +777,20 @@ public class VolunteerController {
 		organization.setProvince(request.getParameter("province"));		
 		organization.setCountry(request.getParameter("country"));
 			
+		HttpSession  session = request.getSession();
 		if (volunteerManager.addOrganization(organization))
 		{
-			HttpSession session = request.getSession();
+			//add logs
+			User loggedInUser = TapestryHelper.getLoggedInUser(request);
+			StringBuffer sb = new StringBuffer();
+			sb.append(loggedInUser.getName());
+			sb.append(" has added a new Organization  ");
+			sb.append(request.getParameter("name"));				
+			userManager.addUserLog(sb.toString(), loggedInUser);
+						
 			session.setAttribute("organizatioMessage", "C");							
-		}		
+		}
 		
-		HttpSession  session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "redirect:/view_organizations";			
@@ -913,11 +954,18 @@ public class VolunteerController {
    		//send message to Central Admin
    		TapestryHelper.sendMessageToInbox(subject, message, volunteerUserId, centralAdminId, messageManager);
    		
+   		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has authenticate PHR for patient#  ");
+		sb.append(patientId);				
+		userManager.addUserLog(sb.toString(), loggedInUser);
+   		
    		HttpSession session = request.getSession();
    		if (session.getAttribute("appointmentId") != null)
    		{
-   			String appointmentId = session.getAttribute("appointmentId").toString();
-   			
+   			String appointmentId = session.getAttribute("appointmentId").toString();   			
    			return "redirect:/patient/" + patientId + "?appointmentId=" + appointmentId;
    		}
    		else
@@ -1170,6 +1218,15 @@ public class VolunteerController {
 	@RequestMapping(value="/delete_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String deleteAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
 		appointmentManager.deleteAppointment(id);
+		
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has deleted the appointment #  ");
+		sb.append(id);				
+		userManager.addUserLog(sb.toString(), loggedInUser);
+		
 		if(request.isUserInRole("ROLE_USER")) {
 			return "redirect:/";
 		} else {
@@ -1180,12 +1237,30 @@ public class VolunteerController {
 	@RequestMapping(value="/approve_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String approveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
 		appointmentManager.approveAppointment(id);
+		
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has approved the appointment #  ");
+		sb.append(id);				
+		userManager.addUserLog(sb.toString(), loggedInUser);
+		
 		return "redirect:/manage_appointments";
 	}
 	
 	@RequestMapping(value="/decline_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String unapproveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
 		appointmentManager.declineAppointment(id);
+		
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has declined the appointment #  ");
+		sb.append(id);				
+		userManager.addUserLog(sb.toString(), loggedInUser);
+		
 		return "redirect:/manage_appointments";
 	}
 	
@@ -1436,8 +1511,7 @@ public class VolunteerController {
 			sb.append(" on ");
 			sb.append(date);
 			sb.append(".\n");			
-			sb.append("This appointment is awaiting confirmation.");
-			
+						
 			String msg = sb.toString();
 			
 			TapestryHelper.sendMessageToInbox(msg, userId, volunteerId, messageManager); //send message to volunteer
@@ -1445,7 +1519,7 @@ public class VolunteerController {
 			TapestryHelper.sendMessageToInbox(msg, userId, userId, messageManager); //send message to admin her/his self	
 			model.addAttribute("successToCreateAppointment",true);
 			//log activity
-			userManager.addUserLog(sb.toString(), user);
+			userManager.addUserLog(msg, user);
 		}
 		else
 			model.addAttribute("failedToCreateAppointment",true);
@@ -1483,6 +1557,13 @@ public class VolunteerController {
 		String keyObservations = request.getParameter("keyObservations");
 		
 		appointmentManager.addAlertsAndKeyObservations(appointmentId, alerts, keyObservations);
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has added alerts and key observation for appointment #  ");
+		sb.append(appointmentId);				
+		userManager.addUserLog(sb.toString(), loggedInUser);
 		
 		int patientId = TapestryHelper.getPatientId(request);		
 		Appointment appointment = appointmentManager.getAppointmentById(appointmentId);		
@@ -1537,6 +1618,14 @@ public class VolunteerController {
 			sb.append(request.getParameter("planSpecify"));
 		}				
 		appointmentManager.addPlans(appointmentId, sb.toString());
+		
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has added plans for appointment #  ");
+		sb.append(appointmentId);				
+		userManager.addUserLog(sb.toString(), loggedInUser);
 	
 		return "redirect:/";
 	}
@@ -1588,6 +1677,14 @@ public class VolunteerController {
 //		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
 		//set visit alert as comments in DB
 		appointmentManager.completeAppointment(id, request.getParameter("visitAlerts"));
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has set the appointment #  ");
+		sb.append(id);		
+		sb.append("'s status as completed");
+		userManager.addUserLog(sb.toString(), loggedInUser);
 		
 		Appointment appt = appointmentManager.getAppointmentById(id);
 		int patientId = appt.getPatientID();
@@ -1628,7 +1725,6 @@ public class VolunteerController {
 		}
 	}
 	
-
 	//narrative 
 	@RequestMapping(value="/view_narratives", method=RequestMethod.GET)
 	public String getNarrativesByUser(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
@@ -1731,6 +1827,14 @@ public class VolunteerController {
 			}
 			
 			volunteerManager.updateNarrative(narrative);			
+			//add logs
+			User loggedInUser = TapestryHelper.getLoggedInUser(request);
+			StringBuffer sb = new StringBuffer();
+			sb.append(loggedInUser.getName());
+			sb.append(" has modified the narrative # ");
+			sb.append(narrative.getNarrativeId());				
+			userManager.addUserLog(sb.toString(), loggedInUser);
+			
 			session.setAttribute("narrativeMessage","U");
 		}				
 		return "redirect:/view_narratives";
@@ -1763,7 +1867,15 @@ public class VolunteerController {
 		//add new narrative in narrative table in DB
 		volunteerManager.addNarrative(narrative);
 		//set complete narrative in Appointment table in DB
-		appointmentManager.completeNarrative(appointmentId);		
+		appointmentManager.completeNarrative(appointmentId);	
+		
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has added the narrative for the appointment # ");
+		sb.append(appointmentId);			
+		userManager.addUserLog(sb.toString(), loggedInUser);
 		
 		HttpSession session = request.getSession();
 		session.setAttribute("newNarrative", true);
@@ -1773,9 +1885,15 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/delete_narrative/{narrativeId}", method=RequestMethod.GET)
 	public String deleteNarrativeById(@PathVariable("narrativeId") int id, 
-				SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-		
-		volunteerManager.deleteNarrativeById(id);
+				SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+		volunteerManager.deleteNarrativeById(id);		
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has deleted the narrative # ");
+		sb.append(id);			
+		userManager.addUserLog(sb.toString(), loggedInUser);
 				
 		HttpSession  session = request.getSession();		
 		session.setAttribute("narrativeMessage","D");

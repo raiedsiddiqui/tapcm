@@ -583,7 +583,7 @@ public class TapestryController{
 		List<UserLog> logs = new ArrayList<UserLog>();
 		int count = 0;
 		
-		if (request.isUserInRole("ROLE_AMIN"))
+		if (request.isUserInRole("ROLE_ADMIN"))
 		{
 			logs = userManager.getUserLogs((page - 1) * 20, 20);
 			count = userManager.count();
@@ -663,7 +663,7 @@ public class TapestryController{
    	
    	@RequestMapping(value="/add_patient", method=RequestMethod.POST)
 	public String addPatient(SecurityContextHolderAwareRequestWrapper request, ModelMap model) 
-			throws JAXBException, DatatypeConfigurationException, Exception{
+			throws JAXBException, DatatypeConfigurationException, Exception{   		
 		//Add a new patient
 		Patient p = new Patient();
 		
@@ -686,7 +686,18 @@ public class TapestryController{
 			p.setAlerts(request.getParameter("alerts"));
 			p.setClinic(request.getParameter("clinic"));
 			
-			int newPatientID = patientManager.createPatient(p);			
+			int newPatientID = patientManager.createPatient(p);		
+			
+			//add logs
+			User loggedInUser = TapestryHelper.getLoggedInUser(request);
+			StringBuffer sb = new StringBuffer();
+			sb.append(loggedInUser.getName());
+			sb.append(" has added a new patient ");
+			sb.append(p.getFirstName());
+			sb.append(" ");
+			sb.append(p.getLastName());
+			userManager.addUserLog(sb.toString(), loggedInUser);
+			
 			//Auto assign all existing surveys
 			List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
 	   		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();
@@ -777,6 +788,15 @@ public class TapestryController{
 			
 			patientManager.updatePatient(p);
 			model.addAttribute("updatePatientSuccessfully",true);
+			
+			User loggedInUser = TapestryHelper.getLoggedInUser(request);
+			StringBuffer sb = new StringBuffer();
+			sb.append(loggedInUser.getName());
+			sb.append(" has modified the patient ");
+			sb.append(p.getFirstName());
+			sb.append(" ");
+			sb.append(p.getLastName());
+			userManager.addUserLog(sb.toString(), loggedInUser);
 		}
 		else
 			model.addAttribute("misMatchedVolunteer",true);		
@@ -791,8 +811,20 @@ public class TapestryController{
 	}
    	
    	@RequestMapping(value="/remove_patient/{patient_id}", method=RequestMethod.GET)
-	public String removePatient(@PathVariable("patient_id") int id){
+	public String removePatient(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper request){
+   		Patient p = patientManager.getPatientByID(id);
+   		
    		patientManager.deletePatientWithId(id);
+   		
+   		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has deleted the patient ");
+		sb.append(p.getFirstName());
+		sb.append(" ");
+		sb.append(p.getLastName());
+		userManager.addUserLog(sb.toString(), loggedInUser);
+   		
 		return "redirect:/manage_patients";
 	}
 
@@ -1481,6 +1513,12 @@ public class TapestryController{
    		ArrayList<SurveyTemplate> selectSurveyTemplats = new ArrayList<SurveyTemplate>();
    		String[] surveyTemplateIds = request.getParameterValues("surveyTemplates"); 
    		int[] patientIds;
+   		//add logs
+   		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has assigned surveys to patients");
+		String logDes = sb.toString();
    		
    		//if user selects Client/Details/Assign Survey, patient id would store in hidden field called patient   		
    		String hPatient = request.getParameter("patient");
@@ -1490,11 +1528,11 @@ public class TapestryController{
    	   		{   
    				if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
 
-   					TapestryHelper.addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);   
-   					
+   					TapestryHelper.addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);     					
    	   	   			patientIds = new int[] {Integer.valueOf(hPatient)};
    	   	   			
-   	   	   			TapestryHelper.assignSurveysToClient(selectSurveyTemplats, patientIds, request, model, surveyManager);   		   	   		 
+   	   	   			TapestryHelper.assignSurveysToClient(selectSurveyTemplats, patientIds, request, model, surveyManager);   	
+   	   	   			userManager.addUserLog(logDes, loggedInUser);
    	   	   		}
    	   	   		else//no survey template has been selected
    	   	   		{
@@ -1535,7 +1573,8 @@ public class TapestryController{
 		   	   				patient = patients.get(i);
 		   	   				patientIds[i] = patient.getPatientID();
 		   	   			}		   	   			
-		   	   			TapestryHelper.assignSurveysToClient(selectSurveyTemplats, patientIds, request, model, surveyManager);			
+		   	   			TapestryHelper.assignSurveysToClient(selectSurveyTemplats, patientIds, request, model, surveyManager);		
+		   	   			userManager.addUserLog(logDes, loggedInUser);
 		   	   		}
 		   	   		else
 		   	   		{//for selected patients, convert String[] to int[]   			
@@ -1547,7 +1586,8 @@ public class TapestryController{
 		   	   	   			for (int j = 0; j < selectedPatientIds.length; j++){
 		   	   	   				iSelectedPatientIds[j] = Integer.parseInt(selectedPatientIds[j]);
 		   	   				}
-		   	   	   	TapestryHelper.assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request, model, surveyManager);
+		   	   	   			TapestryHelper.assignSurveysToClient(selectSurveyTemplats, iSelectedPatientIds, request, model, surveyManager);
+		   	   	   			userManager.addUserLog(logDes, loggedInUser);
 		   	   			}   			
 		   	   		} 
 	   	   		}
@@ -1601,7 +1641,7 @@ public class TapestryController{
 	}
 	
  	@RequestMapping(value = "/upload_survey_template", method=RequestMethod.POST)
-	public String addSurveyTemplate(HttpServletRequest request) throws Exception{
+	public String addSurveyTemplate(SecurityContextHolderAwareRequestWrapper request) throws Exception{
    		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
    		MultipartFile multipartFile = multipartRequest.getFile("file");
    		
@@ -1614,6 +1654,13 @@ public class TapestryController{
 		st.setPriority(p);
 		st.setContents(multipartFile.getBytes());
 		surveyManager.uploadSurveyTemplate(st);
+		
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has uploaded survey template ");
+		sb.append(request.getParameter("title"));
+		userManager.addUserLog(sb.toString(), loggedInUser);
 		
 		return "redirect:/manage_survey_templates";
 	}
@@ -1774,6 +1821,15 @@ public class TapestryController{
 		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
    		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();
    		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
+   		//add logs
+   		HttpSession session = request.getSession();
+   		User loggedInUser = (User)session.getAttribute("loggedInUser");
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has deleted survey # ");
+		sb.append(id);
+		userManager.addUserLog(sb.toString(), loggedInUser);
+   		
    		return "redirect:/manage_surveys";
    	}
    	
@@ -1796,13 +1852,21 @@ public class TapestryController{
    		HttpSession session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
+		//add logs
+   		User loggedInUser = (User)session.getAttribute("loggedInUser");
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has viewed survey # ");
+		sb.append(id);
+		userManager.addUserLog(sb.toString(), loggedInUser);
    		
    		return "/admin/view_survey_results";
    	}
    	
    	@RequestMapping(value="/export_csv/{resultID}", method=RequestMethod.GET)
    	@ResponseBody
-   	public String downloadCSV(@PathVariable("resultID") int id, HttpServletResponse response){
+   	public String downloadCSV(@PathVariable("resultID") int id, HttpServletRequest request, HttpServletResponse response){
    		SurveyResult r = surveyManager.getSurveyResultByID(id);
    		String xml;
    		try{
@@ -1821,6 +1885,16 @@ public class TapestryController{
    		} catch (Exception e) {
    			e.printStackTrace();
    		}   		
+   		
+   		//add logs
+   		HttpSession session = request.getSession();
+   		User loggedInUser = (User)session.getAttribute("loggedInUser");
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has downloaded survey # ");
+		sb.append(id);
+		userManager.addUserLog(sb.toString(), loggedInUser);
+   		
    		return res;
    	}
    	
