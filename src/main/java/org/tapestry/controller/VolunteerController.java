@@ -55,7 +55,8 @@ public class VolunteerController {
    	
 	//display all volunteers
 	@RequestMapping(value="/view_volunteers", method=RequestMethod.GET)
-	public String getAllVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String getAllVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		HttpSession  session = request.getSession();	
 		User user = TapestryHelper.getLoggedInUser(request, userManager);
@@ -91,7 +92,8 @@ public class VolunteerController {
 	
 	//display all volunteers with search criteria
 	@RequestMapping(value="/view_volunteers", method=RequestMethod.POST)
-	public String viewFilteredVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewFilteredVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		User user = TapestryHelper.getLoggedInUser(request, userManager);		
 		String name = request.getParameter("searchName");
@@ -112,7 +114,8 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/new_volunteer", method=RequestMethod.GET)
-	public String newVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String newVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		//save exist user names for validating on UI
 		List<String> existUserNames = new ArrayList<String>();
 		existUserNames = volunteerManager.getAllExistUsernames();
@@ -145,7 +148,8 @@ public class VolunteerController {
 	//display detail of a volunteer
 	@RequestMapping(value="/display_volunteer/{volunteerId}", method=RequestMethod.GET)
 	public String displayVolunteer(SecurityContextHolderAwareRequestWrapper request, 
-				@PathVariable("volunteerId") int id, ModelMap model){		
+				@PathVariable("volunteerId") int id, ModelMap model)
+	{		
 		//get volunteer by id
 		Volunteer volunteer = new Volunteer();
 		volunteer = volunteerManager.getVolunteerById(id);
@@ -201,7 +205,8 @@ public class VolunteerController {
 	
 	//create a new volunteer and save in the table of volunteers and users in the DB
 	@RequestMapping(value="/add_volunteer", method=RequestMethod.POST)
-	public String addVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){				
+	public String addVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{				
 		String username = request.getParameter("username").trim();
 		List<String> uList = volunteerManager.getAllExistUsernames();
 		
@@ -215,8 +220,7 @@ public class VolunteerController {
 			Volunteer volunteer = new Volunteer();			
 			volunteer.setFirstName(request.getParameter("firstname").trim());
 			volunteer.setLastName(request.getParameter("lastname").trim());
-			volunteer.setEmail(request.getParameter("email").trim());	
-			
+			volunteer.setEmail(request.getParameter("email").trim());			
 			
 			ShaPasswordEncoder enc = new ShaPasswordEncoder();
 			String hashedPassword = enc.encodePassword(request.getParameter("password"), null);
@@ -311,7 +315,8 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/modify_volunteer/{volunteerId}", method=RequestMethod.GET)
 	public String modifyVolunteer(SecurityContextHolderAwareRequestWrapper request, 
-			@PathVariable("volunteerId") int id, ModelMap model){
+			@PathVariable("volunteerId") int id, ModelMap model)
+	{
 		Volunteer volunteer = new Volunteer();
 		volunteer = volunteerManager.getVolunteerById(id);		
 		List<Organization> organizations;
@@ -367,7 +372,8 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/update_volunteer/{volunteerId}", method=RequestMethod.POST)
 	public String updateVolunteer(SecurityContextHolderAwareRequestWrapper request, 
-			@PathVariable("volunteerId") int id, ModelMap model){		
+			@PathVariable("volunteerId") int id, ModelMap model)
+	{		
 		HttpSession  session = request.getSession();
 		Volunteer volunteer;
 			
@@ -449,15 +455,24 @@ public class VolunteerController {
 		userManager.addUserLog(sb.toString(), loggedInUser);
 		
 		session.setAttribute("volunteerMessage","U");
-		return "redirect:/view_volunteers";
-	
+		return "redirect:/view_volunteers";	
 	}
 	
 	@RequestMapping(value="/delete_volunteer/{volunteerId}", method=RequestMethod.GET)
 	public String deleteVolunteerById(@PathVariable("volunteerId") int id, 
-				SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+				SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
+		String volunteerName = volunteerManager.getVolunteerNameById(id);
 		volunteerManager.deleteVolunteerById(id);
 				
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has deleted the volunteer, ");
+		sb.append(volunteerName);		
+		userManager.addUserLog(sb.toString(), loggedInUser);
+		
 		HttpSession  session = request.getSession();		
 		session.setAttribute("volunteerMessage", "D");		
 	
@@ -467,7 +482,8 @@ public class VolunteerController {
 	//Activity in Volunteer
 	//display all activity input by volunteers
 	@RequestMapping(value="/view_activity_admin", method=RequestMethod.GET)
-	public String viewActivityByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+	public String viewActivityByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{	
 		List<Activity> activities = new ArrayList<Activity>();
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();		
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
@@ -498,7 +514,8 @@ public class VolunteerController {
 		
 	//display all activity logs for selected volunteer
 	@RequestMapping(value="/view_activity_admin", method=RequestMethod.POST)
-	public String viewActivityBySelectedVolunteerByAdmin( SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	public String viewActivityBySelectedVolunteerByAdmin( SecurityContextHolderAwareRequestWrapper request,
+			ModelMap model)
 	{		
 		String strVId = request.getParameter("search_volunteer");		
 		List<Activity> activities = new ArrayList<Activity>();
@@ -531,7 +548,8 @@ public class VolunteerController {
 	}
 		
 	@RequestMapping(value="/view_activity", method=RequestMethod.GET)
-	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewActivityByVolunteer( SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		HttpSession  session = request.getSession();		
 		int volunteerId = TapestryHelper.getLoggedInVolunteerId(request);	
 		List<Activity> activities = new ArrayList<Activity>();
@@ -564,7 +582,8 @@ public class VolunteerController {
 	}
 		
 	@RequestMapping(value="/new_activity", method=RequestMethod.GET)
-	public String newActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String newActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		HttpSession  session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
@@ -572,7 +591,8 @@ public class VolunteerController {
 	}
 		
 	@RequestMapping(value="/add_activity", method=RequestMethod.POST)
-	public String addActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String addActivityByVolunteer(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		HttpSession  session = request.getSession();		
 		int volunteerId = TapestryHelper.getLoggedInVolunteerId(request);	
 			
@@ -621,7 +641,8 @@ public class VolunteerController {
 		
 	@RequestMapping(value="/delete_activity/{activityId}", method=RequestMethod.GET)
 	public String deleteActivityById(@PathVariable("activityId") int id, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){				
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{				
 		volunteerManager.deleteActivity(id);	
 		//add logs
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
@@ -639,7 +660,8 @@ public class VolunteerController {
 		
 	@RequestMapping(value="/modify_activity/{activityId}", method=RequestMethod.GET)
 	public String modifyActivityLog(SecurityContextHolderAwareRequestWrapper request, 
-			@PathVariable("activityId") int id, ModelMap model){
+			@PathVariable("activityId") int id, ModelMap model)
+	{
 		Activity activity = new Activity();
 		activity = volunteerManager.getActivity(id);			
 		model.addAttribute("activityLog", activity);
@@ -652,7 +674,8 @@ public class VolunteerController {
 	}
 		
 	@RequestMapping(value="/update_activity", method=RequestMethod.POST)
-	public String updateActivityById(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String updateActivityById(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		String activityId = null;
 		int iActivityId = 0;		
 		Activity activity = new Activity();
@@ -712,7 +735,8 @@ public class VolunteerController {
 	
 	//Organizations		
 	@RequestMapping(value="/view_organizations", method=RequestMethod.GET)
-	public String getOganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String getOganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		List<Organization> organizations = new ArrayList<Organization>();
 		HttpSession  session = request.getSession();	
 		
@@ -736,7 +760,8 @@ public class VolunteerController {
 	
 	//display all volunteers with search criteria
 	@RequestMapping(value="/view_organizations", method=RequestMethod.POST)
-	public String viewFilteredOrganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewFilteredOrganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		List<Organization> organizations = new ArrayList<Organization>();
 		
 		String name = request.getParameter("searchName");
@@ -753,7 +778,8 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/new_organization", method=RequestMethod.GET)
-	public String newOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+	public String newOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{	
 		HttpSession  session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
@@ -762,7 +788,8 @@ public class VolunteerController {
 	
 	//create a new volunteer and save in the table of volunteers and users in the DB
 	@RequestMapping(value="/add_organization", method=RequestMethod.POST)
-	public String addOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String addOrganization(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		Organization organization = new Organization();
 			
 		organization.setName(request.getParameter("name").trim());
@@ -802,7 +829,8 @@ public class VolunteerController {
 	public String welcome(@RequestParam(value="booked", required=false) Boolean booked, 
 			@RequestParam(value="noMachedTime", required=false) String noMachedTime,
 			@RequestParam(value="patientId", required=false) Integer patientId, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		int unreadMessages;			
 		List<Appointment> remindingAppointments = new ArrayList<Appointment>();
 		HttpSession session = request.getSession();
@@ -889,7 +917,8 @@ public class VolunteerController {
    	@RequestMapping(value="/manage_appointments", method=RequestMethod.GET)
    	public String manageAppointments(@RequestParam(value="success", required=false) Boolean appointmentBooked,
    			@RequestParam(value="noMachedTime", required=false) String noMatchedMsg,
-   			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+   			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+   	{
    		User user = TapestryHelper.getLoggedInUser(request, userManager);
    		List<Appointment> allAppointments, allPastAppointments, allPendingAppointments;
    		List<Patient> allPatients;
@@ -927,7 +956,8 @@ public class VolunteerController {
      
    	@RequestMapping(value="/authenticate_myoscar/{volunteerId}", method=RequestMethod.POST)
    	public String authenticateMyOscar(@PathVariable("volunteerId") int id, @RequestParam(value="patientId", required=true) int patientId,
-   			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+   			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+   	{
    		int centralAdminId = 1;
  
    		String clientFirstName = request.getParameter("client_first_name");
@@ -974,7 +1004,8 @@ public class VolunteerController {
    	
    	@RequestMapping(value="/display_appointment/{appointmentID}", method=RequestMethod.GET)
    	public String displayAppointment(@PathVariable("appointmentID") int id, 
-   			SecurityContextHolderAwareRequestWrapper request, ModelMap model){   		
+   			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+   	{   		
    		Appointment appointment = appointmentManager.getAppointmentById(id);
    		model.addAttribute("appointment", appointment);
    		
@@ -1007,7 +1038,8 @@ public class VolunteerController {
    	}
    	
    	@RequestMapping(value="/book_appointment", method=RequestMethod.GET)
-	public String goAddAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String goAddAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+   	{
    		List<Patient> patients = new ArrayList<Patient>();
    		HttpSession  session = request.getSession();
    		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
@@ -1040,7 +1072,8 @@ public class VolunteerController {
    	}
    	
    	@RequestMapping(value="/out_book_appointment", method=RequestMethod.GET)
-	public String outAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){   		
+	public String outAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+   	{   		
    		if (request.isUserInRole("ROLE_USER"))
    			return "redirect:/";
    		else
@@ -1048,7 +1081,8 @@ public class VolunteerController {
    	}
    	
 	@RequestMapping(value="/book_appointment", method=RequestMethod.POST)
-	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String addAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		User user = TapestryHelper.getLoggedInUser(request, userManager);		
 		int patientId = Integer.parseInt(request.getParameter("patient"));	
 		String noMatchedMsg="";			
@@ -1216,9 +1250,9 @@ public class VolunteerController {
 	}	
 	
 	@RequestMapping(value="/delete_appointment/{appointmentID}", method=RequestMethod.GET)
-	public String deleteAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
-		appointmentManager.deleteAppointment(id);
-		
+	public String deleteAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request)
+	{
+		appointmentManager.deleteAppointment(id);		
 		//add logs
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
 		StringBuffer sb = new StringBuffer();
@@ -1235,7 +1269,8 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/approve_appointment/{appointmentID}", method=RequestMethod.GET)
-	public String approveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
+	public String approveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request)
+	{
 		appointmentManager.approveAppointment(id);
 		
 		//add logs
@@ -1250,7 +1285,8 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/decline_appointment/{appointmentID}", method=RequestMethod.GET)
-	public String unapproveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request){
+	public String unapproveAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request)
+	{
 		appointmentManager.declineAppointment(id);
 		
 		//add logs
@@ -1266,7 +1302,8 @@ public class VolunteerController {
 	
 	//view_appointments
 	@RequestMapping(value="/view_appointments", method=RequestMethod.GET)
-	public String viewAppointmentByAdmin( SecurityContextHolderAwareRequestWrapper request){
+	public String viewAppointmentByAdmin( SecurityContextHolderAwareRequestWrapper request)
+	{
 		
 		return "/admin/view_appointments";
 	}
@@ -1282,7 +1319,8 @@ public class VolunteerController {
 	
 	//display scheduler page
 	@RequestMapping(value="/view_scheduler", method=RequestMethod.GET)
-	public String viewScheduler( SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewScheduler( SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		List<Patient> patients = TapestryHelper.getPatients(request, patientManager);	
 		List<Volunteer> allVolunteers = TapestryHelper.getAllVolunteers(volunteerManager);
 		
@@ -1304,8 +1342,8 @@ public class VolunteerController {
 	public String addAppointmentFromSecheduler(@PathVariable("volunteerId") int volunteerId, 
 			@RequestParam(value="vId", required=false) int partnerId, 			
 			@RequestParam(value="time", required=false) String time, 			
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
-		
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		List<Patient> patients = TapestryHelper.getPatients(request, patientManager);		
 	
 		//get volunteers's name		
@@ -1334,7 +1372,8 @@ public class VolunteerController {
 	
 	//load match time for both selected volunteers  /view_matchTime
 	@RequestMapping(value="/view_matchTime", method=RequestMethod.POST)
-	public String viewMatchAvailablities( SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String viewMatchAvailablities( SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		List<Patient> patients = TapestryHelper.getPatients(request, patientManager);		
 		List<Volunteer> volunteers = TapestryHelper.getAllVolunteers(volunteerManager);
 		
@@ -1408,7 +1447,8 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/find_volunteers", method=RequestMethod.POST)
-	public String getPairedVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+	public String getPairedVolunteers(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{	
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		List<Volunteer> volunteers = new ArrayList<Volunteer>();
 		
@@ -1454,7 +1494,8 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/schedule_appointment", method=RequestMethod.POST)
-	public String createAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String createAppointment(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		//set up appointment
 		Appointment appointment = new Appointment();		
 		int patientId = Integer.parseInt(request.getParameter("patient"));
@@ -1528,7 +1569,8 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/open_alerts_keyObservations/{appointmentId}", method=RequestMethod.GET)
 	public String openAlertsAndKeyObservations(@PathVariable("appointmentId") int id, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{			
 		Appointment appt = appointmentManager.getAppointmentById(id);
 		
 		int patientId = appt.getPatientID();
@@ -1551,7 +1593,8 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/saveAlertsAndKeyObservations", method=RequestMethod.POST)
-	public String saveAlertsAndKeyObservations(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+	public String saveAlertsAndKeyObservations(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{	
 		int appointmentId = TapestryHelper.getAppointmentId(request);		
 		String alerts = request.getParameter("alerts");
 		String keyObservations = request.getParameter("keyObservations");
@@ -1582,7 +1625,8 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/open_plan/{appointmentId}", method=RequestMethod.GET)
 	public String openPlan(@PathVariable("appointmentId") int id, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{	
 		List<String> planDef = Utils.getPlanDefinition();				
 		Appointment appt = appointmentManager.getAppointmentById(id);
 		
@@ -1599,7 +1643,8 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/savePlans", method=RequestMethod.POST)
-	public String savePlans(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+	public String savePlans(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{	
 		int appointmentId = TapestryHelper.getAppointmentId(request);
 		
 		StringBuffer sb = new StringBuffer();		
@@ -1632,7 +1677,8 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/goMyOscarAuthenticate/{appointmentId}", method=RequestMethod.GET)
 	public String openMyOscarAuthenticate(@PathVariable("appointmentId") int id, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{	
 		
 		HttpSession session = request.getSession();
 		session.setAttribute("appointmentId", id);
@@ -1659,8 +1705,9 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/visit_complete/{appointment_id}", method=RequestMethod.GET)
-	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
-		
+	public String viewVisitComplete(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model) 
+	{		
 		Appointment appointment = appointmentManager.getAppointmentById(id);
 		HttpSession  session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
@@ -1673,7 +1720,9 @@ public class VolunteerController {
 	}
 	
 	@RequestMapping(value="/complete_visit/{appointment_id}", method=RequestMethod.POST)
-	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model) {
+	public String completeVisit(@PathVariable("appointment_id") int id, SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model) 
+	{
 //		boolean contactedAdmin = request.getParameter("contacted_admin") != null;
 		//set visit alert as comments in DB
 		appointmentManager.completeAppointment(id, request.getParameter("visitAlerts"));
@@ -1759,26 +1808,24 @@ public class VolunteerController {
 	//loading a existing narrative to view detail or make a change
 	@RequestMapping(value="/modify_narrative/{narrativeId}", method=RequestMethod.GET)
 	public String modifyNarrative(SecurityContextHolderAwareRequestWrapper request, 
-				@PathVariable("narrativeId") int id, ModelMap model){		
-		Narrative narrative = volunteerManager.getNarrativeById(id);			
-		
+				@PathVariable("narrativeId") int id, ModelMap model)
+	{		
+		Narrative narrative = volunteerManager.getNarrativeById(id);				
 		//set Date format for editDate
-		String editDate = narrative.getEditDate();
-		
+		String editDate = narrative.getEditDate();		
 		if(!Utils.isNullOrEmpty(editDate))
-			editDate = editDate.substring(0,10);
-		
+			editDate = editDate.substring(0,10);		
 		narrative.setEditDate(editDate);
 		
-		model.addAttribute("narrative", narrative);	
-		
+		model.addAttribute("narrative", narrative);			
 		TapestryHelper.setUnreadMsg(null, request, model, messageManager);
 		
 		return "/volunteer/modify_narrative";
 	}
 	
 	@RequestMapping(value="/new_narrative", method=RequestMethod.GET)
-	public String newNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String newNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		int appointmentId = TapestryHelper.getAppointmentId(request);
 		
 		Appointment appt = appointmentManager.getAppointmentById(appointmentId);
@@ -1793,7 +1840,8 @@ public class VolunteerController {
 	
 	//Modify a narrative and save the change in the DB
 	@RequestMapping(value="/update_narrative", method=RequestMethod.POST)
-	public String updateNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+	public String updateNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		String narrativeId = null;
 		int iNarrativeId;	
 		Narrative narrative = new Narrative();		
@@ -1842,7 +1890,8 @@ public class VolunteerController {
 	
 	//create a new narrative and save it in DB
 	@RequestMapping(value="/add_narrative", method=RequestMethod.POST)
-	public String addNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
+	public String addNarrative(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{			
 		int patientId = TapestryHelper.getPatientId(request);
 		int appointmentId = TapestryHelper.getAppointmentId(request);
 		int loggedInVolunteerId  = TapestryHelper.getLoggedInVolunteerId(request);		
@@ -1885,7 +1934,8 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/delete_narrative/{narrativeId}", method=RequestMethod.GET)
 	public String deleteNarrativeById(@PathVariable("narrativeId") int id, 
-				SecurityContextHolderAwareRequestWrapper request, ModelMap model){		
+				SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		volunteerManager.deleteNarrativeById(id);		
 		//add logs
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);

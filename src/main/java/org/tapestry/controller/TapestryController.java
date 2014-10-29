@@ -104,16 +104,17 @@ public class TapestryController{
    	
    	//Everything below this point is a RequestMapping
 	@RequestMapping(value="/login", method=RequestMethod.GET)
-	public String login(@RequestParam(value="usernameChanged", required=false) Boolean usernameChanged, ModelMap model){		
+	public String login(@RequestParam(value="usernameChanged", required=false) Boolean usernameChanged, ModelMap model)
+	{		
 		if (usernameChanged != null)
 			model.addAttribute("usernameChanged", usernameChanged);
 		return "login";
 	}
 	
 	@RequestMapping(value="/loginsuccess", method=RequestMethod.GET)
-	public String loginSuccess(SecurityContextHolderAwareRequestWrapper request){				
+	public String loginSuccess(SecurityContextHolderAwareRequestWrapper request)
+	{				
 		User u = TapestryHelper.getLoggedInUser(request, userManager);
-
 		StringBuffer sb = new StringBuffer();
 		sb.append(u.getName());
 		sb.append(" logged in");		
@@ -123,15 +124,16 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/loginfailed", method=RequestMethod.GET)
-	public String failed(ModelMap model){
+	public String failed(ModelMap model)
+	{
 		model.addAttribute("error", "true");
 		return "login";
 	}
 
 	@RequestMapping(value="/logout", method=RequestMethod.GET)
-	public String logout(SecurityContextHolderAwareRequestWrapper request){
-		User u = TapestryHelper.getLoggedInUser(request, userManager);
-		
+	public String logout(SecurityContextHolderAwareRequestWrapper request)
+	{
+		User u = TapestryHelper.getLoggedInUser(request, userManager);		
 		StringBuffer sb = new StringBuffer();
 		sb.append(u.getName());
 		sb.append(" logged out");
@@ -141,7 +143,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/client", method=RequestMethod.GET)
-	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model){	
+	public String getClients(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{	
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		//get volunteer Id from login user		
 		int volunteerId= volunteerManager.getVolunteerIdByUsername(loggedInUser.getUsername());
@@ -155,7 +158,8 @@ public class TapestryController{
 	
 	@RequestMapping(value="/manage_users", method=RequestMethod.GET)
 	public String manageUsers(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model,
-			SecurityContextHolderAwareRequestWrapper request){
+			SecurityContextHolderAwareRequestWrapper request)
+	{
 		TapestryHelper.setUnreadMessage(request, model, messageManager);
 		HttpSession session = request.getSession();
 		
@@ -197,11 +201,11 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/add_user", method=RequestMethod.POST)
-	public String addUser(SecurityContextHolderAwareRequestWrapper request){
+	public String addUser(SecurityContextHolderAwareRequestWrapper request)
+	{
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		//Add a new user
-		User u = new User();
-		
+		User u = new User();		
 		//set name with firstname + lastname
 		StringBuffer sb = new StringBuffer();
 		sb.append(request.getParameter("firstname").trim());
@@ -248,7 +252,8 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/remove_user/{user_id}", method=RequestMethod.GET)
-	public String removeUser(SecurityContextHolderAwareRequestWrapper request, @PathVariable("user_id") int id){
+	public String removeUser(SecurityContextHolderAwareRequestWrapper request, @PathVariable("user_id") int id)
+	{
 		userManager.removeUserWithID(id);
 		
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
@@ -262,7 +267,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/disable_user/{user_id}", method=RequestMethod.GET)
-	public String disableUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request){
+	public String disableUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request)
+	{
 		userManager.disableUserWithID(id);
 		
 		User u = userManager.getUserByID(id);
@@ -277,7 +283,8 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/enable_user/{user_id}", method=RequestMethod.GET)
-	public String enableUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request){
+	public String enableUser(@PathVariable("user_id") int id, SecurityContextHolderAwareRequestWrapper request)
+	{
 		userManager.enableUserWithID(id);
 		
 		User u = userManager.getUserByID(id);
@@ -292,8 +299,10 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/profile", method=RequestMethod.GET)
-	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, @RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-	
+	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, 
+			@RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model)
+	{	
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		model.addAttribute("vol", loggedInUser);
 		TapestryHelper.setUnreadMessage(request, model, messageManager);
@@ -309,7 +318,8 @@ public class TapestryController{
 	
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
 	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent,@RequestParam(value="failure",
-			required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+			required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		int userId = loggedInUser.getUserID();
 		List<Message> messages;		
@@ -339,8 +349,7 @@ public class TapestryController{
 			List<User> volunteers = userManager.getGroupedUsersByRole(loggedInUser.getOrganization(), "ROLE_USER");	
 			receivers.addAll(volunteers);
 			
-			model.addAttribute("volunteers", receivers);			
-//			return "/admin/inbox";
+			model.addAttribute("volunteers", receivers);
 		}
 		else
 		{// central admin	
@@ -350,15 +359,14 @@ public class TapestryController{
 			List<User> volunteers = userManager.getAllUsersWithRole("ROLE_USER");	
 			receivers.addAll(volunteers);			
 			
-			model.addAttribute("volunteers", receivers);			
-//			return "/admin/inbox";
-		}
-		
+			model.addAttribute("volunteers", receivers);	
+		}		
 		return "/admin/inbox";
 	}
 	
 	@RequestMapping(value="/view_message/{msgID}", method=RequestMethod.GET)
-	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewMessage(@PathVariable("msgID") int id, SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		int userId = loggedInUser.getUserID();		
 		Message m;		
@@ -391,7 +399,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/dismiss/{announcement}", method=RequestMethod.GET)
-	public String dismissAnnouncement(@PathVariable("announcement") int id, SecurityContextHolderAwareRequestWrapper request){	
+	public String dismissAnnouncement(@PathVariable("announcement") int id, SecurityContextHolderAwareRequestWrapper request)
+	{	
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		int userId = loggedInUser.getUserID();
 		Message m;		
@@ -406,7 +415,8 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/send_message", method=RequestMethod.POST)
-	public String sendMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model){			
+	public String sendMessage(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{			
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		Message m = new Message();
 		String subject = request.getParameter("msgSubject");
@@ -494,7 +504,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/reply_to/{msgID}", method=RequestMethod.POST)
-	public String replyToMessage(@PathVariable("msgID") int id, ModelMap model, SecurityContextHolderAwareRequestWrapper request){
+	public String replyToMessage(@PathVariable("msgID") int id, ModelMap model, SecurityContextHolderAwareRequestWrapper request)
+	{
 		Message oldMsg = messageManager.getMessageByID(id);
 		Message newMsg = new Message();
 		//Reverse sender and recipient
@@ -512,12 +523,14 @@ public class TapestryController{
 
 	//Error pages
 	@RequestMapping(value="/403", method=RequestMethod.GET)
-	public String forbiddenError(){
+	public String forbiddenError()
+	{
 		return "error-forbidden";
 	}
 	
 	@RequestMapping(value="/update_user", method=RequestMethod.POST)
-	public String updateUser(SecurityContextHolderAwareRequestWrapper request){
+	public String updateUser(SecurityContextHolderAwareRequestWrapper request)
+	{
 		String currentUsername = request.getUserPrincipal().getName();
 
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
@@ -535,7 +548,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/change_password/{id}", method=RequestMethod.POST)
-	public String changePassword(@PathVariable("id") int userID, SecurityContextHolderAwareRequestWrapper request){
+	public String changePassword(@PathVariable("id") int userID, SecurityContextHolderAwareRequestWrapper request)
+	{
 		String newPassword;
 		String target;
 		if (request.isUserInRole("ROLE_USER")){
@@ -570,13 +584,15 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/remove_picture/{id}", method=RequestMethod.GET)
-	public String removePicture(@PathVariable("id") int pictureID){
+	public String removePicture(@PathVariable("id") int pictureID)
+	{
 		pictureManager.removePicture(pictureID);
 		return "redirect:/profile";
 	}
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.GET)
-	public String viewUserLogs(@PathVariable("page") int page, SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewUserLogs(@PathVariable("page") int page, SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		int organizationId = loggedInUser.getOrganization();
 		
@@ -603,7 +619,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/user_logs/{page}", method=RequestMethod.POST)
-	public String viewFilteredUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewFilteredUserLogs(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		List<UserLog> logs = new ArrayList<UserLog>();
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		String name = request.getParameter("name");
@@ -621,7 +638,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/upload_picture_to_profile", method=RequestMethod.POST)
-	public String uploadPicture(MultipartHttpServletRequest request){
+	public String uploadPicture(MultipartHttpServletRequest request)
+	{
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
 		
@@ -632,7 +650,8 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/upload_picture_for_patient/{patientID}", method=RequestMethod.POST)
-	public String uploadPicture(@PathVariable("patientID") int id, MultipartHttpServletRequest request){
+	public String uploadPicture(@PathVariable("patientID") int id, MultipartHttpServletRequest request)
+	{
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
 		MultipartFile pic = request.getFile("pic");
 		
@@ -646,7 +665,8 @@ public class TapestryController{
 			
 	//===================== Client(patient)  =============================//
    	@RequestMapping(value="/manage_patients", method=RequestMethod.GET)
-	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request){   		
+	public String managePatients(ModelMap model, SecurityContextHolderAwareRequestWrapper request)
+   	{   		
    		User loggedInUser = TapestryHelper.getLoggedInUser(request);
    		HttpSession session = request.getSession();
    		if (session.getAttribute("unread_messages") != null)
@@ -663,10 +683,9 @@ public class TapestryController{
    	
    	@RequestMapping(value="/add_patient", method=RequestMethod.POST)
 	public String addPatient(SecurityContextHolderAwareRequestWrapper request, ModelMap model) 
-			throws JAXBException, DatatypeConfigurationException, Exception{   		
-		//Add a new patient
-		Patient p = new Patient();
-		
+			throws JAXBException, DatatypeConfigurationException, Exception
+	{   //Add a new patient
+		Patient p = new Patient();		
 		int vId1 = Integer.parseInt(request.getParameter("volunteer1"));
 		int vId2 = Integer.parseInt(request.getParameter("volunteer2"));
 		Volunteer v1 = volunteerManager.getVolunteerById(vId1);
@@ -744,7 +763,8 @@ public class TapestryController{
 	}
    	
    	@RequestMapping(value="/edit_patient/{id}", method=RequestMethod.GET)
-	public String editPatientForm(@PathVariable("id") int patientID,SecurityContextHolderAwareRequestWrapper request, ModelMap model){   
+	public String editPatientForm(@PathVariable("id") int patientID,SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+   	{   
 		Patient p = patientManager.getPatientByID(patientID);		
 		if("Male".equalsIgnoreCase(p.getGender()))
 			p.setGender("M");
@@ -766,7 +786,8 @@ public class TapestryController{
 	}
    	@RequestMapping(value="/submit_edit_patient/{id}", method=RequestMethod.POST)
 	public String modifyPatient(@PathVariable("id") int patientID, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+   	{
    		int vId1 = Integer.parseInt(request.getParameter("volunteer1"));
 		int vId2 = Integer.parseInt(request.getParameter("volunteer2"));
 		Volunteer v1 = volunteerManager.getVolunteerById(vId1);
@@ -811,9 +832,9 @@ public class TapestryController{
 	}
    	
    	@RequestMapping(value="/remove_patient/{patient_id}", method=RequestMethod.GET)
-	public String removePatient(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper request){
-   		Patient p = patientManager.getPatientByID(id);
-   		
+	public String removePatient(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper request)
+   	{
+   		Patient p = patientManager.getPatientByID(id);   		
    		patientManager.deletePatientWithId(id);
    		
    		User loggedInUser = TapestryHelper.getLoggedInUser(request);
@@ -832,8 +853,8 @@ public class TapestryController{
 	public String viewPatient(@PathVariable("patient_id") int id, @RequestParam(value="complete", required=false)
 					String completedSurvey, @RequestParam(value="aborted", required=false) String inProgressSurvey, 
 					@RequestParam(value="appointmentId", required=false) Integer appointmentId, 
-					SecurityContextHolderAwareRequestWrapper request, ModelMap model){
-				
+					SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{		
 		Patient patient = patientManager.getPatientByID(id);
 		//Find the name of the current user
 		User u = TapestryHelper.getLoggedInUser(request);
@@ -893,7 +914,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/view_clients_admin", method=RequestMethod.GET)
-	public String viewPatientsFromAdmin(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewPatientsFromAdmin(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		HttpSession session = request.getSession();
 		
 		List<Patient> patients = TapestryHelper.getAllPatientsWithFullInfos(patientManager, request);
@@ -907,7 +929,8 @@ public class TapestryController{
 	
 	//display all patients by search name
 	@RequestMapping(value="/view_clients_admin", method=RequestMethod.POST)
-	public String viewPatientsBySelectedName(SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+	public String viewPatientsBySelectedName(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		String name = request.getParameter("searchName");
 		HttpSession session = request.getSession();
 		List<Patient> patients = new ArrayList<Patient>();
@@ -928,7 +951,8 @@ public class TapestryController{
 	
 	@RequestMapping(value="/display_client/{patient_id}",method=RequestMethod.GET)
 	public String displayPatientDetails(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper
-			request, ModelMap model){
+			request, ModelMap model)
+	{
 		Patient patient = new Patient();
 		List<Patient> patients  = TapestryHelper.getAllPatientsWithFullInfos(patientManager, request);
 		for (Patient p: patients)
@@ -974,8 +998,8 @@ public class TapestryController{
 	@RequestMapping(value="/downlad_report/{patientID}", method=RequestMethod.GET)
 	public String downladReport(@PathVariable("patientID") int id,
 			@RequestParam(value="appointmentId", required=true) int appointmentId, 	
-			ModelMap model, HttpServletResponse response){
-	
+			ModelMap model, HttpServletResponse response)
+	{	
 		Patient patient = patientManager.getPatientByID(id);
 		//call web service to get patient info from myoscar
 		String userName = "carolchou.test";
@@ -1382,7 +1406,8 @@ public class TapestryController{
 	//====================== Survey ===================================//
 	@RequestMapping(value="/manage_survey_templates", method=RequestMethod.GET)
 	public String manageSurveyTemplates(@RequestParam(value="failed", required=false) Boolean deleteFailed, 
-			SecurityContextHolderAwareRequestWrapper request, ModelMap model){
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
 		List<SurveyTemplate> surveyTemplateList = surveyManager.getAllSurveyTemplates();
 		model.addAttribute("survey_templates", surveyTemplateList);
 		if (deleteFailed != null)
@@ -1415,7 +1440,8 @@ public class TapestryController{
 
 	@RequestMapping(value="/search_survey", method=RequestMethod.POST)
 	public String searchSurvey(@RequestParam(value="failed", required=false) Boolean failed, ModelMap model, 
-			SecurityContextHolderAwareRequestWrapper request){		
+			SecurityContextHolderAwareRequestWrapper request)
+	{		
 		String title = request.getParameter("searchTitle");		
 		List<SurveyTemplate>  surveyTemplateList = surveyManager.getSurveyTemplatesByPartialTitle(title);
 		
@@ -1470,8 +1496,8 @@ public class TapestryController{
    	
    	@RequestMapping(value="/go_assign_survey/{patientId}", method=RequestMethod.GET)
 	public String goAssignSurvey(@PathVariable("patientId") int id, SecurityContextHolderAwareRequestWrapper request, 
-			ModelMap model){
- 
+			ModelMap model)
+   	{ 
    		List<SurveyTemplate> surveyTemplates = TapestryHelper.getSurveyTemplates(request, surveyManager);		
    		//Assign Survey in Survey Mangement, it will load all patients in the table with checkbox for later selection
    		if (id == 0)
@@ -1507,7 +1533,8 @@ public class TapestryController{
    	
    	@RequestMapping(value="/assign_selectedsurvey", method=RequestMethod.POST)
 	public String assignSurvey(SecurityContextHolderAwareRequestWrapper request, ModelMap model) 
-			throws JAXBException, DatatypeConfigurationException, Exception{      		
+			throws JAXBException, DatatypeConfigurationException, Exception
+	{      		
    		List<SurveyTemplate> sTemplates = TapestryHelper.getSurveyTemplates(request, surveyManager);		
    		List<Patient> patients = TapestryHelper.getPatients(request, patientManager);   	
    		ArrayList<SurveyTemplate> selectSurveyTemplats = new ArrayList<SurveyTemplate>();
@@ -1605,7 +1632,9 @@ public class TapestryController{
 	}
 
 	@RequestMapping(value="/assign_surveys", method=RequestMethod.POST)
-	public String assignSurveys(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, DatatypeConfigurationException, Exception{
+	public String assignSurveys(SecurityContextHolderAwareRequestWrapper request) throws JAXBException, 
+		DatatypeConfigurationException, Exception
+	{
 		String[] patients = request.getParameterValues("patients[]");
 		if(patients == null) {
 			return "redirect:/manage_surveys?failed=true";
@@ -1641,7 +1670,8 @@ public class TapestryController{
 	}
 	
  	@RequestMapping(value = "/upload_survey_template", method=RequestMethod.POST)
-	public String addSurveyTemplate(SecurityContextHolderAwareRequestWrapper request) throws Exception{
+	public String addSurveyTemplate(SecurityContextHolderAwareRequestWrapper request) throws Exception
+	{
    		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
    		MultipartFile multipartFile = multipartRequest.getFile("file");
    		
@@ -1666,7 +1696,8 @@ public class TapestryController{
 	}
  	
    	@RequestMapping(value="/delete_survey_template/{surveyID}", method=RequestMethod.GET)
-   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model){   		
+   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model)
+   	{   		
    		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResultsBySurveyId(id);  		
    		
    		if(surveyResults.isEmpty()) {
@@ -1678,7 +1709,8 @@ public class TapestryController{
    	}
 	
 	@RequestMapping(value="open_survey/{resultID}", method=RequestMethod.GET)
-	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {		
+	public String openSurvey(@PathVariable("resultID") int id, HttpServletRequest request) 
+	{		
 		HttpSession session = request.getSession();
 		User u = (User)session.getAttribute("loggedInUser");	
 		String name = u.getName();
@@ -1707,7 +1739,8 @@ public class TapestryController{
 	}
    	
    	@RequestMapping(value="/show_survey/{resultID}", method=RequestMethod.GET)
-   	public ModelAndView showSurvey(@PathVariable("resultID") int id, HttpServletRequest request) {   		   		
+   	public ModelAndView showSurvey(@PathVariable("resultID") int id, HttpServletRequest request)
+   	{   		   		
    		ModelAndView redirectAction = null;
    		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
 		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();
@@ -1816,7 +1849,8 @@ public class TapestryController{
 	}
   
    	@RequestMapping(value="/delete_survey/{resultID}", method=RequestMethod.GET)
-   	public String deleteSurvey(@PathVariable("resultID") int id, HttpServletRequest request){
+   	public String deleteSurvey(@PathVariable("resultID") int id, HttpServletRequest request)
+   	{
    		surveyManager.deleteSurvey(id);
 		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
    		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();
@@ -1834,7 +1868,8 @@ public class TapestryController{
    	}
    	
    	@RequestMapping(value="/view_survey_results/{resultID}", method=RequestMethod.GET)
-   	public String viewSurveyResults(@PathVariable("resultID") int id, HttpServletRequest request, ModelMap model){
+   	public String viewSurveyResults(@PathVariable("resultID") int id, HttpServletRequest request, ModelMap model)
+   	{
    		SurveyResult r = surveyManager.getSurveyResultByID(id); 		
    		
    		String xml;
@@ -1866,7 +1901,8 @@ public class TapestryController{
    	
    	@RequestMapping(value="/export_csv/{resultID}", method=RequestMethod.GET)
    	@ResponseBody
-   	public String downloadCSV(@PathVariable("resultID") int id, HttpServletRequest request, HttpServletResponse response){
+   	public String downloadCSV(@PathVariable("resultID") int id, HttpServletRequest request, HttpServletResponse response)
+   	{
    		SurveyResult r = surveyManager.getSurveyResultByID(id);
    		String xml;
    		try{
@@ -1900,8 +1936,8 @@ public class TapestryController{
    	
    	@RequestMapping(value="/download_survey_template/{surveyID}", method=RequestMethod.GET)
    	@ResponseBody
-   	public String downloadSurveyTemplate(@PathVariable("surveyID") int id, HttpServletResponse response){
-   		   		
+   	public String downloadSurveyTemplate(@PathVariable("surveyID") int id, HttpServletResponse response)
+   	{   		   		
    		SurveyTemplate sTemplate = surveyManager.getSurveyTemplateByID(id);
    		String fileName = sTemplate.getTitle();
    		byte[] bContent = sTemplate.getContents();
