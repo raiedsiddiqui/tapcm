@@ -36,13 +36,7 @@ public interface ActivityDAO {
 	 * @param volunteer
 	 */
 	public void logActivity(String description, int volunteer);
-	/**
-	 * Log activity with description by volunteer for patient
-	 * @param description
-	 * @param volunteer
-	 * @param patient
-	 */
-	public void logActivity(String description, int volunteer, int patient);
+	
 	/**
 	 * Log activity
 	 * @param activity
@@ -59,7 +53,7 @@ public interface ActivityDAO {
 	 * @param appointmentId
 	 * @return a list of activities for patient and appointment
 	 */
-	public List<Activity> getDetailedLog(int patientId, int appointmentId);
+//	public List<Activity> getDetailedLog(int patientId, int appointmentId);
 	/**
 	 * 
 	 * @param activityId
@@ -130,4 +124,11 @@ public interface ActivityDAO {
 	 */
 	public List<UserLog> getGroupedUserLogssByPartialName(String partialName, int organizationId);
 	
+	/**
+	 * Save a copy of deleted activity
+	 * @param activity
+	 * @param deletedBy
+	 * @param volunteer
+	 */
+	public void archivedActivity(Activity activity, String deletedBy, String volunteer);
 }

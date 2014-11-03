@@ -54,6 +54,12 @@ public interface UserDAO {
 	 * @param id
 	 */
 	public void removeUserWithID(int id);
+	
+	/**
+	 * Delete a user by username
+	 * @param username
+	 */
+	public void removeUserByUsername(String username);
 	/**
 	 * Disable a user by id
 	 * @param id
@@ -122,5 +128,12 @@ public interface UserDAO {
 	 * @return a list of central Admin by selected organization
 	 */
 	public List<User> getVolunteerCoordinatorByOrganizationId(int id);
+	
+	/**
+	 * Save a copy of deleted user
+	 * @param user
+	 * @param deletedBy
+	 */
+	public void archiveUser(User user, String deletedBy);
 	
 }

@@ -41,4 +41,10 @@ public interface SurveyTemplateDAO {
 	 * @return number of survey template
 	 */
 	public int countSurveyTemplate();
+	
+	/**
+	 * Keep a copy of deleted survey template
+	 * @param st
+	 */
+	public void archiveSurveyTemplate(SurveyTemplate st, String deletedBy);
 }

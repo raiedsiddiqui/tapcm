@@ -70,6 +70,24 @@
 									<input type="text" name="lastname" class="form-control" required/>
 								</div>
 								<div class="col-md-4">
+									<label>Gender:</label>
+										<select name="gender" form="add_volunteer" class="form-control">
+											<option value="M">Male</option>
+											<option value="F">Female</option>
+											<option value="O">Other</option>
+										</select>
+								</div>
+							</div>
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Experience:</label>
+									<select class="form-control" name="level" form="add_volunteer">
+										<option value="E" selected>Experienced</option>
+										<option value="I" >Intermediate</option>
+										<option value="B" >Beginner</option>
+									</select>	
+								</div>
+								<div class="col-md-4">
 									<label>Organization:</label>									
 									<select name="organization" form="add_volunteer" class="form-control">
 										<c:forEach items="${organizations}" var="o">
@@ -180,15 +198,6 @@
 								  		<span class="input-group-addon">Password</span>
 								  		<input type="password" name="password" class="form-control">
 									</div>
-								</div>
-																							
-								<div class="col-md-4">
-									<label>Experience:</label>
-									<select class="form-control" name="level" form="add_volunteer">
-										<option value="E" selected>Experienced</option>
-										<option value="I" >Intermediate</option>
-										<option value="B" >Beginner</option>
-									</select>	
 								</div>
 							</div>
 

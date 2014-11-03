@@ -98,7 +98,7 @@
 </table>
 
 	<h3>Alerts</h3>		${alerts}
-
+<!-- 
 	<h2>Detailed Log</h2>
 	<table   width="970" border="1">
 		<tr>
@@ -117,7 +117,7 @@
 			<td>${a.time}</td>
 		</tr>
 		</c:forEach>
-	</table>	
+	</table>	 -->
 </div>
 </div>
 <div class="row-fluid" id="displayV1NarrativeDiv" style="display:none">				

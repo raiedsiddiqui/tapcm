@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -256,6 +257,8 @@ public class VolunteerController {
 				volunteer.setNotes(request.getParameter("notes"));
 			if (!Utils.isNullOrEmpty(request.getParameter("organization")))
 				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));		
+			if (!Utils.isNullOrEmpty(request.getParameter("gender")))
+				volunteer.setGender(request.getParameter("gender"));
 								
 			String strAvailableTime = TapestryHelper.getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
@@ -462,15 +465,25 @@ public class VolunteerController {
 	public String deleteVolunteerById(@PathVariable("volunteerId") int id, 
 				SecurityContextHolderAwareRequestWrapper request, ModelMap model)
 	{		
-		String volunteerName = volunteerManager.getVolunteerNameById(id);
-		volunteerManager.deleteVolunteerById(id);
-				
-		//add logs
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		Volunteer volunteer = volunteerManager.getVolunteerById(id);
+		String username = volunteer.getUserName();
+		User deletedVolunteer = userManager.getUserByUsername(username);
+		volunteerManager.deleteVolunteerById(id);
+		userManager.removeUserByUsername(username);
+				
+		//archive deleted volunteer
+		String loggedInUserName = loggedInUser.getName();
+		volunteerManager.archiveVolunteer(volunteer, loggedInUserName);
+		userManager.archiveUser(deletedVolunteer, loggedInUserName);
+				
+		//add logs		
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" has deleted the volunteer, ");
-		sb.append(volunteerName);		
+		sb.append(volunteer.getFirstName());	
+		sb.append(" ");
+		sb.append(volunteer.getLastName());
 		userManager.addUserLog(sb.toString(), loggedInUser);
 		
 		HttpSession  session = request.getSession();		
@@ -642,11 +655,32 @@ public class VolunteerController {
 	@RequestMapping(value="/delete_activity/{activityId}", method=RequestMethod.GET)
 	public String deleteActivityById(@PathVariable("activityId") int id, 
 			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
-	{				
+	{			
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);		
+		Activity activity = volunteerManager.getActivity(id);		
 		volunteerManager.deleteActivity(id);	
-		//add logs
-		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		//archive acitvity		
+		int volunteerId = Integer.valueOf(activity.getVolunteer());
+		String volunteerName = volunteerManager.getVolunteerNameById(volunteerId);
+		
 		StringBuffer sb = new StringBuffer();
+		String date = activity.getDate();
+		sb.append(date);
+		sb.append(" ");
+		sb.append(activity.getStartTime());
+		sb.append(":00");
+		activity.setStartTime(sb.toString());
+		
+		sb = new StringBuffer();
+		sb.append(date);
+		sb.append(" ");
+		sb.append(activity.getEndTime());
+		sb.append(":00");
+		activity.setEndTime(sb.toString());
+				
+		volunteerManager.archivedActivity(activity, loggedInUser.getName(), volunteerName);		
+		//add logs		
+		sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" has deleted the acitiviy #  ");
 		sb.append(id);		
@@ -1028,8 +1062,8 @@ public class VolunteerController {
    		if (v2Narratives.size() > 0)
    			model.addAttribute("narratives2", v2Narratives);   	
    		   		
-   		List<Activity> activities = volunteerManager.getActivities(patientId, appointmentId);   		   		   		   		
-   		model.addAttribute("activities", activities);
+//   		List<Activity> activities = volunteerManager.getActivities(patientId, appointmentId);   		   		   		   		
+//   		model.addAttribute("activities", activities);
    		   		
 		if (request.isUserInRole("ROLE_ADMIN"))
 			model.addAttribute("isCentralAdmin", true);   	

@@ -78,6 +78,21 @@ public interface UserManager {
 	public void removeUserWithID(int id);
 	
 	/**
+	 * 
+	 * @param username
+	 */
+	@Transactional
+	public void removeUserByUsername(String username);
+	
+	/**
+	 * Save a copy of a user
+	 * @param user
+	 * @param deletedBy
+	 */
+	@Transactional
+	public void archiveUser(User user, String deletedBy);
+	
+	/**
 	 * disable a user
 	 * @param id
 	 */

@@ -47,7 +47,16 @@
 									<label>Last Name:</label>
 									<input type="text" name="lastname" class="form-control" value="${volunteer.lastName}" required/>
 								</div>
-								
+								<div class="col-md-4">
+									<label>Gender:</label>
+										<select name="gender" form="modify_volunteer" class="form-control">
+											<option value="M">Male</option>
+											<option value="F">Female</option>
+											<option value="O">Other</option>
+										</select>
+								</div>
+							</div>
+							<div class="row form-group">
 								<div class="col-md-4">
 									<label>Organization:</label>
 										<select name="organization" form="modify_volunteer" class="form-control">
@@ -55,6 +64,15 @@
 												<option value="${o.organizationId}" <c:if test="${o.organizationId eq volunteer.organizationId}">selected</c:if>>${o.name}</option>
 											</c:forEach>
 										</select>
+								</div>
+								
+								<div class="col-md-4">
+									<label>Experience:</label>
+									<select class="form-control" name="level" form="modify_volunteer">
+										<option value='E' <c:if test="${volunteer.experienceLevel eq 'Experienced'}">selected</c:if>>Experienced</option>
+										<option value='I' <c:if test="${volunteer.experienceLevel eq 'Intermediate'}">selected</c:if>>Intermediate</option>
+										<option value='B' <c:if test="${volunteer.experienceLevel eq 'Beginer'}">selected</c:if> >Beginner</option>
+									</select>	
 								</div>
 							</div>
 
@@ -165,14 +183,7 @@
 									</div>
 								</div>
 																							
-								<div class="col-md-4">
-									<label>Experience:</label>
-									<select class="form-control" name="level" form="modify_volunteer">
-										<option value='E' <c:if test="${volunteer.experienceLevel eq 'Experienced'}">selected</c:if>>Experienced</option>
-										<option value='I' <c:if test="${volunteer.experienceLevel eq 'Intermediate'}">selected</c:if>>Intermediate</option>
-										<option value='B' <c:if test="${volunteer.experienceLevel eq 'Beginer'}">selected</c:if> >Beginner</option>
-									</select>	
-								</div>
+								
 							</div>
 						<h2>Availability </h2>
 						<c:set var="availability" value="${volunteer.availability}"/>						

@@ -2,7 +2,6 @@ package org.tapestry.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -111,6 +110,22 @@ public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
 		String sql = "DELETE FROM users WHERE user_ID=?";
 		getJdbcTemplate().update(sql, id);
 
+	}
+	
+	@Override
+	public void removeUserByUsername(String username) {
+		String sql = "DELETE FROM users WHERE username=?";
+		getJdbcTemplate().update(sql, username);
+		
+	}
+	
+	@Override
+	public void archiveUser(User u, String deletedBy) {
+		String sql = "INSERT INTO users_archive (username, name, role, email, phone_number, site, organization, "
+				+ "deleted_user_ID, deleted_by, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		getJdbcTemplate().update(sql, u.getUsername(), u.getName(), u.getRole(), u.getEmail(), u.getPhoneNumber(), 
+				u.getSite(), u.getOrganization(), u.getUserID(), deletedBy, u.isEnabled());
+		
 	}
 	
 	/**
@@ -268,6 +283,5 @@ public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
 			return u;
 		}
 	}
-
 
 }

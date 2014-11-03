@@ -61,6 +61,16 @@ public class UserManagerImpl implements UserManager {
 	}
 
 	@Override
+	public void removeUserByUsername(String username) {
+		userDao.removeUserByUsername(username);		
+	}
+
+	@Override
+	public void archiveUser(User user, String deletedBy) {
+		userDao.archiveUser(user, deletedBy);
+	}
+	
+	@Override
 	public void disableUserWithID(int id) {
 		userDao.disableUserWithID(id);
 	}
@@ -150,6 +160,5 @@ public class UserManagerImpl implements UserManager {
 	public List<UserLog> getGroupedUserLogssByPartialName(String partialName, int organizationId) {
 		return activityDAO.getGroupedUserLogssByPartialName(partialName, organizationId);
 	}
-
 
 }

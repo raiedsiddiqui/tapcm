@@ -87,33 +87,33 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 	}
 
 	@Override
-	public boolean addVolunteer(Volunteer volunteer) {
+	public boolean addVolunteer(Volunteer v) {
 		String sql = "INSERT INTO volunteers (firstname, lastname, street,"
 				+ "username, email, experience_level, city, province, home_phone, cell_phone,"
 				+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
-				+ " availability, street_number, password, organization) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-		getJdbcTemplate().update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getStreet(), volunteer.getUserName(),
-				volunteer.getEmail(),volunteer.getExperienceLevel(), volunteer.getCity(), volunteer.getProvince(), volunteer.getHomePhone(),
-				volunteer.getCellPhone(), volunteer.getPostalCode(), volunteer.getCountry(), volunteer.getEmergencyContact(), 
-				volunteer.getEmergencyPhone(), volunteer.getAptNumber(), volunteer.getNotes(), volunteer.getAvailability(), 
-				volunteer.getStreetNumber(), volunteer.getPassword(), volunteer.getOrganizationId());
+				+ " availability, street_number, password, organization, gender) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		getJdbcTemplate().update(sql, v.getFirstName(), v.getLastName(), v.getStreet(), v.getUserName(),
+				v.getEmail(),v.getExperienceLevel(), v.getCity(), v.getProvince(), v.getHomePhone(),
+				v.getCellPhone(), v.getPostalCode(), v.getCountry(), v.getEmergencyContact(), 
+				v.getEmergencyPhone(), v.getAptNumber(), v.getNotes(), v.getAvailability(), 
+				v.getStreetNumber(), v.getPassword(), v.getOrganizationId(), v.getGender());
 		
 		return true;
 	}
 
 	@Override
-	public void updateVolunteer(Volunteer volunteer) {
+	public void updateVolunteer(Volunteer v) {
 		String sql = "UPDATE volunteers SET firstname=?,lastname=?, username=?, street=?,"
 				+ "email=?, experience_level=?, city=?, province=?, home_phone=?, cell_phone=?,"
 				+ "postal_code=?, country=?, emergency_contact=?, emergency_phone=?, appartment=?, "
-				+ "notes=?, availability=?, street_number=?, password=?, organization=? WHERE volunteer_ID=?";
+				+ "notes=?, availability=?, street_number=?, password=?, organization=?, gender=? WHERE volunteer_ID=?";
 		
-		getJdbcTemplate().update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getUserName(), volunteer.getStreet(), 
-				volunteer.getEmail(), volunteer.getExperienceLevel(), volunteer.getCity(), volunteer.getProvince(), volunteer.getHomePhone(),
-				volunteer.getCellPhone(), volunteer.getPostalCode(), volunteer.getCountry(), volunteer.getEmergencyContact(), 
-				volunteer.getEmergencyPhone(), volunteer.getAptNumber(), volunteer.getNotes(), volunteer.getAvailability(), volunteer.getStreetNumber(), 				
-				volunteer.getPassword(), volunteer.getOrganizationId(), volunteer.getVolunteerId());		
+		getJdbcTemplate().update(sql, v.getFirstName(), v.getLastName(), v.getUserName(), v.getStreet(), 
+				v.getEmail(), v.getExperienceLevel(), v.getCity(), v.getProvince(), v.getHomePhone(),
+				v.getCellPhone(), v.getPostalCode(), v.getCountry(), v.getEmergencyContact(), 
+				v.getEmergencyPhone(), v.getAptNumber(), v.getNotes(), v.getAvailability(), v.getStreetNumber(), 				
+				v.getPassword(), v.getOrganizationId(), v.getVolunteerId(), v.getGender());		
 	}
 
 	@Override
@@ -192,6 +192,20 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 
 	}
 	
+	@Override
+	public void archiveVolunteer(Volunteer volunteer, String deletedBy) {
+		String sql = "INSERT INTO volunteers_archive (firstname, lastname, street,"
+				+ "username, email, experience_level, city, province, home_phone, cell_phone,"
+				+ "postal_code, country, emergency_contact, emergency_phone, appartment,"
+				+ " street_number, organization, deleted_by, deleted_volunteer_ID) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		getJdbcTemplate().update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getStreet(), volunteer.getUserName(),
+				volunteer.getEmail(),volunteer.getExperienceLevel(), volunteer.getCity(), volunteer.getProvince(), volunteer.getHomePhone(),
+				volunteer.getCellPhone(), volunteer.getPostalCode(), volunteer.getCountry(), volunteer.getEmergencyContact(), 
+				volunteer.getEmergencyPhone(), volunteer.getAptNumber(), volunteer.getStreetNumber(), volunteer.getOrganizationId(),
+				deletedBy, volunteer.getVolunteerId());		
+	}
+	
 	class VolunteerMapper implements RowMapper<Volunteer>{
 		public Volunteer mapRow(ResultSet rs, int rowNum) throws SQLException{
 			
@@ -266,5 +280,7 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 			
 		}
 	}
+
+	
 
 }

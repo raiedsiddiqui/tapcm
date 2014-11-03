@@ -114,4 +114,14 @@ public class SurveyManagerImpl implements SurveyManager {
 		return surveyTemplateDao.countSurveyTemplate();
 	}
 
+	@Override
+	public void archiveSurveyTemplate(SurveyTemplate st, String deletedBy) {
+		surveyTemplateDao.archiveSurveyTemplate(st, deletedBy);		
+	}
+
+	@Override
+	public void archiveSurveyResult(SurveyResult sr, String patient, String deletedBy) {
+		surveyResultDao.archiveSurveyResult(sr, patient, deletedBy);
+	}
+
 }

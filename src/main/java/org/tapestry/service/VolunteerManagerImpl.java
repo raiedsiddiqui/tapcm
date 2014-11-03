@@ -146,11 +146,6 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	}
 
 	@Override
-	public void logActivity(String description, int volunteer, int patient) {
-		activityDAO.logActivity(description, volunteer, patient);
-	}
-
-	@Override
 	public void logActivity(Activity activity) {
 		activityDAO.logActivity(activity);
 	}
@@ -160,10 +155,10 @@ public class VolunteerManagerImpl implements VolunteerManager {
 		activityDAO.updateActivity(activity);
 	}
 
-	@Override
-	public List<Activity> getActivities(int patientId, int appointmentId) {
-		return activityDAO.getDetailedLog(patientId, appointmentId);
-	}
+//	@Override
+//	public List<Activity> getActivities(int patientId, int appointmentId) {
+//		return activityDAO.getDetailedLog(patientId, appointmentId);
+//	}
 
 	@Override
 	public void deleteActivity(int id) {
@@ -179,6 +174,11 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	@Override
 	public Activity getActivity(int activityId) {		
 		return activityDAO.getActivityLogById(activityId);
+	}
+	
+	@Override
+	public void archivedActivity(Activity activity, String deletedBy, String volunteer) {
+		activityDAO.archivedActivity(activity, deletedBy, volunteer);
 	}
 	
 	//=============Narrative ======//
@@ -211,4 +211,11 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	public void deleteNarrativeById(int narrativeId) {
 		narrativeDao.deleteNarrativeById(narrativeId);
 	}
+
+	@Override
+	public void archiveVolunteer(Volunteer volunteer, String deletedBy) {
+		volunteerDao.archiveVolunteer(volunteer, deletedBy);
+	}
+
+
 }

@@ -1670,7 +1670,7 @@ public class TapestryController{
 	}
 	
  	@RequestMapping(value = "/upload_survey_template", method=RequestMethod.POST)
-	public String addSurveyTemplate(SecurityContextHolderAwareRequestWrapper request) throws Exception
+	public String addSurveyTemplate(HttpServletRequest request) throws Exception
 	{
    		MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
    		MultipartFile multipartFile = multipartRequest.getFile("file");
@@ -1685,7 +1685,8 @@ public class TapestryController{
 		st.setContents(multipartFile.getBytes());
 		surveyManager.uploadSurveyTemplate(st);
 		
-		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		HttpSession session = request.getSession();
+		User loggedInUser = (User)session.getAttribute("loggedInUser");
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" has uploaded survey template ");
@@ -1696,12 +1697,28 @@ public class TapestryController{
 	}
  	
    	@RequestMapping(value="/delete_survey_template/{surveyID}", method=RequestMethod.GET)
-   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model)
+   	public String deleteSurveyTemplate(@PathVariable("surveyID") int id, ModelMap model, 
+   			SecurityContextHolderAwareRequestWrapper request)
    	{   		
-   		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResultsBySurveyId(id);  		
-   		
-   		if(surveyResults.isEmpty()) {
+   		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResultsBySurveyId(id);   		
+   		if(surveyResults.isEmpty())
+   		{	
+   			SurveyTemplate st = surveyManager.getSurveyTemplateByID(id);
    			surveyManager.deleteSurveyTemplate(id);
+   			//archieve the record
+   			User loggedInUser = TapestryHelper.getLoggedInUser(request);
+   			// get a java.util.Date from the Calendar instance.   			
+   		//	java.util.Date now = Calendar.getInstance().getTime();   	 
+   			// 3) a java current time (now) instance
+   		//	java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
+   			surveyManager.archiveSurveyTemplate(st, loggedInUser.getName());
+   			//user logs   			
+   			StringBuffer sb  = new StringBuffer();
+   			sb.append(loggedInUser.getName());
+   			sb.append(" deleted survey template # ");
+   			sb.append(id);   			   		
+   			userManager.addUserLog(sb.toString(), loggedInUser);
+   			
    			return "redirect:/manage_survey_templates";
    		} else {
    			return "redirect:/manage_survey_templates?failed=true";
@@ -1806,7 +1823,8 @@ public class TapestryController{
 			
 			//user logs
 			sb  = new StringBuffer();
-			sb.append("Completed survey ");
+			sb.append(currentUser.getName());
+			sb.append(" completed survey ");
 			sb.append(surveyResult.getSurveyTitle());
 			sb.append(" for patient ");
 			
@@ -1825,7 +1843,8 @@ public class TapestryController{
 			
 			//user logs
 			sb  = new StringBuffer();
-			sb.append("Saved incomplete survey ");
+			sb.append(currentUser.getName());
+			sb.append(" saved incomplete survey ");
 			sb.append(surveyResult.getSurveyTitle());
 			sb.append(" for patient ");
 			
@@ -1851,16 +1870,25 @@ public class TapestryController{
    	@RequestMapping(value="/delete_survey/{resultID}", method=RequestMethod.GET)
    	public String deleteSurvey(@PathVariable("resultID") int id, HttpServletRequest request)
    	{
+   		SurveyResult sr = surveyManager.getSurveyResultByID(id);   		
    		surveyManager.deleteSurvey(id);
 		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
    		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();
    		DoSurveyAction.getSurveyMapAndStoreInSession(request, surveyResults, surveyTemplates);
-   		//add logs
+   		
    		HttpSession session = request.getSession();
    		User loggedInUser = (User)session.getAttribute("loggedInUser");
-		StringBuffer sb = new StringBuffer();
+   		//archive the deleted survey result
+   		Patient patient = patientManager.getPatientByID(sr.getPatientID());
+   		StringBuffer sb = new StringBuffer();
+   		sb.append(patient.getFirstName());
+   		sb.append(" ");
+   		sb.append(patient.getLastName());   		
+   		surveyManager.archiveSurveyResult(sr, sb.toString(), loggedInUser.getName());
+   		//add logs
+		sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
-		sb.append(" has deleted survey # ");
+		sb.append(" has deleted survey result # ");
 		sb.append(id);
 		userManager.addUserLog(sb.toString(), loggedInUser);
    		

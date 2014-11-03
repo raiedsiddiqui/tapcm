@@ -59,9 +59,7 @@ CREATE TABLE IF NOT EXISTS activities (
 	event_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	start_time TIMESTAMP NULL,
 	end_time TIMESTAMP NULL,
-	volunteer SMALLINT UNSIGNED NOT NULL,
-	patient SMALLINT UNSIGNED,
-	appointment SMALLINT UNSIGNED,
+	volunteer SMALLINT UNSIGNED NOT NULL,		
 	description TEXT,
 	organization MEDIUMINT UNSIGNED,
 	PRIMARY KEY (event_ID)
@@ -177,15 +175,143 @@ CREATE TABLE IF NOT EXISTS report(
 	PRIMARY KEY (report_ID)		
 );
 
-CREATE TABLE IF NOT EXISTS narratives_archived (
-    narrative_ID MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS users_archive (
+	id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	deleted_user_ID INT UNSIGNED NOT NULL, /*Using UNSIGNED TINYINT allows for 255 users*/
+	name VARCHAR(255) NOT NULL,
+	username VARCHAR(255) NOT NULL,
+	phone_number VARCHAR(20),
+	site VARCHAR(50),
+	enabled BOOLEAN NOT NULL,
+	email VARCHAR(50) NOT NULL,
+	role VARCHAR(45),
+	organization MEDIUMINT UNSIGNED NOT NULL, /*for volunteer and volunteer coordinator*/
+	deleted_by VARCHAR(255) NOT NULL,
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+	
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS narratives_archive (
+	id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    deleted_narrative_ID MEDIUMINT UNSIGNED NOT NULL ,
     title VARCHAR(50) NOT NULL,
     contents TEXT,
-    edit_Date TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP, /*edit_Date represents the last edit date*/    
-    volunteer SMALLINT UNSIGNED NOT NULL,
+    edit_Date TIMESTAMP NOT NULL , /*edit_Date represents the last edit date*/    
+    volunteer_ID SMALLINT UNSIGNED NOT NULL,
     patient_ID SMALLINT UNSIGNED NOT NULL,
-    appointment SMALLINT UNSIGNED NOT NULL,
-    PRIMARY KEY (narrative_ID)
+    appointment_ID SMALLINT UNSIGNED NOT NULL,
+    deleted_by VARCHAR(255) NOT NULL,
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+	
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS surveys_archive (
+	id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED TINYINT allows 255 surveys*/
+	deleted_survey_ID TINYINT UNSIGNED NOT NULL,
+	title VARCHAR(50),
+	type VARCHAR(255),
+	contents MEDIUMBLOB,
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, /*Automatically updates when record changed*/
+    priority TINYINT(1), /*Between 0-9*/
+    description TEXT,
+    deleted_by VARCHAR(255) NOT NULL,
+	 	
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS survey_results_archive (
+	id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, /*Using UNSIGNED SMALLINT allows for 65,535 results*/
+	deleted_result_ID SMALLINT UNSIGNED NOT NULL,
+	survey_ID SMALLINT UNSIGNED NOT NULL, /*Same as survey_ID field in surveys*/
+	patient VARCHAR(255) NOT NULL, 
+	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the survey (0=incomplete)*/
+	startDate DATETIME, /*Automatically assigns the startDate when the survey is assigned*/
+	data MEDIUMBLOB, /*The survey data*/
+	deleted_by VARCHAR(255) NOT NULL,
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+	
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS activities_archive (
+	id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	deleted_event_ID INT UNSIGNED NOT NULL , /*Using UNSIGNED INT allows for 4,294,967,295 events, which should be enough*/
+	start_time TIMESTAMP NOT NULL,
+	end_time TIMESTAMP NOT NULL,
+	volunteer VARCHAR(255) NOT NULL,	
+	description TEXT,
+	organization VARCHAR(255) NOT NULL,
+	deleted_by VARCHAR(255) NOT NULL,
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+	
+	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS volunteers_archive (
+	id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	deleted_volunteer_ID MEDIUMINT UNSIGNED NOT NULL ,
+	firstname VARCHAR(255) NOT NULL,
+	lastname VARCHAR(255) NOT NULL,
+	preferredname VARCHAR(255),
+	username VARCHAR(50),
+	gender VARCHAR(10), 
+	email VARCHAR(50),
+	experience_level VARCHAR(20),
+	street_number VARCHAR(20),
+	street VARCHAR(100),
+	appartment VARCHAR(10),	
+	city VARCHAR(50),
+	province VARCHAR(3),
+	country VARCHAR(50),
+	home_phone VARCHAR(20),
+	cell_phone VARCHAR(20),
+	emergency_contact VARCHAR(50),
+	emergency_phone VARCHAR(20),
+	postal_code VARCHAR(10),
+	organization MEDIUMINT UNSIGNED NOT NULL,
+	deleted_by VARCHAR(255) NOT NULL,
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+	
+	PRIMARY KEY (id)	
+);
+
+CREATE TABLE IF NOT EXISTS appointments_archive (
+	id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	deleted_appointment_ID SMALLINT UNSIGNED NOT NULL , /*Using UNSIGNED SMALLINT allows for 65,535 appointments*/
+	volunteer TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
+	partner TINYINT UNSIGNED,
+	patient SMALLINT UNSIGNED NOT NULL, /* Same as patient_ID */
+	date_time DATETIME NOT NULL, /*Contains both date and time, separated using functions in query*/
+	comments TEXT, /*Volunteer visit comments*/
+	status TEXT NOT NULL, /*Approval status of appointment*/
+	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the appointment (0=incomplete)*/
+	contactedAdmin BOOLEAN NOT NULL DEFAULT 0, /*The status of the volunteer contacted the admin*/
+	hasNarrative BOOLEAN NOT NULL DEFAULT 0, /*The narrative has been completed of the appointment (0=incomplete)*/
+	alerts TEXT,
+	key_observations TEXT,
+	plan TEXT,	
+	type SMALLINT UNSIGNED NOT NULL,
+	deleted_by VARCHAR(255) NOT NULL,
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+	
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS messages_archive (
+	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	deleted_message_ID BIGINT UNSIGNED NOT NULL ,
+	recipient TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
+	sender TINYINT UNSIGNED NOT NULL,
+	msg TEXT,
+    sent TIMESTAMP NOT NULL ,
+	subject VARCHAR(255) NOT NULL,
+	msgRead BOOLEAN NOT NULL DEFAULT 0,
+	deleted_by VARCHAR(255) NOT NULL,
+	deleted_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+	
+	PRIMARY KEY (id)
 );
 
 COMMIT;

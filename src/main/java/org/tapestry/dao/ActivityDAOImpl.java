@@ -63,30 +63,23 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 		return getJdbcTemplate().query(sql, new Object[]{id}, new ActivityMapper());	
 	}
 	
-	@Override
-	public List<Activity> getDetailedLog(int patientId, int appointmentId){
-		String sql = "SELECT DATE(activities.event_timestamp) AS date, activities.description, "
-				+ "TIME(activities.start_Time) AS sTime, TIME(activities.end_Time) AS eTime, "
-				+ "activities.organization, activities.event_ID, "
-				+ "volunteers.firstname, volunteers.lastname  FROM activities "
-				+ "INNER JOIN volunteers ON activities.volunteer=volunteers.volunteer_ID"
-				+ " WHERE patient = ? AND appointment = ? ORDER BY event_timestamp";
-				
-		return getJdbcTemplate().query(sql, new Object[]{patientId, appointmentId}, new ActivityMapper());	
-	}
+//	@Override
+//	public List<Activity> getDetailedLog(int patientId, int appointmentId){
+//		String sql = "SELECT DATE(activities.event_timestamp) AS date, activities.description, "
+//				+ "TIME(activities.start_Time) AS sTime, TIME(activities.end_Time) AS eTime, "
+//				+ "activities.organization, activities.event_ID, "
+//				+ "volunteers.firstname, volunteers.lastname  FROM activities "
+//				+ "INNER JOIN volunteers ON activities.volunteer=volunteers.volunteer_ID"
+//				+ " WHERE patient = ? AND appointment = ? ORDER BY event_timestamp";
+//				
+//		return getJdbcTemplate().query(sql, new Object[]{patientId, appointmentId}, new ActivityMapper());	
+//	}
 
 	@Override
 	public void logActivity(String description, int volunteer) {
 		//volunteer add activity
 		String sql = "INSERT INTO activities (description,volunteer) VALUES (?, ?)";
 		getJdbcTemplate().update(sql,description, volunteer);		
-	}
-
-	@Override
-	public void logActivity(String description, int volunteer, int patient) {
-		// volunteer add activity 
-		String sql = "INSERT INTO activities (description,volunteer,patient) VALUES (?, ?, ?)";
-		getJdbcTemplate().update(sql,description, volunteer, patient);		
 	}
 
 	@Override
@@ -118,8 +111,8 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 
 	@Override
 	public Activity getActivityLogById(int activityId) {
-		String sql = "SELECT DATE(event_timestamp) AS date, description, event_ID, "
-				+ " TIME(start_Time) AS sTime, TIME(end_Time) AS eTime FROM activities WHERE event_ID = ?";
+		String sql = "SELECT DATE(event_timestamp) AS date, description, event_ID, volunteer,"
+				+ " TIME(start_Time) AS sTime, TIME(end_Time) AS eTime, organization FROM activities WHERE event_ID = ?";
 		
 		return getJdbcTemplate().queryForObject(sql, new Object[]{activityId}, new DetailedActivityMapper());		
 	}
@@ -226,6 +219,8 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 			activity.setStartTime(time.substring(0, time.length() - 3));			
 			time = rs.getString("eTime");
 			activity.setEndTime(time.substring(0, time.length() - 3));
+			activity.setVolunteer(rs.getString("volunteer"));
+			activity.setOrganizationId(rs.getInt("organization"));
 			
 			return activity;			
 		}
@@ -233,8 +228,7 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 		
 	class UserLogMapper implements RowMapper<UserLog> {
 		public UserLog mapRow(ResultSet rs, int rowNum) throws SQLException{
-			UserLog log = new UserLog();
-			
+			UserLog log = new UserLog();			
 			log.setDate(rs.getString("event_timestamp"));
 			log.setDescription(rs.getString("description"));
 			log.setUserId(rs.getInt("user"));
@@ -242,6 +236,15 @@ public class ActivityDAOImpl extends JdbcDaoSupport implements ActivityDAO {
 			
 			return log;
 		}
+	}
+
+	@Override
+	public void archivedActivity(Activity activity, String deletedBy, String volunteer) {
+		String sql = "INSERT INTO activities_archive (deleted_event_ID, description,volunteer, start_Time,end_Time, "
+				+ " organization, deleted_by) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		getJdbcTemplate().update(sql, activity.getActivityId(), activity.getDescription(), volunteer, 
+				activity.getStartTime(), activity.getEndTime(), activity.getOrganizationId(), deletedBy);
+		
 	}
 
 }

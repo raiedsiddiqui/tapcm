@@ -99,6 +99,14 @@ public interface VolunteerManager {
 	public void deleteVolunteerById(int id);
 	
 	/**
+	 * 
+	 * @param volunteer
+	 * @param deleteBy
+	 */
+	@Transactional
+	public void archiveVolunteer(Volunteer volunteer, String deletedBy);
+	
+	/**
 	 * Count all volunteers
 	 * @return number of volunteers
 	 */
@@ -189,14 +197,7 @@ public interface VolunteerManager {
 	 */
 	@Transactional
 	public void logActivity(String description, int volunteer);
-	/**
-	 * log activity with desc by volunteer for patient
-	 * @param description
-	 * @param volunteer
-	 * @param patient
-	 */
-	@Transactional
-	public void logActivity(String description, int volunteer, int patient);
+
 	/**
 	 * log activity
 	 * @param activity
@@ -215,8 +216,8 @@ public interface VolunteerManager {
 	 * @param appointmentId
 	 * @return a list of activities for patient on appointment
 	 */
-	@Transactional
-	public List<Activity> getActivities(int patientId, int appointmentId);
+//	@Transactional
+//	public List<Activity> getActivities(int patientId, int appointmentId);
 	/**
 	 * delete activity
 	 * @param id
@@ -238,6 +239,15 @@ public interface VolunteerManager {
 	 */
 	@Transactional
 	public Activity getActivity(int activityId);	
+	
+	/**
+	 * 
+	 * @param activity
+	 * @param deletedBy
+	 * @param volunteer
+	 */
+	@Transactional
+	public void archivedActivity(Activity activity, String deletedBy, String volunteer);
 	
 	//==========Narrative=====//
 	@Transactional
