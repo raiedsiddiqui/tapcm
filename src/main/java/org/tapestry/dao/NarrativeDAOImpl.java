@@ -3,6 +3,7 @@ package org.tapestry.dao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,6 @@ public class NarrativeDAOImpl extends JdbcDaoSupport implements NarrativeDAO {
 		
 		getJdbcTemplate().update(sql, narrative.getTitle(), narrative.getContents(), narrative.getEditDate(), 
 				narrative.getPatientId(), narrative.getAppointmentId(), narrative.getVolunteerId());
-
 	}
 
 	@Override
@@ -90,6 +90,15 @@ public class NarrativeDAOImpl extends JdbcDaoSupport implements NarrativeDAO {
 		String sql = "DELETE FROM narratives WHERE narrative_ID=?";
 		getJdbcTemplate().update(sql, narrativeId);
 
+	}
+	
+	@Override
+	public void archiveNarrative(Narrative n, String updatedBy,	String whatAction) {
+		String sql = "INSERT INTO narratives_archive (title, contents, last_edit, patient_ID, appointment_ID, "
+				+ "volunteer_ID, updated_narrative_ID, update_action, updated_by) VALUES (?,?,?,?,?,?,?,?,?)";
+		
+		getJdbcTemplate().update(sql, n.getTitle(), n.getContents(), n.getEditDate(), n.getPatientId(), 
+				n.getAppointmentId(), n.getVolunteerId(), n.getNarrativeId(), whatAction, updatedBy);
 	}
 	
 	class NarrativeMapper implements RowMapper<Narrative> {
@@ -116,4 +125,5 @@ public class NarrativeDAOImpl extends JdbcDaoSupport implements NarrativeDAO {
 			return narrative;
 		}
 	}
+
 }

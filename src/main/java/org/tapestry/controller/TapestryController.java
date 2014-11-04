@@ -498,8 +498,20 @@ public class TapestryController{
 				session.setAttribute("unread_messages", iUnRead);
 				model.addAttribute("unread", iUnRead);
 			}
-		}			
+		}
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
+		String loggedInUserName = loggedInUser.getName();
+		Message message = messageManager.getMessageByID(id);
 		messageManager.deleteMessage(id);
+		//archive deleted message
+		messageManager.archiveMessage(message, loggedInUserName);
+		
+		//add log
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUserName);
+		sb.append(" deleted a message ");		
+		userManager.addUserLog(sb.toString(), loggedInUser);	
+		
 		return "redirect:/inbox";
 	}
 	
@@ -995,8 +1007,8 @@ public class TapestryController{
 		return "/admin/display_client";
 	}
 	//============report======================
-	@RequestMapping(value="/downlad_report/{patientID}", method=RequestMethod.GET)
-	public String downladReport(@PathVariable("patientID") int id,
+	@RequestMapping(value="/download_report/{patientID}", method=RequestMethod.GET)
+	public String downloadReport(@PathVariable("patientID") int id,
 			@RequestParam(value="appointmentId", required=true) int appointmentId, 	
 			ModelMap model, HttpServletResponse response)
 	{	

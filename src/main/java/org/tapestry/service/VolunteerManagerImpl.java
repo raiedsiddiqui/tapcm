@@ -210,7 +210,13 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	@Override
 	public void deleteNarrativeById(int narrativeId) {
 		narrativeDao.deleteNarrativeById(narrativeId);
+	}	
+
+	@Override
+	public void archiveNarrative(Narrative n, String updatedBy,	String whatAction) {
+		narrativeDao.archiveNarrative(n, updatedBy, whatAction);		
 	}
+
 
 	@Override
 	public void archiveVolunteer(Volunteer volunteer, String deletedBy) {

@@ -231,4 +231,11 @@ public interface AppointmentDAO {
      * @param id
      */
     public void completeNarrative(int id);
+    
+    /**
+     * Save a copy of deleted appointment
+     * @param appointment
+     * @param deletedBy
+     */
+    public void archiveAppointment(Appointment appointment, String deletedBy);
 }

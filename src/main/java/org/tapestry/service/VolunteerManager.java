@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Narrative;
 import org.tapestry.objects.Organization;
-import org.tapestry.objects.User;
-import org.tapestry.objects.UserLog;
 import org.tapestry.objects.Volunteer;
 
 /**
@@ -250,16 +248,59 @@ public interface VolunteerManager {
 	public void archivedActivity(Activity activity, String deletedBy, String volunteer);
 	
 	//==========Narrative=====//
+	/**
+	 * 
+	 * @param volunteerId
+	 * @return
+	 */			
 	@Transactional
 	public List<Narrative> getAllNarrativesByUser(int volunteerId);
+	
+	/**
+	 * 
+	 * @param volunteerId
+	 * @param patientId
+	 * @param appointmentId
+	 * @return
+	 */
 	@Transactional
 	public List<Narrative> getNarrativesByVolunteer(int volunteerId, int patientId, int appointmentId);
+	
+	/**
+	 * 
+	 * @param narrativeId
+	 * @return
+	 */
 	@Transactional
 	public Narrative getNarrativeById(int narrativeId);
+	
+	/**
+	 * 
+	 * @param narrative
+	 */
 	@Transactional
 	public void addNarrative(Narrative narrative);
+	
+	/**
+	 * 
+	 * @param narrative
+	 */
 	@Transactional
 	public void updateNarrative(Narrative narrative);
+	
+	/**
+	 * 
+	 * @param narrativeId
+	 */
 	@Transactional
 	public void deleteNarrativeById(int narrativeId);
+	
+	/**
+	 * Save a copy of updated narrative
+	 * @param n
+	 * @param updatedBy
+	 * @param whatAction
+	 */
+	@Transactional
+	public void archiveNarrative(Narrative n, String updatedBy,	String whatAction);
 }

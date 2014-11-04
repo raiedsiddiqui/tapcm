@@ -212,7 +212,7 @@
 			<td>${cVistits.date}</td>			
 			<td>${cVistits.volunteer},&nbsp &nbsp ${cVistits.partner}</td>
 			<c:if test="${showReport}">
-				<td><a href="<c:url value="/downlad_report/${patient.patientID}?appointmentId=${cVistits.appointmentID}"/>">DOWNLOAD</a> </td>
+				<td><a href="<c:url value="/download_report/${patient.patientID}?appointmentId=${cVistits.appointmentID}"/>">DOWNLOAD</a> </td>
 			</c:if>
 		</tr>
 		</c:forEach>

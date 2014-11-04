@@ -124,6 +124,7 @@ public class VolunteerController {
 		
 		List<Organization> organizations = new ArrayList<Organization>();
 		HttpSession session = request.getSession();
+		
 		if (session.getAttribute("organizations") != null)
 			organizations = (List<Organization>) session.getAttribute("organizations");
 		else 
@@ -259,7 +260,7 @@ public class VolunteerController {
 				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));		
 			if (!Utils.isNullOrEmpty(request.getParameter("gender")))
 				volunteer.setGender(request.getParameter("gender"));
-								
+											
 			String strAvailableTime = TapestryHelper.getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
@@ -319,17 +320,24 @@ public class VolunteerController {
 	@RequestMapping(value="/modify_volunteer/{volunteerId}", method=RequestMethod.GET)
 	public String modifyVolunteer(SecurityContextHolderAwareRequestWrapper request, 
 			@PathVariable("volunteerId") int id, ModelMap model)
-	{
-		Volunteer volunteer = new Volunteer();
-		volunteer = volunteerManager.getVolunteerById(id);		
-		List<Organization> organizations;
+	{		
+		Volunteer volunteer = volunteerManager.getVolunteerById(id);		
+		
+		List<Organization> organizations = new ArrayList<Organization>();
 		HttpSession session = request.getSession();
 		
 		if (session.getAttribute("organizations") != null)
 			organizations = (List<Organization>) session.getAttribute("organizations");
 		else 
 		{
-			organizations = volunteerManager.getAllOrganizations();
+			if (request.isUserInRole("ROLE_ADMIN"))
+				organizations = volunteerManager.getAllOrganizations();
+			else
+			{
+				int organizationId = TapestryHelper.getLoggedInUser(request, userManager).getOrganization();
+				Organization organization = volunteerManager.getOrganizationById(organizationId);
+				organizations.add(organization);
+			}				
 			session.setAttribute("organizations", organizations);
 		}
 		
@@ -380,7 +388,7 @@ public class VolunteerController {
 		HttpSession  session = request.getSession();
 		Volunteer volunteer;
 			
-		volunteer = volunteerManager.getVolunteerById(id);		
+		volunteer = volunteerManager.getVolunteerById(id);				
 		
 		if (!Utils.isNullOrEmpty(request.getParameter("firstname")))
 			volunteer.setFirstName(request.getParameter("firstname"));
@@ -436,6 +444,9 @@ public class VolunteerController {
 		if (!Utils.isNullOrEmpty(request.getParameter("notes")))
 			volunteer.setNotes(request.getParameter("notes"));
 		
+		if (!Utils.isNullOrEmpty(request.getParameter("gender")))
+			volunteer.setGender(request.getParameter("gender"));
+				
 		if (!Utils.isNullOrEmpty(request.getParameter("organization")))
 			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
 			
@@ -1286,9 +1297,12 @@ public class VolunteerController {
 	@RequestMapping(value="/delete_appointment/{appointmentID}", method=RequestMethod.GET)
 	public String deleteAppointment(@PathVariable("appointmentID") int id, SecurityContextHolderAwareRequestWrapper request)
 	{
-		appointmentManager.deleteAppointment(id);		
-		//add logs
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		Appointment a = appointmentManager.getAppointmentById(id);		
+		appointmentManager.deleteAppointment(id);		
+		//archive deleted appointment
+		appointmentManager.archiveAppointment(a, loggedInUser.getName());
+		//add logs		
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" has deleted the appointment #  ");
@@ -1852,8 +1866,8 @@ public class VolunteerController {
 		narrative.setEditDate(editDate);
 		
 		model.addAttribute("narrative", narrative);			
-		TapestryHelper.setUnreadMsg(null, request, model, messageManager);
-		
+	//	TapestryHelper.setUnreadMsg(null, request, model, messageManager);
+		TapestryHelper.setUnreadMsg(request.getSession(), request, model, messageManager);
 		return "/volunteer/modify_narrative";
 	}
 	
@@ -1879,13 +1893,16 @@ public class VolunteerController {
 		String narrativeId = null;
 		int iNarrativeId;	
 		Narrative narrative = new Narrative();		
-		HttpSession  session = request.getSession();			
+		HttpSession  session = request.getSession();	
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
 					
 		if (request.getParameter("narrativeId") != null){
 			narrativeId = request.getParameter("narrativeId").toString();	
 			iNarrativeId = Integer.parseInt(narrativeId);
 			
 			narrative = volunteerManager.getNarrativeById(iNarrativeId);
+			//archive narrative
+			volunteerManager.archiveNarrative(narrative, loggedInUser.getName(), "update");
 						
 			String title = null;
 			if (request.getParameter("mNarrativeTitle") != null){
@@ -1909,8 +1926,7 @@ public class VolunteerController {
 			}
 			
 			volunteerManager.updateNarrative(narrative);			
-			//add logs
-			User loggedInUser = TapestryHelper.getLoggedInUser(request);
+			//add logs			
 			StringBuffer sb = new StringBuffer();
 			sb.append(loggedInUser.getName());
 			sb.append(" has modified the narrative # ");
@@ -1970,9 +1986,14 @@ public class VolunteerController {
 	public String deleteNarrativeById(@PathVariable("narrativeId") int id, 
 				SecurityContextHolderAwareRequestWrapper request, ModelMap model)
 	{		
-		volunteerManager.deleteNarrativeById(id);		
-		//add logs
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		Narrative narrative = volunteerManager.getNarrativeById(id);
+		//arvhice narrative
+		volunteerManager.archiveNarrative(narrative, loggedInUser.getName(), "delete");
+		//delete
+		volunteerManager.deleteNarrativeById(id);	
+		
+		//add logs
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" has deleted the narrative # ");

@@ -227,6 +227,14 @@ public interface AppointmentManager {
      */
 	@Transactional
     public void deleteAppointment(int id);
+	
+	/**
+	 * Save a copy of deleted appointment
+	 * @param a
+	 * @param deletedBy
+	 */
+	@Transactional
+	public void archiveAppointment(Appointment a, String deletedBy);
     
     /**
      * @param id appointmentId

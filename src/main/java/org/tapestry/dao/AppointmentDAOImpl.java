@@ -385,6 +385,16 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 		String sql = "DELETE FROM appointments WHERE appointment_ID=?";
 		getJdbcTemplate().update(sql, id);
 	}
+	
+	@Override
+	public void archiveAppointment(Appointment a, String deletedBy) {
+		String sql = "INSERT INTO appointments_archive (volunteer, patient, date_time, partner, status, type, "
+				+ "deleted_appointment_ID, deleted_by, comments, completed) values (?,?,?,?,?,?,?,?,?,?)";
+		getJdbcTemplate().update(sql, a.getVolunteerID(),a.getPatientID(), a.getDate() + " " + a.getTime(), a.getPartnerId(), 
+				a.getStatus(), a.getType(), a.getAppointmentID(), deletedBy, a.getComments(), a.isCompleted());
+		
+	}
+
 
 	@Override
 	public String getKeyObservationByAppointmentId(int id) {
@@ -482,8 +492,5 @@ public class AppointmentDAOImpl extends JdbcDaoSupport implements AppointmentDAO
 			return appointment;
 		}
 	}
-
-	
-
 
 }

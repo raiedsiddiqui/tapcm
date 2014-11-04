@@ -180,4 +180,9 @@ public class AppointmentManagerImpl implements AppointmentManager {
 		return appointmentDao.getPendingAppointmentsGroupByOrganization(organizationId);
 	}
 
+	@Override
+	public void archiveAppointment(Appointment a, String deletedBy) {
+		appointmentDao.archiveAppointment(a, deletedBy);		
+	}
+
 }

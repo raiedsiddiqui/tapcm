@@ -193,16 +193,17 @@ CREATE TABLE IF NOT EXISTS users_archive (
 );
 
 CREATE TABLE IF NOT EXISTS narratives_archive (
-	id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    deleted_narrative_ID MEDIUMINT UNSIGNED NOT NULL ,
+	id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,    
+	updated_narrative_ID MEDIUMINT UNSIGNED NOT NULL,
     title VARCHAR(50) NOT NULL,
     contents TEXT,
-    edit_Date TIMESTAMP NOT NULL , /*edit_Date represents the last edit date*/    
+    last_edit TIMESTAMP ,  
     volunteer_ID SMALLINT UNSIGNED NOT NULL,
     patient_ID SMALLINT UNSIGNED NOT NULL,
     appointment_ID SMALLINT UNSIGNED NOT NULL,
-    deleted_by VARCHAR(255) NOT NULL,
-	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    update_action VARCHAR(255) NOT NULL,
+    updated_by VARCHAR(255) NOT NULL,    
+	updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
 	
     PRIMARY KEY (id)
 );
@@ -286,12 +287,7 @@ CREATE TABLE IF NOT EXISTS appointments_archive (
 	date_time DATETIME NOT NULL, /*Contains both date and time, separated using functions in query*/
 	comments TEXT, /*Volunteer visit comments*/
 	status TEXT NOT NULL, /*Approval status of appointment*/
-	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the appointment (0=incomplete)*/
-	contactedAdmin BOOLEAN NOT NULL DEFAULT 0, /*The status of the volunteer contacted the admin*/
-	hasNarrative BOOLEAN NOT NULL DEFAULT 0, /*The narrative has been completed of the appointment (0=incomplete)*/
-	alerts TEXT,
-	key_observations TEXT,
-	plan TEXT,	
+	completed BOOLEAN NOT NULL DEFAULT 0, /*The completion status of the appointment (0=incomplete)*/	
 	type SMALLINT UNSIGNED NOT NULL,
 	deleted_by VARCHAR(255) NOT NULL,
 	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
@@ -305,11 +301,11 @@ CREATE TABLE IF NOT EXISTS messages_archive (
 	recipient TINYINT UNSIGNED NOT NULL, /* Same as user_ID */
 	sender TINYINT UNSIGNED NOT NULL,
 	msg TEXT,
-    sent TIMESTAMP NOT NULL ,
+    sent TIMESTAMP NULL ,
 	subject VARCHAR(255) NOT NULL,
 	msgRead BOOLEAN NOT NULL DEFAULT 0,
 	deleted_by VARCHAR(255) NOT NULL,
-	deleted_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
 	
 	PRIMARY KEY (id)
 );

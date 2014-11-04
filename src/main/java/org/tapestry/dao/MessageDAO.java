@@ -48,5 +48,11 @@ public interface MessageDAO {
 	 * @return
 	 */
 	public List<Message> getAnnouncementsForUser(int userID);
+	
+	/**
+	 * Save a copy of deleted message
+	 * @param m
+	 */
+	public void archiveMessage(Message m, String deletedBy);
 
 }

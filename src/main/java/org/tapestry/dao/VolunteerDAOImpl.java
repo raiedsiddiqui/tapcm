@@ -113,7 +113,7 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 				v.getEmail(), v.getExperienceLevel(), v.getCity(), v.getProvince(), v.getHomePhone(),
 				v.getCellPhone(), v.getPostalCode(), v.getCountry(), v.getEmergencyContact(), 
 				v.getEmergencyPhone(), v.getAptNumber(), v.getNotes(), v.getAvailability(), v.getStreetNumber(), 				
-				v.getPassword(), v.getOrganizationId(), v.getVolunteerId(), v.getGender());		
+				v.getPassword(), v.getOrganizationId(), v.getGender(), v.getVolunteerId());		
 	}
 
 	@Override
@@ -252,7 +252,8 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 			vol.setNotes(rs.getString("notes"));
 			vol.setAvailability(rs.getString("availability"));
 			vol.setOrganizationId(rs.getInt("organization"));
-			vol.setOrganization(rs.getString("organization"));
+			vol.setOrganization(rs.getString("name"));
+			vol.setGender(rs.getString("gender"));
 			
 			return vol;
 			

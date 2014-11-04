@@ -50,9 +50,9 @@
 								<div class="col-md-4">
 									<label>Gender:</label>
 										<select name="gender" form="modify_volunteer" class="form-control">
-											<option value="M">Male</option>
-											<option value="F">Female</option>
-											<option value="O">Other</option>
+											<option value='M' <c:if test="${volunteer.gender eq 'M'}">selected</c:if>>Male</option>
+											<option value='F' <c:if test="${volunteer.gender eq 'F'}">selected</c:if>>Female</option>
+											<option value="O" <c:if test="${volunteer.gender eq 'O'}">selected</c:if>>Other</option>
 										</select>
 								</div>
 							</div>
