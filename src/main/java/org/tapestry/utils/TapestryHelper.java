@@ -1909,16 +1909,14 @@ public class TapestryHelper {
 	
 	/**
 	 * Set unread message count
-	 * @param session
 	 * @param request
 	 * @param model
 	 * @param messageDao
 	 */
-	public static void setUnreadMsg(HttpSession session, SecurityContextHolderAwareRequestWrapper request, 
-			ModelMap model, MessageManager messageDao){		
-		if (session == null)
-			session = request.getSession();
-		
+	public static void setUnreadMsg(SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model, MessageManager messageDao)
+	{	
+		HttpSession session = request.getSession();
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		else
@@ -1928,6 +1926,7 @@ public class TapestryHelper {
 			model.addAttribute("unread", unreadMessages);
 		}
 	}
+	
 	
 	public static void sendMessageByEmail(User user, String subject, String msg){
 		try{

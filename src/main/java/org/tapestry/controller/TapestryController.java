@@ -298,24 +298,6 @@ public class TapestryController{
 		return "redirect:/manage_users";
 	}
 	
-	@RequestMapping(value="/profile", method=RequestMethod.GET)
-	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, 
-			@RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, 
-			ModelMap model)
-	{	
-		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
-		model.addAttribute("vol", loggedInUser);
-		TapestryHelper.setUnreadMessage(request, model, messageManager);
-		
-		if (errorsPresent != null)
-			model.addAttribute("errors", errorsPresent);
-		if(success != null)
-			model.addAttribute("success", true);
-		List<Picture> pics = pictureManager.getPicturesForUser(loggedInUser.getUserID());
-		model.addAttribute("pictures", pics);
-		return "/volunteer/profile";
-	}
-	
 	@RequestMapping(value="/inbox", method=RequestMethod.GET)
 	public String viewInbox(@RequestParam(value="success", required=false) Boolean messageSent,@RequestParam(value="failure",
 			required=false) Boolean messageFailed, SecurityContextHolderAwareRequestWrapper request, ModelMap model)
@@ -588,7 +570,7 @@ public class TapestryController{
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
 		StringBuffer sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
-		sb.append(" Changed password for ");
+		sb.append(" has changed password for ");
 		sb.append(whosePwdChanged.getName());
 		userManager.addUserLog(sb.toString(), loggedInUser);		
 	
@@ -1006,6 +988,7 @@ public class TapestryController{
 			model.addAttribute("unread", session.getAttribute("unread_messages"));				
 		return "/admin/display_client";
 	}
+	
 	//============report======================
 	@RequestMapping(value="/download_report/{patientID}", method=RequestMethod.GET)
 	public String downloadReport(@PathVariable("patientID") int id,

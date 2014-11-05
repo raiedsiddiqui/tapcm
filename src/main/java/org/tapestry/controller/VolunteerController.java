@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -501,8 +500,26 @@ public class VolunteerController {
 		session.setAttribute("volunteerMessage", "D");		
 	
 		return "redirect:/view_volunteers";		
-	}	
-
+	}
+	
+	@RequestMapping(value="/profile", method=RequestMethod.GET)
+	public String viewProfile(@RequestParam(value="error", required=false) String errorsPresent, 
+			@RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model)
+	{	
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
+		model.addAttribute("loggedInUserId", loggedInUser.getUserID());
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
+		
+		if (errorsPresent != null)
+			model.addAttribute("errors", errorsPresent);
+		if(success != null)
+			model.addAttribute("success", true);
+//		List<Picture> pics = pictureManager.getPicturesForUser(loggedInUser.getUserID());
+//		model.addAttribute("pictures", pics);
+		return "/volunteer/profile";
+	}
+	
 	//Activity in Volunteer
 	//display all activity input by volunteers
 	@RequestMapping(value="/view_activity_admin", method=RequestMethod.GET)
@@ -1845,10 +1862,8 @@ public class VolunteerController {
 				model.addAttribute("narrativeUpdate", true);
 				session.removeAttribute("narrativeMessage");
 			}			
-		}
-		
-		TapestryHelper.setUnreadMsg(session, request, model, messageManager);
-		
+		}		
+		TapestryHelper.setUnreadMsg(request, model, messageManager);		
 		model.addAttribute("narratives", narratives);	
 		return "/volunteer/view_narrative";
 	}
@@ -1866,8 +1881,7 @@ public class VolunteerController {
 		narrative.setEditDate(editDate);
 		
 		model.addAttribute("narrative", narrative);			
-	//	TapestryHelper.setUnreadMsg(null, request, model, messageManager);
-		TapestryHelper.setUnreadMsg(request.getSession(), request, model, messageManager);
+		TapestryHelper.setUnreadMsg(request, model, messageManager);
 		return "/volunteer/modify_narrative";
 	}
 	
