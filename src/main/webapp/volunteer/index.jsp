@@ -157,10 +157,13 @@
 		</div>
 
 		<div class="row-fluid">				
-			<p class="pageheader">Pending Completion</p>
+			<p class="pageheader">Pending Approval</p>
 			<c:forEach items="${pending_appointments}" var="pa">
 				<div class="pname">
-					<button type="button" class="pendingappt btn-lg btn-block pbutton">${pa.patient} <span class="app-date">${pa.date}</span> <span class="tright"> ${pa.time}</button>
+					<div class="row pbutton">
+						<div class="col-sm-6 col-xs-5">${pa.patient}</div> 
+						<div class="col-sm-5 col-xs-5">${pa.date}</div> 
+						<div class="col-sm-1 col-xs-2">${pa.time}</div>
 				</div>
 			</c:forEach>
 		</div>

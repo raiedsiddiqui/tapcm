@@ -5,21 +5,12 @@
 <head>
 	<title>Tapestry Admin</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" />
 
 <!-- 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  
- -->		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
+ -->	
+ 	<link href="${pageContext.request.contextPath}/resources/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />
+	<link href="${pageContext.request.contextPath}/resources/css/font-awesome.min.css" rel="stylesheet" />
 
-		<!--<script src="${pageContext.request.contextPath}/resources/js/bootstrap-datetimepicker.min.js"></script>-->
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>				
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.css" id="theme_base">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.date.css" id="theme_date">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.time.css" id="theme_time">
 
 		
 	
