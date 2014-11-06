@@ -20,9 +20,8 @@
 </head>
 
 <body>	
-<div id="headerholder">	
 	<%@include file="subNavi.jsp" %>
-</div>
+
 
 	<!-- 	breadcrumb START-->	
 <!-- 	<div id="crumbs"> 

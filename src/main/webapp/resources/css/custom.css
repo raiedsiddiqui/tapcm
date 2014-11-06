@@ -525,6 +525,7 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 		/*border-left: 1px solid white;*/
 		font-family: 'Open Sans', 'sans-serif';
 		color: white !important;
+		padding: 10px 10px;
 	}
 
 	.navbar .brand {

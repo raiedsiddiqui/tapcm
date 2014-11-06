@@ -53,8 +53,8 @@
  <%@include file="subNavi.jsp" %>
 </div>
 <div class="content">
-	<div class="row-fluid">
-		<div class="col-md-10">
+	<div class="row">
+		<div class="col-md-12">
 			<h3>Change Password </h3>
 		</div>
 	</div>
@@ -74,17 +74,40 @@
 	</c:if>						
 
 	<div class="tab-content">
-		<div class="row-fluid">
+		<div class="row">
 			<div class="span12">				
 				<form id="changePassword" action="<c:url value="/change_password/${loggedInUserId}"/>" method="POST" >
-						<fieldset>								
-	  						<label>Current password:</label>
-							<input type="password" name="currentPassword" required />
-							<label>New password:</label>
-							<input id="pass1" type="password" name="newPassword" required />
-							<label>Confirm password:</label>
-							<input id="pass2" type="password" name="confirmPassword" onkeyup="checkPass(); return false;" required />
-							 <span id="confirmMessage" class="confirmMessage"></span>
+						<fieldset>
+
+							<div class="row">
+								<div class="col-md-4">								
+		  							<label>Current password:</label> 
+		  						</div>
+		  						<div class="col-md-4">	
+									<input type="password" name="currentPassword" required />
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-4">
+									<label>New password:</label>
+								</div>
+								<div class="col-md-4">
+									<input id="pass1" type="password" name="newPassword" required />
+									<span id="confirmMessage" class="confirmMessage"></span>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-4">
+									<label>Confirm password:</label>
+								</div>
+								<div class="col-md-4">
+									<input id="pass2" type="password" name="confirmPassword" onkeyup="checkPass(); return false;" required />
+									<span id="confirmMessage" class="confirmMessage"></span>
+								</div>
+
+							</div>
 							<br />
 							
 						</fieldset>
