@@ -1,6 +1,7 @@
 package org.tapestry.surveys;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.survey_component.data.PHRSurvey;
@@ -62,7 +63,7 @@ public class SurveyActionMumps {
 
 			for (String answer : qaPair.answers)
 			{
-				SurveyAnswer mAnswer = new SurveyAnswerString(answer);				
+				SurveyAnswer mAnswer = new SurveyAnswerString(answer);						
 				mQuestion.getAnswers().add(mAnswer);
 			}
 			
