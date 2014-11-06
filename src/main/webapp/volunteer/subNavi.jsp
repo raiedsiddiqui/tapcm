@@ -23,20 +23,20 @@
 	</style>
 	<script type="text/javascript">
 		$(function(){
-			$('#tp1').datetimepicker({
-				pickDate: false,
-				pickSeconds: false
-			});
+			// $('#tp1').datetimepicker({
+			// 	pickDate: false,
+			// 	pickSeconds: false
+			// });
 			
-			$('#tp2').datetimepicker({
-				pickDate: false,
-				pickSeconds: false
-			});
+			// $('#tp2').datetimepicker({
+			// 	pickDate: false,
+			// 	pickSeconds: false
+			// });
 			
-			$('#dp').datetimepicker({
-				pickTime: false,
-				startDate: new Date()
-  			});
+			// $('#dp').datetimepicker({
+			// 	pickTime: false,
+			// 	startDate: new Date()
+  	// 		});
   			
  			$('#newActivityLogButton').click(function(){
 		        var btn = $(this)
@@ -55,16 +55,17 @@
 				<img id="logo" src="<c:url value="/resources/images/logow.png"/>" />
 			</div>
 
-		<div class="col-md-9 tblack">
+		<div class="col-md-9 tblack logoheight">
 		<div class="navbar">      
 			<ul id="mainnavbar" class="nav navbar-nav">	
-	    		<li id="navhome"><a class="brand" href="<c:url value="/"/>">Home</a></li>
-	    		<li id="navclient"><a href="<c:url value="/client"/>">Clients</a></li>  	   			 
+	    		<li id="navhome"><a href="<c:url value="/"/>">Home</a></li>
+	    		<li id="navclient"><a href="<c:url value="/client"/>">Clients</a></li>    	
+	 <!--    		<li><a href="#bookAppointment" data-toggle="modal">Book Visit</a></li>    	--> 
 	 			<li><a href="<c:url value="/book_appointment"/>">Book Visit</a></li>
  	    		<li><a href="<c:url value="/view_activity"/>">Journal</a> </li>
 	    		<li><a href="<c:url value="/view_narratives"/>">Narratives</a></li>
 	    		<li><a href="<c:url value="/inbox"/>">Inbox <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a></li>
-				<li><a href="<c:url value="/profile"/>">Profile</a></li>   
+	    		<li><a href="<c:url value="/profile"/>">Profile</a></li>
 				<li><a href="<c:url value="/logout"/>">Log Out</a></li>
 
 		    </ul>
@@ -75,7 +76,7 @@
 	</div>
 
 
-
+<!--
 
   	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
     <script>window.jQuery||document.write('<script src="tests/jquery.2.0.0.js"><\/script>')</script>
@@ -83,7 +84,7 @@
     <script src="${pageContext.request.contextPath}/resources/lib/picker.date.js"></script>
     <script src="${pageContext.request.contextPath}/resources/lib/picker.time.js"></script>
     <script src="${pageContext.request.contextPath}/resources/lib/legacy.js"></script>
-
+-->
 
 	<script type="text/javascript">
 		$(function(){
@@ -107,24 +108,6 @@
 
 		});
 
-		    $('.datepicker').pickadate({
-		    // Escape any “rule” characters with an exclamation mark (!).
-		    format: 'You selecte!d: dddd, dd mmm, yyyy',
-		    formatSubmit: 'yyyy/mm/dd',
-		    hiddenName: true
-		   	// hiddenPrefix: 'prefix__',
-		    // hiddenSuffix: '__suffix'
-			})
-		
-
-		$('.timepicker').pickatime({
-		    // Escape any “rule” characters with an exclamation mark (!).
-		    formatSubmit: 'HH:i:00',
-		   	hiddenName: true
-
-		    // hiddenPrefix: 'prefix__',
-		    // hiddenSuffix: '__suffix'
-		})
 		
 	</script>
 

@@ -8,6 +8,7 @@ img {
 	width: 220px !important;
 	float: left;
 }
+
 #logofam {
 	height: 60px;
 	width: 120px;
@@ -31,24 +32,27 @@ img {
 }
 
 #logininput {
-	height: 50px;
-	width: 100%;
-	font-size: 30px;
+	height: 70px;
+	width: 55%;
+	font-size: 25px;
 	font-family: 'Open Sans', serif;
 	-webkit-tap-highlight-color: rgba(0,0,0,0); 
 	font-weight: 400 !important;
+	padding: 10px;
+	border-radius: 0px;
 
 }
 
 #loginbtn {
-	width: 30%;
+	width: 65%;
 	font-size: 30px;
-	background-color: #4a307b;
+	background-color: #6BB040;
 	color:white;
 	font-family: 'Open Sans', serif;
 	-webkit-tap-highlight-color: rgba(0,0,0,0); 
 	border:0;
 	margin-top: 4%;
+	height: 70px;
 
 }
 
@@ -122,10 +126,19 @@ Lanscape CSS ENDS*/
 	padding-top: 6px;
 	font-size: 18px; 
 	font-family:'Open Sans', 'sans-serif';
-	background-color: #6BB040;
+	background-color: rgba(108, 93, 0, 0.66);
 	color:white;
 
 
+}
+
+#footer {
+	position: absolute;
+	bottom: 0;
+	background-color: #444;
+	width: 100%;
+	padding: 30px;
+	height:100px;
 }
 
 .squestion {
@@ -470,6 +483,7 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 
 }
 
+
 .logoheight {
 	height:63px;
 }
@@ -615,10 +629,6 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 		height: 60px;
 	}
 
-	.form-search input, .form-inline input, .form-horizontal input, .form-search textarea, .form-inline textarea, .form-horizontal textarea, .form-search select, .form-inline select, .form-horizontal select, .form-search .help-inline, .form-inline .help-inline, .form-horizontal .help-inline, .form-search .uneditable-input, .form-inline .uneditable-input, .form-horizontal .uneditable-input, .form-search .input-prepend, .form-inline .input-prepend, .form-horizontal .input-prepend, .form-search .input-append, .form-inline .input-append, .form-horizontal .input-append {
-		width: 70%;
-		float: right;
-	}
 
 	.patientinfo {
 		padding: 4px;
@@ -694,7 +704,12 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 	}
 
 	#footer {
-		top:150px;
+		position: absolute;
+		bottom: 0;
+		background-color: #444;
+		width: 100%;
+		padding: 30px;
+		height:100px;	
 	}
 
 	#headerholder {

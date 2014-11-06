@@ -12,7 +12,7 @@
 <body>
 
 <div class="content">
-<div id = "navigation_bar">
+<div id="navigation_bar">
 	<%@ include file="navbar.jsp"%>
 	<c:if test="${not empty noSearchName}">
 		<div class ="alert alert-info"><spring:message code="message_noSearchName"/></div>
@@ -20,7 +20,7 @@
 </div>
 	
 	
-	<div class="row-fluid" id = "bookAppt_admin">
+	<div class="row-fluid" id="bookAppt_admin">
 		<%@ include file="../book_appointment.jsp"%>
 	</div>
 	

@@ -230,7 +230,7 @@
                 	<input id="saveclose" type="button" value="<%if (!survey.isComplete()) {%>Save and <%}%>Close" onclick="document.location='<c:url value="/save_survey/"/><%=documentId%>?survey_completed=<%=completed%>'">
                 	-->	
                 	<div id="answer-buttons">
-                		<div class="row animated bounceInLeft">
+                		<div class="row animated fadeIn">
                 			<div class="col-md-4">
 	                			<input id="surveyback" class="tleft btn" type="button" value="Back" onclick="document.forms['surveyQuestion'].direction.value='backward'; document.forms['surveyQuestion'].submit();">
 	                		<div id="eq5dcopyright" style="float:left"></div>

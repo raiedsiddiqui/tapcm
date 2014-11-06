@@ -111,7 +111,7 @@
   		</div>
   		<div class="modal-footer">
     		<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-			<input class="right"" form="uploadSurveyForm" type="submit" value="Add Survey" />
+			<input class="right" form="uploadSurveyForm" type="submit" value="Add Survey" />
   		</div>
 	</div>
 	</div>
