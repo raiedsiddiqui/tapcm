@@ -85,4 +85,13 @@ public class SurveyTemplateDAOImpl extends JdbcDaoSupport implements SurveyTempl
 		}
 	}
 
+	@Override
+	public void archiveSurveyTemplate(SurveyTemplate st, String deletedBy) {
+		String sql = "INSERT INTO surveys_archive (deleted_survey_ID, title, type, contents, priority, description, deleted_by) "
+				+ "values (?,?,?,?,?,?,?)";
+		getJdbcTemplate().update(sql, st.getSurveyID(),st.getTitle(), st.getType(), st.getContents(), st.getPriority(), 
+				st.getDescription(), deletedBy);
+		
+	}
+
 }

@@ -68,6 +68,16 @@ public class MessageDAOImpl extends JdbcDaoSupport implements MessageDAO {
 		getJdbcTemplate().update(sql, id);
 
 	}
+	
+	@Override
+	public void archiveMessage(Message m, String deletedBy) {
+		String sql = "INSERT INTO messages_archive (recipient, sender, msg, subject, deleted_message_ID, deleted_by, "
+				+ "sent, msgRead) VALUES (?,?,?,?,?,?,?,?)";
+		getJdbcTemplate().update(sql, m.getRecipient(), m.getSenderID(), m.getText() ,m.getSubject(), m.getMessageID(), 
+				deletedBy, m.getDate(), m.isRead());
+		
+	}
+
 
 	@Override
 	public List<Message> getAnnouncementsForUser(int userID) {

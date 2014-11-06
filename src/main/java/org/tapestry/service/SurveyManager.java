@@ -152,5 +152,19 @@ public interface SurveyManager {
 	 */
 	@Transactional
 	public int countCompletedSurveys(int patientId);
+	
+	/**
+	 * Keep a copy of deleted survey template
+	 * @param st
+	 */
+	@Transactional
+	public void archiveSurveyTemplate(SurveyTemplate st, String deletedBy);
+	
+	/**
+	 * Keep a copy of deleted survey result
+	 * @param sr
+	 */
+	@Transactional
+	public void archiveSurveyResult(SurveyResult sr, String patient,String deletedBy);
 
 }

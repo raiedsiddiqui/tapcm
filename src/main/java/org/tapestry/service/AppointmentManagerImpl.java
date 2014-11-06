@@ -165,4 +165,24 @@ public class AppointmentManagerImpl implements AppointmentManager {
 		appointmentDao.completeNarrative(id);
 	}
 
+	@Override
+	public List<Appointment> getAppointmentsGroupByOrganization(int organizationId) {
+		return appointmentDao.getAppointmentsGroupByOrganization(organizationId);
+	}
+
+	@Override
+	public List<Appointment> getPastAppointmentsGroupByOrganization(int organizationId){
+			return appointmentDao.getPastAppointmentsGroupByOrganization(organizationId);
+	}
+
+	@Override
+	public List<Appointment> getPendingAppointmentsGroupByOrganization(int organizationId) {
+		return appointmentDao.getPendingAppointmentsGroupByOrganization(organizationId);
+	}
+
+	@Override
+	public void archiveAppointment(Appointment a, String deletedBy) {
+		appointmentDao.archiveAppointment(a, deletedBy);		
+	}
+
 }

@@ -98,4 +98,10 @@ public interface SurveyResultDAO {
 	 * @return number of completed survey result 
 	 */
 	public int countCompletedSurveys(int patientId);
+	
+	/**
+	 * Keep a copy of deleted survey result
+	 * @param sr
+	 */
+	public void archiveSurveyResult(SurveyResult sr, String patient, String deletedBy);
 }

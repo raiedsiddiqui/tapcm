@@ -36,13 +36,7 @@ public interface ActivityDAO {
 	 * @param volunteer
 	 */
 	public void logActivity(String description, int volunteer);
-	/**
-	 * Log activity with description by volunteer for patient
-	 * @param description
-	 * @param volunteer
-	 * @param patient
-	 */
-	public void logActivity(String description, int volunteer, int patient);
+	
 	/**
 	 * Log activity
 	 * @param activity
@@ -59,29 +53,45 @@ public interface ActivityDAO {
 	 * @param appointmentId
 	 * @return a list of activities for patient and appointment
 	 */
-	public List<Activity> getDetailedLog(int patientId, int appointmentId);
+//	public List<Activity> getDetailedLog(int patientId, int appointmentId);
 	/**
 	 * 
 	 * @param activityId
 	 * @return an activity by id
 	 */
 	public Activity getActivityLogById(int activityId);
+	
 	/**
-	 * 
-	 * @return number of user logs
+	 * delete activity by id
+	 * @param id
 	 */
-	public int countEntries();
+	public void deleteActivityById(int id);	
+	
 	 /**
      * Returns a list of n items starting at start
      * @param start The position in the log to start at
      * @param n The number of items to return
      */
 	public List<Activity> getPage(int start, int n);	
+	
+	/**
+	 * 
+	 * @return number of user logs
+	 */
+	public int countEntries();
+	
+	/**
+	 * 
+	 * @param organizationId
+	 * @return number of user logs
+	 */
+	public int countEntriesByGroup(int organizationId);
+	
 	/**
 	 * 
 	 * @param start
 	 * @param n
-	 * @return
+	 * @return 
 	 */
 	public List<UserLog> getUserLogsPage(int start, int n);
 	/**
@@ -96,9 +106,29 @@ public interface ActivityDAO {
 	 * @return
 	 */
 	public List<UserLog> getUserLogsByPartialName(String partialName);
+	
 	/**
-	 * delete activity by id
-	 * @param id
+	 * 
+	 * @param start
+	 * @param n
+	 * @param organizationId
+	 * @return
 	 */
-	public void deleteActivityById(int id);
+	public List<UserLog> getUserLogsPageByGroup(int start, int n, int organizationId);
+	
+	/**
+	 * 
+	 * @param partialName
+	 * @param organizationId
+	 * @return
+	 */
+	public List<UserLog> getGroupedUserLogssByPartialName(String partialName, int organizationId);
+	
+	/**
+	 * Save a copy of deleted activity
+	 * @param activity
+	 * @param deletedBy
+	 * @param volunteer
+	 */
+	public void archivedActivity(Activity activity, String deletedBy, String volunteer);
 }

@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Narrative;
 import org.tapestry.objects.Organization;
-import org.tapestry.objects.User;
-import org.tapestry.objects.UserLog;
 import org.tapestry.objects.Volunteer;
 
 /**
@@ -43,6 +41,15 @@ public interface VolunteerManager {
 	 */
 	@Transactional
 	public List<Volunteer> getAllVolunteersByOrganization(int id);
+	
+	/**
+	 * search by name for a grouped volunteer
+	 * @param partialName
+	 * @param organizationId
+	 * @return a list of volunteers whose name contain partialName and belong to an organization
+	 */
+	@Transactional
+	public List<Volunteer> getGroupedVolunteersByName(String partialName, int organizationId);
 	
 	/**
 	 * 
@@ -88,6 +95,14 @@ public interface VolunteerManager {
 	 */
 	@Transactional
 	public void deleteVolunteerById(int id);
+	
+	/**
+	 * 
+	 * @param volunteer
+	 * @param deleteBy
+	 */
+	@Transactional
+	public void archiveVolunteer(Volunteer volunteer, String deletedBy);
 	
 	/**
 	 * Count all volunteers
@@ -180,14 +195,7 @@ public interface VolunteerManager {
 	 */
 	@Transactional
 	public void logActivity(String description, int volunteer);
-	/**
-	 * log activity with desc by volunteer for patient
-	 * @param description
-	 * @param volunteer
-	 * @param patient
-	 */
-	@Transactional
-	public void logActivity(String description, int volunteer, int patient);
+
 	/**
 	 * log activity
 	 * @param activity
@@ -206,8 +214,8 @@ public interface VolunteerManager {
 	 * @param appointmentId
 	 * @return a list of activities for patient on appointment
 	 */
-	@Transactional
-	public List<Activity> getActivities(int patientId, int appointmentId);
+//	@Transactional
+//	public List<Activity> getActivities(int patientId, int appointmentId);
 	/**
 	 * delete activity
 	 * @param id
@@ -230,17 +238,69 @@ public interface VolunteerManager {
 	@Transactional
 	public Activity getActivity(int activityId);	
 	
+	/**
+	 * 
+	 * @param activity
+	 * @param deletedBy
+	 * @param volunteer
+	 */
+	@Transactional
+	public void archivedActivity(Activity activity, String deletedBy, String volunteer);
+	
 	//==========Narrative=====//
+	/**
+	 * 
+	 * @param volunteerId
+	 * @return
+	 */			
 	@Transactional
 	public List<Narrative> getAllNarrativesByUser(int volunteerId);
+	
+	/**
+	 * 
+	 * @param volunteerId
+	 * @param patientId
+	 * @param appointmentId
+	 * @return
+	 */
 	@Transactional
 	public List<Narrative> getNarrativesByVolunteer(int volunteerId, int patientId, int appointmentId);
+	
+	/**
+	 * 
+	 * @param narrativeId
+	 * @return
+	 */
 	@Transactional
 	public Narrative getNarrativeById(int narrativeId);
+	
+	/**
+	 * 
+	 * @param narrative
+	 */
 	@Transactional
 	public void addNarrative(Narrative narrative);
+	
+	/**
+	 * 
+	 * @param narrative
+	 */
 	@Transactional
 	public void updateNarrative(Narrative narrative);
+	
+	/**
+	 * 
+	 * @param narrativeId
+	 */
 	@Transactional
 	public void deleteNarrativeById(int narrativeId);
+	
+	/**
+	 * Save a copy of updated narrative
+	 * @param n
+	 * @param updatedBy
+	 * @param whatAction
+	 */
+	@Transactional
+	public void archiveNarrative(Narrative n, String updatedBy,	String whatAction);
 }

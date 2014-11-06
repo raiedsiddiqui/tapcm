@@ -21,14 +21,6 @@ public interface PatientManager {
 	public Patient getPatientByID(int id);
 	
 	/**
-	* Returns the patient with the given ID
-	* @param id The ID of the patient to find
-	* @return A Patient object representing the result
-	*/
-	@Transactional
-	public Patient getNewestPatient();
-	
-	/**
 	* List all the patients in the database
 	* @return An ArrayList of Patient objects
 	*/
@@ -42,22 +34,37 @@ public interface PatientManager {
 	*/
 	@Transactional
     public List<Patient> getPatientsForVolunteer(int volunteer);
+	
+	/**
+	* List all the patients group by volunteer's organization in the database
+	* @return a List of Patient objects
+	*/
+    public List<Patient> getPatientsByGroup(int organizationId);
     
     /**
-	 * 
+	 * search a group of patients by partial name
 	 * get all patients with partialName in firstname or lastname
 	 * @param partialName
 	 * @return
 	 */
 	@Transactional
 	public List<Patient> getPatientsByPartialName(String partialName);
-	
 	/**
-	* Saves a patient in the database
-	* @param p The Patient object to save
-	*/
+	 * 
+	 * @param partialName
+	 * @param organizationId
+	 * @return
+	 */
 	@Transactional
-    public void createPatient(Patient p);
+	public List<Patient> getGroupedPatientsByName(String partialName, int organizationId);
+		
+	/**
+	 * Create a patient in the database
+	 * @param p
+	 * @return new patient ID
+	 */
+	@Transactional
+    public int createPatient(Patient p);
     
     /**
      * Changes a patient in the database
@@ -72,4 +79,5 @@ public interface PatientManager {
 	*/
 	@Transactional
 	public void deletePatientWithId(int id);
+	
 }

@@ -141,6 +141,27 @@ public interface AppointmentDAO {
     public List<Appointment> getRemindingAppointmentList(int id, int diff);
     
     /**
+     * Group appointment by volunteer's organization
+     * @param organizationId
+     * @return
+     */
+    public List<Appointment> getAppointmentsGroupByOrganization(int organizationId);
+    
+    /**
+     * Group past appointment by volunteer's organization
+     * @param organizationId
+     * @return
+     */
+    public List<Appointment> getPastAppointmentsGroupByOrganization(int organizationId);
+    
+    /**
+     * Group pending appointment by volunteer's organization
+     * @param organizationId
+     * @return
+     */
+    public List<Appointment> getPendingAppointmentsGroupByOrganization(int organizationId);
+    
+    /**
      * Set an appointment status as completed and add comments, set if contacted admin
      * @param id appointmentId
      * @param comments
@@ -210,4 +231,11 @@ public interface AppointmentDAO {
      * @param id
      */
     public void completeNarrative(int id);
+    
+    /**
+     * Save a copy of deleted appointment
+     * @param appointment
+     * @param deletedBy
+     */
+    public void archiveAppointment(Appointment appointment, String deletedBy);
 }

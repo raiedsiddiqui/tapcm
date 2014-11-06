@@ -182,5 +182,12 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 			return sr;
 		}
 	}
+	
+	public void archiveSurveyResult(SurveyResult sr, String patient, String deletedBy){
+		String sql = "INSERT INTO survey_results_archive (patient, survey_ID, data, startDate, deleted_result_ID, "
+				+ "deleted_by) values (?,?,?,?,?,?)";
+		getJdbcTemplate().update(sql, patient, sr.getSurveyID(), sr.getResults(), sr.getStartDate(), sr.getResultID()
+				, deletedBy);
+	}
 
 }

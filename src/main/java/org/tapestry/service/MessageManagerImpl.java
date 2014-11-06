@@ -9,7 +9,7 @@ import org.tapestry.objects.Message;
 
 /**
  * Implementation for service MessageManager
- * @author lxie *
+ * @author lxie 
  */
 @Service
 public class MessageManagerImpl implements MessageManager {
@@ -46,7 +46,13 @@ public class MessageManagerImpl implements MessageManager {
 	}
 
 	@Override
+	public void archiveMessage(Message m, String deletedBy) {
+		messageDao.archiveMessage(m, deletedBy);		
+	}
+	
+	@Override
 	public List<Message> getAnnouncementsForUser(int userID) {
 		return messageDao.getAnnouncementsForUser(userID);
 	}
+
 }

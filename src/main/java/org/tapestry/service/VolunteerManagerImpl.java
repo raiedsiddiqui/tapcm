@@ -103,6 +103,11 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	public List<Organization> getOrganizationsByName(String partialName) {
 		return volunteerDao.getOrganizationsByName(partialName);
 	}
+	
+	@Override
+	public List<Volunteer> getGroupedVolunteersByName(String partialName,int organizationId) {
+		return volunteerDao.getGroupedVolunteersByName(partialName, organizationId);
+	}
 
 	@Override
 	public boolean addOrganization(Organization organization) {
@@ -126,8 +131,8 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	}
 
 	@Override
-	public List<Activity> getActivitiesForLocalAdmin(int id) {		
-		return activityDAO.getAllActivitiesForLocalAdmin(id);
+	public List<Activity> getActivitiesForLocalAdmin(int organizationId) {		
+		return activityDAO.getAllActivitiesForLocalAdmin(organizationId);
 	}
 
 	@Override
@@ -138,31 +143,22 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	@Override
 	public void logActivity(String description, int volunteer) {
 		activityDAO.logActivity(description, volunteer);
-
-	}
-
-	@Override
-	public void logActivity(String description, int volunteer, int patient) {
-		activityDAO.logActivity(description, volunteer, patient);
-
 	}
 
 	@Override
 	public void logActivity(Activity activity) {
 		activityDAO.logActivity(activity);
-
 	}
 
 	@Override
 	public void updateActivity(Activity activity) {
 		activityDAO.updateActivity(activity);
-
 	}
 
-	@Override
-	public List<Activity> getActivities(int patientId, int appointmentId) {
-		return activityDAO.getDetailedLog(patientId, appointmentId);
-	}
+//	@Override
+//	public List<Activity> getActivities(int patientId, int appointmentId) {
+//		return activityDAO.getDetailedLog(patientId, appointmentId);
+//	}
 
 	@Override
 	public void deleteActivity(int id) {
@@ -178,6 +174,11 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	@Override
 	public Activity getActivity(int activityId) {		
 		return activityDAO.getActivityLogById(activityId);
+	}
+	
+	@Override
+	public void archivedActivity(Activity activity, String deletedBy, String volunteer) {
+		activityDAO.archivedActivity(activity, deletedBy, volunteer);
 	}
 	
 	//=============Narrative ======//
@@ -209,6 +210,18 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	@Override
 	public void deleteNarrativeById(int narrativeId) {
 		narrativeDao.deleteNarrativeById(narrativeId);
+	}	
+
+	@Override
+	public void archiveNarrative(Narrative n, String updatedBy,	String whatAction) {
+		narrativeDao.archiveNarrative(n, updatedBy, whatAction);		
 	}
+
+
+	@Override
+	public void archiveVolunteer(Volunteer volunteer, String deletedBy) {
+		volunteerDao.archiveVolunteer(volunteer, deletedBy);
+	}
+
 
 }

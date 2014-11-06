@@ -2,8 +2,8 @@ package org.tapestry.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,6 +112,22 @@ public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
 
 	}
 	
+	@Override
+	public void removeUserByUsername(String username) {
+		String sql = "DELETE FROM users WHERE username=?";
+		getJdbcTemplate().update(sql, username);
+		
+	}
+	
+	@Override
+	public void archiveUser(User u, String deletedBy) {
+		String sql = "INSERT INTO users_archive (username, name, role, email, phone_number, site, organization, "
+				+ "deleted_user_ID, deleted_by, enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		getJdbcTemplate().update(sql, u.getUsername(), u.getName(), u.getRole(), u.getEmail(), u.getPhoneNumber(), 
+				u.getSite(), u.getOrganization(), u.getUserID(), deletedBy, u.isEnabled());
+		
+	}
+	
 	/**
 	 * Disables a user
 	 * Useful for closing access to an account without losing data associated with it
@@ -141,10 +157,21 @@ public class UserDAOImpl extends JdbcDaoSupport implements UserDAO {
 	*/
 	@Override
 	public List<User> getAllUsers() {
-		String sql = "SELECT * FROM users";
-		List <User> users = getJdbcTemplate().query(sql, new UserMapper());
-		
-		return users;
+		String sql = "SELECT * FROM users";		
+		return getJdbcTemplate().query(sql, new UserMapper());
+	}
+	
+	@Override
+	public List<User> getUsersByGroup(int organizationId) {
+		String sql = "SELECT * FROM users WHERE organization=?";		
+		return getJdbcTemplate().query(sql, new Object[]{organizationId}, new UserMapper());
+	}
+	
+
+	@Override
+	public List<User> getGroupedUsersByRole(int organizationId, String role) {
+		String sql = "SELECT * FROM users WHERE organization=? AND role=?";		
+		return getJdbcTemplate().query(sql, new Object[]{organizationId, role}, new UserMapper());
 	}
 	
 	/**

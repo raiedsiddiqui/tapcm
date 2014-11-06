@@ -17,14 +17,7 @@ public interface PatientDAO {
 	* @return A Patient object representing the result
 	*/
 	public Patient getPatientByID(int id);
-	
-	/**
-	* Returns the patient with the given ID
-	* @param id The ID of the patient to find
-	* @return A Patient object representing the result
-	*/
-	public Patient getNewestPatient();
-	
+
 	/**
 	* List all the patients in the database
 	* @return An ArrayList of Patient objects
@@ -47,10 +40,25 @@ public interface PatientDAO {
 	public List<Patient> getPatientsByPartialName(String partialName);
 	
 	/**
-	* Saves a patient in the database
-	* @param p The Patient object to save
+	 * search by name for a grouped patients
+	 * @param partialName
+	 * @param organizationId
+	 * @return a list of volunteers whose name contain partialName and belong to an organization
+	 */
+	public List<Patient> getGroupedPatientsByName(String partialName, int organizationId);
+	
+	/**
+	* List all the patients group by volunteer's organization in the database
+	* @return An ArrayList of Patient objects
 	*/
-    public void createPatient(Patient p);
+    public List<Patient> getPatientsByGroup(int organizationId);
+	
+	/**
+	* create a patient in the database
+	* @param p The Patient object to save
+	* @return new patient ID
+	*/
+    public int createPatient(Patient p);
     
     /**
      * Changes a patient in the database

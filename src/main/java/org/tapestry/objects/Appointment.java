@@ -24,7 +24,8 @@ public class Appointment{
 	private String keyObservation;
 	private int type;
 	private String strType;
-
+	private int group; //based on volunteer's organization
+	
 	/**
 	 * Empty constructor
 	 */
@@ -245,5 +246,13 @@ public class Appointment{
 
 	public void setStrType(String strType) {
 		this.strType = strType;
+	}
+	
+	public int getGroup() {
+		return group;
+	}
+
+	public void setGroup(int group) {
+		this.group = group;
 	}
 }

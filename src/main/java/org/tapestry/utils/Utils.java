@@ -10,15 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.time.DateFormatUtils;
 
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
 
-import org.tapestry.objects.User;
 import org.tapestry.objects.Volunteer;
 
 public class Utils {
@@ -37,49 +34,6 @@ public class Utils {
 		
 		return time;
 	}
-	
-	public static int getLoggedInUserId(SecurityContextHolderAwareRequestWrapper request ){	
-		int loggedInUserId;
-		HttpSession session = request.getSession();
-		if (session.getAttribute("loggedInUserId") != null){
-			String strLoggedInUserId = session.getAttribute("loggedInUserId").toString();
-			loggedInUserId = Integer.parseInt(strLoggedInUserId);
-		}
-		else
-		{
-			User loggedInUser = getLoggedInUser(request);
-			loggedInUserId = loggedInUser.getUserID();
-			
-			session.setAttribute("loggedInUserId", String.valueOf(loggedInUserId));	
-		}
-		
-		return loggedInUserId;
-	}
-	
-	public static User getLoggedInUser(SecurityContextHolderAwareRequestWrapper request){
-		HttpSession session = request.getSession();
-
-		User loggedInUser = null;
-		//check if loggedInUserId is in the session
-		if (session.getAttribute("loggedInUser") != null) //get loggedInUser from session			
-			loggedInUser = (User)session.getAttribute("loggedInUser");		
-
-		
-		return loggedInUser;
-	}
-	
-	public static User getLoggedInUser(MultipartHttpServletRequest request){
-		HttpSession session = request.getSession();
-
-		User loggedInUser = null;
-		//check if loggedInUserId is in the session
-		if (session.getAttribute("loggedInUser") != null) //get loggedInUser from session			
-			loggedInUser = (User)session.getAttribute("loggedInUser");		
-		
-		return loggedInUser;
-	}
-	
-
 	
 	public static boolean isNullOrEmpty(String str){
 		if (str != null && !str.equals(""))
@@ -178,20 +132,6 @@ public class Utils {
 		return  list;
 	}
 	
-	public static Map<String, String> getAvailabilityMap(){
-		Map<String, String> map = new HashMap<String, String>();
-		
-		String[] displayTime = {"08:00:00 AM", "08:30:00 AM", "09:00:00 AM","09:30:00 AM", "10:00:00 AM", "10:30:00 AM",
-				"11:00:00 AM","11:30:00 AM", "13:00:00 PM", "13:30:00 PM", "14:00:00 PM", "14:30:00 PM", "15:00:00 PM",
-				"15:30:00 PM", "16:00:00 PM"};
-		
-		for (int i= 1; i <= displayTime.length; i++){
-			map.put(String.valueOf(i), displayTime[i-1]);
-		}
-		
-		return map;
-	}
-	
 	public static void getPosition(String dayOfWeek, String attribute, String[] alist,
 			boolean dayNull, ModelMap model)
 	{
@@ -286,214 +226,214 @@ public class Utils {
 		}
 	}
 	
-	public static String getAvailableTime(SecurityContextHolderAwareRequestWrapper request)
-	{			
-		String strAvailableTime = "";
-		List<String> availability = new ArrayList<String>();
-		String mondayNull = request.getParameter("mondayNull");
-		String tuesdayNull = request.getParameter("tuesdayNull");
-		String wednesdayNull = request.getParameter("wednesdayNull");
-		String thursdayNull = request.getParameter("thursdayNull");
-		String fridayNull = request.getParameter("fridayNull");		
-		String from1, from2, to1, to2;		
-		
-		//get availability for Monday
-		if (!"non".equals(mondayNull))
-		{
-			from1 = request.getParameter("monFrom1");		
-			from2 = request.getParameter("monFrom2");
-			to1 = request.getParameter("monTo1");
-			to2 = request.getParameter("monTo2");
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("1non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);
-			}
-		}
-		else
-			availability.add("1non");		
-		
-		//get availability for Tuesday
-		if(!"non".equals(tuesdayNull))
-		{
-			from1 = request.getParameter("tueFrom1");
-			from2 = request.getParameter("tueFrom2");
-			to1 = request.getParameter("tueTo1");
-			to2 = request.getParameter("tueTo2");		
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("2non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);				
-				availability = Utils.getAvailablePeriod(from2, to2, availability);
-			}
-		}
-		else
-			availability.add("2non");
-		
-		//get availability for Wednesday
-		if (!"non".equals(wednesdayNull))
-		{
-			from1 = request.getParameter("wedFrom1");
-			from2 = request.getParameter("wedFrom2");
-			to1 = request.getParameter("wedTo1");
-			to2 = request.getParameter("wedTo2");
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("3non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);	
-			}
-		}
-		else
-			availability.add("3non");
-		
-		//get availability for Thursday
-		if (!"non".equals(thursdayNull))
-		{
-			from1 = request.getParameter("thuFrom1");
-			from2 = request.getParameter("thuFrom2");
-			to1 = request.getParameter("thuTo1");
-			to2 = request.getParameter("thuTo2");
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("4non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);	
-			}
-		}
-		else
-			availability.add("4non");
-		
-		//get availability for Friday
-		if(!"non".equals(fridayNull))
-		{			
-			from1 = request.getParameter("friFrom1");
-			from2 = request.getParameter("friFrom2");
-			to1 = request.getParameter("friTo1");
-			to2 = request.getParameter("friTo2");	
-			
-			if ((from1.equals(from2))&&(from1.equals("0")))
-				availability.add("5non");	
-			else
-			{
-				availability = Utils.getAvailablePeriod(from1, to1, availability);
-				availability = Utils.getAvailablePeriod(from2, to2, availability);
-			}
-		}
-		else
-			availability.add("5non");
+//	public static String getAvailableTime(SecurityContextHolderAwareRequestWrapper request)
+//	{			
+//		String strAvailableTime = "";
+//		List<String> availability = new ArrayList<String>();
+//		String mondayNull = request.getParameter("mondayNull");
+//		String tuesdayNull = request.getParameter("tuesdayNull");
+//		String wednesdayNull = request.getParameter("wednesdayNull");
+//		String thursdayNull = request.getParameter("thursdayNull");
+//		String fridayNull = request.getParameter("fridayNull");		
+//		String from1, from2, to1, to2;		
+//		
+//		//get availability for Monday
+//		if (!"non".equals(mondayNull))
+//		{
+//			from1 = request.getParameter("monFrom1");		
+//			from2 = request.getParameter("monFrom2");
+//			to1 = request.getParameter("monTo1");
+//			to2 = request.getParameter("monTo2");
+//			
+//			if ((from1.equals(from2))&&(from1.equals("0")))
+//				availability.add("1non");	
+//			else
+//			{
+//				availability = Utils.getAvailablePeriod(from1, to1, availability);
+//				availability = Utils.getAvailablePeriod(from2, to2, availability);
+//			}
+//		}
+//		else
+//			availability.add("1non");		
+//		
+//		//get availability for Tuesday
+//		if(!"non".equals(tuesdayNull))
+//		{
+//			from1 = request.getParameter("tueFrom1");
+//			from2 = request.getParameter("tueFrom2");
+//			to1 = request.getParameter("tueTo1");
+//			to2 = request.getParameter("tueTo2");		
+//			
+//			if ((from1.equals(from2))&&(from1.equals("0")))
+//				availability.add("2non");	
+//			else
+//			{
+//				availability = Utils.getAvailablePeriod(from1, to1, availability);				
+//				availability = Utils.getAvailablePeriod(from2, to2, availability);
+//			}
+//		}
+//		else
+//			availability.add("2non");
+//		
+//		//get availability for Wednesday
+//		if (!"non".equals(wednesdayNull))
+//		{
+//			from1 = request.getParameter("wedFrom1");
+//			from2 = request.getParameter("wedFrom2");
+//			to1 = request.getParameter("wedTo1");
+//			to2 = request.getParameter("wedTo2");
+//			
+//			if ((from1.equals(from2))&&(from1.equals("0")))
+//				availability.add("3non");	
+//			else
+//			{
+//				availability = Utils.getAvailablePeriod(from1, to1, availability);
+//				availability = Utils.getAvailablePeriod(from2, to2, availability);	
+//			}
+//		}
+//		else
+//			availability.add("3non");
+//		
+//		//get availability for Thursday
+//		if (!"non".equals(thursdayNull))
+//		{
+//			from1 = request.getParameter("thuFrom1");
+//			from2 = request.getParameter("thuFrom2");
+//			to1 = request.getParameter("thuTo1");
+//			to2 = request.getParameter("thuTo2");
+//			
+//			if ((from1.equals(from2))&&(from1.equals("0")))
+//				availability.add("4non");	
+//			else
+//			{
+//				availability = Utils.getAvailablePeriod(from1, to1, availability);
+//				availability = Utils.getAvailablePeriod(from2, to2, availability);	
+//			}
+//		}
+//		else
+//			availability.add("4non");
+//		
+//		//get availability for Friday
+//		if(!"non".equals(fridayNull))
+//		{			
+//			from1 = request.getParameter("friFrom1");
+//			from2 = request.getParameter("friFrom2");
+//			to1 = request.getParameter("friTo1");
+//			to2 = request.getParameter("friTo2");	
+//			
+//			if ((from1.equals(from2))&&(from1.equals("0")))
+//				availability.add("5non");	
+//			else
+//			{
+//				availability = Utils.getAvailablePeriod(from1, to1, availability);
+//				availability = Utils.getAvailablePeriod(from2, to2, availability);
+//			}
+//		}
+//		else
+//			availability.add("5non");
+//	
+//		//convert arrayList to string for matching data type in DB
+//		if (availability != null)
+//			strAvailableTime=StringUtils.collectionToCommaDelimitedString(availability);	
+//		
+//		return strAvailableTime;
+//	}
 	
-		//convert arrayList to string for matching data type in DB
-		if (availability != null)
-			strAvailableTime=StringUtils.collectionToCommaDelimitedString(availability);	
-		
-		return strAvailableTime;
-	}
+//	public static void saveAvailability(String availability, ModelMap model){
+//		List<String> aList = new ArrayList<String>();		
+//		List<String> lMonday = new ArrayList<String>();
+//		List<String> lTuesday = new ArrayList<String>();
+//		List<String> lWednesday = new ArrayList<String>();
+//		List<String> lThursday = new ArrayList<String>();
+//		List<String> lFriday = new ArrayList<String>();	
+//			
+//		Map<String, String> showAvailableTime = Utils.getAvailabilityMap();		
+//		aList = Arrays.asList(availability.split(","));		
+//	
+//		for (String l : aList){			
+//			if (l.startsWith("1"))
+//				lMonday = getFormatedTimeList(l, showAvailableTime, lMonday);									
+//			
+//			if (l.startsWith("2"))
+//				lTuesday = getFormatedTimeList(l, showAvailableTime, lTuesday);									
+//
+//			if (l.startsWith("3"))
+//				lWednesday = getFormatedTimeList(l, showAvailableTime, lWednesday);					
+//			
+//			if (l.startsWith("4"))
+//				lThursday = getFormatedTimeList(l, showAvailableTime, lThursday);	
+//						
+//			if (l.startsWith("5"))
+//				lFriday = getFormatedTimeList(l, showAvailableTime, lFriday);							
+//		}	
+//		
+//		if ((lMonday == null)||(lMonday.size() == 0))
+//			lMonday.add("1non");	
+//		if ((lTuesday == null)||(lTuesday.size() == 0))
+//			lTuesday.add("2non");
+//		if ((lWednesday == null)||(lWednesday.size() == 0))
+//			lWednesday.add("3non");
+//		if ((lThursday == null)||(lThursday.size() == 0))
+//			lThursday.add("4non");
+//		if ((lFriday == null)||(lFriday.size() == 0))
+//			lFriday.add("5non");
+//		
+//		model.addAttribute("monAvailability", lMonday);		
+//		model.addAttribute("tueAvailability", lTuesday);
+//		model.addAttribute("wedAvailability", lWednesday);
+//		model.addAttribute("thuAvailability", lThursday);
+//		model.addAttribute("friAvailability", lFriday);		
+//	}
 	
-	public static void saveAvailability(String availability, ModelMap model){
-		List<String> aList = new ArrayList<String>();		
-		List<String> lMonday = new ArrayList<String>();
-		List<String> lTuesday = new ArrayList<String>();
-		List<String> lWednesday = new ArrayList<String>();
-		List<String> lThursday = new ArrayList<String>();
-		List<String> lFriday = new ArrayList<String>();	
-			
-		Map<String, String> showAvailableTime = Utils.getAvailabilityMap();		
-		aList = Arrays.asList(availability.split(","));		
+//	public static List<String> getFormatedTimeList(String str, Map<String, String> map, List<String> list){
+//		String key;
+//		key = str.substring(1);
+//		
+//		if (!key.equals("non"))
+//		{
+//			list.add(map.get(key));
+//			Utils.sortList(list);
+//		}	
+//		
+//		return list;
+//	}
 	
-		for (String l : aList){			
-			if (l.startsWith("1"))
-				lMonday = getFormatedTimeList(l, showAvailableTime, lMonday);									
-			
-			if (l.startsWith("2"))
-				lTuesday = getFormatedTimeList(l, showAvailableTime, lTuesday);									
-
-			if (l.startsWith("3"))
-				lWednesday = getFormatedTimeList(l, showAvailableTime, lWednesday);					
-			
-			if (l.startsWith("4"))
-				lThursday = getFormatedTimeList(l, showAvailableTime, lThursday);	
-						
-			if (l.startsWith("5"))
-				lFriday = getFormatedTimeList(l, showAvailableTime, lFriday);							
-		}	
-		
-		if ((lMonday == null)||(lMonday.size() == 0))
-			lMonday.add("1non");	
-		if ((lTuesday == null)||(lTuesday.size() == 0))
-			lTuesday.add("2non");
-		if ((lWednesday == null)||(lWednesday.size() == 0))
-			lWednesday.add("3non");
-		if ((lThursday == null)||(lThursday.size() == 0))
-			lThursday.add("4non");
-		if ((lFriday == null)||(lFriday.size() == 0))
-			lFriday.add("5non");
-		
-		model.addAttribute("monAvailability", lMonday);		
-		model.addAttribute("tueAvailability", lTuesday);
-		model.addAttribute("wedAvailability", lWednesday);
-		model.addAttribute("thuAvailability", lThursday);
-		model.addAttribute("friAvailability", lFriday);		
-	}
-	
-	public static List<String> getFormatedTimeList(String str, Map<String, String> map, List<String> list){
-		String key;
-		key = str.substring(1);
-		
-		if (!key.equals("non"))
-		{
-			list.add(map.get(key));
-			Utils.sortList(list);
-		}	
-		
-		return list;
-	}
-	
-	public static boolean isMatchVolunteer(Volunteer v1, Volunteer v2){
-		String v1Type = v1.getExperienceLevel();
-		String v2Type = v2.getExperienceLevel();	
-		
-		boolean matched = false;		
-		
-		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type) || "E".equals(v1Type) || "E".equals(v2Type)){
-			matched = true;
-		}
-		else if (( "Intermediate".equals(v1Type) && "Intermediate".equals(v2Type)) ||("I".equals(v1Type) && "I".equals(v2Type)))
-		{
-			matched = true;
-		}
-		
-		return matched;
-	}
-	
-	/**
-	 * hardcode clinics in a map, when it grows, will store them in the DB.
-	 * @return
-	 */
-	public static Map<String, String> getClinics(){
-		Map<String, String> clinics = new HashMap<String, String>();
-		
-		clinics.put("1", "McMaster Family Practice");
-		clinics.put("2", "Stonechurch Family Health Center");
-		
-		return clinics;		
-	}
-	
-	public static String getClinicName(String code){
-		Map<String, String> clinics = getClinics();
-		
-		return clinics.get(code);		
-	}
-	
+//	public static boolean isMatchVolunteer(Volunteer v1, Volunteer v2){
+//		String v1Type = v1.getExperienceLevel();
+//		String v2Type = v2.getExperienceLevel();	
+//		
+//		boolean matched = false;		
+//		
+//		if ("Experienced".equals(v1Type) || "Experienced".equals(v2Type) || "E".equals(v1Type) || "E".equals(v2Type)){
+//			matched = true;
+//		}
+//		else if (( "Intermediate".equals(v1Type) && "Intermediate".equals(v2Type)) ||("I".equals(v1Type) && "I".equals(v2Type)))
+//		{
+//			matched = true;
+//		}
+//		
+//		return matched;
+//	}
+//	
+//	/**
+//	 * hardcode clinics in a map, when it grows, will store them in the DB.
+//	 * @return
+//	 */
+//	public static Map<String, String> getClinics(){
+//		Map<String, String> clinics = new HashMap<String, String>();
+//		
+//		clinics.put("1", "McMaster Family Practice");
+//		clinics.put("2", "Stonechurch Family Health Center");
+//		
+//		return clinics;		
+//	}
+//	
+//	public static String getClinicName(String code){
+//		Map<String, String> clinics = getClinics();
+//		
+//		return clinics.get(code);		
+//	}
+//	
 
 	/**
 	 * get index of day of week by Date from calendar

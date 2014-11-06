@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -7,59 +8,72 @@
 <head>
 	<title>Tapestry</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-		<link href="${pageContext.request.contextPath}/resources/css/font-awesome.css" rel="stylesheet">
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap-lightbox.js"></script>
-	
-	<link href="${pageContext.request.contextPath}/resources/css/breadcrumb.css" rel="stylesheet" /> 
-	<link href="${pageContext.request.contextPath}/resources/css/custom.css" rel="stylesheet" />      
-
-	  		<link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
-
+	<%@include file="volunteer_head.jsp" %>
 	<style type="text/css">
 		html,body{
 			height:100%;
 		}
-		.content{
-			overflow-x:auto;
-			border-radius:5px;
-			-moz-border-radius:5px;
-			-webkit-border-radius:5px;
-			-o-border-radius:5px;
-			-ms-border-radius:5px;
-		}
-		
-		.btn-primary{
-			margin-bottom:10px;
-		}
-		
-		.modal-backdrop{
-			z-index:0;
-		}
-		
-		.lightbox{
-			z-index:1;
-		}
-		.thumbnail{
-			width:320px;
-		}
 	</style>
 	
-	<script type="text/javascript">
-		function showChangePassword(){
-			document.getElementById("changePassword").style.display="block";
-		}
-	</script>
+	
 	
 </head>
 	
 <body>
 <div id="headerholder">	
+ <%@include file="subNavi.jsp" %>
+</div>
+<div class="content">
+	<div class="row-fluid">
+		<div class="col-md-10">
+			<h3>Change Password </h3>
+		</div>
+	</div>
+		
+	<c:if test="${not empty errors}">
+		<c:choose>
+			<c:when test="${errors == 'confirm'}">
+				<div class="alert alert-error"><spring:message code="message_passwordNoMatch"/></div>
+			</c:when>
+			<c:when test="${errors == 'current'}">
+				<div class="alert alert-error"><spring:message code="message_passwordIncorrect"/></div>
+			</c:when>
+		</c:choose>
+	</c:if>
+	<c:if test="${not empty success}">
+		<div class ="alert alert-info"><spring:message code="message_passwordChangedSuccessfully"/></div>
+	</c:if>						
+
+	<div class="tab-content">
+		<div class="row-fluid">
+			<div class="span12">				
+				<form id="changePassword" action="<c:url value="/change_password/${loggedInUserId}"/>" method="POST" >
+						<fieldset>								
+	  						<label>Current password:</label>
+							<input type="password" name="currentPassword" required />
+							<label>New password:</label>
+							<input type="password" name="newPassword" required />
+							<label>Confirm password:</label>
+							<input type="password" name="confirmPassword" required />
+							<br />
+							
+						</fieldset>
+	  				</form>		
+	  				<button id="changePasswordButton" data-loading-text="Loading..." type="submit"  form="changePassword" class="btn btn-primary">Save changes</button>			
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+<!--<div id="headerholder">	
   <img id="logo" src="<c:url value="/resources/images/logo.png"/>" />
-    <!-- <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" /> -->
+     <img id="logofam" src="<c:url value="/resources/images/fammed.png"/>" /> 
 	<img id="logofhs" src="<c:url value="/resources/images/fhs.png"/>" />
         <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>
   		<div class="navbar">
@@ -75,8 +89,8 @@
      					<li><a class="brand" href="<c:url value="/"/>">Appointments</a></li>
      					
 							<li class="dropdown">
-<!-- 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Appointments<b class="caret"></b></a>
- -->								<ul class="dropdown-menu">
+ 								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Appointments<b class="caret"></b></a>
+								<ul class="dropdown-menu">
 								<c:forEach items="${patients}" var="p">
 									<c:choose>
 										<c:when test="${not empty p.preferredName}">
@@ -98,13 +112,13 @@
 			</div>
 		</div>
 	</div>
-<!-- 	breadcrumb START-->	
+ 	breadcrumb START
 	<div id="crumbs"> 
 		<ul>
 			<li><a href="<c:url value="/client"/>"><img src="${pageContext.request.contextPath}/resources/images/home.png" height="20" width="20" />My Clients</a> </li>
 		</ul>	
 	</div>
-<!-- 	breadcrumb END-->	
+	breadcrumb END
 	<div class="content">
 	</div>
 		
@@ -150,10 +164,10 @@
 							<br />
 							<input type="submit" class="btn btn-primary" value="Save changes" />
 						</fieldset>
-	  				</form> -->
+	  				</form> 
 				</div>
 				
-<!-- 				<div class="span8">
+ 				<div class="span8">
 					<h2>Pictures</h2>
 					<form id="uploadPic" action="<c:url value="upload_picture_to_profile" />" method="POST" enctype="multipart/form-data">
 						<label>Upload picture</label>
@@ -182,9 +196,9 @@
 					<p>No pictures uploaded</p>
 					</c:otherwise>
 					</c:choose>
-				</div> -->
+				</div> 
 			</div>
-		</div>
+		</div>-->
 
 
 </body>

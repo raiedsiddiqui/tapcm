@@ -159,7 +159,30 @@ public interface AppointmentManager {
      */
 	@Transactional
     public List<Appointment> getRemindingAppointmentList(int id, int diff);
-    
+	
+	/**
+	 * Group appointment by volunteer's organization
+	 * @param organizationId
+	 * @return
+	 */
+	@Transactional
+	public List<Appointment> getAppointmentsGroupByOrganization(int organizationId);
+	
+	/**
+	 * Group past appointment by volunteer's organization
+	 * @param organizationId
+	 * @return
+	 */
+	@Transactional
+	public List<Appointment> getPastAppointmentsGroupByOrganization(int organizationId);
+	
+	/**
+	 * Group pending appointment by volunteer's organization
+	 * @param organizationId
+	 * @return
+	 */
+	@Transactional
+	public List<Appointment> getPendingAppointmentsGroupByOrganization(int organizationId);
     /**
      * Set an appointment status as completed and add comments, set if contacted admin
      * @param id appointmentId
@@ -204,6 +227,14 @@ public interface AppointmentManager {
      */
 	@Transactional
     public void deleteAppointment(int id);
+	
+	/**
+	 * Save a copy of deleted appointment
+	 * @param a
+	 * @param deletedBy
+	 */
+	@Transactional
+	public void archiveAppointment(Appointment a, String deletedBy);
     
     /**
      * @param id appointmentId
