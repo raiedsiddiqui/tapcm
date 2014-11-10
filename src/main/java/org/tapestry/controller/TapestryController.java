@@ -1543,11 +1543,11 @@ public class TapestryController{
 		String logDes = sb.toString();
    		
    		//if user selects Client/Details/Assign Survey, patient id would store in hidden field called patient   		
-   		String hPatient = request.getParameter("patient");
+   		String hPatient = request.getParameter("patient");   		
    		if (!Utils.isNullOrEmpty(hPatient))
    		{      			
    			if(request.getParameter("assignSurvey") != null)//assign selected surveys to selected patients
-   	   		{   
+   	   		{   System.out.println("assign selected surveys to selected patients ");
    				if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
 
    					TapestryHelper.addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);     					
