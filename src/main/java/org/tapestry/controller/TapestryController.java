@@ -1,6 +1,7 @@
 package org.tapestry.controller;
 
 import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -682,6 +683,15 @@ public class TapestryController{
 		Patient p = new Patient();		
 		int vId1 = Integer.parseInt(request.getParameter("volunteer1"));
 		int vId2 = Integer.parseInt(request.getParameter("volunteer2"));
+		if (vId1 == vId2)
+		{
+			model.addAttribute("sameVolunteer",true);
+			TapestryHelper.loadPatientsAndVolunteers(model, volunteerManager, patientManager, request);
+			
+			return "admin/manage_patients";
+		}
+			
+		
 		Volunteer v1 = volunteerManager.getVolunteerById(vId1);
 		Volunteer v2 = volunteerManager.getVolunteerById(vId2);
 		
@@ -944,8 +954,8 @@ public class TapestryController{
 	}
 	
 	@RequestMapping(value="/display_client/{patient_id}",method=RequestMethod.GET)
-	public String displayPatientDetails(@PathVariable("patient_id") int id, SecurityContextHolderAwareRequestWrapper
-			request, ModelMap model)
+	public String displayPatientDetails(@PathVariable("patient_id") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
 	{
 		Patient patient = new Patient();
 		List<Patient> patients  = TapestryHelper.getAllPatientsWithFullInfos(patientManager, request);
@@ -993,7 +1003,7 @@ public class TapestryController{
 	@RequestMapping(value="/download_report/{patientID}", method=RequestMethod.GET)
 	public String downloadReport(@PathVariable("patientID") int id,
 			@RequestParam(value="appointmentId", required=true) int appointmentId, 	
-			ModelMap model, HttpServletResponse response)
+			ModelMap model, HttpServletResponse response, SecurityContextHolderAwareRequestWrapper request)
 	{	
 		Patient patient = patientManager.getPatientByID(id);
 		//call web service to get patient info from myoscar
@@ -1389,11 +1399,22 @@ public class TapestryController{
 		else
 			vMap.put(" V", " ");
 		
-		report.setVolunteerInformations(vMap);
-		
-		model.addAttribute("report", report);
-	
+		report.setVolunteerInformations(vMap);		
+		model.addAttribute("report", report);	
 		TapestryHelper.buildPDF(report, response);
+		
+		//add log
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" download/view ");
+		sb.append(patient.getFirstName());
+		sb.append(" ");
+		sb.append(patient.getLastName());
+		sb.append(" report at");		
+		java.util.Date date= new java.util.Date();		
+		sb.append(new Timestamp(date.getTime()));
+		userManager.addUserLog(sb.toString(), loggedInUser);	
 	
 		return null;
 	}
@@ -1752,7 +1773,7 @@ public class TapestryController{
    	
    	@RequestMapping(value="/show_survey/{resultID}", method=RequestMethod.GET)
    	public ModelAndView showSurvey(@PathVariable("resultID") int id, HttpServletRequest request)
-   	{   		   		
+   	{   System.out.println("show survey---next");		   		
    		ModelAndView redirectAction = null;
    		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
 		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();
@@ -1787,7 +1808,7 @@ public class TapestryController{
    	  
    	@RequestMapping(value="/save_survey/{resultID}", method=RequestMethod.GET)
    	public String saveAndExit(@PathVariable("resultID") int id, HttpServletRequest request) throws Exception
-	{
+	{System.out.println("save survey result...");
    		boolean isComplete = Boolean.parseBoolean(request.getParameter("survey_completed"));
    		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
 		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();

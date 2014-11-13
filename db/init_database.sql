@@ -145,6 +145,12 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	notes TEXT,
 	availability TEXT,
 	organization MEDIUMINT UNSIGNED NOT NULL,
+	total_vlc_score VARCHAR(50),
+	number_years_experience VARCHAR(50),
+	availability_per_month VARCHAR(50),
+	technology_skills_score VARCHAR(50),
+	perception_older_adult_score VARCHAR(50),
+	
 	PRIMARY KEY (volunteer_ID)	
 );
 

@@ -77,27 +77,13 @@
 											<option value="O">Other</option>
 										</select>
 								</div>
-							</div>
-							<div class="row form-group">
-								<div class="col-md-4">
-									<label>Experience:</label>
-									<select class="form-control" name="level" form="add_volunteer">
-										<option value="E" selected>Experienced</option>
-										<option value="I" >Intermediate</option>
-										<option value="B" >Beginner</option>
-									</select>	
-								</div>
-								<div class="col-md-4">
-									<label>Organization:</label>									
-									<select name="organization" form="add_volunteer" class="form-control">
-										<c:forEach items="${organizations}" var="o">
-											<option value="${o.organizationId}">${o.name}</option>
-										</c:forEach>
-									</select>
-								</div>
-							</div>
+							</div>							
 
 							<div class="row form-group">
+								<div class="col-md-4">	
+									<label>Apt #:</label>
+									<input type="text" name="aptnum" class="form-control"/>
+								</div>
 								<div class="col-md-4">
 									<label>Street #:</label>
 									<input type="text" name="streetnum" class="form-control" />
@@ -105,11 +91,7 @@
 								<div class="col-md-4">	
 									<label>Street:</label>
 									<input type="text" name="street" class="form-control"/>
-								</div>
-								<div class="col-md-4">	
-									<label>Apt #:</label>
-									<input type="text" name="aptnum" class="form-control"/>
-								</div>
+								</div>								
 							</div>
 
 							<div class="row form-group">
@@ -180,6 +162,50 @@
 									<input name="emergencyphone" class="form-control" type="text">
 								</div>
 							</div>	
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Experience:</label>
+									<select class="form-control" name="level" form="add_volunteer">
+										<option value="E" selected>Experienced</option>
+										<option value="I" >Intermediate</option>
+										<option value="B" >Beginner</option>
+									</select>	
+								</div>
+								<div class="col-md-4">
+									<label>Total VLC Score(.35):</label>
+									<input type="text" name="totalVLCScore" class="form-control" />									
+								</div>
+								<div class="col-md-4">
+									<label>Number years of experience(.1):</label>
+									<input type="text" name="numberYearsOfExperience" class="form-control" />									
+								</div>								
+							</div>
+							
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Volunteer availability(hours/month)(.2):</label>
+									<input type="text" name="availabilityPerMonthe" class="form-control" />									
+								</div>
+								<div class="col-md-4">
+									<label>Technology skills score(.25):</label>
+									<input type="text" name="technologySkillsScore" class="form-control" />									
+								</div>
+								<div class="col-md-4">
+									<label>Perception of older adults score(.2):</label>
+									<input type="text" name="perceptionOfOlderAdultScore" class="form-control" />									
+								</div>
+								
+							</div>
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Organization:</label>									
+									<select name="organization" form="add_volunteer" class="form-control">
+										<c:forEach items="${organizations}" var="o">
+											<option value="${o.organizationId}">${o.name}</option>
+										</c:forEach>
+									</select>
+								</div>
+							</div>
 
 
 						<h2>User Account </h2>
@@ -189,14 +215,14 @@
 								<div class="col-md-4">
 									<div class="input-group input-group-lg">
 										<span class="input-group-addon">Username</span>
-								 		<input name="username" type="text" class="form-control" onchange="isUsernameExist();">
+								 		<input name="username" type="text" class="form-control" onchange="isUsernameExist();" required>
 									</div>
 								</div>
 								
 								<div class="col-md-4">
 									<div class="input-group input-group-lg">
 								  		<span class="input-group-addon">Password</span>
-								  		<input type="password" name="password" class="form-control">
+								  		<input type="password" name="password" class="form-control" required>
 									</div>
 								</div>
 							</div>

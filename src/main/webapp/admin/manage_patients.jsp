@@ -24,6 +24,9 @@
 		<c:if test="${not empty misMatchedVolunteer}">			
 			<div class="alert alert-error"><spring:message code="message_volunteers_misMatchedVolunteer"/></div>
 		</c:if>	
+		<c:if test="${not empty sameVolunteer}">			
+			<div class="alert alert-error"><spring:message code="message_volunteers_sameVolunteer"/></div>
+		</c:if>	
 		<c:if test="${not empty updatePatientSuccessfully}">			
 			<div class="alert alert-info"><spring:message code="message_patient_updateSuccessful"/></div>
 		</c:if>	

@@ -28,23 +28,13 @@ public class Volunteer {
 	private String address;
 	private String organization;
 	private int organizationId;
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
+	private String totalVLCScore;
+	private String numYearsOfExperience;
+	private String availabilityPerMonth;
+	private String technologySkillsScore;
+	private String perceptionOfOlderAdultsScore;
 
 
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
 
 	public Volunteer(){
 		
@@ -239,5 +229,61 @@ public class Volunteer {
 
 	public void setOrganizationId(int organizationId) {
 		this.organizationId = organizationId;
+	}
+	public String getTotalVLCScore() {
+		return totalVLCScore;
+	}
+
+	public void setTotalVLCScore(String totalVLCScore) {
+		this.totalVLCScore = totalVLCScore;
+	}
+
+	public String getNumYearsOfExperience() {
+		return numYearsOfExperience;
+	}
+
+	public void setNumYearsOfExperience(String numYearsOfExperience) {
+		this.numYearsOfExperience = numYearsOfExperience;
+	}
+
+	public String getAvailabilityPerMonth() {
+		return availabilityPerMonth;
+	}
+
+	public void setAvailabilityPerMonth(String availabilityPerMonth) {
+		this.availabilityPerMonth = availabilityPerMonth;
+	}
+
+	public String getTechnologySkillsScore() {
+		return technologySkillsScore;
+	}
+
+	public void setTechnologySkillsScore(String technologySkillsScore) {
+		this.technologySkillsScore = technologySkillsScore;
+	}
+
+	public String getPerceptionOfOlderAdultsScore() {
+		return perceptionOfOlderAdultsScore;
+	}
+
+	public void setPerceptionOfOlderAdultsScore(String perceptionOfOlderAdultsScore) {
+		this.perceptionOfOlderAdultsScore = perceptionOfOlderAdultsScore;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }

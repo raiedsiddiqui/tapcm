@@ -91,13 +91,16 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 		String sql = "INSERT INTO volunteers (firstname, lastname, street,"
 				+ "username, email, experience_level, city, province, home_phone, cell_phone,"
 				+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
-				+ " availability, street_number, password, organization, gender) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				+ " availability, street_number, password, organization, gender, total_vlc_score, "
+				+ "number_years_experience, availability_per_month, technology_skills_score, perception_older_adult_score) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		getJdbcTemplate().update(sql, v.getFirstName(), v.getLastName(), v.getStreet(), v.getUserName(),
 				v.getEmail(),v.getExperienceLevel(), v.getCity(), v.getProvince(), v.getHomePhone(),
 				v.getCellPhone(), v.getPostalCode(), v.getCountry(), v.getEmergencyContact(), 
 				v.getEmergencyPhone(), v.getAptNumber(), v.getNotes(), v.getAvailability(), 
-				v.getStreetNumber(), v.getPassword(), v.getOrganizationId(), v.getGender());
+				v.getStreetNumber(), v.getPassword(), v.getOrganizationId(), v.getGender(), v.getTotalVLCScore(), 
+				v.getNumYearsOfExperience(), v.getAvailabilityPerMonth(), v.getTechnologySkillsScore(), 
+				v.getPerceptionOfOlderAdultsScore());
 		
 		return true;
 	}

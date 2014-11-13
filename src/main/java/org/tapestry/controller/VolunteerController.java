@@ -221,45 +221,32 @@ public class VolunteerController {
 			Volunteer volunteer = new Volunteer();			
 			volunteer.setFirstName(request.getParameter("firstname").trim());
 			volunteer.setLastName(request.getParameter("lastname").trim());
-			volunteer.setEmail(request.getParameter("email").trim());			
-			
-			ShaPasswordEncoder enc = new ShaPasswordEncoder();
-			String hashedPassword = enc.encodePassword(request.getParameter("password"), null);
-			
-			volunteer.setPassword(hashedPassword);
+			volunteer.setGender(request.getParameter("gender"));
+			volunteer.setEmail(request.getParameter("email").trim());				
 			volunteer.setExperienceLevel(request.getParameter("level"));	
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("province")))
-				volunteer.setStreet(request.getParameter("province"));
-			if (!Utils.isNullOrEmpty(request.getParameter("conuntry")))
-				volunteer.setStreet(request.getParameter("conuntry"));	
-			if (!Utils.isNullOrEmpty(request.getParameter("street")))
-				volunteer.setStreet(request.getParameter("street"));
-			if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
-				volunteer.setStreetNumber(request.getParameter("streetnum"));
-			if (!Utils.isNullOrEmpty(request.getParameter("username")))
-				volunteer.setUserName(request.getParameter("username").trim());				
-			if(!Utils.isNullOrEmpty(request.getParameter("city")))
-				volunteer.setCity(request.getParameter("city").trim());		
-			if(!Utils.isNullOrEmpty(request.getParameter("homephone")))
-				volunteer.setHomePhone(request.getParameter("homephone").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
-				volunteer.setCellPhone(request.getParameter("cellphone"));
-			if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
-				volunteer.setEmergencyContact(request.getParameter("emergencycontact").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
-				volunteer.setPostalCode(request.getParameter("postalcode"));
-			if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
-				volunteer.setEmergencyPhone(request.getParameter("emergencyphone").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
-				volunteer.setAptNumber(request.getParameter("aptnum"));
-			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
-				volunteer.setNotes(request.getParameter("notes"));
-			if (!Utils.isNullOrEmpty(request.getParameter("organization")))
-				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));		
-			if (!Utils.isNullOrEmpty(request.getParameter("gender")))
-				volunteer.setGender(request.getParameter("gender"));
-											
+			volunteer.setTotalVLCScore(request.getParameter("totalVLCScore"));
+			volunteer.setAvailabilityPerMonth(request.getParameter("availabilityPerMonthe"));
+			volunteer.setNumYearsOfExperience(request.getParameter("numberYearsOfExperience"));
+			volunteer.setTechnologySkillsScore(request.getParameter("technologySkillsScore"));
+			volunteer.setPerceptionOfOlderAdultsScore(request.getParameter("perceptionOfOlderAdultScore"));			
+			volunteer.setStreet(request.getParameter("province"));
+			volunteer.setStreet(request.getParameter("conuntry"));	
+			volunteer.setAptNumber(request.getParameter("aptnum"));
+			volunteer.setStreet(request.getParameter("street"));
+			volunteer.setStreetNumber(request.getParameter("streetnum"));
+			volunteer.setCity(request.getParameter("city").trim());		
+			volunteer.setHomePhone(request.getParameter("homephone").trim());
+			volunteer.setCellPhone(request.getParameter("cellphone"));
+			volunteer.setEmergencyContact(request.getParameter("emergencycontact").trim());
+			volunteer.setEmergencyPhone(request.getParameter("emergencyphone").trim());
+			volunteer.setPostalCode(request.getParameter("postalcode"));
+			volunteer.setNotes(request.getParameter("notes"));
+			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));		
+			volunteer.setUserName(request.getParameter("username").trim());		
+			ShaPasswordEncoder enc = new ShaPasswordEncoder();
+			String hashedPassword = enc.encodePassword(request.getParameter("password"), null);			
+			volunteer.setPassword(hashedPassword);
+					
 			String strAvailableTime = TapestryHelper.getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
@@ -306,8 +293,7 @@ public class VolunteerController {
 			else{
 				model.addAttribute("volunteerExist", true);
 				return "/admin/add_volunteer";	
-			}
-			
+			}			
 			//set displayed message information 
 			HttpSession session = request.getSession();
 			session.setAttribute("volunteerMessage", "C");
@@ -397,60 +383,26 @@ public class VolunteerController {
 		
 		//set encoded password for security
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
-		String hashedPassword = enc.encodePassword(request.getParameter("password"), null);
-		
+		String hashedPassword = enc.encodePassword(request.getParameter("password"), null);		
 		volunteer.setPassword(hashedPassword);
-		
-		if (!Utils.isNullOrEmpty(request.getParameter("email")))
-			volunteer.setEmail(request.getParameter("email"));			
+		volunteer.setEmail(request.getParameter("email"));	
+		volunteer.setExperienceLevel((request.getParameter("level")));	
+		volunteer.setStreet(request.getParameter("street"));
+		volunteer.setCity(request.getParameter("city"));
+		volunteer.setProvince(request.getParameter("province"));
+		volunteer.setCountry(request.getParameter("country"));
+		volunteer.setStreetNumber(request.getParameter("streetnum"));
+		volunteer.setAptNumber(request.getParameter("aptnum"));
+		volunteer.setPostalCode(request.getParameter("postalcode"));
+		volunteer.setHomePhone(request.getParameter("homephone"));
+		volunteer.setCellPhone(request.getParameter("cellphone"));
+		volunteer.setEmergencyContact(request.getParameter("emergencycontact"));
+		volunteer.setEmergencyPhone(request.getParameter("emergencyphone"));
+		volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
+		volunteer.setNotes(request.getParameter("notes"));
+		volunteer.setGender(request.getParameter("gender"));
 			
-		if (!Utils.isNullOrEmpty(request.getParameter("level")))		
-			volunteer.setExperienceLevel((request.getParameter("level")));	
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("street")))
-			volunteer.setStreet(request.getParameter("street"));
-		
-		if (!Utils.isNullOrEmpty(request.getParameter("city")))
-			volunteer.setCity(request.getParameter("city"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("province")))
-			volunteer.setProvince(request.getParameter("province"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("country")))
-			volunteer.setCountry(request.getParameter("country"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
-			volunteer.setStreetNumber(request.getParameter("streetnum"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
-			volunteer.setAptNumber(request.getParameter("aptnum"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
-			volunteer.setPostalCode(request.getParameter("postalcode"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("homephone")))
-			volunteer.setHomePhone(request.getParameter("homephone"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
-			volunteer.setCellPhone(request.getParameter("cellphone"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
-			volunteer.setEmergencyContact(request.getParameter("emergencycontact"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
-			volunteer.setEmergencyPhone(request.getParameter("emergencyphone"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("notes")))
-			volunteer.setNotes(request.getParameter("notes"));
-		
-		if (!Utils.isNullOrEmpty(request.getParameter("gender")))
-			volunteer.setGender(request.getParameter("gender"));
-				
-		if (!Utils.isNullOrEmpty(request.getParameter("organization")))
-			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
-			
-		String strAvailableTime = TapestryHelper.getAvailableTime(request);		
-		
+		String strAvailableTime = TapestryHelper.getAvailableTime(request);				
 		volunteer.setAvailability(strAvailableTime);
 			
 		volunteerManager.updateVolunteer(volunteer);

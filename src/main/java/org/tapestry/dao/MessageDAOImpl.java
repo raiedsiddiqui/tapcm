@@ -28,7 +28,8 @@ public class MessageDAOImpl extends JdbcDaoSupport implements MessageDAO {
 	public List<Message> getAllMessagesForRecipient(int recipient) {
 		String sql = "SELECT messages.message_ID, messages.sender, messages.recipient, messages.msg,"
 				+ " messages.subject, messages.msgRead, messages.sent, users.name "
-				+ "FROM messages INNER JOIN users ON messages.sender = users.user_ID WHERE messages.recipient=?";
+				+ "FROM messages INNER JOIN users ON messages.sender = users.user_ID WHERE messages.recipient=? "
+				+ "ORDER BY messages.msgRead ASC, messages.sent DESC";
 		
 		List<Message> messages = getJdbcTemplate().query(sql, new Object[]{recipient}, new MessageMapper());			
 		return messages;

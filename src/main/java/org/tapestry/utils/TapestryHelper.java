@@ -1611,6 +1611,7 @@ public class TapestryHelper {
 			document.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 		}			
 	}
 	
@@ -1649,7 +1650,7 @@ public class TapestryHelper {
                 table.writeSelectedRows(0, -1, 34, 823, writer.getDirectContent());  
             }
             catch (Exception e){
-
+            	System.out.println(e.getStackTrace());
             }
 		}
 		
