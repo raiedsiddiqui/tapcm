@@ -137,7 +137,14 @@ public interface VolunteerDAO {
 	 * Delete an organization 
 	 * @param id
 	 */
-	public void deleteOrganizationById(int id);
+	public void deleteOrganizationById(int id);	
+	
+	/**
+	 * save a copy of deleted organization
+	 * @param organization
+	 * @param deletedBy
+	 */
+	public void archiveOrganization(Organization organization, String deletedBy);
 	
 	/**
 	 * save a copy of deleted volunteer

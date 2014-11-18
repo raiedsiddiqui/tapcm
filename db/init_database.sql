@@ -145,11 +145,11 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	notes TEXT,
 	availability TEXT,
 	organization MEDIUMINT UNSIGNED NOT NULL,
-	total_vlc_score VARCHAR(50),
-	number_years_experience VARCHAR(50),
-	availability_per_month VARCHAR(50),
-	technology_skills_score VARCHAR(50),
-	perception_older_adult_score VARCHAR(50),
+	total_vlc_score DECIMAL(6,2),
+	number_years_experience DECIMAL(6,2),
+	availability_per_month DECIMAL(6,2),
+	technology_skills_score DECIMAL(6,2),
+	perception_older_adult_score VDECIMAL(6,2),
 	
 	PRIMARY KEY (volunteer_ID)	
 );
@@ -323,6 +323,26 @@ CREATE TABLE IF NOT EXISTS messages_archive (
 	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
 	
 	PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS organizations_archive (
+	id MEDIUMINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	deleted_organization_ID MEDIUMINT UNSIGNED,
+	name VARCHAR(255) NOT NULL,
+	primary_contact VARCHAR(255) NOT NULL,
+	primary_phone VARCHAR(20),
+	secondary_contact VARCHAR(255),
+	secondary_phone VARCHAR(20),
+	street_number VARCHAR(20),
+	street VARCHAR(100),
+	city VARCHAR(50),
+	province VARCHAR(3),
+	country VARCHAR(50),
+	postal_code VARCHAR(10),
+	deleted_by VARCHAR(255) NOT NULL,
+	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+	
+	PRIMARY KEY (id)	
 );
 
 COMMIT;

@@ -169,6 +169,14 @@ public interface VolunteerManager {
 	@Transactional
 	public void deleteOrganizationById(int id);
 	
+	/**
+	 * Save a copy of deleted organization
+	 * @param organization
+	 * @param deletedBy
+	 */
+	@Transactional
+	public void archiveOrganization(Organization organization, String deletedBy);
+	
 	//Activity----
 	/**	 
 	 * @param volunteer

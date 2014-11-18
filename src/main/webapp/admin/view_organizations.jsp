@@ -22,6 +22,16 @@
 				margin:10px;
 			}
 		</style>		
+		<script type="text/javascript">
+			function confirmDelete()
+			{
+			  var x = confirm("Are you sure you want to delete?");
+			  if (x)
+			      return true;
+			  else
+			    return false;
+			}
+		</script>
 		
 	</head>
 	
@@ -31,6 +41,12 @@
 		<c:if test="${not empty organizationCreated}">
 			<div class ="alert alert-info"><spring:message code="message_newOrganization"/></div>
 		</c:if>		
+		<c:if test="${not empty organizationUpdated}">
+			<div class ="alert alert-info"><spring:message code="message_updateOrganization"/></div>
+		</c:if>	
+		<c:if test="${not empty organizationDeleted}">
+			<div class ="alert alert-info"><spring:message code="message_deleteOrganization"/></div>
+		</c:if>	
 		
 		<div class="row">		
 			<div class="col-md-9">
@@ -63,12 +79,13 @@
 				</tr>
 				<c:forEach items="${organizations}" var="o">
 					<tr>
-						<td>${o.name}</td>						
-						<td>${o.streetNumbet} ${o.streetName}, ${o.city}, ${o.province}</td>
+						<td><a href="<c:url value="/modify_organization/${o.organizationId}"/>">${o.name}</a></td>						
+						<td>${o.streetNumber} ${o.streetName}, ${o.city}, ${o.province}</td>
 						<td>${o.primaryContact}</td>
 						<td>${o.primaryPhone}</td>
 						<td>${o.secondaryContact}</td>
-						<td>${o.secondaryPhone}</td>						
+						<td>${o.secondaryPhone}</td>
+						<td><a href="<c:url value="/delete_organization/${o.organizationId}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Delete</a></td>						
 					</tr>
 				</c:forEach>
 			</table>

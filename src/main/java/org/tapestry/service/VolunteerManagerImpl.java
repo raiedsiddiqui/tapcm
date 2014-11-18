@@ -123,6 +123,12 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	public void deleteOrganizationById(int id) {
 		volunteerDao.deleteOrganizationById(id);
 	}
+
+	@Override
+	public void archiveOrganization(Organization organization, String deletedBy) {
+		volunteerDao.archiveOrganization(organization, deletedBy);
+		
+	}
 	
 	//Activity
 	@Override
@@ -222,6 +228,5 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	public void archiveVolunteer(Volunteer volunteer, String deletedBy) {
 		volunteerDao.archiveVolunteer(volunteer, deletedBy);
 	}
-
 
 }

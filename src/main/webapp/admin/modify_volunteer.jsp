@@ -22,12 +22,19 @@
 				margin:10px;
 			}
 		</style>
-		
 		<script type="text/javascript">
-			function printTable(){
-				$('.table').printThis();
+			function checkNumericInput(id)
+			{				
+				var element = document.getElementById(id);
+				
+				if (isNaN(element.value)) 
+			    {
+				    alert("Must input numbers" );
+				    element.value="";
+				}
 			}
 		</script>
+	
 	</head>
 	
 	<body>
@@ -56,27 +63,13 @@
 										</select>
 								</div>
 							</div>
-							<div class="row form-group">
-								<div class="col-md-4">
-									<label>Organization:</label>
-										<select name="organization" form="modify_volunteer" class="form-control">
-											<c:forEach items="${organizations}" var="o">
-												<option value="${o.organizationId}" <c:if test="${o.organizationId eq volunteer.organizationId}">selected</c:if>>${o.name}</option>
-											</c:forEach>
-										</select>
-								</div>
-								
-								<div class="col-md-4">
-									<label>Experience:</label>
-									<select class="form-control" name="level" form="modify_volunteer">
-										<option value='E' <c:if test="${volunteer.experienceLevel eq 'Experienced'}">selected</c:if>>Experienced</option>
-										<option value='I' <c:if test="${volunteer.experienceLevel eq 'Intermediate'}">selected</c:if>>Intermediate</option>
-										<option value='B' <c:if test="${volunteer.experienceLevel eq 'Beginer'}">selected</c:if> >Beginner</option>
-									</select>	
-								</div>
-							</div>
+						
 
 							<div class="row form-group">
+								<div class="col-md-4">	
+									<label>Apt #:</label>
+									<input type="text" name="aptnum" class="form-control" value="${volunteer.aptNumber}"/>
+								</div>
 								<div class="col-md-4">
 									<label>Street #:</label>
 									<input type="text" name="streetnum" class="form-control" value="${volunteer.streetNumber}" />
@@ -84,28 +77,16 @@
 								<div class="col-md-4">	
 									<label>Street:</label>
 									<input type="text" name="street" class="form-control" value="${volunteer.street}"/>
-								</div>
-								<div class="col-md-4">	
-									<label>Apt #:</label>
-									<input type="text" name="aptnum" class="form-control" value="${volunteer.aptNumber}"/>
-								</div>
+								</div>								
 							</div>		
-
-
-
 							<div class="row form-group">
 								<div class="col-md-4">	
-									<label>Country:</label>
-										<select name="country" form="modify_volunteer" class="form-control"s>
-										<option value="CA" <c:if test="${volunteer.country eq 'CA'}">selected</c:if>>Canada</option>
-										<option value="ST" <c:if test="${volunteer.country eq 'ST'}">selected</c:if>>USA</option>
-										<option value="CH" <c:if test="${volunteer.country eq 'CH'}">selected</c:if>>China</option>
-										<option value="RU" <c:if test="${volunteer.country eq 'RU'}">selected</c:if>>Russia</option>
-										</select>
+									<label>City:</label>
+									<input name="city" class="form-control" value="${volunteer.city}" type="text">
 								</div>
 								<div class="col-md-4">	
 									<label>Province:</label>
-										<select name="province" form="modify_volunteer" class="form-control">
+									<select name="province" form="modify_volunteer" class="form-control">
 										<option value='AB' <c:if test="${volunteer.province eq 'AB'}">selected</c:if>>Alberta</option>
 										<option value='BC' <c:if test="${volunteer.province eq 'BC'}">selected</c:if>>British Colunmbia</option>							
 										<option value='MB' <c:if test="${volunteer.province eq 'MB'}">selected</c:if>>Manitoba</option>
@@ -118,36 +99,33 @@
 										<option value='SK' <c:if test="${volunteer.province eq 'SK'}">selected</c:if>>Saskatchewan</option>							
 										<option value='NT' <c:if test="${volunteer.province eq 'NT'}">selected</c:if>>Northwest Terriotories</option>
 										<option value='NU' <c:if test="${volunteer.province eq 'NU'}">selected</c:if>>Nunavut</option>
-										<option value='YT' <c:if test="${volunteer.province eq 'YT'}">selected</c:if>>Yukon</option>
-											
-										</select>
+										<option value='YT' <c:if test="${volunteer.province eq 'YT'}">selected</c:if>>Yukon</option>											
+									</select>
 								</div>	
 								<div class="col-md-4">	
-									<label>City:</label>
-									<input name="city" class="form-control" value="${volunteer.city}" type="text">
-								</div>
+									<label>Country:</label>
+									<select name="country" form="modify_volunteer" class="form-control"s>
+										<option value="CA" <c:if test="${volunteer.country eq 'CA'}">selected</c:if>>Canada</option>
+										<option value="ST" <c:if test="${volunteer.country eq 'ST'}">selected</c:if>>USA</option>
+										<option value="CH" <c:if test="${volunteer.country eq 'CH'}">selected</c:if>>China</option>
+										<option value="RU" <c:if test="${volunteer.country eq 'RU'}">selected</c:if>>Russia</option>
+									</select>
+								</div>								
 							</div>
-
-
 							<div class="row form-group">
 								<div class="col-md-4">	
 									<label>Postal Code:</label>
 									<input name="postalcode" class="form-control" type="text" value="${volunteer.postalCode}"/>
-								</div>
-							
-							
+								</div>							
 								<div class="col-md-4">		
 									<label >Home Phone:</label>
 									<input name="homephone" class="form-control" type="text" value="${volunteer.homePhone}">
 								</div>
-
 								<div class="col-md-4">	
 									<label>Cell Phone:</label>
 									<input name="cellphone" class="form-control" type="text" value="${volunteer.cellPhone}">
 								</div>
-							</div>
-
-			
+							</div>			
 							<div class="row form-group">
 								<div class="col-md-4">
 									<label>Email:</label>
@@ -161,8 +139,51 @@
 									<label>Emergency #:</label>
 									<input name="emergencyphone" class="form-control" type="text" value="${volunteer.emergencyPhone}">
 								</div>
-							</div>		
-
+							</div>	
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Experience:</label>
+									<select class="form-control" name="level" form="modify_volunteer">
+										<option value='E' <c:if test="${volunteer.experienceLevel eq 'Experienced'}">selected</c:if>>Experienced</option>
+										<option value='I' <c:if test="${volunteer.experienceLevel eq 'Intermediate'}">selected</c:if>>Intermediate</option>
+										<option value='B' <c:if test="${volunteer.experienceLevel eq 'Beginer'}">selected</c:if> >Beginner</option>
+									</select>	
+								</div>
+								<div class="col-md-4">
+									<label>Total VLC Score(.35):</label>
+									<input type="text" id="totalVLCScore" name="totalVLCScore" class="form-control" value="${volunteer.totalVLCScore}" onchange="checkNumericInput(this.id)" required/>									
+								</div>
+								<div class="col-md-4">
+									<label>Number years of experience(.1):</label>
+									<input type="text" id="numberYearsOfExperience" name="numberYearsOfExperience" class="form-control" value="${volunteer.numYearsOfExperience}" onchange="checkNumericInput(this.id)" required/>									
+								</div>	
+							</div>	
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Volunteer availability(hours/month)(.2):</label>
+									<input type="text" id="availabilityPerMonthe" name="availabilityPerMonthe" class="form-control" value="${volunteer.availabilityPerMonth}" onchange="checkNumericInput(this.id)" required/>									
+								</div>
+								<div class="col-md-4">
+									<label>Technology skills score(.25):</label>
+									<input type="text" id="technologySkillsScore" name="technologySkillsScore" class="form-control" value="${volunteer.technologySkillsScore}" onchange="checkNumericInput(this.id)" required/>									
+								</div>
+								<div class="col-md-4">
+									<label>Perception of older adults score(.2):</label>
+									<input type="text" id="perceptionOfOlderAdultScore" name="perceptionOfOlderAdultScore" class="form-control" value="${volunteer.perceptionOfOlderAdultsScore}" onchange="checkNumericInput(this.id)" required/>									
+								</div>								
+							</div>
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Organization:</label>
+										<select name="organization" form="modify_volunteer" class="form-control">
+											<c:forEach items="${organizations}" var="o">
+												<option value="${o.organizationId}" <c:if test="${o.organizationId eq volunteer.organizationId}">selected</c:if>>${o.name}</option>
+											</c:forEach>
+										</select>
+								</div>
+								
+								
+							</div>
 
 
 						<h2>User Account </h2>

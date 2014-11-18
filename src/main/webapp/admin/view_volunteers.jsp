@@ -62,6 +62,7 @@
 					<th>Username</th>
 					<th>Experience</th>
 					<th>City</th>
+					<th>Organization</th>
 					<th>Phone Number</th>
 					<th></th>
 				</tr>
@@ -71,6 +72,7 @@
 						<td>${vl.userName}</td>
 						<td>${vl.experienceLevel}</td>
 						<td>${vl.city}</td>
+						<td>${vl.organization}</td>
 						<td>${vl.homePhone}</td>
 						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-info">Edit</a></td>
 						<td><a href="<c:url value="/delete_volunteer/${vl.volunteerId}"/>" class="btn btn-danger">Delete</a></td>

@@ -28,11 +28,11 @@ public class Volunteer {
 	private String address;
 	private String organization;
 	private int organizationId;
-	private String totalVLCScore;
-	private String numYearsOfExperience;
-	private String availabilityPerMonth;
-	private String technologySkillsScore;
-	private String perceptionOfOlderAdultsScore;
+	private double totalVLCScore;
+	private double numYearsOfExperience;
+	private double availabilityPerMonth;
+	private double technologySkillsScore;
+	private double perceptionOfOlderAdultsScore;
 
 
 
@@ -230,43 +230,43 @@ public class Volunteer {
 	public void setOrganizationId(int organizationId) {
 		this.organizationId = organizationId;
 	}
-	public String getTotalVLCScore() {
+	public double getTotalVLCScore() {
 		return totalVLCScore;
 	}
 
-	public void setTotalVLCScore(String totalVLCScore) {
+	public void setTotalVLCScore(double totalVLCScore) {
 		this.totalVLCScore = totalVLCScore;
 	}
 
-	public String getNumYearsOfExperience() {
+	public double getNumYearsOfExperience() {
 		return numYearsOfExperience;
 	}
 
-	public void setNumYearsOfExperience(String numYearsOfExperience) {
+	public void setNumYearsOfExperience(double numYearsOfExperience) {
 		this.numYearsOfExperience = numYearsOfExperience;
 	}
 
-	public String getAvailabilityPerMonth() {
+	public double getAvailabilityPerMonth() {
 		return availabilityPerMonth;
 	}
 
-	public void setAvailabilityPerMonth(String availabilityPerMonth) {
+	public void setAvailabilityPerMonth(double availabilityPerMonth) {
 		this.availabilityPerMonth = availabilityPerMonth;
 	}
 
-	public String getTechnologySkillsScore() {
+	public double getTechnologySkillsScore() {
 		return technologySkillsScore;
 	}
 
-	public void setTechnologySkillsScore(String technologySkillsScore) {
+	public void setTechnologySkillsScore(double technologySkillsScore) {
 		this.technologySkillsScore = technologySkillsScore;
 	}
 
-	public String getPerceptionOfOlderAdultsScore() {
+	public double getPerceptionOfOlderAdultsScore() {
 		return perceptionOfOlderAdultsScore;
 	}
 
-	public void setPerceptionOfOlderAdultsScore(String perceptionOfOlderAdultsScore) {
+	public void setPerceptionOfOlderAdultsScore(double perceptionOfOlderAdultsScore) {
 		this.perceptionOfOlderAdultsScore = perceptionOfOlderAdultsScore;
 	}
 

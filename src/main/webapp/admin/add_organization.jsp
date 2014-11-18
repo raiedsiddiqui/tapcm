@@ -96,13 +96,13 @@
 							<div class="col-md-4">
 								<label>Province:</label>
 								<select name="province" form="add_organization" class="form-control">
-									<option value="AB" selected>Alberta</option>
+									<option value="AB" >Alberta</option>
 									<option value="BC" >British Colunmbia</option>							
 									<option value="MB" >Manitoba</option>
 									<option value="NB" >New Brunswik</option>
 									<option value="NL" >Newfoundland and Labrador</option>
 									<option value="NS" >Nova Scotia</option>							
-									<option value="ON" >Ontario</option>
+									<option value="ON" selected>Ontario</option>
 									<option value="PE" >PrinceEdword Island</option>
 									<option value="QC" >Quebec</option>
 									<option value="SK" >Saskatchewan</option>							

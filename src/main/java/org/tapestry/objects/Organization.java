@@ -3,7 +3,7 @@ package org.tapestry.objects;
 public class Organization {
 	int organizationId;
 	String name;
-	String streetNumbet;
+	String streetNumber;
 	String streetName;
 	String city;
 	String province;
@@ -34,12 +34,12 @@ public class Organization {
 		this.name = name;
 	}
 
-	public String getStreetNumbet() {
-		return streetNumbet;
+	public String getStreetNumber() {
+		return streetNumber;
 	}
 
-	public void setStreetNumbet(String streetNumbet) {
-		this.streetNumbet = streetNumbet;
+	public void setStreetNumber(String streetNumber) {
+		this.streetNumber = streetNumber;
 	}
 
 	public String getStreetName() {
