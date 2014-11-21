@@ -92,15 +92,16 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 				+ "username, email, experience_level, city, province, home_phone, cell_phone,"
 				+ "postal_code, country, emergency_contact, emergency_phone, appartment, notes,"
 				+ " availability, street_number, password, organization, gender, total_vlc_score, "
-				+ "number_years_experience, availability_per_month, technology_skills_score, perception_older_adult_score) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				+ "number_years_experience, availability_per_month, technology_skills_score, "
+				+ "perception_older_adult_score, vlc_ID) "
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
 		getJdbcTemplate().update(sql, v.getFirstName(), v.getLastName(), v.getStreet(), v.getUserName(),
 				v.getEmail(),v.getExperienceLevel(), v.getCity(), v.getProvince(), v.getHomePhone(),
 				v.getCellPhone(), v.getPostalCode(), v.getCountry(), v.getEmergencyContact(), 
 				v.getEmergencyPhone(), v.getAptNumber(), v.getNotes(), v.getAvailability(), 
 				v.getStreetNumber(), v.getPassword(), v.getOrganizationId(), v.getGender(), v.getTotalVLCScore(), 
 				v.getNumYearsOfExperience(), v.getAvailabilityPerMonth(), v.getTechnologySkillsScore(), 
-				v.getPerceptionOfOlderAdultsScore());
+				v.getPerceptionOfOlderAdultsScore(), v.getvLCID());
 		
 		return true;
 	}
@@ -112,14 +113,15 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 				+ "postal_code=?, country=?, emergency_contact=?, emergency_phone=?, appartment=?, "
 				+ "notes=?, availability=?, street_number=?, password=?, organization=?, gender=?, "
 				+ "total_vlc_score=?, number_years_experience=?, availability_per_month=?, "
-				+ "technology_skills_score=?, perception_older_adult_score=? WHERE volunteer_ID=?";
+				+ "technology_skills_score=?, perception_older_adult_score=?, vlc_ID=? WHERE volunteer_ID=?";
 		
 		getJdbcTemplate().update(sql, v.getFirstName(), v.getLastName(), v.getUserName(), v.getStreet(), 
 				v.getEmail(), v.getExperienceLevel(), v.getCity(), v.getProvince(), v.getHomePhone(),
 				v.getCellPhone(), v.getPostalCode(), v.getCountry(), v.getEmergencyContact(), 
 				v.getEmergencyPhone(), v.getAptNumber(), v.getNotes(), v.getAvailability(), v.getStreetNumber(), 				
 				v.getPassword(), v.getOrganizationId(), v.getGender(), v.getTotalVLCScore(), v.getNumYearsOfExperience(),
-				v.getAvailabilityPerMonth(), v.getTechnologySkillsScore(), v.getPerceptionOfOlderAdultsScore(),v.getVolunteerId());		
+				v.getAvailabilityPerMonth(), v.getTechnologySkillsScore(), v.getPerceptionOfOlderAdultsScore(),
+				v.getvLCID(), v.getVolunteerId());		
 	}
 
 	@Override
@@ -203,13 +205,13 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 		String sql = "INSERT INTO volunteers_archive (firstname, lastname, street,"
 				+ "username, email, experience_level, city, province, home_phone, cell_phone,"
 				+ "postal_code, country, emergency_contact, emergency_phone, appartment,"
-				+ " street_number, organization, deleted_by, deleted_volunteer_ID) "
+				+ " street_number, organization, vlc_ID, deleted_by, deleted_volunteer_ID) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		getJdbcTemplate().update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getStreet(), volunteer.getUserName(),
 				volunteer.getEmail(),volunteer.getExperienceLevel(), volunteer.getCity(), volunteer.getProvince(), volunteer.getHomePhone(),
 				volunteer.getCellPhone(), volunteer.getPostalCode(), volunteer.getCountry(), volunteer.getEmergencyContact(), 
-				volunteer.getEmergencyPhone(), volunteer.getAptNumber(), volunteer.getStreetNumber(), volunteer.getOrganizationId(),
-				deletedBy, volunteer.getVolunteerId());		
+				volunteer.getEmergencyPhone(), volunteer.getAptNumber(), volunteer.getStreetNumber(), volunteer.getOrganizationId(), 
+				volunteer.getvLCID(), deletedBy, volunteer.getVolunteerId());		
 	}	
 
 	@Override
@@ -277,6 +279,7 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 			vol.setPerceptionOfOlderAdultsScore(rs.getDouble("perception_older_adult_score"));
 			vol.setAvailabilityPerMonth(rs.getDouble("availability_per_month"));
 			vol.setNumYearsOfExperience(rs.getDouble("number_years_experience"));
+			vol.setvLCID(rs.getInt("vlc_ID"));
 			
 			return vol;
 			

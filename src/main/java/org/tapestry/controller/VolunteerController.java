@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.tapestry.utils.TapestryHelper;
 import org.tapestry.utils.Utils;
 import org.tapestry.objects.Activity;
@@ -66,9 +67,9 @@ public class VolunteerController {
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole()))
-			volunteers = volunteerManager.getAllVolunteers();	//For central Admin		
+			volunteers = volunteerManager.getAllVolunteersWithCanDelete();	//For central Admin		
 		else		
-			volunteers = volunteerManager.getAllVolunteersByOrganization(user.getOrganization());	// for local Admin
+			volunteers = volunteerManager.getAllVolunteersWithCanDeleteByOrganization(user.getOrganization());	// for local Admin
 		model.addAttribute("volunteers", volunteers);	
 		
 		if (session.getAttribute("volunteerMessage") != null)
@@ -242,7 +243,8 @@ public class VolunteerController {
 			volunteer.setEmergencyPhone(request.getParameter("emergencyphone").trim());
 			volunteer.setPostalCode(request.getParameter("postalcode"));
 			volunteer.setNotes(request.getParameter("notes"));
-			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));		
+			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));					
+			volunteer.setvLCID(Integer.valueOf(request.getParameter("vlcId")));	
 			volunteer.setUserName(request.getParameter("username").trim());		
 			ShaPasswordEncoder enc = new ShaPasswordEncoder();
 			String hashedPassword = enc.encodePassword(request.getParameter("password"), null);			
@@ -400,6 +402,7 @@ public class VolunteerController {
 		volunteer.setEmergencyContact(request.getParameter("emergencycontact"));
 		volunteer.setEmergencyPhone(request.getParameter("emergencyphone"));
 		volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
+		volunteer.setvLCID(Integer.valueOf(request.getParameter("vlcId")));
 		volunteer.setNotes(request.getParameter("notes"));
 		volunteer.setGender(request.getParameter("gender"));
 		volunteer.setTotalVLCScore(Double.parseDouble(request.getParameter("totalVLCScore")));
@@ -476,6 +479,22 @@ public class VolunteerController {
 //		List<Picture> pics = pictureManager.getPicturesForUser(loggedInUser.getUserID());
 //		model.addAttribute("pictures", pics);
 		return "/volunteer/profile";
+	}
+	
+	@RequestMapping(value="/volunteerList.html")
+	@ResponseBody
+	public List<Volunteer> getVolunteerByOrganization(@RequestParam(value="volunteerId") int vId){
+		Volunteer volunteer = volunteerManager.getVolunteerById(vId);
+		System.out.println("vId === "+ vId);
+		List<Volunteer> vl = volunteerManager.getAllVolunteersByOrganization(volunteer.getOrganizationId());
+		if (vl !=null && vl.size()>0)
+			System.out.println("vl size === "+ vl.size());
+		
+		for (Volunteer v: vl)
+			System.out.println("vId === " + v.getVolunteerId() + "  v display name === " + v.getDisplayName());
+		
+		return vl;
+	//	return volunteerManager.getAllVolunteersByOrganization(volunteer.getOrganizationId());
 	}
 	
 	//Activity in Volunteer
@@ -763,9 +782,9 @@ public class VolunteerController {
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
-		organizations = volunteerManager.getAllOrganizations();		
+		organizations = volunteerManager.getOrganizations();		
 		model.addAttribute("organizations", organizations);	
-		
+				
 		if (session.getAttribute("organizatioMessage") != null)
 		{
 			String message = session.getAttribute("organizatioMessage").toString();
@@ -788,7 +807,7 @@ public class VolunteerController {
 		}		
 		return "/admin/view_organizations";
 	}
-	
+
 	//display all volunteers with search criteria
 	@RequestMapping(value="/view_organizations", method=RequestMethod.POST)
 	public String viewFilteredOrganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model)

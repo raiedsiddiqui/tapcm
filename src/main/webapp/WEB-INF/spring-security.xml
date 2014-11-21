@@ -29,8 +29,6 @@
 	<beans:bean id="transactionManager"  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
    		<beans:property name="dataSource" ref="dataSource" />
   	</beans:bean>
-  	
-  	
 	
 	<http auto-config="true">
 		<intercept-url pattern="/admin/*" access="ROLE_ADMIN" />
@@ -87,6 +85,11 @@
 		<intercept-url pattern="/display_volunteer" access="ROLE_ADMIN, ROLE_LOCAL_ADMIN"/>
 		<intercept-url pattern="/view_organizations" access="ROLE_ADMIN"/>
 		<form-login login-page="/login" authentication-failure-url="/loginfailed" default-target-url="/loginsuccess" always-use-default-target="true"/>
+	
+		<session-management invalid-session-url="/login">
+	        <concurrency-control expired-url="/login" />
+		</session-management>
+	
 	</http>
  
  	<beans:bean id="encoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder" />

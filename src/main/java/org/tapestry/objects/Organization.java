@@ -13,7 +13,8 @@ public class Organization {
 	String primaryContact;
 	String secondaryContact;
 	String secondaryPhone;
-	
+	boolean hasVolunteer;
+
 	public Organization(){
 		
 	}
@@ -114,6 +115,12 @@ public class Organization {
 		this.secondaryPhone = secondaryPhone;
 	}
 
-	
+	public boolean isHasVolunteer() {
+		return hasVolunteer;
+	}
+
+	public void setHasVolunteer(boolean hasVolunteer) {
+		this.hasVolunteer = hasVolunteer;
+	}
 
 }

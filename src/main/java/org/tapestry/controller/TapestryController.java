@@ -41,12 +41,13 @@ import org.survey_component.data.SurveyQuestion;
 import org.tapestry.utils.TapestryHelper;
 import org.tapestry.utils.Utils;
 import org.tapestry.myoscar.utils.ClientManager;
+import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.DisplayedSurveyResult;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.Organization;
 import org.tapestry.objects.Patient;
-import org.tapestry.objects.Picture;
+//import org.tapestry.objects.Picture;
 import org.tapestry.objects.Report;
 import org.tapestry.objects.SurveyResult;
 import org.tapestry.objects.SurveyTemplate;
@@ -675,6 +676,40 @@ public class TapestryController{
 
 		return "admin/manage_patients";
 	}
+   	
+   	@RequestMapping(value="/search_patient", method=RequestMethod.POST)
+   	public String searchPatientByVolunteer(ModelMap model, SecurityContextHolderAwareRequestWrapper request)
+   	{
+   		String strVId = request.getParameter("search_volunteer_forPatient");		
+		List<Patient> patients = new ArrayList<Patient>();
+		List<Volunteer> volunteers = new ArrayList<Volunteer>();
+		
+		if (!Utils.isNullOrEmpty(strVId))
+		{
+			patients = patientManager.getPatientsForVolunteer(Integer.parseInt(strVId));
+							
+			if (patients.size() == 0 )  
+				model.addAttribute("emptyPatients", true);				
+		}		
+		
+		if(request.isUserInRole("ROLE_ADMIN")) 
+			volunteers = volunteerManager.getAllVolunteers();
+		else
+		{
+			User loggedInUser = TapestryHelper.getLoggedInUser(request);
+			volunteers = volunteerManager.getAllVolunteersByOrganization(loggedInUser.getOrganization());
+		}
+			
+		model.addAttribute("patients", patients);	
+		model.addAttribute("volunteers", volunteers);	
+		model.addAttribute("selectedVolunteer", strVId);
+		
+		HttpSession  session = request.getSession();
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+			
+		return "/admin/manage_patients";   		
+   	}
    	
    	@RequestMapping(value="/add_patient", method=RequestMethod.POST)
 	public String addPatient(SecurityContextHolderAwareRequestWrapper request, ModelMap model) 

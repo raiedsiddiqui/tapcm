@@ -24,9 +24,15 @@
 		</style>
 		
 		<script type="text/javascript">
-			function printTable(){
-				$('.table').printThis();
+			function confirmDelete()
+			{
+			  var x = confirm("Are you sure you want to delete?");
+			  if (x)
+			      return true;
+			  else
+			    return false;
 			}
+			
 		</script>
 	</head>
 	
@@ -45,16 +51,27 @@
 		<div class="row-fluid">
 			<h2>Volunteers </h2>
 			<div class="row-fluid">
-				<form action="<c:url value="/view_volunteers"/>" method="POST">
-					<fieldset>
-						<label>Name:</label>
-						<input type="text" name="searchName" value="${searchName}" required />
-						<input class="btn btn-primary" type="submit" value="Search" />
-					</fieldset>
-				</form>
+				<table>
+					<tr>
+						<td>
+							<form action="<c:url value="/view_volunteers"/>" method="POST">
+								<fieldset>
+									<label>Name:</label>
+									<input type="text" name="searchName" value="${searchName}" required />
+									<input class="btn btn-primary" type="submit" value="Search" />
+								</fieldset>
+							</form>
+						</td>
+						<td>
+						<div class="col-md-3">
+							<a href="<c:url value="/new_volunteer"/>" class="btn btn-primary" data-toggle="modal">New Volunteer</a>			
+						</div>
+						</td>
+					</tr>
+				</table>
+				
 			</div>
 			
-			<a href="<c:url value="/new_volunteer"/>" class="btn btn-primary" data-toggle="modal">New Volunteer</a>
 			
 			<table class="table">
 				<tr>
@@ -75,7 +92,9 @@
 						<td>${vl.organization}</td>
 						<td>${vl.homePhone}</td>
 						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-info">Edit</a></td>
-						<td><a href="<c:url value="/delete_volunteer/${vl.volunteerId}"/>" class="btn btn-danger">Delete</a></td>
+						<c:if test="${not vl.showDelete}">
+							<td><a href="<c:url value="/delete_volunteer/${vl.volunteerId}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Delete</a></td>
+						</c:if>
 					</tr>
 				</c:forEach>
 			</table>

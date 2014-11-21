@@ -33,9 +33,9 @@ public class Volunteer {
 	private double availabilityPerMonth;
 	private double technologySkillsScore;
 	private double perceptionOfOlderAdultsScore;
-
-
-
+	private boolean showDelete;
+	private int vLCID;
+	
 	public Volunteer(){
 		
 	}
@@ -286,4 +286,22 @@ public class Volunteer {
 	public void setAddress(String address) {
 		this.address = address;
 	}
+
+	public boolean isShowDelete() {
+		return showDelete;
+	}
+
+	public void setShowDelete(boolean showDelete) {
+		this.showDelete = showDelete;
+	}
+
+	public int getvLCID() {
+		return vLCID;
+	}
+
+	public void setvLCID(int vLCID) {
+		this.vLCID = vLCID;
+	}
+	
+	
 }

@@ -31,6 +31,7 @@
 			  else
 			    return false;
 			}
+			
 		</script>
 		
 	</head>
@@ -39,15 +40,14 @@
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<c:if test="${not empty organizationCreated}">
-			<div class ="alert alert-info"><spring:message code="message_newOrganization"/></div>
+			<div id="message" class ="alert alert-info"><spring:message code="message_newOrganization"/></div>
 		</c:if>		
 		<c:if test="${not empty organizationUpdated}">
-			<div class ="alert alert-info"><spring:message code="message_updateOrganization"/></div>
+			<div id="message" class ="alert alert-info"><spring:message code="message_updateOrganization"/></div>
 		</c:if>	
 		<c:if test="${not empty organizationDeleted}">
-			<div class ="alert alert-info"><spring:message code="message_deleteOrganization"/></div>
+			<div id="message" class ="alert alert-info"><spring:message code="message_deleteOrganization"/></div>
 		</c:if>	
-		
 		<div class="row">		
 			<div class="col-md-9">
 				<h2>Volunteer Organizations </h2>
@@ -70,12 +70,12 @@
 			<table class="table">
 				<tr>
 					<th>Name</th>
-					<th>Address</th>
+					<th>Address</th> 
 					<th>Primary Contact</th>
 					<th>Primary Phone</th>
 					<th>Secondary Contact</th>
 					<th>Secondary Phone</th>
-					<th></th>
+					<th>Action</th>
 				</tr>
 				<c:forEach items="${organizations}" var="o">
 					<tr>
@@ -85,7 +85,9 @@
 						<td>${o.primaryPhone}</td>
 						<td>${o.secondaryContact}</td>
 						<td>${o.secondaryPhone}</td>
-						<td><a href="<c:url value="/delete_organization/${o.organizationId}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Delete</a></td>						
+						<c:if test="${not o.hasVolunteer}">
+							<td><a href="<c:url value="/delete_organization/${o.organizationId}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Delete</a></td>>	
+						</c:if>						
 					</tr>
 				</c:forEach>
 			</table>

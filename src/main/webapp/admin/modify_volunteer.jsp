@@ -181,7 +181,10 @@
 											</c:forEach>
 										</select>
 								</div>
-								
+								<div class="col-md-4">
+									<label>VLC ID</label>
+									<input type="text" id="vlcId" name="vlcId" value="${volunteer.vLCID}" class="form-control" required/>									
+								</div>	
 								
 							</div>
 

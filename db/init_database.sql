@@ -150,6 +150,7 @@ CREATE TABLE IF NOT EXISTS volunteers (
 	availability_per_month DECIMAL(6,2),
 	technology_skills_score DECIMAL(6,2),
 	perception_older_adult_score VDECIMAL(6,2),
+	vlc_ID MEDIUMINT UNSIGNED NOT NULL,
 	
 	PRIMARY KEY (volunteer_ID)	
 );
@@ -287,6 +288,7 @@ CREATE TABLE IF NOT EXISTS volunteers_archive (
 	emergency_phone VARCHAR(20),
 	postal_code VARCHAR(10),
 	organization MEDIUMINT UNSIGNED NOT NULL,
+	vlc_ID MEDIUMINT UNSIGNED NOT NULL,
 	deleted_by VARCHAR(255) NOT NULL,
 	deleted_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
 	

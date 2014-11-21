@@ -25,7 +25,7 @@ public class Appointment{
 	private int type;
 	private String strType;
 	private int group; //based on volunteer's organization
-	
+		
 	/**
 	 * Empty constructor
 	 */
@@ -255,4 +255,5 @@ public class Appointment{
 	public void setGroup(int group) {
 		this.group = group;
 	}
+
 }
