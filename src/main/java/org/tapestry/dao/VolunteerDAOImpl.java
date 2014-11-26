@@ -206,7 +206,7 @@ public class VolunteerDAOImpl extends JdbcDaoSupport implements VolunteerDAO {
 				+ "username, email, experience_level, city, province, home_phone, cell_phone,"
 				+ "postal_code, country, emergency_contact, emergency_phone, appartment,"
 				+ " street_number, organization, vlc_ID, deleted_by, deleted_volunteer_ID) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		getJdbcTemplate().update(sql, volunteer.getFirstName(), volunteer.getLastName(), volunteer.getStreet(), volunteer.getUserName(),
 				volunteer.getEmail(),volunteer.getExperienceLevel(), volunteer.getCity(), volunteer.getProvince(), volunteer.getHomePhone(),
 				volunteer.getCellPhone(), volunteer.getPostalCode(), volunteer.getCountry(), volunteer.getEmergencyContact(), 

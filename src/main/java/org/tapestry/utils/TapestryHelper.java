@@ -816,7 +816,9 @@ public class TapestryHelper {
 		List<SurveyTemplate> surveyTemplateList;
 		if (session.getAttribute("survey_template_list") == null)
 		{
-			surveyTemplateList = surveyManager.getAllSurveyTemplates();
+		//	surveyTemplateList = surveyManager.getAllSurveyTemplates();
+			
+			surveyTemplateList = surveyManager.getSurveyTemplatesWithCanDelete();
 			
 			//save in the session
 			if (surveyTemplateList != null && surveyTemplateList.size()>0)

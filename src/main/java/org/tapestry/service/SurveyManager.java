@@ -26,6 +26,13 @@ public interface SurveyManager {
 	 */
 	@Transactional
 	public List<SurveyTemplate> getAllSurveyTemplates();
+	
+	/**
+	 * check if there is any survey result associates with survey template(can not be deleted)
+	 * @return
+	 */
+	@Transactional
+	public List<SurveyTemplate> getSurveyTemplatesWithCanDelete();
 	/**
 	 * A list of Survey template which title contains partialTitle
 	 * @param partialTitle
@@ -39,6 +46,13 @@ public interface SurveyManager {
 	 */
 	@Transactional
 	public void uploadSurveyTemplate(SurveyTemplate st);
+	
+	/**
+	 * Modify a survey template on title and description fields
+	 * @param st
+	 */
+	@Transactional
+	public void updateSurveyTemplate(SurveyTemplate st);
 	/**
 	 * Delete a survey template from the database
 	 * @param id

@@ -13,9 +13,8 @@
 			<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 			<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 			<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	
-			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
-	
+			<script src="${pageContext.request.contextPath}/resources/js/tapestryUtils.js"></script>	
+			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>	
 
 		<style type="text/css">
 			.row-fluid{
@@ -23,17 +22,6 @@
 			}
 		</style>
 		
-		<script type="text/javascript">
-			function confirmDelete()
-			{
-			  var x = confirm("Are you sure you want to delete?");
-			  if (x)
-			      return true;
-			  else
-			    return false;
-			}
-			
-		</script>
 	</head>
 	
 	<body>
@@ -91,7 +79,7 @@
 						<td>${vl.city}</td>
 						<td>${vl.organization}</td>
 						<td>${vl.homePhone}</td>
-						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-info">Edit</a></td>
+						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-info">Edit</a></td>						
 						<c:if test="${not vl.showDelete}">
 							<td><a href="<c:url value="/delete_volunteer/${vl.volunteerId}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Delete</a></td>
 						</c:if>

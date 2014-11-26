@@ -157,6 +157,12 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 		String sql = "SELECT COUNT(*) as c FROM survey_results WHERE (patient_ID=?) AND (completed=1)";
 		return getJdbcTemplate().queryForInt(sql, new Object[]{patientId});
 	}	
+	
+	@Override
+	public int countSurveysBySurveyTemplateId(int surveyTemplateId) {
+		String sql = "SELECT COUNT(*) as c FROM survey_results WHERE (survey_ID=?)";
+		return getJdbcTemplate().queryForInt(sql, new Object[]{surveyTemplateId});
+	}
 		
 	class SurveyResultMapper implements RowMapper<SurveyResult> {
 		public SurveyResult mapRow(ResultSet rs, int rowNum) throws SQLException{

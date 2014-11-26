@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -9,6 +10,7 @@
 		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/tapestryUtils.js"></script>	
 	
 	<style type="text/css">
 		.row-fluid{
@@ -26,7 +28,15 @@
 <body>
 	<div class="content">
 		<%@include file="navbar.jsp" %>
-		
+		<c:if test="${not empty surveyTemplateCreated}">
+			<div class ="alert alert-info"><spring:message code="message_newSurveyTemplate"/></div>
+		</c:if>
+		<c:if test="${not empty surveyTemplateDeleted }">
+			<div class ="alert alert-info"><spring:message code="message_removeSurveyTemplate"/></div>
+		</c:if>
+		<c:if test="${not empty surveyTemplateUpdated }">
+			<div class ="alert alert-info"><spring:message code="message_modifySurveyTemplate"/></div>
+		</c:if>			
 		<a href="<c:url value="/manage_survey"/>" >Survey Management</a> ><br/>
 		<table >
 			<tr>
@@ -64,14 +74,17 @@
 					<th>Remove</th>
 				</tr>
 				<c:forEach items="${survey_templates}" var="st">
-				<tr>
-					<td>${st.title}</td>
+				<tr>					
+					<td><a href="<c:url value="/modify_surveyTemplate/${st.surveyID}"/>">${st.title}</a></td>
 					<td>${st.description}</td>
 					<td>${st.type}</td>
 					<td>${st.priority}</td>
 					<td>${st.createdDate }</td>
 					<td><a href="<c:url value="/download_survey_template/${st.surveyID}"/>">Download</a></td>
-					<td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" class="btn btn-danger">Remove</a></td>
+					<c:if test="${st.showDelete}">
+						<td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Remove</a></td>
+					</c:if>
+					<!-- td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" class="btn btn-danger">Remove</a></td> -->
 				</tr>
 				</c:forEach>
 			</table>

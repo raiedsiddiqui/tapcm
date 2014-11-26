@@ -34,18 +34,22 @@
 		             function(data) {
 		                  var html = '';
 		                  var len = data.length;
-		                  alert("in getVolunteer data len is  " + len);
+		                  
+		                  //clear second dropdown
+		                  document.getElementById('volunteer2').options.length = 0;
+	                	  
+		                  //append data from DB
 		                  for(var i=0; i<len; i++){
 		                       html += '<option value="' + data[i].volunteerId + '">' + data[i].displayName + '</option>';
 		                   }
-		                  $('select#testDropdown').append(html);
+		                  $('select#volunteer2').append(html);		                  
 		             }
 		          );
 		 }
 
 		 $(document).ready(function() {
 		         $('#volunteer1').change(function()		        		 
-		          {  
+		          { 
 		        	 getVolunteers();
 		          });
 		      });
@@ -155,6 +159,7 @@
 					<div class="col-md-6">
 						<label>Volunteer1:</label>
 						<select name="volunteer1" id="volunteer1" form="newPatient" class="form-control">
+							<option value=""></option>
 							<c:forEach items="${volunteers}" var="v">
 								<option value="${v.volunteerId}">${v.displayName}</option>
 							</c:forEach>
@@ -163,18 +168,13 @@
 					<div class="col-md-6">
 						<label>Volunteer2:</label>
 						<select name="volunteer2" id="volunteer2" form="newPatient" class="form-control">
-							<c:forEach items="${volunteers}" var="v">
+							<option value=""></option>
+							
+					<!--  		<c:forEach items="${volunteers}" var="v">
 								<option value="${v.volunteerId}">${v.displayName}</option>
-							</c:forEach>
+							</c:forEach>-->
 						</select>
-					</div>
-					<div class="col-md-6">					
-						<div id="testDropdown">
-							<select name="testDropdown" id="testDropdown" form="newPatient" class="form-control">
-								<option value="0"></option>
-							</select>
-						</div>
-					</div>
+					</div>					
 				</div>		
 					<label>MyOscar verified? </label>
 					<input type="radio" name="myoscar_verified" value="1" checked/>Yes

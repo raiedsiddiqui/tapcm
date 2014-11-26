@@ -483,20 +483,23 @@ public class VolunteerController {
 	
 	@RequestMapping(value="/volunteerList.html")
 	@ResponseBody
-	public List<Volunteer> getVolunteerByOrganization(@RequestParam(value="volunteerId") int vId){
-		Volunteer volunteer = volunteerManager.getVolunteerById(vId);
-		System.out.println("vId === "+ vId);
+	public List<Volunteer> getVolunteerByOrganization(@RequestParam(value="volunteerId") int vId){		
+		Volunteer volunteer = volunteerManager.getVolunteerById(vId);	
 		List<Volunteer> vl = volunteerManager.getAllVolunteersByOrganization(volunteer.getOrganizationId());
-		if (vl !=null && vl.size()>0)
-			System.out.println("vl size === "+ vl.size());
 		
 		for (Volunteer v: vl)
-			System.out.println("vId === " + v.getVolunteerId() + "  v display name === " + v.getDisplayName());
+		{
+			if (vId == v.getVolunteerId())
+			{
+				vl.remove(v);
+				break;
+			}
+		}
 		
 		return vl;
 	//	return volunteerManager.getAllVolunteersByOrganization(volunteer.getOrganizationId());
 	}
-	
+		
 	//Activity in Volunteer
 	//display all activity input by volunteers
 	@RequestMapping(value="/view_activity_admin", method=RequestMethod.GET)

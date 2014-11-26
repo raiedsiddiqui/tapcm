@@ -15,6 +15,18 @@
 			margin:10px;
 		}
 	</style>
+	<script type="text/javascript">
+			function confirmDelete()
+			{
+			  var x = confirm("Are you sure you want to delete?");
+			  if (x)
+			      return true;
+			  else
+			    return false;
+			}
+			
+		</script>
+	
 </head>
 
 <body>
@@ -42,8 +54,10 @@
 					<td>${st.title}</td>
 					<td>${st.description}</td>
 					<td>${st.type}</td>
-					<td>${st.priority}</td>
-					<td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" class="btn btn-danger">Remove</a></td>
+					<td>${st.priority}</td>									
+					<c:if test="${ st.showDelete}">
+						<td><a href="<c:url value="/delete_survey_template/${st.surveyID}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Remove</a></td>
+					</c:if>
 				</tr>
 				</c:forEach>
 			</table>

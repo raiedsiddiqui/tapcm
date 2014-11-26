@@ -100,6 +100,13 @@ public interface SurveyResultDAO {
 	public int countCompletedSurveys(int patientId);
 	
 	/**
+	 * Count number of survey result for a survey template
+	 * @param surveyTemplateId 
+	 * @return number of survey result 
+	 */
+	public int countSurveysBySurveyTemplateId(int surveyTemplateId);
+	
+	/**
 	 * Keep a copy of deleted survey result
 	 * @param sr
 	 */

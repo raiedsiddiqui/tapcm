@@ -13,20 +13,46 @@
 	<style type="text/css">
 		.row-fluid{
 			margin:10px;
-		}
-		
-		
+		}		
 	</style>
 	
 	<script type="text/javascript">
-		function validateVolunteers(){
-			var selectedPatient = document.getElementById("volunteer1");
-			var vValue =selectedPatient.options[selectedPatient.selectedIndex].value;
+		function validateVolunteer(){
+			var selectedVolunteer = document.getElementById("search_volunteer");
+			var vValue =selectedVolunteer.options[selectedVolunteer.selectedIndex].value;
 			
-			alert("volunteer1 is " + vValue);
-			
-			return false;
+			if (vValue == 0)
+			{
+				alert("Please select a volunteer first!");
+				return false;
+			}
 		}
+		 function getVolunteers(){			 
+		        $.getJSON(
+		             "volunteerList.html", 
+		             {volunteerId: $('#volunteer1').val()},
+		             function(data) {
+		                  var html = '';
+		                  var len = data.length;
+		                  
+		                  //clear second dropdown
+		                  document.getElementById('volunteer2').options.length = 0;
+	                	  
+		                  //append data from DB
+		                  for(var i=0; i<len; i++){
+		                       html += '<option value="' + data[i].volunteerId + '">' + data[i].displayName + '</option>';
+		                   }
+		                  $('select#volunteer2').append(html);		                  
+		             }
+		          );
+		 }
+
+		 $(document).ready(function() {
+		         $('#volunteer1').change(function()		        		 
+		          { 
+		        	 getVolunteers();
+		          });
+		      });
 	</script>
 	
 </head>
@@ -36,7 +62,7 @@
 		<%@include file="navbar.jsp" %>
 		<div class="row-fluid">
 			<h2>Edit Patient</h2>
-		  	<form id="editPatient" method="post" action="<c:url value="/submit_edit_patient/${patient.patientID}"/>" onsubmit="return validateVolunteers()">
+		  	<form id="editPatient" method="post" action="<c:url value="/submit_edit_patient/${patient.patientID}"/>" >
 
 				<div class="row form-group">
   					<div class="col-md-6">
@@ -64,7 +90,7 @@
 				<div class="row form-group">						
 					<div class="col-md-6">
 						<label>Volunteer1:</label>
-						<select name="volunteer1" form="editPatient" class="form-control">
+						<select name="volunteer1" id="volunteer1" form="editPatient" class="form-control">
 							<c:forEach items="${volunteers}" var="v">
 								<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq patient.volunteer}">selected</c:if>>${v.displayName}</option>
 							</c:forEach>
@@ -72,10 +98,10 @@
 					</div>
 					<div class="col-md-6">
 						<label>Volunteer2:</label>
-						<select name="volunteer2" form="editPatient" class="form-control">
-							<c:forEach items="${volunteers}" var="v">
+						<select name="volunteer2" id="volunteer2" form="editPatient" class="form-control">							
+						<c:forEach items="${volunteers}" var="v">
 								<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq patient.partner}">selected</c:if>>${v.displayName}</option>
-							</c:forEach>
+							</c:forEach> 	
 						</select><br />
 					</div>
 					

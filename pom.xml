@@ -12,6 +12,7 @@
 
 	<properties>
 		<spring.version>3.0.5.RELEASE</spring.version>
+		<jackson.version>1.9.10</jackson.version>
 	</properties>
 	
 	<repositories>
@@ -266,8 +267,19 @@
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>2.1.7</version>
-		    </dependency>
-	</dependencies>
+	    </dependency>
+		    
+		<!-- Jackson JSON Mapper -->
+		
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-asl</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>    
+		    
+		</dependencies>
+		
+		
 		
 	<build>
 		<plugins>
