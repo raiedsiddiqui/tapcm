@@ -22,6 +22,13 @@ public interface VolunteerManager {
 	public List<Volunteer> getAllVolunteers();
 	
 	/**
+	 * get a list of volunteer, each volunteer has info about if it can be delete or not
+	 * @return
+	 */
+	@Transactional
+	public List<Volunteer> getAllVolunteersWithCanDelete();
+	
+	/**
      * @return all volunteers who has availability set up in a list
      */
 	@Transactional
@@ -37,10 +44,19 @@ public interface VolunteerManager {
 	/**
 	 * 
 	 * @param id
-	 * @return a list of volunteer who belong to a organization
+	 * @return a list of volunteer who belongs to an organization
 	 */
 	@Transactional
 	public List<Volunteer> getAllVolunteersByOrganization(int id);
+	
+	/**
+	 * 
+	 * @param id
+	 * @return a list of volunteer, each volunteer who belongs to an organization 
+	 * has info about if it can be delete or not
+	 */
+	@Transactional
+	public List<Volunteer> getAllVolunteersWithCanDeleteByOrganization(int id);
 	
 	/**
 	 * search by name for a grouped volunteer
@@ -132,6 +148,14 @@ public interface VolunteerManager {
 	@Transactional
 	public List<Organization> getAllOrganizations();
 	
+	
+	/**
+	 * Get a list of Organization containing 'is has volunteer' info for show/hide Delete button
+	 * @return
+	 */
+	@Transactional
+	public List<Organization> getOrganizations();
+	
 	/**
 	 * @param id
 	 * @return an organization object by giving ID
@@ -168,6 +192,14 @@ public interface VolunteerManager {
 	 */
 	@Transactional
 	public void deleteOrganizationById(int id);
+	
+	/**
+	 * Save a copy of deleted organization
+	 * @param organization
+	 * @param deletedBy
+	 */
+	@Transactional
+	public void archiveOrganization(Organization organization, String deletedBy);
 	
 	//Activity----
 	/**	 

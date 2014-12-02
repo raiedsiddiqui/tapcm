@@ -13,7 +13,7 @@
 			<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 			<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 			<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	
+			<script src="${pageContext.request.contextPath}/resources/js/tapestryUtils.js"></script>	
 			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
 	
 
@@ -21,17 +21,21 @@
 			.row-fluid{
 				margin:10px;
 			}
-		</style>		
-		
+		</style>	
 	</head>
 	
 	<body>
 	<div class="content">
 		<%@include file="navbar.jsp" %>
 		<c:if test="${not empty organizationCreated}">
-			<div class ="alert alert-info"><spring:message code="message_newOrganization"/></div>
+			<div id="message" class ="alert alert-info"><spring:message code="message_newOrganization"/></div>
 		</c:if>		
-		
+		<c:if test="${not empty organizationUpdated}">
+			<div id="message" class ="alert alert-info"><spring:message code="message_updateOrganization"/></div>
+		</c:if>	
+		<c:if test="${not empty organizationDeleted}">
+			<div id="message" class ="alert alert-info"><spring:message code="message_deleteOrganization"/></div>
+		</c:if>	
 		<div class="row">		
 			<div class="col-md-9">
 				<h2>Volunteer Organizations </h2>
@@ -54,21 +58,24 @@
 			<table class="table">
 				<tr>
 					<th>Name</th>
-					<th>Address</th>
+					<th>Address</th> 
 					<th>Primary Contact</th>
 					<th>Primary Phone</th>
 					<th>Secondary Contact</th>
 					<th>Secondary Phone</th>
-					<th></th>
+					<th>Action</th>
 				</tr>
 				<c:forEach items="${organizations}" var="o">
 					<tr>
-						<td>${o.name}</td>						
-						<td>${o.streetNumbet} ${o.streetName}, ${o.city}, ${o.province}</td>
+						<td><a href="<c:url value="/modify_organization/${o.organizationId}"/>">${o.name}</a></td>						
+						<td>${o.streetNumber} ${o.streetName}, ${o.city}, ${o.province}</td>
 						<td>${o.primaryContact}</td>
 						<td>${o.primaryPhone}</td>
 						<td>${o.secondaryContact}</td>
-						<td>${o.secondaryPhone}</td>						
+						<td>${o.secondaryPhone}</td>
+						<c:if test="${not o.hasVolunteer}">
+							<td><a href="<c:url value="/delete_organization/${o.organizationId}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Delete</a></td>>	
+						</c:if>						
 					</tr>
 				</c:forEach>
 			</table>

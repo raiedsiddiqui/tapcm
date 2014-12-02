@@ -28,24 +28,14 @@ public class Volunteer {
 	private String address;
 	private String organization;
 	private int organizationId;
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
+	private double totalVLCScore;
+	private double numYearsOfExperience;
+	private double availabilityPerMonth;
+	private double technologySkillsScore;
+	private double perceptionOfOlderAdultsScore;
+	private boolean showDelete;
+	private int vLCID;
+	
 	public Volunteer(){
 		
 	}
@@ -240,4 +230,78 @@ public class Volunteer {
 	public void setOrganizationId(int organizationId) {
 		this.organizationId = organizationId;
 	}
+	public double getTotalVLCScore() {
+		return totalVLCScore;
+	}
+
+	public void setTotalVLCScore(double totalVLCScore) {
+		this.totalVLCScore = totalVLCScore;
+	}
+
+	public double getNumYearsOfExperience() {
+		return numYearsOfExperience;
+	}
+
+	public void setNumYearsOfExperience(double numYearsOfExperience) {
+		this.numYearsOfExperience = numYearsOfExperience;
+	}
+
+	public double getAvailabilityPerMonth() {
+		return availabilityPerMonth;
+	}
+
+	public void setAvailabilityPerMonth(double availabilityPerMonth) {
+		this.availabilityPerMonth = availabilityPerMonth;
+	}
+
+	public double getTechnologySkillsScore() {
+		return technologySkillsScore;
+	}
+
+	public void setTechnologySkillsScore(double technologySkillsScore) {
+		this.technologySkillsScore = technologySkillsScore;
+	}
+
+	public double getPerceptionOfOlderAdultsScore() {
+		return perceptionOfOlderAdultsScore;
+	}
+
+	public void setPerceptionOfOlderAdultsScore(double perceptionOfOlderAdultsScore) {
+		this.perceptionOfOlderAdultsScore = perceptionOfOlderAdultsScore;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public boolean isShowDelete() {
+		return showDelete;
+	}
+
+	public void setShowDelete(boolean showDelete) {
+		this.showDelete = showDelete;
+	}
+
+	public int getvLCID() {
+		return vLCID;
+	}
+
+	public void setvLCID(int vLCID) {
+		this.vLCID = vLCID;
+	}
+	
+	
 }

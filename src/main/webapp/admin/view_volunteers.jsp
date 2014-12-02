@@ -13,9 +13,8 @@
 			<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
 			<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
 			<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	
-			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
-	
+			<script src="${pageContext.request.contextPath}/resources/js/tapestryUtils.js"></script>	
+			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>	
 
 		<style type="text/css">
 			.row-fluid{
@@ -23,11 +22,6 @@
 			}
 		</style>
 		
-		<script type="text/javascript">
-			function printTable(){
-				$('.table').printThis();
-			}
-		</script>
 	</head>
 	
 	<body>
@@ -45,16 +39,27 @@
 		<div class="row-fluid">
 			<h2>Volunteers </h2>
 			<div class="row-fluid">
-				<form action="<c:url value="/view_volunteers"/>" method="POST">
-					<fieldset>
-						<label>Name:</label>
-						<input type="text" name="searchName" value="${searchName}" required />
-						<input class="btn btn-primary" type="submit" value="Search" />
-					</fieldset>
-				</form>
+				<table>
+					<tr>
+						<td>
+							<form action="<c:url value="/view_volunteers"/>" method="POST">
+								<fieldset>
+									<label>Name:</label>
+									<input type="text" name="searchName" value="${searchName}" required />
+									<input class="btn btn-primary" type="submit" value="Search" />
+								</fieldset>
+							</form>
+						</td>
+						<td>
+						<div class="col-md-3">
+							<a href="<c:url value="/new_volunteer"/>" class="btn btn-primary" data-toggle="modal">New Volunteer</a>			
+						</div>
+						</td>
+					</tr>
+				</table>
+				
 			</div>
 			
-			<a href="<c:url value="/new_volunteer"/>" class="btn btn-primary" data-toggle="modal">New Volunteer</a>
 			
 			<table class="table">
 				<tr>
@@ -62,6 +67,7 @@
 					<th>Username</th>
 					<th>Experience</th>
 					<th>City</th>
+					<th>Organization</th>
 					<th>Phone Number</th>
 					<th></th>
 				</tr>
@@ -71,9 +77,12 @@
 						<td>${vl.userName}</td>
 						<td>${vl.experienceLevel}</td>
 						<td>${vl.city}</td>
+						<td>${vl.organization}</td>
 						<td>${vl.homePhone}</td>
-						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-info">Edit</a></td>
-						<td><a href="<c:url value="/delete_volunteer/${vl.volunteerId}"/>" class="btn btn-danger">Delete</a></td>
+						<td><a href="<c:url value="/modify_volunteer/${vl.volunteerId}"/>" class="btn btn-info">Edit</a></td>						
+						<c:if test="${not vl.showDelete}">
+							<td><a href="<c:url value="/delete_volunteer/${vl.volunteerId}"/>" Onclick="return confirmDelete()" class="btn btn-danger">Delete</a></td>
+						</c:if>
 					</tr>
 				</c:forEach>
 			</table>

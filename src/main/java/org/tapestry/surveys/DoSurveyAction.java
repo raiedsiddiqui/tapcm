@@ -226,6 +226,10 @@ public class DoSurveyAction
 						question.setAnswers(answers);
 						saved = true;
 						moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);
+						/////////////////////////////////////////////////
+						for (int z=0; z<answers.size(); z++)
+							System.out.println("answer is   === " + answers.get(z));
+						/////////////////////////////////////////////////////
 					}
 					//finished survey
 					if (!moreQuestions)
@@ -284,7 +288,8 @@ public class DoSurveyAction
 		else if (direction.equalsIgnoreCase("backward"))
 		{
 			int questionIndex = currentSurvey.getQuestionIndexbyId(questionId);
-			if (questionIndex > 0) nextQuestionId = currentSurvey.getQuestions().get(questionIndex - 1).getId();
+			if (questionIndex > 0) 
+				nextQuestionId = currentSurvey.getQuestions().get(questionIndex - 1).getId();
 		}
 		
 		//backward to the description page(before the first qustion)

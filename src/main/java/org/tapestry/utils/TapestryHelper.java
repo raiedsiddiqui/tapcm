@@ -816,7 +816,9 @@ public class TapestryHelper {
 		List<SurveyTemplate> surveyTemplateList;
 		if (session.getAttribute("survey_template_list") == null)
 		{
-			surveyTemplateList = surveyManager.getAllSurveyTemplates();
+		//	surveyTemplateList = surveyManager.getAllSurveyTemplates();
+			
+			surveyTemplateList = surveyManager.getSurveyTemplatesWithCanDelete();
 			
 			//save in the session
 			if (surveyTemplateList != null && surveyTemplateList.size()>0)
@@ -1611,6 +1613,7 @@ public class TapestryHelper {
 			document.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 		}			
 	}
 	
@@ -1649,7 +1652,7 @@ public class TapestryHelper {
                 table.writeSelectedRows(0, -1, 34, 823, writer.getDirectContent());  
             }
             catch (Exception e){
-
+            	System.out.println(e.getStackTrace());
             }
 		}
 		

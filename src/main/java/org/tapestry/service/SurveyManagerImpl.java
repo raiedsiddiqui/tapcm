@@ -1,5 +1,6 @@
 package org.tapestry.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +96,22 @@ public class SurveyManagerImpl implements SurveyManager {
 	}
 
 	@Override
+	public List<SurveyTemplate> getSurveyTemplatesWithCanDelete() {
+		List<SurveyTemplate> surveyTemplates = getAllSurveyTemplates();
+		int surveyTemplateId;
+			
+		for (SurveyTemplate st: surveyTemplates)
+		{
+			surveyTemplateId = st.getSurveyID();
+			if(surveyResultDao.countSurveysBySurveyTemplateId(surveyTemplateId) > 0)
+				st.setShowDelete(false);
+			else
+				st.setShowDelete(true);			
+		}
+		return surveyTemplates;
+	}
+
+	@Override
 	public List<SurveyTemplate> getSurveyTemplatesByPartialTitle(String partialTitle) {
 		return surveyTemplateDao.getSurveyTemplatesByPartialTitle(partialTitle);
 	}
@@ -104,6 +121,11 @@ public class SurveyManagerImpl implements SurveyManager {
 		surveyTemplateDao.uploadSurveyTemplate(st);
 	}
 
+	@Override
+	public void updateSurveyTemplate(SurveyTemplate st) {
+		surveyTemplateDao.updateSurveyTemplate(st);
+		
+	}
 	@Override
 	public void deleteSurveyTemplate(int id) {
 		surveyTemplateDao.deleteSurveyTemplate(id);
@@ -123,5 +145,6 @@ public class SurveyManagerImpl implements SurveyManager {
 	public void archiveSurveyResult(SurveyResult sr, String patient, String deletedBy) {
 		surveyResultDao.archiveSurveyResult(sr, patient, deletedBy);
 	}
+
 
 }

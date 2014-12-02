@@ -36,8 +36,15 @@
 		</style>
 		
 		<script type="text/javascript">
-			function printTable(){
-				$('.table').printThis();
+			function checkNumericInput(id)
+			{				
+				var element = document.getElementById(id);
+				
+				if (isNaN(element.value)) 
+				  {
+				    alert("Must input numbers" );
+				    element.value="";
+				  }
 			}
 			
 			function isUsernameExist(){
@@ -77,27 +84,13 @@
 											<option value="O">Other</option>
 										</select>
 								</div>
-							</div>
-							<div class="row form-group">
-								<div class="col-md-4">
-									<label>Experience:</label>
-									<select class="form-control" name="level" form="add_volunteer">
-										<option value="E" selected>Experienced</option>
-										<option value="I" >Intermediate</option>
-										<option value="B" >Beginner</option>
-									</select>	
-								</div>
-								<div class="col-md-4">
-									<label>Organization:</label>									
-									<select name="organization" form="add_volunteer" class="form-control">
-										<c:forEach items="${organizations}" var="o">
-											<option value="${o.organizationId}">${o.name}</option>
-										</c:forEach>
-									</select>
-								</div>
-							</div>
+							</div>							
 
 							<div class="row form-group">
+								<div class="col-md-4">	
+									<label>Apt #:</label>
+									<input type="text" name="aptnum" class="form-control"/>
+								</div>
 								<div class="col-md-4">
 									<label>Street #:</label>
 									<input type="text" name="streetnum" class="form-control" />
@@ -105,33 +98,24 @@
 								<div class="col-md-4">	
 									<label>Street:</label>
 									<input type="text" name="street" class="form-control"/>
-								</div>
-								<div class="col-md-4">	
-									<label>Apt #:</label>
-									<input type="text" name="aptnum" class="form-control"/>
-								</div>
+								</div>								
 							</div>
 
 							<div class="row form-group">
 								<div class="col-md-4">	
-									<label>Country:</label>
-										<select name="country" form="add_volunteer" class="form-control">
-											<option value="CA" selected>Canada</option>
-											<option value="ST">USA</option>
-											<option value="CH">China</option>
-											<option value="RU">Russia</option>
-										</select>
+									<label>City:</label>
+									<input name="city" class="form-control" type="text">
 								</div>
 								<div class="col-md-4">	
 									<label>Province:</label>
 										<select name="province" form="add_volunteer" class="form-control">
-											<option value="AB" selected>Alberta</option>
+											<option value="AB" >Alberta</option>
 											<option value="BC" >British Colunmbia</option>							
 											<option value="MB" >Manitoba</option>
 											<option value="NB" >New Brunswik</option>
 											<option value="NL" >Newfoundland and Labrador</option>
 											<option value="NS" >Nova Scotia</option>							
-											<option value="ON" >Ontario</option>
+											<option value="ON" selected>Ontario</option>
 											<option value="PE" >PrinceEdword Island</option>
 											<option value="QC" >Quebec</option>
 											<option value="SK" >Saskatchewan</option>							
@@ -142,8 +126,13 @@
 										</select>
 								</div>	
 								<div class="col-md-4">	
-									<label>City:</label>
-									<input name="city" class="form-control" type="text">
+									<label>Country:</label>
+										<select name="country" form="add_volunteer" class="form-control">
+											<option value="CA" selected>Canada</option>
+											<option value="ST">USA</option>
+											<option value="CH">China</option>
+											<option value="RU">Russia</option>
+										</select>
 								</div>
 							</div>
 
@@ -180,6 +169,53 @@
 									<input name="emergencyphone" class="form-control" type="text">
 								</div>
 							</div>	
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Experience:</label>
+									<select class="form-control" name="level" form="add_volunteer">
+										<option value="E" selected>Experienced</option>
+										<option value="I" >Intermediate</option>
+										<option value="B" >Beginner</option>
+									</select>	
+								</div>
+								<div class="col-md-4">
+									<label>Total VLC Score(.35):</label>
+									<input type="text" id="totalVLCScore" name="totalVLCScore" class="form-control" onchange="checkNumericInput(this.id)" required/>									
+								</div>
+								<div class="col-md-4">
+									<label>Number years of experience(.1):</label>
+									<input type="text" id="numberYearsOfExperience" name="numberYearsOfExperience" class="form-control" onchange="checkNumericInput(this.id)" required/>									
+								</div>								
+							</div>
+							
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Volunteer availability(hours/month)(.2):</label>
+									<input type="text" id="availabilityPerMonthe" name="availabilityPerMonthe"  class="form-control" onchange="checkNumericInput(this.id)" required/>									
+								</div>
+								<div class="col-md-4">
+									<label>Technology skills score(.25):</label>
+									<input type="text" id="technologySkillsScore" name="technologySkillsScore" class="form-control" onchange="checkNumericInput(this.id)" required/>									
+								</div>
+								<div class="col-md-4">
+									<label>Perception of older adults score(.2):</label>
+									<input type="text" id="perceptionOfOlderAdultScore" name="perceptionOfOlderAdultScore" class="form-control" onchange="checkNumericInput(this.id)" required/>									
+								</div>								
+							</div>
+							<div class="row form-group">
+								<div class="col-md-4">
+									<label>Organization:</label>									
+									<select name="organization" form="add_volunteer" class="form-control">
+										<c:forEach items="${organizations}" var="o">
+											<option value="${o.organizationId}">${o.name}</option>
+										</c:forEach>
+									</select>
+								</div>
+								<div class="col-md-4">
+									<label>VLC ID</label>
+									<input type="text" id="vlcId" name="vlcId" class="form-control" required/>									
+								</div>	
+							</div>
 
 
 						<h2>User Account </h2>
@@ -189,14 +225,14 @@
 								<div class="col-md-4">
 									<div class="input-group input-group-lg">
 										<span class="input-group-addon">Username</span>
-								 		<input name="username" type="text" class="form-control" onchange="isUsernameExist();">
+								 		<input name="username" type="text" class="form-control" onchange="isUsernameExist();" required>
 									</div>
 								</div>
 								
 								<div class="col-md-4">
 									<div class="input-group input-group-lg">
 								  		<span class="input-group-addon">Password</span>
-								  		<input type="password" name="password" class="form-control">
+								  		<input type="password" name="password" class="form-control" required>
 									</div>
 								</div>
 							</div>
@@ -204,7 +240,7 @@
 						<h2>Availability </h2>
 						<%@include file="add_availabilities.jsp" %>			
 							</div>
-							<br/>
+							<!--  br/>-->
 							<h2> Comments </h2>
 					<div class="col-md-10">		
 						<input type="textarea" class="form-control" maxlength="50" name="notes"/>

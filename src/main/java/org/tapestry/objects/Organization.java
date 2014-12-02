@@ -3,7 +3,7 @@ package org.tapestry.objects;
 public class Organization {
 	int organizationId;
 	String name;
-	String streetNumbet;
+	String streetNumber;
 	String streetName;
 	String city;
 	String province;
@@ -13,7 +13,8 @@ public class Organization {
 	String primaryContact;
 	String secondaryContact;
 	String secondaryPhone;
-	
+	boolean hasVolunteer;
+
 	public Organization(){
 		
 	}
@@ -34,12 +35,12 @@ public class Organization {
 		this.name = name;
 	}
 
-	public String getStreetNumbet() {
-		return streetNumbet;
+	public String getStreetNumber() {
+		return streetNumber;
 	}
 
-	public void setStreetNumbet(String streetNumbet) {
-		this.streetNumbet = streetNumbet;
+	public void setStreetNumber(String streetNumber) {
+		this.streetNumber = streetNumber;
 	}
 
 	public String getStreetName() {
@@ -114,6 +115,12 @@ public class Organization {
 		this.secondaryPhone = secondaryPhone;
 	}
 
-	
+	public boolean isHasVolunteer() {
+		return hasVolunteer;
+	}
+
+	public void setHasVolunteer(boolean hasVolunteer) {
+		this.hasVolunteer = hasVolunteer;
+	}
 
 }

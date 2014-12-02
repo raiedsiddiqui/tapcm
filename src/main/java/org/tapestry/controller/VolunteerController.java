@@ -1,5 +1,6 @@
 package org.tapestry.controller;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.tapestry.utils.TapestryHelper;
 import org.tapestry.utils.Utils;
 import org.tapestry.objects.Activity;
@@ -65,9 +67,9 @@ public class VolunteerController {
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
 		if ("ROLE_ADMIN".equalsIgnoreCase(user.getRole()))
-			volunteers = volunteerManager.getAllVolunteers();	//For central Admin		
+			volunteers = volunteerManager.getAllVolunteersWithCanDelete();	//For central Admin		
 		else		
-			volunteers = volunteerManager.getAllVolunteersByOrganization(user.getOrganization());	// for local Admin
+			volunteers = volunteerManager.getAllVolunteersWithCanDeleteByOrganization(user.getOrganization());	// for local Admin
 		model.addAttribute("volunteers", volunteers);	
 		
 		if (session.getAttribute("volunteerMessage") != null)
@@ -221,45 +223,33 @@ public class VolunteerController {
 			Volunteer volunteer = new Volunteer();			
 			volunteer.setFirstName(request.getParameter("firstname").trim());
 			volunteer.setLastName(request.getParameter("lastname").trim());
-			volunteer.setEmail(request.getParameter("email").trim());			
-			
-			ShaPasswordEncoder enc = new ShaPasswordEncoder();
-			String hashedPassword = enc.encodePassword(request.getParameter("password"), null);
-			
-			volunteer.setPassword(hashedPassword);
+			volunteer.setGender(request.getParameter("gender"));
+			volunteer.setEmail(request.getParameter("email").trim());				
 			volunteer.setExperienceLevel(request.getParameter("level"));	
-			
-			if (!Utils.isNullOrEmpty(request.getParameter("province")))
-				volunteer.setStreet(request.getParameter("province"));
-			if (!Utils.isNullOrEmpty(request.getParameter("conuntry")))
-				volunteer.setStreet(request.getParameter("conuntry"));	
-			if (!Utils.isNullOrEmpty(request.getParameter("street")))
-				volunteer.setStreet(request.getParameter("street"));
-			if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
-				volunteer.setStreetNumber(request.getParameter("streetnum"));
-			if (!Utils.isNullOrEmpty(request.getParameter("username")))
-				volunteer.setUserName(request.getParameter("username").trim());				
-			if(!Utils.isNullOrEmpty(request.getParameter("city")))
-				volunteer.setCity(request.getParameter("city").trim());		
-			if(!Utils.isNullOrEmpty(request.getParameter("homephone")))
-				volunteer.setHomePhone(request.getParameter("homephone").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
-				volunteer.setCellPhone(request.getParameter("cellphone"));
-			if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
-				volunteer.setEmergencyContact(request.getParameter("emergencycontact").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
-				volunteer.setPostalCode(request.getParameter("postalcode"));
-			if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
-				volunteer.setEmergencyPhone(request.getParameter("emergencyphone").trim());
-			if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
-				volunteer.setAptNumber(request.getParameter("aptnum"));
-			if (!Utils.isNullOrEmpty(request.getParameter("notes")))
-				volunteer.setNotes(request.getParameter("notes"));
-			if (!Utils.isNullOrEmpty(request.getParameter("organization")))
-				volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));		
-			if (!Utils.isNullOrEmpty(request.getParameter("gender")))
-				volunteer.setGender(request.getParameter("gender"));
-											
+			volunteer.setTotalVLCScore(Double.parseDouble(request.getParameter("totalVLCScore")));
+			volunteer.setAvailabilityPerMonth(Double.parseDouble(request.getParameter("availabilityPerMonthe")));
+			volunteer.setNumYearsOfExperience(Double.parseDouble(request.getParameter("numberYearsOfExperience")));
+			volunteer.setTechnologySkillsScore(Double.parseDouble(request.getParameter("technologySkillsScore")));
+			volunteer.setPerceptionOfOlderAdultsScore(Double.parseDouble(request.getParameter("perceptionOfOlderAdultScore")));			
+			volunteer.setStreet(request.getParameter("province"));
+			volunteer.setStreet(request.getParameter("conuntry"));	
+			volunteer.setAptNumber(request.getParameter("aptnum"));
+			volunteer.setStreet(request.getParameter("street"));
+			volunteer.setStreetNumber(request.getParameter("streetnum"));
+			volunteer.setCity(request.getParameter("city").trim());		
+			volunteer.setHomePhone(request.getParameter("homephone").trim());
+			volunteer.setCellPhone(request.getParameter("cellphone"));
+			volunteer.setEmergencyContact(request.getParameter("emergencycontact").trim());
+			volunteer.setEmergencyPhone(request.getParameter("emergencyphone").trim());
+			volunteer.setPostalCode(request.getParameter("postalcode"));
+			volunteer.setNotes(request.getParameter("notes"));
+			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));					
+			volunteer.setvLCID(Integer.valueOf(request.getParameter("vlcId")));	
+			volunteer.setUserName(request.getParameter("username").trim());		
+			ShaPasswordEncoder enc = new ShaPasswordEncoder();
+			String hashedPassword = enc.encodePassword(request.getParameter("password"), null);			
+			volunteer.setPassword(hashedPassword);
+					
 			String strAvailableTime = TapestryHelper.getAvailableTime(request);
 			volunteer.setAvailability(strAvailableTime);
 			//save a volunteer in the table volunteers
@@ -306,8 +296,7 @@ public class VolunteerController {
 			else{
 				model.addAttribute("volunteerExist", true);
 				return "/admin/add_volunteer";	
-			}
-			
+			}			
 			//set displayed message information 
 			HttpSession session = request.getSession();
 			session.setAttribute("volunteerMessage", "C");
@@ -397,60 +386,32 @@ public class VolunteerController {
 		
 		//set encoded password for security
 		ShaPasswordEncoder enc = new ShaPasswordEncoder();
-		String hashedPassword = enc.encodePassword(request.getParameter("password"), null);
-		
+		String hashedPassword = enc.encodePassword(request.getParameter("password"), null);		
 		volunteer.setPassword(hashedPassword);
-		
-		if (!Utils.isNullOrEmpty(request.getParameter("email")))
-			volunteer.setEmail(request.getParameter("email"));			
+		volunteer.setEmail(request.getParameter("email"));	
+		volunteer.setExperienceLevel((request.getParameter("level")));	
+		volunteer.setStreet(request.getParameter("street"));
+		volunteer.setCity(request.getParameter("city"));
+		volunteer.setProvince(request.getParameter("province"));
+		volunteer.setCountry(request.getParameter("country"));
+		volunteer.setStreetNumber(request.getParameter("streetnum"));
+		volunteer.setAptNumber(request.getParameter("aptnum"));
+		volunteer.setPostalCode(request.getParameter("postalcode"));
+		volunteer.setHomePhone(request.getParameter("homephone"));
+		volunteer.setCellPhone(request.getParameter("cellphone"));
+		volunteer.setEmergencyContact(request.getParameter("emergencycontact"));
+		volunteer.setEmergencyPhone(request.getParameter("emergencyphone"));
+		volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
+		volunteer.setvLCID(Integer.valueOf(request.getParameter("vlcId")));
+		volunteer.setNotes(request.getParameter("notes"));
+		volunteer.setGender(request.getParameter("gender"));
+		volunteer.setTotalVLCScore(Double.parseDouble(request.getParameter("totalVLCScore")));
+		volunteer.setNumYearsOfExperience(Double.parseDouble(request.getParameter("numberYearsOfExperience")));
+		volunteer.setAvailabilityPerMonth(Double.parseDouble(request.getParameter("availabilityPerMonthe")));
+		volunteer.setTechnologySkillsScore(Double.parseDouble(request.getParameter("technologySkillsScore")));
+		volunteer.setPerceptionOfOlderAdultsScore(Double.parseDouble(request.getParameter("perceptionOfOlderAdultScore")));
 			
-		if (!Utils.isNullOrEmpty(request.getParameter("level")))		
-			volunteer.setExperienceLevel((request.getParameter("level")));	
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("street")))
-			volunteer.setStreet(request.getParameter("street"));
-		
-		if (!Utils.isNullOrEmpty(request.getParameter("city")))
-			volunteer.setCity(request.getParameter("city"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("province")))
-			volunteer.setProvince(request.getParameter("province"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("country")))
-			volunteer.setCountry(request.getParameter("country"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("streetnum")))
-			volunteer.setStreetNumber(request.getParameter("streetnum"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("aptnum")))
-			volunteer.setAptNumber(request.getParameter("aptnum"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("postalcode")))
-			volunteer.setPostalCode(request.getParameter("postalcode"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("homephone")))
-			volunteer.setHomePhone(request.getParameter("homephone"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("cellphone")))
-			volunteer.setCellPhone(request.getParameter("cellphone"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("emergencycontact")))
-			volunteer.setEmergencyContact(request.getParameter("emergencycontact"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("emergencyphone")))
-			volunteer.setEmergencyPhone(request.getParameter("emergencyphone"));
-			
-		if (!Utils.isNullOrEmpty(request.getParameter("notes")))
-			volunteer.setNotes(request.getParameter("notes"));
-		
-		if (!Utils.isNullOrEmpty(request.getParameter("gender")))
-			volunteer.setGender(request.getParameter("gender"));
-				
-		if (!Utils.isNullOrEmpty(request.getParameter("organization")))
-			volunteer.setOrganizationId(Integer.valueOf(request.getParameter("organization")));
-			
-		String strAvailableTime = TapestryHelper.getAvailableTime(request);		
-		
+		String strAvailableTime = TapestryHelper.getAvailableTime(request);				
 		volunteer.setAvailability(strAvailableTime);
 			
 		volunteerManager.updateVolunteer(volunteer);
@@ -520,6 +481,25 @@ public class VolunteerController {
 		return "/volunteer/profile";
 	}
 	
+	@RequestMapping(value="/volunteerList.html")
+	@ResponseBody
+	public List<Volunteer> getVolunteerByOrganization(@RequestParam(value="volunteerId") int vId){		
+		Volunteer volunteer = volunteerManager.getVolunteerById(vId);	
+		List<Volunteer> vl = volunteerManager.getAllVolunteersByOrganization(volunteer.getOrganizationId());
+		
+		for (Volunteer v: vl)
+		{
+			if (vId == v.getVolunteerId())
+			{
+				vl.remove(v);
+				break;
+			}
+		}
+		
+		return vl;
+	//	return volunteerManager.getAllVolunteersByOrganization(volunteer.getOrganizationId());
+	}
+		
 	//Activity in Volunteer
 	//display all activity input by volunteers
 	@RequestMapping(value="/view_activity_admin", method=RequestMethod.GET)
@@ -805,9 +785,9 @@ public class VolunteerController {
 		if (session.getAttribute("unread_messages") != null)
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		
-		organizations = volunteerManager.getAllOrganizations();		
+		organizations = volunteerManager.getOrganizations();		
 		model.addAttribute("organizations", organizations);	
-		
+				
 		if (session.getAttribute("organizatioMessage") != null)
 		{
 			String message = session.getAttribute("organizatioMessage").toString();
@@ -816,10 +796,21 @@ public class VolunteerController {
 				model.addAttribute("organizationCreated", true);
 				session.removeAttribute("organizatioMessage");
 			}	
+			else if ("U".equals(message))
+			{
+				model.addAttribute("organizationUpdated", true);
+				session.removeAttribute("organizatioMessage");
+			}
+			else if ("D".equals(message))
+			{
+				model.addAttribute("organizationDeleted", true);
+				session.removeAttribute("organizatioMessage");
+			}
+			
 		}		
 		return "/admin/view_organizations";
 	}
-	
+
 	//display all volunteers with search criteria
 	@RequestMapping(value="/view_organizations", method=RequestMethod.POST)
 	public String viewFilteredOrganizations(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
@@ -860,7 +851,7 @@ public class VolunteerController {
 		organization.setPrimaryPhone(request.getParameter("primaryPhone"));
 		organization.setSecondaryContact(request.getParameter("secondaryContact"));
 		organization.setSecondaryPhone(request.getParameter("secondaryPhone"));
-		organization.setStreetNumbet(request.getParameter("streetNumber"));
+		organization.setStreetNumber(request.getParameter("streetNumber"));
 		organization.setStreetName(request.getParameter("streetName"));
 		organization.setPostCode(request.getParameter("postCode"));
 		organization.setProvince(request.getParameter("province"));		
@@ -873,7 +864,7 @@ public class VolunteerController {
 			User loggedInUser = TapestryHelper.getLoggedInUser(request);
 			StringBuffer sb = new StringBuffer();
 			sb.append(loggedInUser.getName());
-			sb.append(" has added a new Organization  ");
+			sb.append(" has added a new Organization,  ");
 			sb.append(request.getParameter("name"));				
 			userManager.addUserLog(sb.toString(), loggedInUser);
 						
@@ -884,6 +875,82 @@ public class VolunteerController {
 			model.addAttribute("unread", session.getAttribute("unread_messages"));
 		return "redirect:/view_organizations";			
 	}	
+	
+	@RequestMapping(value="/modify_organization/{organizationId}", method=RequestMethod.GET)
+	public String modifyOrganization(@PathVariable("organizationId") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
+		Organization organization = volunteerManager.getOrganizationById(id);
+		model.addAttribute("o", organization);
+		
+		return "/admin/modify_organization";
+	}
+	@RequestMapping(value="/update_organization/{organizationId}", method=RequestMethod.POST)
+	public String updateOrganization(@PathVariable("organizationId") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
+		Organization organization = volunteerManager.getOrganizationById(id);
+		
+		organization.setName(request.getParameter("name").trim());
+		organization.setCity(request.getParameter("city"));
+		organization.setPrimaryContact(request.getParameter("primaryContact"));
+		organization.setPrimaryPhone(request.getParameter("primaryPhone"));
+		organization.setSecondaryContact(request.getParameter("secondaryContact"));
+		organization.setSecondaryPhone(request.getParameter("secondaryPhone"));
+		organization.setStreetNumber(request.getParameter("streetNumber"));
+		organization.setStreetName(request.getParameter("streetName"));
+		organization.setPostCode(request.getParameter("postCode"));
+		organization.setProvince(request.getParameter("province"));		
+		organization.setCountry(request.getParameter("country"));
+			
+		HttpSession  session = request.getSession();
+		
+		volunteerManager.updateOrganization(organization);
+		//add logs
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" has modified the organization, ");
+		sb.append(organization.getName());				
+		userManager.addUserLog(sb.toString(), loggedInUser);
+						
+		session.setAttribute("organizatioMessage", "U");			
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
+		return "redirect:/view_organizations";			
+	}
+	
+	@RequestMapping(value="/delete_organization/{organizationId}", method=RequestMethod.GET)
+	public String deleteOrganizationById(@PathVariable("organizationId") int id, 
+			SecurityContextHolderAwareRequestWrapper request, ModelMap model)
+	{
+		User loggedInUser = TapestryHelper.getLoggedInUser(request);
+		String loggedInUserName = loggedInUser.getName();
+		Organization organization = volunteerManager.getOrganizationById(id);
+		volunteerManager.deleteOrganizationById(id);
+		
+		//archive deleted organization
+		volunteerManager.archiveOrganization(organization, loggedInUserName);
+		
+		HttpSession  session = request.getSession();		
+		session.setAttribute("organizatioMessage", "D");	
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUserName);
+		sb.append(" has deleted the organization, ");
+		sb.append(organization.getName());	
+		sb.append("at ");
+		java.util.Date date= new java.util.Date();		
+		sb.append(new Timestamp(date.getTime()));
+		userManager.addUserLog(sb.toString(), loggedInUser);
+		
+		if (session.getAttribute("unread_messages") != null)
+			model.addAttribute("unread", session.getAttribute("unread_messages"));
+		
+		return "redirect:/view_organizations";	
+	}
 	
 	//==================== Appointment ==============================//
 	@RequestMapping(value="/", method=RequestMethod.GET)

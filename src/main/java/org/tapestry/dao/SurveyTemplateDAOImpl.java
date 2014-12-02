@@ -51,6 +51,13 @@ public class SurveyTemplateDAOImpl extends JdbcDaoSupport implements SurveyTempl
 	public void uploadSurveyTemplate(SurveyTemplate st) {
 		String sql = "INSERT INTO surveys (title, type, contents, priority, description) values (?,?,?,?,?)";
 		getJdbcTemplate().update(sql, st.getTitle(), st.getType(), st.getContents(), st.getPriority(), st.getDescription());
+	}	
+
+	@Override
+	public void updateSurveyTemplate(SurveyTemplate st) {
+		String sql = "UPDATE surveys SET title=?, description=? WHERE survey_ID=?";
+		getJdbcTemplate().update(sql, st.getTitle(), st.getDescription(), st.getSurveyID());
+		
 	}
 
 	@Override
@@ -93,5 +100,6 @@ public class SurveyTemplateDAOImpl extends JdbcDaoSupport implements SurveyTempl
 				st.getDescription(), deletedBy);
 		
 	}
+
 
 }

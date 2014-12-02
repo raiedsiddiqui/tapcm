@@ -1,15 +1,20 @@
 package org.tapestry.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.tapestry.dao.ActivityDAO;
+import org.tapestry.dao.AppointmentDAO;
 import org.tapestry.dao.NarrativeDAO;
+import org.tapestry.dao.PatientDAO;
 import org.tapestry.dao.VolunteerDAO;
 import org.tapestry.objects.Activity;
+import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Narrative;
 import org.tapestry.objects.Organization;
+import org.tapestry.objects.Patient;
 import org.tapestry.objects.Volunteer;
 /**
  * Implementation for service VolunteerManager
@@ -23,10 +28,60 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	private ActivityDAO activityDAO;
 	@Autowired
 	private NarrativeDAO narrativeDao;
+	@Autowired
+	private AppointmentDAO appointmentDao;
+	@Autowired
+	private PatientDAO patientDao;
 	
 	@Override
 	public List<Volunteer> getAllVolunteers() {
 		return volunteerDao.getAllVolunteers();
+	}
+
+	@Override
+	public List<Volunteer> getAllVolunteersWithCanDelete() {
+		List<Volunteer> volunteers = getAllVolunteers();
+		List<Appointment> appointments = new ArrayList<Appointment>();
+		List<Patient> patients = new ArrayList<Patient>();
+		int vId;
+		
+		for (Volunteer v: volunteers)
+		{
+			vId = v.getVolunteerId();
+			appointments = appointmentDao.getAllUpcomingAppointmentsForVolunteer(vId);
+			patients = patientDao.getPatientsForVolunteer(vId);
+			
+			if (((appointments != null) && (appointments.size()>0)) || ((patients != null)
+					&& (patients.size()>0)))
+				v.setShowDelete(true);
+			else
+				v.setShowDelete(false);			
+		}		
+		return volunteers;
+	}
+
+	@Override
+	public List<Volunteer> getAllVolunteersWithCanDeleteByOrganization(int id) {
+		List<Volunteer> volunteers = getAllVolunteersByOrganization(id);
+		List<Appointment> appointments = new ArrayList<Appointment>();
+		List<Patient> patients = new ArrayList<Patient>();
+		int vId;
+		
+		for (Volunteer v: volunteers)
+		{
+			vId = v.getVolunteerId();
+			appointments = appointmentDao.getAllUpcomingAppointmentsForVolunteer(vId);
+			patients = patientDao.getPatientsForVolunteer(vId);
+			
+			
+			if (((appointments != null) && (appointments.size()>0)) || ((patients != null)
+					&& (patients.size()>0)))
+				v.setShowDelete(true);
+			else
+				v.setShowDelete(false);			
+		}
+		
+		return volunteers;
 	}
 
 	@Override
@@ -90,9 +145,27 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	}
 
 	@Override
-	public List<Organization> getAllOrganizations() {
+	public List<Organization> getAllOrganizations() {			
 		return volunteerDao.getAllOrganizations();
 	}
+	
+	@Override
+	public List<Organization> getOrganizations() {
+		List<Volunteer> vols = new ArrayList<Volunteer>();
+		List<Organization> organizations = getAllOrganizations();
+		int id;
+		
+		for(Organization o: organizations){
+			id = o.getOrganizationId();
+			vols = volunteerDao.getAllVolunteersByOrganization(id);
+			if ((vols != null) && (vols.size()>0))
+				o.setHasVolunteer(true);
+			else
+				o.setHasVolunteer(false);
+		}		
+		return organizations;
+	}
+
 
 	@Override
 	public Organization getOrganizationById(int id) {
@@ -122,6 +195,12 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	@Override
 	public void deleteOrganizationById(int id) {
 		volunteerDao.deleteOrganizationById(id);
+	}
+
+	@Override
+	public void archiveOrganization(Organization organization, String deletedBy) {
+		volunteerDao.archiveOrganization(organization, deletedBy);
+		
 	}
 	
 	//Activity
@@ -222,6 +301,5 @@ public class VolunteerManagerImpl implements VolunteerManager {
 	public void archiveVolunteer(Volunteer volunteer, String deletedBy) {
 		volunteerDao.archiveVolunteer(volunteer, deletedBy);
 	}
-
 
 }

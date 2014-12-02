@@ -16,6 +16,44 @@
 			margin:10px;
 		}
 	</style>
+	<script type="text/javascript">
+		function validateVolunteer(){
+			var selectedVolunteer = document.getElementById("search_volunteer");
+			var vValue =selectedVolunteer.options[selectedVolunteer.selectedIndex].value;
+			
+			if (vValue == 0)
+			{
+				alert("Please select a volunteer first!");
+				return false;
+			}
+		}
+		 function getVolunteers(){			 
+		        $.getJSON(
+		             "volunteerList.html", 
+		             {volunteerId: $('#volunteer1').val()},
+		             function(data) {
+		                  var html = '';
+		                  var len = data.length;
+		                  
+		                  //clear second dropdown
+		                  document.getElementById('volunteer2').options.length = 0;
+	                	  
+		                  //append data from DB
+		                  for(var i=0; i<len; i++){
+		                       html += '<option value="' + data[i].volunteerId + '">' + data[i].displayName + '</option>';
+		                   }
+		                  $('select#volunteer2').append(html);		                  
+		             }
+		          );
+		 }
+
+		 $(document).ready(function() {
+		         $('#volunteer1').change(function()		        		 
+		          { 
+		        	 getVolunteers();
+		          });
+		      });
+	</script>
 </head>
 	
 <body>	
@@ -24,14 +62,43 @@
 		<c:if test="${not empty misMatchedVolunteer}">			
 			<div class="alert alert-error"><spring:message code="message_volunteers_misMatchedVolunteer"/></div>
 		</c:if>	
+		<c:if test="${not empty sameVolunteer}">			
+			<div class="alert alert-error"><spring:message code="message_volunteers_sameVolunteer"/></div>
+		</c:if>	
 		<c:if test="${not empty updatePatientSuccessfully}">			
 			<div class="alert alert-info"><spring:message code="message_patient_updateSuccessful"/></div>
 		</c:if>	
 		<c:if test="${not empty createPatientSuccessfully}">			
 			<div class="alert alert-info"><spring:message code="message_patient_createSuccessful"/></div>
 		</c:if>
+		<c:if test="${not empty emptyPatients}">
+					<div class ="alert alert-info"><spring:message code="message_emptyPatients"/></div>
+				</c:if>
 		<div class="row-fluid">
-			<h2>Patients</h2><a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add New</a>
+			<h2>Patients</h2>
+			<table>
+				<tr>
+					<td align="left">
+						<form id="searchPatient" action="<c:url value="/search_patient"/>" method="POST" onsubmit="return validateVolunteer()">
+							<fieldset>
+								<label>Volunteer:</label>
+								<select name="search_volunteer_forPatient" form="searchPatient" id="search_volunteer" >
+									<c:forEach items="${volunteers}" var="v">				
+										<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq selectedVolunteer}">selected</c:if> >${v.displayName}</option>
+									</c:forEach>
+								</select>
+								<input class="btn btn-primary" type="submit" value="Search" />
+							</fieldset>
+						</form>
+					</td>
+					<td align="right">
+						<div class="col-md-3">
+							<a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add New</a>
+						</div>
+					</td>
+				</tr>
+			</table>				
+			
 			<table class="table">
 				<tr>
 					<th>Name</th>
@@ -42,15 +109,15 @@
 					<!-- <th>Remove</th> -->
 				</tr>
                 <c:forEach items="${patients}" var="p">
-                <tr>
-                    <td>${p.firstName} ${p.lastName} (${p.gender})</td>
-                    <td>${p.preferredName}</td>
-                    <td>${p.volunteerName}</td>
-                    <td>${p.partnerName}</td>
-                    <td><a href="<c:url value="/edit_patient/${p.patientID}"/>" class="btn btn-info">Edit</a></td>
-                    <!-- Disabling the ability to delete patients as data relating to a patient should not be deleted -->
-                    <!-- <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td> -->
-                </tr>
+	                <tr>
+	                    <td>${p.firstName} ${p.lastName} (${p.gender})</td>
+	                    <td>${p.preferredName}</td>
+	                    <td>${p.volunteerName}</td>
+	                    <td>${p.partnerName}</td>
+	                    <td><a href="<c:url value="/edit_patient/${p.patientID}"/>" class="btn btn-info">Edit</a></td>
+	                    <!-- Disabling the ability to delete patients as data relating to a patient should not be deleted -->
+	                    <!-- <td><a href="<c:url value="/remove_patient/${p.patientID}"/>" class="btn btn-danger">Remove</a></td> -->
+	                </tr>
                 </c:forEach>
 			</table>
 			<!--  a href="#addPatient" class="btn btn-primary" data-toggle="modal">Add New</a>-->
@@ -91,7 +158,8 @@
 					</div>
 					<div class="col-md-6">
 						<label>Volunteer1:</label>
-						<select name="volunteer1" form="newPatient" class="form-control">
+						<select name="volunteer1" id="volunteer1" form="newPatient" class="form-control">
+							<option value=""></option>
 							<c:forEach items="${volunteers}" var="v">
 								<option value="${v.volunteerId}">${v.displayName}</option>
 							</c:forEach>
@@ -99,12 +167,14 @@
 					</div>
 					<div class="col-md-6">
 						<label>Volunteer2:</label>
-						<select name="volunteer2" form="newPatient" class="form-control">
-							<c:forEach items="${volunteers}" var="v">
+						<select name="volunteer2" id="volunteer2" form="newPatient" class="form-control">
+							<option value=""></option>
+							
+					<!--  		<c:forEach items="${volunteers}" var="v">
 								<option value="${v.volunteerId}">${v.displayName}</option>
-							</c:forEach>
+							</c:forEach>-->
 						</select>
-					</div>
+					</div>					
 				</div>		
 					<label>MyOscar verified? </label>
 					<input type="radio" name="myoscar_verified" value="1" checked/>Yes

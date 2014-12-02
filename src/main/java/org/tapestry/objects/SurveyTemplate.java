@@ -15,6 +15,7 @@ public class SurveyTemplate {
 	private byte[] contents;
 	private String description;
 	private String createdDate;
+	private boolean showDelete;
 
 	public SurveyTemplate(){
 		//Default constructor
@@ -126,4 +127,13 @@ public class SurveyTemplate {
 	public void setCreatedDate(String createdDate) {
 		this.createdDate = createdDate;
 	}
+
+	public boolean isShowDelete() {
+		return showDelete;
+	}
+
+	public void setShowDelete(boolean showDelete) {
+		this.showDelete = showDelete;
+	}
+	
 }
