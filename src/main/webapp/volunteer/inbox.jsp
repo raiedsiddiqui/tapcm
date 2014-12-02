@@ -28,15 +28,9 @@
 	</div> -->
 <!-- 	breadcrumb END-->	
 	<div class="content">
-		<div class="row-fluid">
-			<div class="row" style="padding:0px 15px;">
-				<div class="col-md-6">
-					<h2 class="pull-left">Inbox</h2>
-				</div>
-				<div class="col-md-6">
-					<a href="#modalSend" data-toggle="modal" class="pull-right lgbtn">New Message</a>
-				</div>
-			</div>
+		<h2 class="pagetitle">Inbox</h2>
+		<a href="#modalSend" data-toggle="modal" class="pull-right lgbtn">New Message</a>
+			<div class="row-fluid">
 				<c:if test="${not empty success}">
 					<div class="alert alert-info">
 						<p>Message sent</p>

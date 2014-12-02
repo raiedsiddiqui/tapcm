@@ -1,5 +1,5 @@
 <div class="content">	
-	<h3>Book Appointment</h3>
+	<h3 class="pagetitle">Book Appointment <span class="pagedesc">Select the client name, date and time of the visit to book their next appointment</span></h3>
 	<div>
 		 <form id="book-appointment-form" method="post" action="<c:url value="/book_appointment"/>">
 			<h4>With patient:</h4>

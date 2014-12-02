@@ -5,16 +5,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0 user-scalable=no"></meta>
 	<title>Narrative in Volunteer</title>
 <%@include file="volunteer_head.jsp" %>
 </head>
 <body>
   <%@ include file="subNavi.jsp" %>
 
-	<div class="content">
+	<div class="content">	
+		<h3 class="pagetitle">My Narrative <span class="pagedesc">Click on a past appointment to add a narrative</span></h3>
 		<div class="row-fluid">
-			<div class="span12">
-				<h3>My Narrative </h3><!--  <a href="<c:url value="/new_narrative"/>" class="btn btn-primary" data-toggle="modal">New Narrative</a>-->  
+			<!--  <a href="<c:url value="/new_narrative"/>" class="btn btn-primary" data-toggle="modal">New Narrative</a>-->  
 							
 				<c:if test="${not empty narrativeDeleted }">
 					<div class ="alert alert-info"><spring:message code="message_removeNarrative"/></div>

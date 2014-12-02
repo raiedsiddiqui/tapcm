@@ -20,6 +20,11 @@
 		.navbar {
 			width: 100%;
 		}
+
+		#mainnavbar {
+			width: 100%;
+		}
+
 	</style>
 	<script type="text/javascript">
 		$(function(){
@@ -55,7 +60,7 @@
 				<img id="logo" src="<c:url value="/resources/images/logow.png"/>" />
 			</div>
 
-		<div class="col-md-9 tblack logoheight">
+		<div class="col-md-9 tblack logoheight" style="padding-left:0px;padding-right:0px;">
 		<div class="navbar">      
 			<ul id="mainnavbar" class="nav navbar-nav">	
 	    		<li id="navhome"><a href="<c:url value="/"/>">Home</a></li>

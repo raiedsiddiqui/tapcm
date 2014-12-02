@@ -33,8 +33,9 @@
 	<!-- 	breadcrumb END-->	
 	
 	<div class="content">
+		<h3 class="pagetitle">My Clients<span class="pagedesc">These are the clients you are assigned to. Select a client name to view their appointments</span></h3>
 		<div class="row-fluid">
-				<h3>Select a client</h3>
+				
 				<div class="tab-content">
 					<div class="tab-pane active" id="all">
 						<c:forEach items="${clients}" var="c">

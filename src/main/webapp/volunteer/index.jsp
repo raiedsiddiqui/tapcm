@@ -112,7 +112,7 @@
 						<p> Select an appointment </p>
 					</c:when>
 					<c:otherwise>
-						<p class="pageheader">Appointments</p>
+						<h3 class="pagetitle">Appointments <span class="pagedesc">Click on a client name to start the visit</span></h3>
 
 					</c:otherwise>
 				</c:choose>
@@ -157,7 +157,7 @@
 		</div>
 
 		<div class="row-fluid">				
-			<p class="pageheader">Pending Approval</p>
+			<h3 class="pagetitle">Pending Approval <span class="pagedesc"> These appointments have not been approved by your volunteer coordinator </span></h3>
 			<c:forEach items="${pending_appointments}" var="pa">
 				<div class="pname">
 					<div class="row pbutton">
