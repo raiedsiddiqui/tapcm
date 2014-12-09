@@ -34,7 +34,7 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 	
 	@Override
 	public List<SurveyResult> getSurveysByPatientID(int patientId) {
-		String sql = "SELECT survey_results.*, surveys.title, patients.firstname, patients.lastname FROM survey_results"
+		String sql = "SELECT survey_results.*, surveys.title, surveys.description, patients.firstname, patients.lastname FROM survey_results"
 				+ " INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
 				+ " ON survey_results.patient_ID=patients.patient_ID WHERE survey_results.patient_ID=?"
 				+ " ORDER BY survey_results.startDate ";
@@ -77,7 +77,7 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 
 	@Override
 	public List<SurveyResult> getAllSurveyResults() {
-		String sql = "SELECT survey_results.*, surveys.title, patients.firstname, patients.lastname FROM survey_results"
+		String sql = "SELECT survey_results.*, surveys.title, surveys.description, patients.firstname, patients.lastname FROM survey_results"
 				+ " INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
 				+ " ON survey_results.patient_ID=patients.patient_ID ORDER BY survey_results.startDate ";
 		List<SurveyResult> results = getJdbcTemplate().query(sql, new SurveyResultMapper());
@@ -87,7 +87,7 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 
 	@Override
 	public List<SurveyResult> getAllSurveyResultsBySurveyId(int surveyId) {
-		String sql = "SELECT survey_results.*, surveys.title, patients.firstname, patients.lastname FROM survey_results"
+		String sql = "SELECT survey_results.*, surveys.title, surveys.description, patients.firstname, patients.lastname FROM survey_results"
 				+ " INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
 				+ " ON survey_results.patient_ID=patients.patient_ID WHERE survey_results.survey_ID=?"
 				+ " ORDER BY survey_results.startDate ";
@@ -98,7 +98,7 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 
 	@Override
 	public List<SurveyResult> getSurveyResultByPatientAndSurveyId(int patientId, int surveyId) {
-		String sql = "SELECT survey_results.*, surveys.title, patients.firstname, patients.lastname FROM survey_results"
+		String sql = "SELECT survey_results.*, surveys.title, surveys.description, patients.firstname, patients.lastname FROM survey_results"
 				+ " INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
 				+ " ON survey_results.patient_ID=patients.patient_ID WHERE survey_results.patient_ID=? AND survey_results.survey_ID=?"
 				+ " ORDER BY survey_results.startDate ";
