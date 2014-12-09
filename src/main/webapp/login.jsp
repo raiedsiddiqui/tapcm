@@ -166,8 +166,8 @@
      				</div> -->
           <div id="footer">
             <div class="col-md-12">
-                <img id="logofhs" src="${pageContext.request.contextPath}/resources/images/fhs.png"/>
-                <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>
+                <img id="logofhs" src="${pageContext.request.contextPath}/resources/images/fhswhite.png"/>
+                <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degrootewhite.png"/>
             </div>
    			</div>
 

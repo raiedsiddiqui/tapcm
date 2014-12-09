@@ -3,7 +3,7 @@
 	<div>
 		 <form id="book-appointment-form" method="post" action="<c:url value="/book_appointment"/>">
 			<h4>With patient:</h4>
-			<select id="selectpatient" name="patient" form="book-appointment-form">
+			<select id="selectpatient" name="patient" form="book-appointment-form" class="form-control">
 				<c:forEach items="${patients}" var="p">
 				<option value="${p.patientID}">${p.displayName}</option>
 				</c:forEach>

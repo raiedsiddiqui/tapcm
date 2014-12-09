@@ -6,10 +6,6 @@
 <head>
 	<title>Tapestry Admin</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 
 	<style type="text/css">
 		.row-fluid{
@@ -170,9 +166,9 @@
 						<select name="volunteer2" id="volunteer2" form="newPatient" class="form-control">
 							<option value=""></option>
 							
-					<!--  		<c:forEach items="${volunteers}" var="v">
+					  		<c:forEach items="${volunteers}" var="v">
 								<option value="${v.volunteerId}">${v.displayName}</option>
-							</c:forEach>-->
+							</c:forEach>
 						</select>
 					</div>					
 				</div>		
