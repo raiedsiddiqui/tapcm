@@ -238,9 +238,9 @@ Lanscape CSS ENDS*/
 	height:200px;
 }
 #answer-buttons {
-	position: absolute;
-	bottom: 50px;
-	width: 90%
+	/*position: absolute;*/
+	margin-bottom: 35px;
+	/*width: 90%;*/
 }
 input[type=submit] {
     -webkit-border-radius:0px;

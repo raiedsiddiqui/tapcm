@@ -1,18 +1,6 @@
 <head>
-	<link href="${pageContext.request.contextPath}/resources/css/bootstrap.css" rel="stylesheet" />
-	<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" /> 
-	<link href="${pageContext.request.contextPath}/resources/css/custom_admin.css" rel="stylesheet" />      
-		
-	<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-	<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	<script src="${pageContext.request.contextPath}/resources/js/bootstrap.js"></script>
 
-
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.css" id="theme_base">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.date.css" id="theme_date">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/lib/themes/default.time.css" id="theme_time">
-  <!-- FONTS -->
-  <link href='http://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+<%@include file="admin_head.jsp" %>
 
 </head>
 
@@ -35,24 +23,42 @@
  -->        </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-         			<li <c:if test="${pageContext.request.requestURI.contains('view_organizations')}">class="active"</c:if>><a href="<c:url value="/view_organizations"/>">Organizations <span class="glyphicon glyphicon-user"></span></a></li>
-					<li <c:if test="${pageContext.request.requestURI.contains('view_volunteers')}">class="active"</c:if>><a href="<c:url value="/view_volunteers"/>">Volunteers <span class="glyphicon glyphicon-user"></span></a></li>
-					<li <c:if test="${pageContext.request.requestURI.contains('view_clients_admin')}">class="active"</c:if>><a href="<c:url value="/view_clients_admin"/>">Clients <span class="glyphicon glyphicon-user"></span></a></li>
-					<li <c:if test="${pageContext.request.requestURI.contains('manage_users')}">class="active"</c:if>><a href="<c:url value="/manage_users"/>">Manage Users</a></li>
-					<li <c:if test="${pageContext.request.requestURI.contains('manage_patients')}">class="active"</c:if>><a href="<c:url value="/manage_patients"/>">Manage Patients</a></li>
-					<li <c:if test="${pageContext.request.requestURI.contains('manage_appointments')}">class="active"</c:if>><a href="<c:url value="/manage_appointments"/>">Manage Appointments <span class="glyphicon glyphicon-time"></span></a></li>
+         			<li <c:if test="${pageContext.request.requestURI.contains('view_organizations')}">class="active"</c:if>><a href="<c:url value="/view_organizations"/>">Organizations <span class="glyphicon glyphicon-tower"></span></a></li>
 					
+					
+					
+					
+					
+					
+
+					<li class="dropdown">
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Users <span class="glyphicon glyphicon-user"></span><span class="caret"></span></a>
+			          <ul class="dropdown-menu" role="menu">
+						<li <c:if test="${pageContext.request.requestURI.contains('view_volunteers')}">class="active"</c:if>><a href="<c:url value="/view_volunteers"/>">Volunteers <span class="glyphicon glyphicon-user"></span></a></li>
+						<li <c:if test="${pageContext.request.requestURI.contains('manage_users')}">class="active"</c:if>><a href="<c:url value="/manage_users"/>">Admin/Research</a></li>
+			          </ul>
+			        </li>	
+
+			        <li class="dropdown">
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Clients<span class="caret"></span></a>
+			          <ul class="dropdown-menu" role="menu">
+						<li <c:if test="${pageContext.request.requestURI.contains('manage_patients')}">class="active"</c:if>><a href="<c:url value="/manage_patients"/>">Add/Edit Client</a></li>
+						<li <c:if test="${pageContext.request.requestURI.contains('view_clients_admin')}">class="active"</c:if>><a href="<c:url value="/view_clients_admin"/>">Manage Clients </a></li>
+
+			          	</ul>
+			        </li>
+			        <li <c:if test="${pageContext.request.requestURI.contains('manage_appointments')}">class="active"</c:if>><a href="<c:url value="/manage_appointments"/>">Appointments <span class="glyphicon glyphicon-time"></span></a></li>
 				<!-- 
 					<li <c:if test="${pageContext.request.requestURI.contains('manage_survey_templates')}">class="active"</c:if>><a href="<c:url value="/manage_survey_templates"/>">Survey Management... <span class="glyphicon glyphicon-list"></a></li>
 				 -->
 					
 					
 					<li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Surveys<span class="caret"></span></a>
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Surveys <span class="glyphicon glyphicon-list"></span><span class="caret"></span></a>
 			          <ul class="dropdown-menu" role="menu">
-			          	<li <c:if test="${pageContext.request.requestURI.contains('manage_surveys')}">class="active"</c:if>><a href="<c:url value="/manage_surveys"/>">Manage Surveys</a></li>
+			          	<li <c:if test="${pageContext.request.requestURI.contains('manage_surveys')}">class="active"</c:if>><a href="<c:url value="/manage_surveys"/>">Assign/View Survey</a></li>
 			            
-			            <li <c:if test="${pageContext.request.requestURI.contains('manage_survey')}">class="active"</c:if>><a href="<c:url value="/manage_survey"/>">Survey Management <span class="glyphicon glyphicon-list"></a></li>
+			            <li <c:if test="${pageContext.request.requestURI.contains('manage_survey')}">class="active"</c:if>><a href="<c:url value="/manage_survey"/>">Add/Edit Survey </a></li>
 
 			          </ul>
 			        </li>

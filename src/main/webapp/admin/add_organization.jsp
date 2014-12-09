@@ -9,12 +9,8 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Add Organization</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-			<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
-			<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
-			<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
-			<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 	
-			<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
+		<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/printelement.js"></script>
 	
 
 		<style type="text/css">
