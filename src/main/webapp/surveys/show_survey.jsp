@@ -60,10 +60,20 @@
 		}
 		
 		input[type="button"], input[type="submit"]{
-			height:40px;
 			font-size:1em;
 		}
+
+		#surveynext {
+			background-color: #6BB040; 
+			text-transform: uppercase;
+			font-size: 2em;
+		}
 		
+		#surveyback {
+			background-color: #6BB040; 
+			text-transform: uppercase;
+
+		}
 	</style>
 	
 	<script type="text/javascript">
@@ -246,7 +256,7 @@
 
 
 	                		<div class="col-md-4"> 
-	                			<input id="surveynext" class="tright btn" type="submit" value="Next">
+	                			<input id="surveynext" class="tright btn" type="submit" value="next &#10140">
 	                		</div>
                 		</div>
                 		

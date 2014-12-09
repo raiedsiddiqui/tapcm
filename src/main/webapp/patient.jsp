@@ -14,41 +14,50 @@
 			height:100%;
 		}
 		
+	.pagetitle {
+		margin-left: -30px;
+	}
+
+	.visitcompletebox {
+		padding-top: 20px;
+		float:right;
+	}
 	</style>
 </head>
 	
 <body>
 	<%@include file="volunteer/subNavi.jsp" %>
 
-
-	<div id="visitandbook" class="row btn-group">
+	<div class="container">
+	<div class="row">
+		<div class="col-md-7">
+			<c:if test="${not empty patient}">
+				<c:choose>
+					<c:when test="${not empty patient.preferredName}">
+						<h4 class="pagetitle">${patient.preferredName} <span class="pagedesc">${appointment.date}</span></h4>
+					</c:when>
+					<c:otherwise>
+						<h4 class="pagetitle">${patient.displayName} <span class="pagedesc">${appointment.date}</span></h4>
+					</c:otherwise>
+				</c:choose>
+			</c:if>
+		</div>
+		<div class="col-md-5">
 			<c:if test="${not empty patient.notes}">
 				<a href="#modalNotes" class="btn btn-large btn-inverse lgbtn" role="button" data-toggle="modal"><i class="icon-info-sign icon-white"></i></a>
 			</c:if>
-			<div class="col-md-6">
-				<c:if test="${not empty patient}">
-					<c:choose>
-						<c:when test="${not empty patient.preferredName}">
-							<p class="patientname">${patient.preferredName}</p>
-						</c:when>
-						<c:otherwise>
-							<p class="patientname">${patient.displayName}</p>
-						</c:otherwise>
-					</c:choose>
-				</c:if>
-				<span class="surveycomp">${appointment.date}</span>
-			</div>
-			<div class="col-md-6">
-				<a href="<c:url value="/goMyOscarAuthenticate/${appointment.appointmentID}"/>" role="button" class="btn pull-right lgbtn">Authenticate PHR</a>
 
-				<c:if test="${not empty appointment}">
-					<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="btn pull-right lgbtn">Visit Complete</a>
+			<div class="visitcompletebox">
+<!-- 				<a href="<c:url value="/goMyOscarAuthenticate/${appointment.appointmentID}"/>" role="button" class="lgbtn">Authenticate PHR</a>-->				
+					<c:if test="${not empty appointment}">
+					<a href="<c:url value="/visit_complete/${appointment.appointmentID}"/>" role="button" class="lgbtn">Visit Complete</a>
 				</c:if>
 			</div>
+		</div>
+	</div>
 			<!-- <a href="#bookAppointment" role="button" class="btn btn-primary pull-right lgbtn" data-toggle="modal">Book appointment</a> -->
-	</div>	
 
-	<div class="container">
+
 		<div class="row-fluid">
 <!-- 				<div class="span3">
 				<c:choose>
@@ -103,7 +112,7 @@
 <!-- 			      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordionSurveys" href="#collapseTwo">
  -->			
  				
- 				<p class="pageheader">Completed Surveys</p>
+ 				<h4 class="pagetitle">Completed Surveys <span class="pagedesc"></span></h4>
 <!-- 			      
 				</a>
 			    </div> -->

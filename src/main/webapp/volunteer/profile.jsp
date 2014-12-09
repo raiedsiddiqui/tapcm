@@ -13,6 +13,21 @@
 		html,body{
 			height:100%;
 		}
+
+		label {
+			font-size: 25px;
+			font-family: 'Open Sans', sans-serif;
+			font-weight: 300;
+		}
+
+		h3 {
+			font-family: 'Open Sans', sans-serif;
+
+		}
+
+		.form-control {
+			height: 60px;
+		}
 	</style>
 	
 	<script type="">
@@ -33,15 +48,21 @@
 		        //Set the color to the good color and inform
 		        //the user that they have entered the correct password 
 		        pass2.style.backgroundColor = goodColor;
+		        pass1.style.backgroundColor = goodColor;
 		        message.style.color = goodColor;
 		        message.innerHTML = "Passwords Match!"
+		        document.getElementById("changePasswordButton").disabled = false; 
+		        document.getElementById("changePasswordButton").style.backgroundColor="#4A307A";
 		    }else{
 		        //The passwords do not match.
 		        //Set the color to the bad color and
 		        //notify the user.
 		        pass2.style.backgroundColor = badColor;
+		        pass1.style.backgroundColor = badColor;
 		        message.style.color = badColor;
-		        message.innerHTML = "Passwords Do Not Match!"
+		        message.innerHTML = "Passwords Do Not Match!";
+		        document.getElementById("changePasswordButton").disabled = true; 
+		        document.getElementById("changePasswordButton").style.backgroundColor="gray";
 		    }
 		}  
 	</script>
@@ -53,12 +74,7 @@
  <%@include file="subNavi.jsp" %>
 </div>
 <div class="content">
-	<div class="row">
-		<div class="col-md-12">
-			<h3>Change Password </h3>
-		</div>
-	</div>
-		
+	<h3 class="pagetitle">Password Change <span class="pagedesc"> Enter your old passowrd then enter your new password twice </span> </h3>
 	<c:if test="${not empty errors}">
 		<c:choose>
 			<c:when test="${errors == 'confirm'}">
@@ -75,35 +91,31 @@
 
 	<div class="tab-content">
 		<div class="row">
-			<div class="span12">				
+			<div class="col-md-12">				
 				<form id="changePassword" action="<c:url value="/change_password/${loggedInUserId}"/>" method="POST" >
 						<fieldset>
 
 							<div class="row">
-								<div class="col-md-4">								
+								<div class="col-md-10">								
 		  							<label>Current password:</label> 
-		  						</div>
-		  						<div class="col-md-4">	
-									<input type="password" name="currentPassword" required />
+		  							<br>
+									<input type="password" name="currentPassword" class="form-control" required />
 								</div>
 							</div>
 
 							<div class="row">
-								<div class="col-md-4">
+								<div class="col-md-10">
 									<label>New password:</label>
-								</div>
-								<div class="col-md-4">
-									<input id="pass1" type="password" name="newPassword" required />
-									<span id="confirmMessage" class="confirmMessage"></span>
+									<br>
+									<input id="pass1" type="password" name="newPassword" class="form-control" required />
 								</div>
 							</div>
 
 							<div class="row">
-								<div class="col-md-4">
+								<div class="col-md-10">
 									<label>Confirm password:</label>
-								</div>
-								<div class="col-md-4">
-									<input id="pass2" type="password" name="confirmPassword" onkeyup="checkPass(); return false;" required />
+									<br>
+									<input id="pass2" type="password" name="confirmPassword" onkeyup="checkPass(); return false;" class="form-control" required />
 									<span id="confirmMessage" class="confirmMessage"></span>
 								</div>
 
@@ -112,7 +124,8 @@
 							
 						</fieldset>
 	  				</form>		
-	  				<button id="changePasswordButton" data-loading-text="Loading..." type="submit"  form="changePassword" class="btn btn-primary">Save changes</button>			
+	  				<button class="btn btn-info" onClick="history.back()" class="pull-left">Cancel</button>
+	  				<button id="changePasswordButton" data-loading-text="Loading..." type="submit"  form="changePassword" class="pull-right lgbtn">Change Password</button>			
 			</div>
 		</div>
 	</div>

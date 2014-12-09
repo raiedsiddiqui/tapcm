@@ -13,7 +13,13 @@
 		html,body{
 			height:100%;
 		}
+
+		.pagetitle {
+			margin-left: -30px;
+		}
 	</style>
+
+
 </head>
 	
 <body>	
@@ -23,17 +29,16 @@
  <%@include file="subNavi.jsp" %>
 </div>
 <div class="content">
-	<div class="row-fluid">
-		<div class="col-md-10">
-			<h3>Activity Journal </h3>
+
+	<div class="row">
+		<div class="col-md-8">
+			<h3 class="pagetitle">Activity Journal <span class="pagedesc">You can add a new journal entry or edit an existing one</span> </h3>
 		</div>
-
-		<div class="col-md-2">			
-
-			<a href="<c:url value="/new_activity"/>" class="btn btn-primary" data-toggle="modal">New Entry</a>
-
+		<div class="col-md-4">	
+			<a href="<c:url value="/new_activity"/>" class="pull-right lgbtn" data-toggle="modal">New Entry</a>
 		</div>
 	</div>
+
 	<c:if test="${not empty activityCreated}">					
 		<div class ="alert alert-info"><spring:message code="message_newActivity"/></div>
 	</c:if>

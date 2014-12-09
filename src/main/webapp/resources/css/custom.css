@@ -264,10 +264,26 @@ margin-top: 15px;
 	color: white;
 }
 
-.span12 h3 {
-	font-size: 25px;
-	font-family: 'Roboto Slab', serif;
-	}
+h2, h3 {
+	font-family: 'Open Sans', sans-serif;
+}
+
+.pagetitle {
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 500;
+	border-left: 10px solid #F7D600;
+	width: 45%;
+	padding: 5px 10px 3px 10px;
+	margin-left: -15px
+}
+
+.pagedesc {
+	font-size: 13px;
+	/* clear:both; */
+	display: block;
+	padding-top: 3px;
+}
+
 
 .app-date {
 	font-family: 'Open Sans', serif; 
@@ -381,7 +397,7 @@ input > #contacted {
 	background-color: #4A307A;
 	border:none;
 	border-radius: 0px;
-	/*margin-top: 15px;*/
+	margin-top: 25px;
 
 }
 
@@ -516,16 +532,20 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 	font-weight: 600;
 }
 
+.nav>li>a:hover
+{
+	color:black;
+}
+
 @media (min-width: 768px) {
 	.navbar .nav > li > a
 	{
-		/*padding: 18px 9px 23px !important;*/
+		padding: 18px 12px 23px !important;
 		padding-top: 18px;
 		font-size: 14px !important;
 		/*border-left: 1px solid white;*/
 		font-family: 'Open Sans', 'sans-serif';
 		color: white !important;
-		padding: 10px 10px;
 	}
 
 	.navbar .brand {
@@ -694,16 +714,6 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 		border-right: 5px solid white;
 		}
 
-	.pageheader {
-		font-size: 23px;
-		font-family: 'Open Sans';
-		font-weight: 500;
-		margin-bottom: 2%;
-		border-bottom: 1px solid lightgray;
-		text-transform: uppercase;
-		letter-spacing: 1px;
-	}
-
 	#footer {
 		position: absolute;
 		bottom: 0;
@@ -716,7 +726,6 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 	#headerholder {
 	/*	border-bottom: 2px solid lightgray;
 	*/	height: auto;
-	margin-bottom: 15px;
 	}
 
 	.lgbtn:hover {
