@@ -111,7 +111,10 @@
  -->			    <div class="row">  
  						<c:forEach items="${completedSurveys}" var="cs">
 							<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4">
-								<a href="#" class="surveybtnc btn">${cs.surveyTitle}</a><br/>
+								<a href="#" class="surveybtnc btn">${cs.surveyTitle}<br/>
+									<span class="surveycomp">${cs.description}</span>
+								</a><br/>
+								
 								<!-- <span class="surveycomp">complete</span> -->
 					<!-- 		${cs.description} -->	
 							</div>

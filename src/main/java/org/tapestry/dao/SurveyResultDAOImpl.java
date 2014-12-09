@@ -45,8 +45,8 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 
 	@Override
 	public List<SurveyResult> getCompletedSurveysByPatientID(int patientId) {
-		String sql = "SELECT survey_results.*, surveys.title, patients.firstname, patients.lastname FROM survey_results"
-				+ " INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
+		String sql = "SELECT survey_results.*, surveys.title, surveys.description, patients.firstname, patients.lastname "
+				+ "FROM survey_results INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
 				+ " ON survey_results.patient_ID=patients.patient_ID WHERE survey_results.patient_ID=? AND"
 				+ " survey_results.completed = 1 ORDER BY survey_results.startDate ";
 		List<SurveyResult> results = getJdbcTemplate().query(sql, new Object[]{patientId}, new SurveyResultMapper());
@@ -56,8 +56,8 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 
 	@Override
 	public List<SurveyResult> getIncompleteSurveysByPatientID(int patientId) {
-		String sql = "SELECT survey_results.*, surveys.title, patients.firstname, patients.lastname FROM survey_results"
-				+ " INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
+		String sql = "SELECT survey_results.*, surveys.title, surveys.description, patients.firstname, patients.lastname "
+				+ "FROM survey_results INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
 				+ " ON survey_results.patient_ID=patients.patient_ID WHERE survey_results.patient_ID=? AND"
 				+ " survey_results.completed = 0 ORDER BY survey_results.startDate ";
 		List<SurveyResult> results = getJdbcTemplate().query(sql, new Object[]{patientId}, new SurveyResultMapper());
@@ -67,8 +67,8 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 
 	@Override
 	public SurveyResult getSurveyResultByID(int resultId) {
-		String sql = "SELECT survey_results.*, surveys.title, patients.firstname, patients.lastname FROM survey_results"
-				+ " INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
+		String sql = "SELECT survey_results.*, surveys.title, surveys.description, patients.firstname, patients.lastname "
+				+ "FROM survey_results INNER JOIN surveys ON survey_results.survey_ID = surveys.survey_ID INNER JOIN patients"
 				+ " ON survey_results.patient_ID=patients.patient_ID WHERE survey_results.result_ID=? "
 				+ " ORDER BY survey_results.startDate ";
 		
@@ -171,6 +171,7 @@ public class SurveyResultDAOImpl extends JdbcDaoSupport implements SurveyResultD
 			sr.setResultID(rs.getInt("result_ID"));
 			sr.setSurveyID(rs.getInt("survey_ID"));
 			sr.setSurveyTitle(rs.getString("title"));
+			sr.setDescription(rs.getString("description"));
 			sr.setPatientID(rs.getInt("patient_ID"));
 			sr.setPatientName(rs.getString("firstname") + " " + rs.getString("lastname"));
 			
