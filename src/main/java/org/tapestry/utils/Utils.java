@@ -1,5 +1,7 @@
 package org.tapestry.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,12 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
-import org.apache.commons.lang.time.DateFormatUtils;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.ui.ModelMap;
 import org.springframework.util.StringUtils;
-
 import org.tapestry.objects.Volunteer;
 
 public class Utils {
@@ -551,6 +555,21 @@ public class Utils {
 			age = yearOfToday - yearOfBirth;
 			
 		return age;
+	}
+	
+	public static void download (HttpServletResponse response, String fileName, String contentType) throws Exception {
+		response.setContentType(contentType);
+		response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+		FileInputStream in = new FileInputStream(fileName);
+		ServletOutputStream out = response.getOutputStream();
+		long buf_size = new File(fileName).length();
+		byte[] outputByte = new byte[(int) buf_size];
+		while (in.read(outputByte) != -1) {
+			out.write(outputByte, 0, (int)buf_size);
+		}
+		in.close();
+		out.flush();
+		out.close();
 	}
 	
 }

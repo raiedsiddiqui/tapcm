@@ -40,10 +40,11 @@ import org.survey_component.data.PHRSurvey;
 import org.survey_component.data.SurveyQuestion;
 import org.tapestry.utils.TapestryHelper;
 import org.tapestry.utils.Utils;
+import org.tapestry.hl7.Hl7Utils;
 import org.tapestry.myoscar.utils.ClientManager;
-import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.DisplayedSurveyResult;
+import org.tapestry.objects.HL7Report;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.Organization;
 import org.tapestry.objects.Patient;
@@ -70,6 +71,7 @@ import org.tapestry.surveys.ResultParser;
 import org.tapestry.surveys.SurveyFactory;
 import org.tapestry.surveys.TapestryPHRSurvey;
 import org.tapestry.surveys.TapestrySurveyMap;
+
 /**
 * Main controller class
 * This class is responsible for interpreting URLs and returning the appropriate pages.
@@ -922,7 +924,7 @@ public class TapestryController{
 		Collections.sort(completedSurveyResultList);
 		Collections.sort(incompleteSurveyResultList);
 		List<SurveyTemplate> surveyList = surveyManager.getAllSurveyTemplates();		
-	
+		
 		List<Patient> patientsForUser = patientManager.getPatientsForVolunteer(volunteerId);						
 		Appointment appointment = appointmentManager.getAppointmentById(appointmentId);
 		
@@ -1035,6 +1037,299 @@ public class TapestryController{
 	}
 	
 	//============report======================
+	@RequestMapping(value="/generate_report_hl7/{patientID}", method=RequestMethod.GET)
+	@ResponseBody
+	public String generateHL7Report (@PathVariable("patientID") int id,
+			@RequestParam(value="appointmentId", required=true) int appointmentId, 	
+			ModelMap model, HttpServletResponse response, HttpServletRequest request) throws Exception
+	{	
+		Patient patient = patientManager.getPatientByID(id);		
+		patient = TapestryHelper.getPatientWithFullInfos(patientManager, patient);
+		Appointment appointment = appointmentManager.getAppointmentById(appointmentId);
+		HL7Report report = new HL7Report();		
+		ScoresInReport scores = new ScoresInReport();
+		    	
+		report.setPatient(patient);
+		//Plan and Key Observations
+		String keyObservation = appointmentManager.getKeyObservationByAppointmentId(appointmentId);
+		String plan = appointmentManager.getPlanByAppointmentId(appointmentId);
+		appointment.setKeyObservation(keyObservation);
+		appointment.setPlans(plan);
+				
+		report.setAppointment(appointment);
+		
+		//Survey---  goals setting
+		List<SurveyResult> surveyResultList = surveyManager.getCompletedSurveysByPatientID(id);
+		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
+		SurveyResult nutritionSurvey = new SurveyResult();
+		SurveyResult rAPASurvey = new SurveyResult();
+		SurveyResult mobilitySurvey = new SurveyResult();
+		SurveyResult socialLifeSurvey = new SurveyResult();
+		SurveyResult generalHealthySurvey = new SurveyResult();
+		SurveyResult memorySurvey = new SurveyResult();
+		SurveyResult carePlanSurvey = new SurveyResult();
+		SurveyResult goals = new SurveyResult();		
+		
+		for(SurveyResult survey: surveyResultList){			
+			String title = survey.getSurveyTitle();
+			
+			if (title.equalsIgnoreCase("Daily Life Activities"))//Daily life activity survey
+				dailyLifeActivitySurvey = survey;
+			
+			if (title.equalsIgnoreCase("Screen II"))//Nutrition
+				nutritionSurvey = survey;
+			
+			if (title.equalsIgnoreCase("Rapid Assessment of Physical Activity"))//RAPA survey
+				rAPASurvey = survey;
+			
+			if (title.equalsIgnoreCase("Mobility Survey"))//Mobility survey
+				mobilitySurvey = survey;
+			
+			if (title.equalsIgnoreCase("Social Life")) //Social Life(Duke Index of Social Support)
+				socialLifeSurvey = survey;
+			
+			if (title.equalsIgnoreCase("General Health")) //General Health(Edmonton Frail Scale)
+				generalHealthySurvey = survey;
+			
+			if (title.equalsIgnoreCase("Memory")) //Memory Survey
+				memorySurvey = survey;
+			
+			if (title.equalsIgnoreCase("Advance_Directives")) //Care Plan/Advanced_Directive survey
+				carePlanSurvey = survey;
+			
+			if (title.equalsIgnoreCase("GAS"))
+				goals = survey;				
+		}
+		
+		String xml;
+		List<String> qList = new ArrayList<String>();
+   	   		   		
+   		//Additional Information
+  		//Memory
+   		try{
+   			xml = new String(memorySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		
+   		LinkedHashMap<String, String> mSurvey = ResultParser.getResults(xml);
+   		qList = TapestryHelper.getQuestionListForMemorySurvey(mSurvey);   
+   		
+   		//Care Plan/Advanced_Directive
+   		try{
+   			xml = new String(carePlanSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+	   	}
+ 
+   		mSurvey = ResultParser.getResults(xml);
+   		qList.addAll(TapestryHelper.getQuestionList(mSurvey)); 
+   		
+   		report.setAdditionalInfos(qList);
+   		
+   		//daily activity -- tapestry questions
+   		try{
+   			xml = new String(dailyLifeActivitySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}
+   		qList = new ArrayList<String>();   
+   		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));
+   		//last question in Daily life activity survey is about falling stuff
+   		List<String> lAlert = new ArrayList<String>();
+   		String fallingQA = qList.get(qList.size() -1);
+   		if (fallingQA.startsWith("yes")||fallingQA.startsWith("Yes"))
+   			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);  
+   		report.setDailyActivities(qList);
+   		
+   		//alerts   		
+   		try{
+   			xml = new String(generalHealthySurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}	
+   		//get answer list
+   		qList = new ArrayList<String>();   
+		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));
+		
+		//get score info for Summary of tapestry tools
+		if ((qList != null)&&(qList.size()>10))
+		{
+			if ("1".equals(qList.get(0))) 
+				scores.setClockDrawingTest("No errors");
+			else if ("2".equals(qList.get(0))) 
+				scores.setClockDrawingTest("Minor spacing errors");
+			else if ("3".equals(qList.get(0))) 
+				scores.setClockDrawingTest("Other errors");
+			else 
+				scores.setClockDrawingTest("Not done");
+			
+			if ("1".equals(qList.get(10))) 
+				scores.setTimeUpGoTest("1 (0-10s)");
+			else if ("2".equals(qList.get(10))) 
+				scores.setTimeUpGoTest("2 (11-20s)");
+			else if ("3".equals(qList.get(10))) 
+				scores.setTimeUpGoTest("3 (More than 20s)");
+			else if ("4".equals(qList.get(10))) 
+				scores.setTimeUpGoTest("4 (Patient required assistance)");
+			else 
+				scores.setTimeUpGoTest("5 (Patient is unwilling)");
+		}		
+		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
+		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert);
+		
+		if (generalHealthyScore < 5)
+			scores.setEdmontonFrailScale(String.valueOf(generalHealthyScore) + " (Robust)");
+		else if (generalHealthyScore < 7)
+			scores.setEdmontonFrailScale(String.valueOf(generalHealthyScore) + " (Apparently Vulnerable)");
+		else
+			scores.setEdmontonFrailScale(String.valueOf(generalHealthyScore) + " (Frail)");		
+	
+		//Social Life Alert
+		try{
+   			xml = new String(socialLifeSurvey.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}		
+		qList = new ArrayList<String>();   		
+   		//get answer list
+		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));
+		
+		int socialLifeScore = CalculationManager.getScoreByQuestionsList(qList);
+		lAlert = AlertManager.getSocialLifeAlerts(socialLifeScore, lAlert);
+		
+		//summary tools for social supports
+		if ((qList != null)&&(qList.size()>0))
+		{
+			int satisfactionScore = CalculationManager.getScoreByQuestionsList(qList.subList(0, 6));
+			scores.setSocialSatisfication(satisfactionScore);
+			int networkScore = CalculationManager.getScoreByQuestionsList(qList.subList(6, 10));
+			scores.setSocialNetwork(networkScore);
+		}
+		   		   		
+		//Nutrition Alerts   		
+		try{
+			xml = new String(nutritionSurvey.getResults(), "UTF-8");
+		} catch (Exception e) {
+			xml = "";
+		}		   		
+		qList = new ArrayList<String>();   		
+		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));  
+		
+		//get scores for nutrition survey based on answer list
+		if ((qList != null)&&(qList.size()>0))
+		{
+			int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
+			scores.setNutritionScreen(nutritionScore);
+			
+			//high nutrition risk alert
+			Map<String, String> nAlert = new TreeMap<String, String>();
+			lAlert = AlertManager.getNutritionAlerts(nutritionScore, lAlert, qList);
+					
+			//set alerts in report bean
+			if (nAlert != null && nAlert.size()>0)	
+				report.setAlerts(lAlert);
+			else
+				report.setAlerts(null);
+		}
+				
+		//RAPA Alert
+		try{
+			xml = new String(rAPASurvey.getResults(), "UTF-8");
+		} catch (Exception e) {
+			xml = "";
+		}
+				
+		qList = new ArrayList<String>();   		
+		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));  		
+
+		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
+		if (rAPAScore < 6)
+			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
+				
+		scores.setPhysicalActivity(rAPAScore);
+						
+		//Mobility Alerts
+		try{
+			xml = new String(mobilitySurvey.getResults(), "UTF-8");
+		} catch (Exception e) {
+			xml = "";
+		}				
+		
+		Map<String, String> qMap = TapestryHelper.getQuestionMap(ResultParser.getResults(xml));  
+		   		   		
+		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);    		
+		
+		//summary tools for Mobility
+		for (int i = 0; i < lAlert.size(); i++)
+		{
+			if (lAlert.get(i).contains("2.0"))
+				scores.setMobilityWalking2(lAlert.get(i));
+		   			
+			if (lAlert.get(i).contains("0.5"))
+				scores.setMobilityWalkingHalf(lAlert.get(i));
+		   			
+			if (lAlert.get(i).contains("climbing"))
+				scores.setMobilityClimbing(lAlert.get(i));   			
+		}		   		
+		String noLimitation = "No Limitation";   		
+		if (Utils.isNullOrEmpty(scores.getMobilityWalking2()))
+			scores.setMobilityWalking2(noLimitation);		   		
+		if (Utils.isNullOrEmpty(scores.getMobilityWalkingHalf()))
+			scores.setMobilityWalkingHalf(noLimitation);
+		   		
+		if (Utils.isNullOrEmpty(scores.getMobilityClimbing()))
+			scores.setMobilityClimbing(noLimitation);		   		
+		report.setScores(scores);
+		report.setAlerts(lAlert);
+		//end of alert
+		
+		//Patient Goals -- life goals, health goals
+		try{
+   			xml = new String(goals.getResults(), "UTF-8");
+   		} catch (Exception e) {
+   			xml = "";
+   		}   	   		
+   		//get answer list
+		qList = new ArrayList<String>();
+		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));   
+		report.setPatientGoals(qList);
+		
+		//get volunteer information
+		List<String> volunteerInfos = new ArrayList<String>();
+		volunteerInfos.add(appointment.getVolunteer());
+		volunteerInfos.add(appointment.getPartner());
+		volunteerInfos.add(appointment.getComments());
+		
+		report.setVolunteerInformations(volunteerInfos);		
+		//populate hl7 message		
+		String messageText = Hl7Utils.populateORUMessage(report);   
+		
+		//save hl7 message in a file store on tomcat/webapps/hl7
+//		StringBuffer sb = new StringBuffer();
+//		sb.append(String.valueOf(patient.getPatientID()));		
+	//	Hl7Utils.save(messageText, sb.toString());
+		
+		//save or open hl7 message in local file system
+		StringBuffer sb = new StringBuffer();
+		sb.append("TR");
+		sb.append(patient.getPatientID());
+		sb.append(".hl7");
+		String filename= sb.toString();
+		response.setContentType("text/hl7");
+   		response.setContentLength(messageText.length());
+   		response.setHeader("Content-Disposition", "attachment; filename=" + filename);  
+   		try{
+   			PrintWriter pw = new PrintWriter(response.getOutputStream());
+   			pw.write(messageText);
+   		} catch (Exception e) {
+   			e.printStackTrace();
+   		}   			
+   		return messageText;
+
+//   		model.addAttribute("message",messageText);
+//   		return "/admin/hl7Test";
+	}
 	@RequestMapping(value="/download_report/{patientID}", method=RequestMethod.GET)
 	public String downloadReport(@PathVariable("patientID") int id,
 			@RequestParam(value="appointmentId", required=true) int appointmentId, 	
@@ -1045,6 +1340,7 @@ public class TapestryController{
 		String userName = "carolchou.test";
 		try{
 			PersonTransfer3 personInMyoscar = ClientManager.getClientByUsername(userName);
+						
 			StringBuffer sb = new StringBuffer();
 			if (personInMyoscar.getStreetAddress1() != null)
 				sb.append(personInMyoscar.getStreetAddress1());
@@ -1090,7 +1386,7 @@ public class TapestryController{
 
 		//Survey---  goals setting
 		List<SurveyResult> surveyResultList = surveyManager.getCompletedSurveysByPatientID(id);
-		SurveyResult healthGoalsSurvey = new SurveyResult();
+//		SurveyResult healthGoalsSurvey = new SurveyResult();
 		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
 		SurveyResult nutritionSurvey = new SurveyResult();
 		SurveyResult rAPASurvey = new SurveyResult();
@@ -1104,8 +1400,8 @@ public class TapestryController{
 		for(SurveyResult survey: surveyResultList){			
 			String title = survey.getSurveyTitle();
 			
-			if (title.equalsIgnoreCase("Goal Setting"))//Goal Setting survey
-				healthGoalsSurvey = survey;
+//			if (title.equalsIgnoreCase("Goal Setting"))//Goal Setting survey
+//				healthGoalsSurvey = survey;
 			
 			if (title.equalsIgnoreCase("Daily Life Activities"))//Daily life activity survey
 				dailyLifeActivitySurvey = survey;
@@ -1136,6 +1432,10 @@ public class TapestryController{
 		}
 		
 		String xml;
+		List<String> qList = new ArrayList<String>();
+   		List<String> questionTextList = new ArrayList<String>();
+   		Map<String, String> sMap = new TreeMap<String, String>();
+		/*
 		//Healthy Goals
    		try{
    			xml = new String(healthGoalsSurvey.getResults(), "UTF-8");
@@ -1152,8 +1452,9 @@ public class TapestryController{
 		
    		Map<String, String> sMap = new TreeMap<String, String>();
    		sMap = TapestryHelper.getSurveyContentMap(questionTextList, qList);
-   		
+   		   		   		
   		report.setHealthGoals(sMap);   		
+  		*/
    		//Additional Information
   		//Memory
    		try{
@@ -1198,12 +1499,11 @@ public class TapestryController{
 	   	   		for (int i = 1; i <= 3; i++)
 	   	   			displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(i)));
 	   	   		
-	   	   		displayQuestionTextList = TapestryHelper.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");
-	   	   		
+	   	   		displayQuestionTextList = TapestryHelper.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");	   	   		
 	   	   		//get answer list   		
-	   	   		qList.addAll(TapestryHelper.getQuestionList(mCarePlanSurvey));   	
-	   	   		
+	   	   		qList.addAll(TapestryHelper.getQuestionList(mCarePlanSurvey));   		   	   		
 	   	   		sMap = TapestryHelper.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
+	   	   			   	   		
 	   	   		report.setAdditionalInfos(sMap);
    	   		}   
    		}
@@ -2120,5 +2420,7 @@ public class TapestryController{
    			e.printStackTrace();
    		}   		   		
    		return "admin/manage_survey";
-   	}   		
+   	}   
+   	   
+
 }

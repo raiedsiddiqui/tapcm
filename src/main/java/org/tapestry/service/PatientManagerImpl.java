@@ -2,7 +2,10 @@ package org.tapestry.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Service;
 import org.tapestry.dao.PatientDAO;
 import org.tapestry.objects.Patient;
@@ -58,6 +61,19 @@ public class PatientManagerImpl implements PatientManager {
 	@Override
 	public List<Patient> getGroupedPatientsByName(String partialName, int organizationId) {
 		return patientDao.getGroupedPatientsByName(partialName, organizationId);
+	}
+
+	@Override
+	public Patient getClientFromSession(SecurityContextHolderAwareRequestWrapper request, int patientId) {	
+		HttpSession session = request.getSession();
+		List<Patient> patients = (List<Patient>)session.getAttribute("allPatientWithFullInfos");
+		
+		for (Patient patient: patients)
+		{
+			if (patientId == patient.getPatientID())
+				return patient;
+		}
+		return null;
 	}
 
 }

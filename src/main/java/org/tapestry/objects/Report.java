@@ -6,15 +6,15 @@ import java.util.Map;
 import org.tapestry.report.ScoresInReport;
 
 public class Report {
-	private List<String> alerts;
-	private Map<String, String> healthGoals;
-	private Map<String, String> dailyActivities;
-	private Map<String, String> volunteerInformations;
-	private Map<String, String> additionalInfos;
-	private Patient patient;
-	private Appointment appointment;
-	private ScoresInReport scores;
-	private List<String> patientGoals;
+	private List<String> alerts; //alert:consider case review with IP-team
+//	private Map<String, String> healthGoals;
+	private Map<String, String> dailyActivities;//tapestry questions
+	private Map<String, String> volunteerInformations;//volunteer information and notes
+	private Map<String, String> additionalInfos;//additional information
+	private Patient patient;//patient information,name...
+	private Appointment appointment;//visit,plan, key observation
+	private ScoresInReport scores;//summary of tapestry tools
+	private List<String> patientGoals; // patient goal(s)
 
 	public Report(){}
 	
@@ -43,13 +43,13 @@ public class Report {
 	public void setAlerts(List<String> alerts) {
 		this.alerts = alerts;
 	}
-	public Map<String, String> getHealthGoals() {
-		return healthGoals;
-	}
-
-	public void setHealthGoals(Map<String, String> healthGoals) {
-		this.healthGoals = healthGoals;
-	}
+//	public Map<String, String> getHealthGoals() {
+//		return healthGoals;
+//	}
+//
+//	public void setHealthGoals(Map<String, String> healthGoals) {
+//		this.healthGoals = healthGoals;
+//	}
 
 	public Map<String, String> getDailyActivities() {
 		return dailyActivities;

@@ -170,7 +170,15 @@
 								<option value="${v.volunteerId}">${v.displayName}</option>
 							</c:forEach>
 						</select>
-					</div>					
+					</div>	
+					<div class="col-md-6">
+						<label>Username in MyOscar:</label>
+						<input type="text" name="username_myoscar" class="form-control" required/>
+					</div>
+					<div class="col-md-6">
+						<label>MRP:</label>
+						<input type="text" name="mrp" class="form-control" required/>
+					</div>				
 				</div>		
 					<label>MyOscar verified? </label>
 					<input type="radio" name="myoscar_verified" value="1" checked/>Yes
