@@ -57,7 +57,8 @@ public class Hl7Utils {
 		pid.getPatientIDInternalID(0).getID().setValue(String.valueOf(patientId));//patientId	
 		pid.getPatientName().getFamilyName().setValue(p.getLastName());//last name		
 		pid.getPatientName().getGivenName().setValue(p.getFirstName());//first name
-		pid.getDateOfBirth().getDegreeOfPrecision().setValue(p.getBod()); // birth date	
+		pid.getDateOfBirth().getTimeOfAnEvent().setValue(p.getBod());// birth date	
+//		pid.getDateOfBirth().getDegreeOfPrecision().setValue(p.getBod()); // birth date	
 //		pid.getDateOfBirth().getDegreeOfPrecision().setValue("19301201"); // birth date	
 		pid.getPatientAddress(0).getStreetAddress().setValue(" 11 Hunter Street S");
 		pid.getPatientAddress(0).getCity().setValue("Hamilton");				 
@@ -82,6 +83,11 @@ public class Hl7Utils {
 		ca.uhn.hl7v2.model.v23.segment.ORC orc = message.getRESPONSE().getORDER_OBSERVATION().getORC();
 		orc.getOrc1_OrderControl().setValue("NW");
 		orc.getOrc2_PlacerOrderNumber(0).getUniversalID().setValue("TR" + patientId);
+		orc.getOrc5_OrderStatus().setValue("F");
+		orc.getOrc12_OrderingProvider(0).getIDNumber().setValue("05808");//provider Id number
+		orc.getOrc12_OrderingProvider(0).getFamilyName().setValue("Admin");//family name
+		orc.getOrc12_OrderingProvider(0).getGivenName().setValue("Admin");//first name
+		orc.getOrc15_OrderEffectiveDateTime().getTimeOfAnEvent().setValue(orbDate);
 	
 		/*
 		 * The OBR segment is contained within a group called ORDER_OBSERVATION, 
