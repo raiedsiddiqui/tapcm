@@ -107,7 +107,8 @@ public class PatientDAOImpl extends NamedParameterJdbcDaoSupport implements Pati
 	@Override
 	public int createPatient(final Patient p) {	
 		 final String sql = "INSERT INTO patients (firstname, lastname, preferredname, volunteer,"
-					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, username) VALUES (?, ?, ?, ?,"
+					+ " gender, notes, volunteer2, alerts, myoscar_verified, clinic, username, mrp, "
+					+ "mrp_firstname, mrp_lastname) VALUES (?, ?, ?, ?, ?, ?, ?,"
 					+ " ?, ?, ?, ?, ?, ?, ?)";
 		  
 		 JdbcTemplate jdbcTemplate = getJdbcTemplate();  
@@ -128,6 +129,9 @@ public class PatientDAOImpl extends NamedParameterJdbcDaoSupport implements Pati
 				 ps.setString(9, p.getMyoscarVerified());
 				 ps.setString(10,  p.getClinic());
 				 ps.setString(11, "tapestry_patient");
+				 ps.setInt(12, p.getMrp());
+				 ps.setString(13,  p.getMrpFirstName());
+				 ps.setString(14, p.getMrpLastName());
 			        
 				 return ps;  
 			 }  
@@ -138,9 +142,11 @@ public class PatientDAOImpl extends NamedParameterJdbcDaoSupport implements Pati
 	@Override
 	public void updatePatient(Patient p) {
 		String sql = "UPDATE patients SET firstname=?, lastname=?, preferredname=?, volunteer=?, "
-				+ "gender=?, notes=?, clinic=?, myoscar_verified=?, alerts=?, volunteer2=? WHERE patient_ID=?";
-		getJdbcTemplate().update(sql, p.getFirstName(),  p.getLastName(), p.getPreferredName(), p.getVolunteer(), p.getGender(),
-				p.getNotes(), p.getClinic(), p.getMyoscarVerified(), p.getAlerts(), p.getPartner(), p.getPatientID());
+				+ "gender=?, notes=?, clinic=?, myoscar_verified=?, alerts=?, volunteer2=?, mrp=?, "
+				+ "mrp_firstname=?, mrp_lastname=? WHERE patient_ID=?";
+		getJdbcTemplate().update(sql, p.getFirstName(),  p.getLastName(), p.getPreferredName(), p.getVolunteer(), 
+				p.getGender(), p.getNotes(), p.getClinic(), p.getMyoscarVerified(), p.getAlerts(), p.getPartner(), 
+				p.getMrp(), p.getMrpFirstName(), p.getMrpLastName(), p.getPatientID());
 
 	}
 
@@ -173,6 +179,9 @@ public class PatientDAOImpl extends NamedParameterJdbcDaoSupport implements Pati
 			patient.setVolunteer(rs.getInt("volunteer"));
 			patient.setNotes(rs.getString("notes"));
 			patient.setAlerts(rs.getString("alerts"));	
+			patient.setMrp(rs.getInt("mrp"));
+			patient.setMrpFirstName(rs.getString("mrp_firstname"));
+			patient.setMrpLastName(rs.getString("mrp_lastname"));
 			
 			String myOscarVerfied = rs.getString("myoscar_verified");
 			patient.setMyoscarVerified(myOscarVerfied);    

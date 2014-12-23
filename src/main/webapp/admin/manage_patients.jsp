@@ -6,6 +6,10 @@
 <head>
 	<title>Tapestry Admin</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 
 	<style type="text/css">
 		.row-fluid{
@@ -165,10 +169,6 @@
 						<label>Volunteer2:</label>
 						<select name="volunteer2" id="volunteer2" form="newPatient" class="form-control">
 							<option value=""></option>
-							
-					  		<c:forEach items="${volunteers}" var="v">
-								<option value="${v.volunteerId}">${v.displayName}</option>
-							</c:forEach>
 						</select>
 					</div>	
 					<div class="col-md-6">
@@ -178,7 +178,15 @@
 					<div class="col-md-6">
 						<label>MRP:</label>
 						<input type="text" name="mrp" class="form-control" required/>
-					</div>				
+					</div>		
+					<div class="col-md-6">
+						<label>MRP Firstname:</label>
+						<input type="text" name="mrp_firstname" class="form-control" required/>
+					</div>
+					<div class="col-md-6">
+						<label>MRP Lastname:</label>
+						<input type="text" name="mrp_lastname" class="form-control" required/>
+					</div>						
 				</div>		
 					<label>MyOscar verified? </label>
 					<input type="radio" name="myoscar_verified" value="1" checked/>Yes

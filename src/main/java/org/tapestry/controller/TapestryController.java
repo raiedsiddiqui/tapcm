@@ -745,6 +745,9 @@ public class TapestryController{
 			p.setNotes(request.getParameter("notes"));
 			p.setAlerts(request.getParameter("alerts"));
 			p.setClinic(request.getParameter("clinic"));
+			p.setMrp(Integer.parseInt(request.getParameter("mrp")));
+			p.setMrpFirstName(request.getParameter("mrp_firstname"));
+			p.setMrpLastName(request.getParameter("mrp_lastname"));
 			
 			int newPatientID = patientManager.createPatient(p);		
 			
@@ -847,6 +850,9 @@ public class TapestryController{
 			p.setClinic(request.getParameter("clinic"));
 			p.setAlerts(request.getParameter("alerts"));
 			p.setMyoscarVerified(request.getParameter("myoscar_verified"));
+			p.setMrp(Integer.parseInt(request.getParameter("mrp")));
+			p.setMrpFirstName(request.getParameter("mrp_firstname"));
+			p.setMrpLastName(request.getParameter("mrp_lastname"));
 			
 			patientManager.updatePatient(p);
 			model.addAttribute("updatePatientSuccessfully",true);

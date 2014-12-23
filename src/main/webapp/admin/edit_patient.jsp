@@ -117,6 +117,20 @@
 						</select>
 					</div>
 				</div>
+				<div class="row form-group">
+					<div class="col-md-6">
+						<label>MRP:</label>
+						<input type="text" name="mrp" class="form-control" value="${patient.mrp}" required/>
+					</div>		
+					<div class="col-md-6">
+						<label>MRP Firstname:</label>
+						<input type="text" name="mrp_firstname" class="form-control" value="${patient.mrpFirstName}" required/>
+					</div>
+					<div class="col-md-6">
+						<label>MRP Lastname:</label>
+						<input type="text" name="mrp_lastname" class="form-control" value="${patient.mrpLastName}" required/>
+					</div>		
+				</div>
 				
 	<!--  			<label>Availability:</label><br/>
 				<%@include file="edit_availabilities.jsp" %> 

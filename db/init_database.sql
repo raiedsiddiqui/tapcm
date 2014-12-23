@@ -29,7 +29,10 @@ CREATE TABLE IF NOT EXISTS patients (
 	myoscar_verified TINYINT(1) NOT NULL, /* 0--not authenticated, 1--authenticated*/
 	volunteer2 TINYINT UNSIGNED NOT NULL,/* Same as user_ID */
 	username VARCHAR(255) NOT NULL, /* username used to login in myoscar account */
-	mrp VARCHAR(50) NOT NULL, 
+	mrp SMALLINT UNSIGNED NOT NULL, 
+	mrp_firstname VARCHAR(50) NOT NULL,
+	mrp_lastname VARCHAR(50) NOT NULL,
+	
 	PRIMARY KEY (patient_ID)
 );
 

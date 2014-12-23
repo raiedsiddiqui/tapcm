@@ -84,6 +84,7 @@ public class Hl7Utils {
 		orc.getOrc1_OrderControl().setValue("NW");
 		orc.getOrc2_PlacerOrderNumber(0).getUniversalID().setValue("TR" + patientId);
 		orc.getOrc5_OrderStatus().setValue("F");
+		orc.getOrc12_OrderingProvider(0).getAssigningAuthority().getUniversalID().setValue("Tapestry");//provider organization
 		orc.getOrc12_OrderingProvider(0).getIDNumber().setValue("05808");//provider Id number
 		orc.getOrc12_OrderingProvider(0).getFamilyName().setValue("Admin");//family name
 		orc.getOrc12_OrderingProvider(0).getGivenName().setValue("Admin");//first name
@@ -229,6 +230,9 @@ public class Hl7Utils {
 		 obr.getObr7_ObservationDateTime().getTimeOfAnEvent().setValue(obrDate);
 		 obr.getPlacerOrderNumber(0).getEi1_EntityIdentifier().setValue("TR" + patientId);
 		 obr.getOrderingProvider(0).getAssigningAuthority().getUniversalID().setValue("Tapestry");
+		 obr.getOrderingProvider(0).getIDNumber().setValue("05808");//provider Id number
+		 obr.getOrderingProvider(0).getFamilyName().setValue("Admin");//family name
+		 obr.getOrderingProvider(0).getGivenName().setValue("Admin");//first name
 		 obr.getPlacerField1().setValue(tagName);	
 	 }
 	 

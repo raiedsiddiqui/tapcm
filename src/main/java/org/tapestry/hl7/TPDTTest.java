@@ -43,7 +43,7 @@ public class TPDTTest {
 		this.patientData[0] = patient.getFirstName();
 		this.patientData[1] = patient.getLastName();
 		this.patientData[2] = patient.getBod();
-		this.patientData[3] = patient.getMrp();
+		this.patientData[3] = String.valueOf(patient.getMrp());
 		this.patientData[4] = patient.getAddress();
 	}
 	
