@@ -2180,7 +2180,7 @@ public class TapestryHelper {
 		m.setSenderID(sender);
 		m.setText(msg);
 		m.setSubject(subject);
-		messageManager.sendMessage(m);
+		messageManager.sendMessage(m);		
 	}
 	/**
 	 * Send message to Inbox
@@ -2192,6 +2192,8 @@ public class TapestryHelper {
 	public static void sendMessageToInbox(String msg, int sender, int recipient, MessageManager messageManager){		
 		sendMessageToInbox("New Appointment", msg, sender, recipient, messageManager);
 	}
+	
+	
 	
 	/**
 	 * Send message to client's account in MyOscar(PHR)

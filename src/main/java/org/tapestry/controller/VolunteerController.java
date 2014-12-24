@@ -499,7 +499,7 @@ public class VolunteerController {
 				break;
 			}
 		}
-		
+		System.out.println("get vol list, and size if  "+ vl.size());
 		return vl;
 	//	return volunteerManager.getAllVolunteersByOrganization(volunteer.getOrganizationId());
 	}
@@ -1680,9 +1680,10 @@ public class VolunteerController {
 			StringBuffer sb = new StringBuffer();			
 			sb.append(user.getName());
 			sb.append(" has booked an appointment for ");
-			sb.append(patient.getFirstName());
-			sb.append(" ");
-			sb.append(patient.getLastName());
+			sb.append(patient.getDisplayName());
+//			sb.append(patient.getFirstName());
+//			sb.append(" ");
+//			sb.append(patient.getLastName());
 			sb.append( " at ");
 			sb.append(time);
 			sb.append(" on ");
@@ -1752,7 +1753,7 @@ public class VolunteerController {
 		else 
 		{
 			if (!Utils.isNullOrEmpty(appointment.getComments()))
-			{//send alert to MRP	
+			{//todo:send alert to MRP	
 				
 			}				
 			return "redirect:/";	
@@ -1809,27 +1810,60 @@ public class VolunteerController {
 		sb.append(" has added plans for appointment #  ");
 		sb.append(appointmentId);				
 		userManager.addUserLog(sb.toString(), loggedInUser);
+		
+		//for temporary use, send a message to coordinator, hl7 report is ready to donwload on Admin side
+		////////////////////////
+		User user = TapestryHelper.getLoggedInUser(request, userManager);
+		int userId = user.getUserID();	
+		int patientId = TapestryHelper.getPatientId(request);
+		Appointment a = appointmentManager.getAppointmentById(appointmentId);
+		Patient p;
+		if (patientId != 0)
+			p = patientManager.getPatientByID(patientId);
+		else
+			p = patientManager.getPatientByID(a.getPatientID());
+		
+		String patientName = p.getDisplayName();
+		int organizationId = a.getGroup();		
+		
+		List<User> coordinators = userManager.getVolunteerCoordinatorByOrganizationId(organizationId);
+						
+		sb = new StringBuffer();
+		sb.append(patientName);
+		sb.append("'s hl7 report is ready to be downloaded. ");				
+		
+		if (coordinators != null)			
+		{	//send message to all coordinators in the organization					
+			for (int i = 0; i<coordinators.size(); i++)		
+				TapestryHelper.sendMessageToInbox("HL7 Report", sb.toString(), userId, coordinators.get(i).getUserID(), messageManager);			
+		}
+		else{
+			System.out.println("Can't find any coordinator in organization id# " + organizationId);
+			logger.error("Can't find any coordinator in organization id# " + organizationId);
+		}
+		
+		///////////////////////
 	
 		//todo:generate tapestry reprot, send it to MRP in Oscar, and send message to patient in MyOscar
-		Appointment a = appointmentManager.getAppointmentById(appointmentId);
-		Patient p = patientManager.getPatientByID(a.getPatientID());
-		p = TapestryHelper.getPatientWithFullInfos(patientManager, p);
-		a.setPlans(plans);
-		a.setKeyObservation(appointmentManager.getKeyObservationByAppointmentId(appointmentId));
-		//generate HL7 report
-		HL7Report report = TapestryHelper.generateHL7Report(p, a, surveyManager);
-		//populate hl7 message		
-		try{
-			String messageText = Hl7Utils.populateORUMessage(report);   
-			sb = new StringBuffer();
-			sb.append(String.valueOf(p.getPatientID()));
-			sb.append(a.getDate());
-			sb.append(a.getTime());
-			
-			Hl7Utils.save(messageText, sb.toString());
-		}catch(Exception e){
-			e.printStackTrace();
-		}		
+//		Appointment a = appointmentManager.getAppointmentById(appointmentId);
+//		Patient p = patientManager.getPatientByID(a.getPatientID());
+//		p = TapestryHelper.getPatientWithFullInfos(patientManager, p);
+//		a.setPlans(plans);
+//		a.setKeyObservation(appointmentManager.getKeyObservationByAppointmentId(appointmentId));
+//		//generate HL7 report
+//		HL7Report report = TapestryHelper.generateHL7Report(p, a, surveyManager);
+//		//populate hl7 message		
+//		try{
+//			String messageText = Hl7Utils.populateORUMessage(report);   
+//			sb = new StringBuffer();
+//			sb.append(String.valueOf(p.getPatientID()));
+//			sb.append(a.getDate());
+//			sb.append(a.getTime());
+//			
+//			Hl7Utils.save(messageText, sb.toString());
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}		
 		
 		return "redirect:/";
 	}

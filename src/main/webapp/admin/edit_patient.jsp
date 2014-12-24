@@ -5,7 +5,10 @@
 <head>
 	<title>Tapestry Admin</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
-
+	<link href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="${pageContext.request.contextPath}/resources/css/bootstrap-responsive.min.css" rel="stylesheet" />  		
+		<script src="${pageContext.request.contextPath}/resources/js/jquery-2.0.3.min.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 
 	<style type="text/css">
 		.row-fluid{
@@ -24,8 +27,8 @@
 				return false;
 			}
 		}
-		 function getVolunteers(){			 
-		        $.getJSON(
+		 function getVolunteers(){			
+		        $.getJSON( 
 		             "volunteerList.html", 
 		             {volunteerId: $('#volunteer1').val()},
 		             function(data) {
@@ -33,7 +36,7 @@
 		                  var len = data.length;
 		                  
 		                  //clear second dropdown
-		                  document.getElementById('volunteer2').options.length = 0;
+		                  document.getElementById('volunteer22').options.length = 0;
 	                	  
 		                  //append data from DB
 		                  for(var i=0; i<len; i++){
@@ -46,7 +49,7 @@
 
 		 $(document).ready(function() {
 		         $('#volunteer1').change(function()		        		 
-		          { 
+		          {
 		        	 getVolunteers();
 		          });
 		      });
@@ -95,7 +98,7 @@
 					</div>
 					<div class="col-md-6">
 						<label>Volunteer2:</label>
-						<select name="volunteer2" id="volunteer2" form="editPatient" class="form-control">							
+						<select name="volunteer2" id="volunteer2" form="editPatient" class="form-control">
 						<c:forEach items="${volunteers}" var="v">
 								<option value="${v.volunteerId}" <c:if test="${v.volunteerId eq patient.partner}">selected</c:if>>${v.displayName}</option>
 							</c:forEach> 	

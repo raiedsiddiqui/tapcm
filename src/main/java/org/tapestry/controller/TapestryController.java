@@ -1047,7 +1047,7 @@ public class TapestryController{
 	@ResponseBody
 	public String generateHL7Report (@PathVariable("patientID") int id,
 			@RequestParam(value="appointmentId", required=true) int appointmentId, 	
-			ModelMap model, HttpServletResponse response, HttpServletRequest request) throws Exception
+			ModelMap model, HttpServletResponse response, SecurityContextHolderAwareRequestWrapper request) throws Exception
 	{	
 		Patient patient = patientManager.getPatientByID(id);		
 		patient = TapestryHelper.getPatientWithFullInfos(patientManager, patient);
@@ -1330,7 +1330,22 @@ public class TapestryController{
    			pw.write(messageText);
    		} catch (Exception e) {
    			e.printStackTrace();
-   		}   			
+   		}   	
+   		
+   		//add log
+   		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
+   		sb = new StringBuffer();
+   		sb.append(loggedInUser.getName());
+   		sb.append(" download ");
+   		sb.append(patient.getDisplayName());
+//   		sb.append(patient.getFirstName());
+//   		sb.append(" ");
+//   		sb.append(patient.getLastName());
+   		sb.append(" report at ");		
+   		java.util.Date date= new java.util.Date();		
+   		sb.append(new Timestamp(date.getTime()));
+   		userManager.addUserLog(sb.toString(), loggedInUser);	
+   		
    		return messageText;
 
 //   		model.addAttribute("message",messageText);
@@ -2160,7 +2175,7 @@ public class TapestryController{
    	
    	@RequestMapping(value="/show_survey/{resultID}", method=RequestMethod.GET)
    	public ModelAndView showSurvey(@PathVariable("resultID") int id, HttpServletRequest request)
-   	{   System.out.println("show survey---next");		   		
+   	{   	   		
    		ModelAndView redirectAction = null;
    		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
 		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();
