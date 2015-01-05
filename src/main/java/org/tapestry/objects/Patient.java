@@ -13,7 +13,9 @@ public class Patient{
 	private String bod;// birth of date
 	private int age;
 	private String clinic;
-	private String mrp; // family doctor
+	private int mrp; // family doctor
+	private String mrpFirstName;
+	private String mrpLastName;
 	private String city;
 	private String homePhone;	
 	private String alerts;
@@ -88,12 +90,28 @@ public class Patient{
 		this.clinic = clinic;
 	}
 
-	public String getMrp() {
+	public int getMrp() {
 		return mrp;
 	}
 
-	public void setMrp(String mrp) {
+	public void setMrp(int mrp) {
 		this.mrp = mrp;
+	}
+
+	public String getMrpFirstName() {
+		return mrpFirstName;
+	}
+
+	public void setMrpFirstName(String mrpFirstName) {
+		this.mrpFirstName = mrpFirstName;
+	}
+
+	public String getMrpLastName() {
+		return mrpLastName;
+	}
+
+	public void setMrpLastName(String mrpLastName) {
+		this.mrpLastName = mrpLastName;
 	}
 
 	public String getCity() {

@@ -2,6 +2,7 @@ package org.tapestry.service;
 
 import java.util.List;
 
+import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestWrapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tapestry.objects.Patient;
@@ -19,6 +20,13 @@ public interface PatientManager {
 	*/
 	@Transactional
 	public Patient getPatientByID(int id);
+	
+	/** 
+	 * @param request
+	 * @return a patient with full info from session
+	 */
+	@Transactional
+	public Patient getClientFromSession(SecurityContextHolderAwareRequestWrapper request, int patientId);
 	
 	/**
 	* List all the patients in the database
@@ -79,5 +87,7 @@ public interface PatientManager {
 	*/
 	@Transactional
 	public void deletePatientWithId(int id);
+	
+	
 	
 }

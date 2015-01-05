@@ -200,7 +200,8 @@
 			<th width="300"> Visit Date</th>		
 			<th>Assigned Volunteers</th>
 			<c:if test="${showReport}">
-				<th>Report</th>
+				<th>Report/PDF</th>
+				<th>Report/HL7</th>
 			</c:if>
 		</tr>
 		<c:forEach items="${completedVisits}" var="cVistits">
@@ -210,6 +211,7 @@
 			<td>${cVistits.volunteer},&nbsp &nbsp ${cVistits.partner}</td>
 			<c:if test="${showReport}">
 				<td><a href="<c:url value="/download_report/${patient.patientID}?appointmentId=${cVistits.appointmentID}"/>">DOWNLOAD</a> </td>
+				<td><a href="<c:url value="/generate_report_hl7/${patient.patientID}?appointmentId=${cVistits.appointmentID}"/>">DOWNLOAD</a> </td>
 			</c:if>
 		</tr>
 		</c:forEach>

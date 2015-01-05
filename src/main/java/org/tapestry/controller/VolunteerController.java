@@ -23,9 +23,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.tapestry.utils.TapestryHelper;
 import org.tapestry.utils.Utils;
+import org.tapestry.hl7.Hl7Utils;
 import org.tapestry.objects.Activity;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.Availability;
+import org.tapestry.objects.HL7Report;
 import org.tapestry.objects.Message;
 import org.tapestry.objects.Narrative;
 import org.tapestry.objects.Patient;
@@ -38,6 +40,8 @@ import org.tapestry.service.PatientManager;
 import org.tapestry.service.SurveyManager;
 import org.tapestry.service.UserManager;
 import org.tapestry.service.VolunteerManager;
+
+import ca.uhn.hl7v2.HL7Exception;
 
 @Controller
 public class VolunteerController {
@@ -495,7 +499,7 @@ public class VolunteerController {
 				break;
 			}
 		}
-		
+		System.out.println("get vol list, and size if  "+ vl.size());
 		return vl;
 	//	return volunteerManager.getAllVolunteersByOrganization(volunteer.getOrganizationId());
 	}
@@ -1676,9 +1680,10 @@ public class VolunteerController {
 			StringBuffer sb = new StringBuffer();			
 			sb.append(user.getName());
 			sb.append(" has booked an appointment for ");
-			sb.append(patient.getFirstName());
-			sb.append(" ");
-			sb.append(patient.getLastName());
+			sb.append(patient.getDisplayName());
+//			sb.append(patient.getFirstName());
+//			sb.append(" ");
+//			sb.append(patient.getLastName());
 			sb.append( " at ");
 			sb.append(time);
 			sb.append(" on ");
@@ -1748,7 +1753,7 @@ public class VolunteerController {
 		else 
 		{
 			if (!Utils.isNullOrEmpty(appointment.getComments()))
-			{//send alert to MRP	
+			{//todo:send alert to MRP	
 				
 			}				
 			return "redirect:/";	
@@ -1778,23 +1783,25 @@ public class VolunteerController {
 	public String savePlans(SecurityContextHolderAwareRequestWrapper request, ModelMap model)
 	{	
 		int appointmentId = TapestryHelper.getAppointmentId(request);
+		String seperator = ";";
 		
 		StringBuffer sb = new StringBuffer();		
 		sb.append(request.getParameter("plan1"));
-		sb.append(",");
+		sb.append(seperator);
 		sb.append(request.getParameter("plan2"));
-		sb.append(",");
+		sb.append(seperator);
 		sb.append(request.getParameter("plan3"));
-		sb.append(",");
+		sb.append(seperator);
 		sb.append(request.getParameter("plan4"));
-		sb.append(",");
+		sb.append(seperator);
 		sb.append(request.getParameter("plan5"));
 		if (!Utils.isNullOrEmpty(request.getParameter("planSpecify")))
 		{
-			sb.append(",");
+			sb.append(seperator);
 			sb.append(request.getParameter("planSpecify"));
-		}				
-		appointmentManager.addPlans(appointmentId, sb.toString());
+		}	
+		String plans = sb.toString();
+		appointmentManager.addPlans(appointmentId, plans);
 		
 		//add logs
 		User loggedInUser = TapestryHelper.getLoggedInUser(request);
@@ -1803,7 +1810,61 @@ public class VolunteerController {
 		sb.append(" has added plans for appointment #  ");
 		sb.append(appointmentId);				
 		userManager.addUserLog(sb.toString(), loggedInUser);
+		
+		//for temporary use, send a message to coordinator, hl7 report is ready to donwload on Admin side
+		////////////////////////
+		User user = TapestryHelper.getLoggedInUser(request, userManager);
+		int userId = user.getUserID();	
+		int patientId = TapestryHelper.getPatientId(request);
+		Appointment a = appointmentManager.getAppointmentById(appointmentId);
+		Patient p;
+		if (patientId != 0)
+			p = patientManager.getPatientByID(patientId);
+		else
+			p = patientManager.getPatientByID(a.getPatientID());
+		
+		String patientName = p.getDisplayName();
+		int organizationId = a.getGroup();		
+		
+		List<User> coordinators = userManager.getVolunteerCoordinatorByOrganizationId(organizationId);
+						
+		sb = new StringBuffer();
+		sb.append(patientName);
+		sb.append("'s hl7 report is ready to be downloaded. ");				
+		
+		if (coordinators != null)			
+		{	//send message to all coordinators in the organization					
+			for (int i = 0; i<coordinators.size(); i++)		
+				TapestryHelper.sendMessageToInbox("HL7 Report", sb.toString(), userId, coordinators.get(i).getUserID(), messageManager);			
+		}
+		else{
+			System.out.println("Can't find any coordinator in organization id# " + organizationId);
+			logger.error("Can't find any coordinator in organization id# " + organizationId);
+		}
+		
+		///////////////////////
 	
+		//todo:generate tapestry reprot, send it to MRP in Oscar, and send message to patient in MyOscar
+//		Appointment a = appointmentManager.getAppointmentById(appointmentId);
+//		Patient p = patientManager.getPatientByID(a.getPatientID());
+//		p = TapestryHelper.getPatientWithFullInfos(patientManager, p);
+//		a.setPlans(plans);
+//		a.setKeyObservation(appointmentManager.getKeyObservationByAppointmentId(appointmentId));
+//		//generate HL7 report
+//		HL7Report report = TapestryHelper.generateHL7Report(p, a, surveyManager);
+//		//populate hl7 message		
+//		try{
+//			String messageText = Hl7Utils.populateORUMessage(report);   
+//			sb = new StringBuffer();
+//			sb.append(String.valueOf(p.getPatientID()));
+//			sb.append(a.getDate());
+//			sb.append(a.getTime());
+//			
+//			Hl7Utils.save(messageText, sb.toString());
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}		
+		
 		return "redirect:/";
 	}
 	

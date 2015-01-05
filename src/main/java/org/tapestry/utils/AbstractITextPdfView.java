@@ -1,4 +1,4 @@
-package org.tapestry.controller.utils;
+package org.tapestry.utils;
 
 import java.util.Map;
 

@@ -117,7 +117,7 @@
     			<div id="squestion2" > <!-- style="float: left;" -->
         			<!-- Look at the div with class="questionWidth" at the bottom to adjust question min-width) -->
         			
-        			<form action="/tapestrytesting/show_survey/<%=documentId%>" name="surveyQuestion" id="surveyform">
+        			<form action="/tapestry/show_survey/<%=documentId%>" name="surveyQuestion" id="surveyform">
             			<input type="hidden" name="questionid" value="<%=question.getId()%>">
             			<input type="hidden" name="direction" value="forward">
 
