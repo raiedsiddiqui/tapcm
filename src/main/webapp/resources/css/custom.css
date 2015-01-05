@@ -239,7 +239,8 @@ Lanscape CSS ENDS*/
 }
 #answer-buttons {
 	/*position: absolute;*/
-	margin-bottom: 35px;
+	margin-bottom: 3em;
+	margin-top: 3em;
 	/*width: 90%;*/
 }
 input[type=submit] {

@@ -103,31 +103,31 @@
 <h2>    <button type="submit" align="right">Submit</button><input type="button" value="Cancel" class="btn btn-primary" onclick="javascript:history.go(-1)"></h2>
 <br/>
 <label>1 &nbsp &nbsp  </label>
-	<select name="plan1" form="plansfrm">
+	<select class="form-control" name="plan1" form="plansfrm">
 		<c:forEach items="${plans}" var="p">							
 			<option value="${p}" >${p}</option>
 		</c:forEach>
 	</select><br/>
 <label>2 &nbsp &nbsp  </label>
-	<select name="plan2" form="plansfrm">
+	<select class="form-control" name="plan2" form="plansfrm">
 		<c:forEach items="${plans}" var="p">							
 			<option value="${p}" >${p}</option>
 		</c:forEach>
 	</select><br/>
 <label>3  &nbsp &nbsp </label>
-	<select name="plan3" form="plansfrm">
+	<select class="form-control" name="plan3" form="plansfrm">
 		<c:forEach items="${plans}" var="p">							
 			<option value="${p}" >${p}</option>
 		</c:forEach>
 	</select><br/>
 <label>4  &nbsp &nbsp </label>
-	<select name="plan4" form="plansfrm">
+	<select class="form-control" name="plan4" form="plansfrm">
 		<c:forEach items="${plans}" var="p">							
 			<option value="${p}" >${p}</option>
 		</c:forEach>
 	</select><br/>
 <label>5  &nbsp &nbsp </label>
-	<select name="plan5" form="plansfrm">
+	<select class="form-control" name="plan5" form="plansfrm">
 		<c:forEach items="${plans}" var="p">							
 			<option value="${p}" >${p}</option>
 		</c:forEach>
