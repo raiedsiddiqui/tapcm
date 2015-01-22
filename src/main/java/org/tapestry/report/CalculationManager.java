@@ -26,8 +26,8 @@ public class CalculationManager {
 		return score;
 	}
 	
-	public static int getScoreForRAPA(List<String> qList){
-		int scores = 0;		
+	public static int getAScoreForRAPA(List<String> qList){
+		int score = 0;		
 		Integer[] answerArray = new Integer[6];
 		//set answer into an array
 		for(int i = 0; i < qList.size() - 2; i++)
@@ -36,35 +36,49 @@ public class CalculationManager {
 		Integer[] otherAnswers = removeFirstElementInArray(answerArray);
 		
 		if ((answerArray[0].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			scores = 2;
+			score = 2;
 		
 		otherAnswers = removeFirstElementInArray(otherAnswers);
 		
 		if ((answerArray[1].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			scores = 3;
+			score = 3;
 		
 		otherAnswers = removeFirstElementInArray(otherAnswers);
 		
 		if ((answerArray[2].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			scores = 4;
+			score = 4;
 		
 		otherAnswers = removeFirstElementInArray(otherAnswers);
 		
 		if ((answerArray[3].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			scores = 5;
+			score = 5;
 		
 		otherAnswers = removeFirstElementInArray(otherAnswers);
 		
 		if ((answerArray[4].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			scores = 6;		
+			score = 6;		
 	
 		if (answerArray[5].intValue() == 1) 
-			scores = 7;
+			score = 7;		
 		
-		
-		return scores;
+		return score;
 	}
 	
+	public static int getSFScoreForRAPA(List<String> qList){
+		int score = 0;				
+		int size = qList.size();
+		
+		if (("1".equals(qList.get(size - 2))) && ("2".equals(qList.get(size - 1))))
+			score = 1;
+		else if (("1".equals(qList.get(size - 2))) && ("1".equals(qList.get(size - 1))))
+			score = 3;
+		else if (("2".equals(qList.get(size - 2))) && ("1".equals(qList.get(size - 1))))
+			score = 2;
+		else if (("2".equals(qList.get(size - 2))) && ("2".equals(qList.get(size - 1))))
+			score = 0;
+		
+		return score;
+	}	
 	
 	private static Integer[] removeFirstElementInArray(Integer[] array){		
 		final Integer[] EMPTY_Integer_ARRAY = new Integer[0];

@@ -1566,10 +1566,12 @@ public class TapestryHelper {
 			table.addCell(cell);            
 	           
 			sb = new StringBuffer();
-			sb.append("Score =  ");
-			sb.append(report.getScores().getPhysicalActivity());
-			sb.append("\n");	
-			sb.append("\n");	            
+			sb.append("Aerobic Score =  ");
+			sb.append(report.getScores().getpAAerobic());
+			sb.append("\n");
+			sb.append("Strength & Flexibility Score = ");
+			sb.append(report.getScores().getpAStrengthAndFlexibility());
+//			sb.append("\n");	            
 			sb.append("\n");
 	            
 			cell = new PdfPCell(new Phrase(sb.toString(), iSmallFont));
@@ -1580,10 +1582,11 @@ public class TapestryHelper {
 			sb = new StringBuffer();
 			sb.append("Rapid Assessment of Physical Activity(RAPA)");
 			sb.append("\n");
-			sb.append("Score range : 1-7");
+			sb.append("Aerobic:ranges from 1-7");
 			sb.append("\n");
-			sb.append("Score < 6 Suboptimal Activity(Aerobic)");
-			sb.append("\n");	            
+			sb.append("Score < 6 Suboptimal Activity");
+			sb.append("\n");	
+			sb.append("Strength & Flexibility: ranges from 0-3)");
 			sb.append("\n");	            
 	            
 			cell = new PdfPCell(new Phrase(sb.toString(), sFont));
@@ -1713,6 +1716,8 @@ public class TapestryHelper {
 	 */
 	public static Map<String, String> getSurveyContentMap(List<String> questionTextList, List<String> questionAnswerList){
 		Map<String, String> content;
+		String text;
+		int index;
 		
 		if (questionTextList != null && questionTextList.size() > 0)
    		{//remove the first element which is description about whole survey
@@ -1720,20 +1725,27 @@ public class TapestryHelper {
    			
    	   		if (questionAnswerList != null && questionAnswerList.size() > 0)
    	   		{//remove the first element which is empty or "-"
-	   	   		questionAnswerList.remove(0);
-	   	   			
+	   	   	//	questionAnswerList.remove(0);
+	   	   	
 	   	   		content = new TreeMap<String, String>(); 
 		   	   	StringBuffer sb;
 	   	   		
 	   	   		for (int i = 0; i < questionAnswerList.size(); i++){
-	   	   			sb = new StringBuffer();
-	   	   			sb.append(questionTextList.get(i));
-	   	   			sb.append("<br/><br/>");
-	   	   			sb.append("\"");
+	   	   			text = questionTextList.get(i);	   	   			
+	   	   			//remove observer notes
+	   		    	index = text.indexOf("/observernote/");	   		    	
+	   		    	if (index > 0)
+	   		    		text = text.substring(0, index);   
+	   		    	
+	   	   			sb = new StringBuffer();	   	  
+	   	   			sb.append(text);
+	 //  	   			sb.append("<br/><br/>");
+	   	   			sb.append("\n");
+	 //  	   			sb.append("\"");
 	   	   			sb.append(questionAnswerList.get(i));
-	   	   			sb.append("\"");
+	//   	   			sb.append("\"");
 	   	   			content.put(String.valueOf(i + 1), sb.toString());
-	   	   		}	   	   		
+	   	   		}		   	  
 	   	   		return content;
    	   		}
    	   		else
@@ -1913,16 +1925,42 @@ public class TapestryHelper {
 		for(SurveyResult survey: surveyResultList){			
 			String title = survey.getSurveyTitle();
 			
-			if (title.equalsIgnoreCase("Daily Life Activities"))//Daily life activity survey
+//			if (title.equalsIgnoreCase("Daily Life Activities"))//Daily life activity survey
+//				dailyLifeActivitySurvey = survey;
+//			
+//			if (title.equalsIgnoreCase("Screen II"))//Nutrition
+//				nutritionSurvey = survey;
+//			
+//			if (title.equalsIgnoreCase("Rapid Assessment of Physical Activity"))//RAPA survey
+//				rAPASurvey = survey;
+//			
+//			if (title.equalsIgnoreCase("Mobility Survey"))//Mobility survey
+//				mobilitySurvey = survey;
+//			
+//			if (title.equalsIgnoreCase("Social Life")) //Social Life(Duke Index of Social Support)
+//				socialLifeSurvey = survey;
+//			
+//			if (title.equalsIgnoreCase("General Health")) //General Health(Edmonton Frail Scale)
+//				generalHealthySurvey = survey;
+//			
+//			if (title.equalsIgnoreCase("Memory")) //Memory Survey
+//				memorySurvey = survey;
+//			
+//			if (title.equalsIgnoreCase("Advance_Directives")) //Care Plan/Advanced_Directive survey
+//				carePlanSurvey = survey;
+//			
+//			if (title.equalsIgnoreCase("GAS"))
+//				goals = survey;				
+			if (title.equalsIgnoreCase("1. Daily Life Activities"))//Daily life activity survey
 				dailyLifeActivitySurvey = survey;
 			
-			if (title.equalsIgnoreCase("Screen II"))//Nutrition
+			if (title.equalsIgnoreCase("Nutrition"))//Nutrition
 				nutritionSurvey = survey;
 			
-			if (title.equalsIgnoreCase("Rapid Assessment of Physical Activity"))//RAPA survey
+			if (title.equalsIgnoreCase("Physical Activity"))//RAPA survey
 				rAPASurvey = survey;
 			
-			if (title.equalsIgnoreCase("Mobility Survey"))//Mobility survey
+			if (title.equalsIgnoreCase("Mobility"))//Mobility survey
 				mobilitySurvey = survey;
 			
 			if (title.equalsIgnoreCase("Social Life")) //Social Life(Duke Index of Social Support)
@@ -1934,11 +1972,11 @@ public class TapestryHelper {
 			if (title.equalsIgnoreCase("Memory")) //Memory Survey
 				memorySurvey = survey;
 			
-			if (title.equalsIgnoreCase("Advance_Directives")) //Care Plan/Advanced_Directive survey
+			if (title.equalsIgnoreCase("Advance Directives")) //Care Plan/Advanced_Directive survey
 				carePlanSurvey = survey;
 			
-			if (title.equalsIgnoreCase("GAS"))
-				goals = survey;				
+			if (title.equalsIgnoreCase("2. Goals"))
+				goals = survey;		
 		}
 		
 		String xml;
@@ -2083,11 +2121,14 @@ public class TapestryHelper {
 		qList = new ArrayList<String>();   		
 		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));  		
 
-		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
+		int rAPAScore = CalculationManager.getAScoreForRAPA(qList);
+		int sFPAScore = CalculationManager.getSFScoreForRAPA(qList);
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
 				
-		scores.setPhysicalActivity(rAPAScore);
+		scores.setpAAerobic(rAPAScore);
+		scores.setpAStrengthAndFlexibility(sFPAScore);
+	//	scores.setPhysicalActivity(rAPAScore);
 						
 		//Mobility Alerts
 		try{

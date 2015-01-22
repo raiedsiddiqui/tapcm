@@ -1249,11 +1249,15 @@ public class TapestryController{
 		qList = new ArrayList<String>();   		
 		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));  		
 
-		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
+		int rAPAScore = CalculationManager.getAScoreForRAPA(qList);
+		int sFPAScore = CalculationManager.getSFScoreForRAPA(qList);
+	
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
 				
-		scores.setPhysicalActivity(rAPAScore);
+	//	scores.setPhysicalActivity(rAPAScore);
+		scores.setpAAerobic(rAPAScore);
+		scores.setpAStrengthAndFlexibility(sFPAScore);
 						
 		//Mobility Alerts
 		try{
@@ -1420,20 +1424,20 @@ public class TapestryController{
 		
 		for(SurveyResult survey: surveyResultList){			
 			String title = survey.getSurveyTitle();
-			
+						
 //			if (title.equalsIgnoreCase("Goal Setting"))//Goal Setting survey
 //				healthGoalsSurvey = survey;
-			
-			if (title.equalsIgnoreCase("Daily Life Activities"))//Daily life activity survey
+							            
+			if (title.equalsIgnoreCase("1. Daily Life Activities"))//Daily life activity survey
 				dailyLifeActivitySurvey = survey;
 			
-			if (title.equalsIgnoreCase("Screen II"))//Nutrition
+			if (title.equalsIgnoreCase("Nutrition"))//Nutrition
 				nutritionSurvey = survey;
 			
-			if (title.equalsIgnoreCase("Rapid Assessment of Physical Activity"))//RAPA survey
+			if (title.equalsIgnoreCase("Physical Activity"))//RAPA survey
 				rAPASurvey = survey;
 			
-			if (title.equalsIgnoreCase("Mobility Survey"))//Mobility survey
+			if (title.equalsIgnoreCase("Mobility"))//Mobility survey
 				mobilitySurvey = survey;
 			
 			if (title.equalsIgnoreCase("Social Life")) //Social Life(Duke Index of Social Support)
@@ -1445,11 +1449,11 @@ public class TapestryController{
 			if (title.equalsIgnoreCase("Memory")) //Memory Survey
 				memorySurvey = survey;
 			
-			if (title.equalsIgnoreCase("Advance_Directives")) //Care Plan/Advanced_Directive survey
+			if (title.equalsIgnoreCase("Advance Directives")) //Care Plan/Advanced_Directive survey
 				carePlanSurvey = survey;
 			
-			if (title.equalsIgnoreCase("GAS"))
-				goals = survey;				
+			if (title.equalsIgnoreCase("2. Goals"))
+				goals = survey;	
 		}
 		
 		String xml;
@@ -1529,7 +1533,7 @@ public class TapestryController{
    	   		}   
    		}
    			
-   		//Daily Life Activities
+   		//Daily Life Activities---Tapestry Questions
    		try{
    			xml = new String(dailyLifeActivitySurvey.getResults(), "UTF-8");
    		} catch (Exception e) {
@@ -1538,11 +1542,11 @@ public class TapestryController{
    		
    		LinkedHashMap<String, String> mDailyLifeActivitySurvey = ResultParser.getResults(xml);
    		questionTextList = new ArrayList<String>();
-   		questionTextList = ResultParser.getSurveyQuestions(xml);   		
-   		   		
+   		questionTextList = ResultParser.getSurveyQuestions(xml);   
+   	   		   		
    		qList = new ArrayList<String>();
    		qList = TapestryHelper.getQuestionList(mDailyLifeActivitySurvey);
-   		
+   	   		
    		//last question in Daily life activity survey is about falling stuff
    		List<String> lAlert = new ArrayList<String>();
    		String fallingQA = qList.get(qList.size() -1);
@@ -1664,11 +1668,14 @@ public class TapestryController{
    		//get answer list
 		qList = TapestryHelper.getQuestionList(mRAPASurvey);  		
 
-		int rAPAScore = CalculationManager.getScoreForRAPA(qList);
+		int rAPAScore = CalculationManager.getAScoreForRAPA(qList);
+		int sFPAScore = CalculationManager.getSFScoreForRAPA(qList);
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
 		
-		scores.setPhysicalActivity(rAPAScore);
+//		scores.setPhysicalActivity(rAPAScore);
+		scores.setpAAerobic(rAPAScore);
+		scores.setpAStrengthAndFlexibility(sFPAScore);
 				
 		//Mobility Alerts
 		try{
