@@ -70,7 +70,7 @@
 <%@include file="subNavi.jsp" %>
 </div>
 <!-- 	breadcrumb START-->	
-	<div id="crumbs"> 
+<!-- 	<div id="crumbs"> 
 		<ul>
 			<li> <a href="<c:url value="/"/>">Appointments</a> </li>
 			<li><a href="<c:url value="/?patientId=${patient.patientID}"/>">
@@ -89,6 +89,9 @@
 					<b>Completion</b>
 				</a>       </li>
 		</ul>
+</div> -->
+
+		
 <!-- Message display 
 	<div id="visitandbook" class="span12 btn-group">
 			<c:if test="${not empty patient.notes}">
@@ -100,7 +103,7 @@
 			<a href="" role="button" class="btn btn-primary pull-right lgbtn" >Submit</a>
 	</div>	
 	-->
-	</div>
+	
 <!-- 	breadcrumb END-->	
 
 <h2>My Appointments</h2>   
