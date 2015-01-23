@@ -10,7 +10,6 @@ public class ScoresInReport {
 	private String mobilityWalking2;
 	private String mobilityWalkingHalf;
 	private String mobilityClimbing;
-	private int physicalActivity;	
 	private int pAAerobic;
 	private int pAStrengthAndFlexibility;
 	
@@ -88,14 +87,6 @@ public class ScoresInReport {
 
 	public void setMobilityClimbing(String mobilityClimbing) {
 		this.mobilityClimbing = mobilityClimbing;
-	}
-
-	public int getPhysicalActivity() {
-		return physicalActivity;
-	}
-
-	public void setPhysicalActivity(int physicalActivity) {
-		this.physicalActivity = physicalActivity;
 	}
 
 	public int getpAAerobic() {

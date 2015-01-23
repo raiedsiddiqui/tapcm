@@ -161,7 +161,7 @@ public class Hl7Utils {
 		         
 		//physical activity
 		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(11);
-		String[] physicalActivity= new String[]{String.valueOf(scores.getPhysicalActivity()),"8"};
+		String[] physicalActivity= new String[]{String.valueOf(scores.getpAAerobic()),String.valueOf(scores.getpAStrengthAndFlexibility())};
 		fillOBXAndOBRField(12, physicalActivity, orderObservation, message, "TPPA", 2, patientId, orbDate);
 		//end of summary tools
 		                  

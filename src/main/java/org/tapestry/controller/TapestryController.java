@@ -1079,16 +1079,16 @@ public class TapestryController{
 		for(SurveyResult survey: surveyResultList){			
 			String title = survey.getSurveyTitle();
 			
-			if (title.equalsIgnoreCase("Daily Life Activities"))//Daily life activity survey
+			if (title.equalsIgnoreCase("1. Daily Life Activities"))//Daily life activity survey
 				dailyLifeActivitySurvey = survey;
 			
-			if (title.equalsIgnoreCase("Screen II"))//Nutrition
+			if (title.equalsIgnoreCase("Nutrition"))//Nutrition
 				nutritionSurvey = survey;
 			
-			if (title.equalsIgnoreCase("Rapid Assessment of Physical Activity"))//RAPA survey
+			if (title.equalsIgnoreCase("Physical Activity"))//RAPA survey
 				rAPASurvey = survey;
 			
-			if (title.equalsIgnoreCase("Mobility Survey"))//Mobility survey
+			if (title.equalsIgnoreCase("Mobility"))//Mobility survey
 				mobilitySurvey = survey;
 			
 			if (title.equalsIgnoreCase("Social Life")) //Social Life(Duke Index of Social Support)
@@ -1100,11 +1100,11 @@ public class TapestryController{
 			if (title.equalsIgnoreCase("Memory")) //Memory Survey
 				memorySurvey = survey;
 			
-			if (title.equalsIgnoreCase("Advance_Directives")) //Care Plan/Advanced_Directive survey
+			if (title.equalsIgnoreCase("Advance Directives")) //Care Plan/Advanced_Directive survey
 				carePlanSurvey = survey;
 			
-			if (title.equalsIgnoreCase("GAS"))
-				goals = survey;				
+			if (title.equalsIgnoreCase("2. Goals"))
+				goals = survey;	
 		}
 		
 		String xml;
@@ -1254,8 +1254,7 @@ public class TapestryController{
 	
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
-				
-	//	scores.setPhysicalActivity(rAPAScore);
+
 		scores.setpAAerobic(rAPAScore);
 		scores.setpAStrengthAndFlexibility(sFPAScore);
 						
@@ -1673,7 +1672,6 @@ public class TapestryController{
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
 		
-//		scores.setPhysicalActivity(rAPAScore);
 		scores.setpAAerobic(rAPAScore);
 		scores.setpAStrengthAndFlexibility(sFPAScore);
 				
@@ -2221,7 +2219,7 @@ public class TapestryController{
    	  
    	@RequestMapping(value="/save_survey/{resultID}", method=RequestMethod.GET)
    	public String saveAndExit(@PathVariable("resultID") int id, HttpServletRequest request) throws Exception
-	{System.out.println("save survey result...");
+	{
    		boolean isComplete = Boolean.parseBoolean(request.getParameter("survey_completed"));
    		List<SurveyResult> surveyResults = surveyManager.getAllSurveyResults();
 		List<SurveyTemplate> surveyTemplates = surveyManager.getAllSurveyTemplates();

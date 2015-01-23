@@ -1976,7 +1976,7 @@ public class TapestryHelper {
 				carePlanSurvey = survey;
 			
 			if (title.equalsIgnoreCase("2. Goals"))
-				goals = survey;		
+				goals = survey;	
 		}
 		
 		String xml;
@@ -2128,7 +2128,6 @@ public class TapestryHelper {
 				
 		scores.setpAAerobic(rAPAScore);
 		scores.setpAStrengthAndFlexibility(sFPAScore);
-	//	scores.setPhysicalActivity(rAPAScore);
 						
 		//Mobility Alerts
 		try{
