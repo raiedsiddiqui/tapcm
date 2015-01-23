@@ -1953,7 +1953,7 @@ public class TapestryController{
    		if (!Utils.isNullOrEmpty(hPatient))
    		{      			
    			if(request.getParameter("assignSurvey") != null)//assign selected surveys to selected patients
-   	   		{   System.out.println("assign selected surveys to selected patients ");
+   	   		{   
    				if (surveyTemplateIds != null && surveyTemplateIds.length > 0){
 
    					TapestryHelper.addSurveyTemplate(surveyTemplateIds,sTemplates, selectSurveyTemplats);     					
@@ -2053,6 +2053,10 @@ public class TapestryController{
 			SurveyResult sr = new SurveyResult();
             sr.setSurveyID(surveyId);
             sr.setPatientID(Integer.parseInt(patients[i]));
+            //set today as startDate
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");		        	
+            sr.setStartDate(sdf.format(new Date()));
+            
           //if requested survey that's already done
     		if (specificSurveys.size() < template.getMaxInstances())
     		{

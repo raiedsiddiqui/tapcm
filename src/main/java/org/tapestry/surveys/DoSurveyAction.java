@@ -225,11 +225,7 @@ public class DoSurveyAction
 						logger.debug("user hit forward, and requested the next question");
 						question.setAnswers(answers);
 						saved = true;
-						moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);
-						/////////////////////////////////////////////////
-						for (int z=0; z<answers.size(); z++)
-							System.out.println("answer is   === " + answers.get(z));
-						/////////////////////////////////////////////////////
+						moreQuestions = addNextQuestion(questionId, currentSurvey, templateSurvey);						
 					}
 					//finished survey
 					if (!moreQuestions)

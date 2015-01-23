@@ -1812,7 +1812,7 @@ public class VolunteerController {
 		userManager.addUserLog(sb.toString(), loggedInUser);
 		
 		//for temporary use, send a message to coordinator, hl7 report is ready to donwload on Admin side
-		////////////////////////
+		///////////////
 		User user = TapestryHelper.getLoggedInUser(request, userManager);
 		int userId = user.getUserID();	
 		int patientId = TapestryHelper.getPatientId(request);
