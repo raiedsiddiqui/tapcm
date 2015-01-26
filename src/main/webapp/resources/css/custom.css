@@ -541,7 +541,7 @@ div.bootstrap-datetimepicker-widget.dropdown-menu.pull-right {
 @media (min-width: 768px) {
 	.navbar .nav > li > a
 	{
-		padding: 18px 12px 23px !important;
+		padding: 18px 11px 23px !important;
 		padding-top: 18px;
 		font-size: 14px !important;
 		/*border-left: 1px solid white;*/
