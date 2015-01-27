@@ -29,8 +29,8 @@ public class CalculationManager {
 	public static int getAScoreForRAPA(List<String> qList){
 		int score = 0;		
 		Integer[] answerArray = new Integer[6];
-		//set answer into an array
-		for(int i = 0; i < qList.size() - 2; i++)
+		//set answer into an array from first 6 questions
+		for(int i = 0; i < 6; i++)
 			answerArray[i] = Integer.valueOf(qList.get(i));	
 		
 		Integer[] otherAnswers = removeFirstElementInArray(answerArray);
