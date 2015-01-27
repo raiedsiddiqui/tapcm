@@ -1114,23 +1114,23 @@ public class TapestryHelper {
 			Font bmFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
 			Font blFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD);	
 			//set multiple images as header
-			List<Image> imageHeader = new ArrayList<Image>();      	
-	            
-			Image imageLogo = Image.getInstance("webapps/tapestry/resources/images/logo.png"); 
-			imageLogo.scalePercent(25f);
-			imageHeader.add(imageLogo);			
-				            
-			Image imageDegroote = Image.getInstance("webapps/tapestry/resources/images/degroote.png");
-			imageDegroote.scalePercent(25f);
-			imageHeader.add(imageDegroote);	
-			
-			Image imageFhs = Image.getInstance("webapps/tapestry/resources/images/fhs.png");
-			imageFhs.scalePercent(25f);	
-			imageHeader.add(imageFhs);
-						
-			ReportHeader event = new ReportHeader();
-			event.setHeader(imageHeader);
-			writer.setPageEvent(event);			
+//			List<Image> imageHeader = new ArrayList<Image>();      	
+//	            
+//			Image imageLogo = Image.getInstance("webapps/tapestry/resources/images/logo.png"); 
+//			imageLogo.scalePercent(25f);
+//			imageHeader.add(imageLogo);			
+//				            
+//			Image imageDegroote = Image.getInstance("webapps/tapestry/resources/images/degroote.png");
+//			imageDegroote.scalePercent(25f);
+//			imageHeader.add(imageDegroote);	
+//			
+//			Image imageFhs = Image.getInstance("webapps/tapestry/resources/images/fhs.png");
+//			imageFhs.scalePercent(25f);	
+//			imageHeader.add(imageFhs);
+//						
+//			ReportHeader event = new ReportHeader();
+//			event.setHeader(imageHeader);
+//			writer.setPageEvent(event);			
 			
 			document.open(); 
 			//Patient info
@@ -1924,33 +1924,7 @@ public class TapestryHelper {
 		
 		for(SurveyResult survey: surveyResultList){			
 			String title = survey.getSurveyTitle();
-			
-//			if (title.equalsIgnoreCase("Daily Life Activities"))//Daily life activity survey
-//				dailyLifeActivitySurvey = survey;
-//			
-//			if (title.equalsIgnoreCase("Screen II"))//Nutrition
-//				nutritionSurvey = survey;
-//			
-//			if (title.equalsIgnoreCase("Rapid Assessment of Physical Activity"))//RAPA survey
-//				rAPASurvey = survey;
-//			
-//			if (title.equalsIgnoreCase("Mobility Survey"))//Mobility survey
-//				mobilitySurvey = survey;
-//			
-//			if (title.equalsIgnoreCase("Social Life")) //Social Life(Duke Index of Social Support)
-//				socialLifeSurvey = survey;
-//			
-//			if (title.equalsIgnoreCase("General Health")) //General Health(Edmonton Frail Scale)
-//				generalHealthySurvey = survey;
-//			
-//			if (title.equalsIgnoreCase("Memory")) //Memory Survey
-//				memorySurvey = survey;
-//			
-//			if (title.equalsIgnoreCase("Advance_Directives")) //Care Plan/Advanced_Directive survey
-//				carePlanSurvey = survey;
-//			
-//			if (title.equalsIgnoreCase("GAS"))
-//				goals = survey;				
+
 			if (title.equalsIgnoreCase("1. Daily Life Activities"))//Daily life activity survey
 				dailyLifeActivitySurvey = survey;
 			
