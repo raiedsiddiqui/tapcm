@@ -1073,6 +1073,7 @@ public class TapestryHelper {
 	 * @param response
 	 */
 	public static void buildPDF(Report report, HttpServletResponse response){		
+		System.out.println("report by pdf...");
 		String patientName = report.getPatient().getFirstName() + " " + report.getPatient().getLastName();
 		String orignalFileName= patientName +"_report.pdf";
 		try {
