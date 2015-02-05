@@ -15,6 +15,8 @@ public class Report {
 	private Appointment appointment;//visit,plan, key observation
 	private ScoresInReport scores;//summary of tapestry tools
 	private List<String> patientGoals; // patient goal(s)
+	private Map<String, String> caringPlan;
+	private Map<String, String> memory;
 
 	public Report(){}
 	
@@ -90,5 +92,23 @@ public class Report {
 	public void setAppointment(Appointment appointment) {
 		this.appointment = appointment;
 	}
+
+	public Map<String, String> getCaringPlan() {
+		return caringPlan;
+	}
+
+	public void setCaringPlan(Map<String, String> caringPlan) {
+		this.caringPlan = caringPlan;
+	}
+
+	public Map<String, String> getMemory() {
+		return memory;
+	}
+
+	public void setMemory(Map<String, String> memory) {
+		this.memory = memory;
+	}
+	
+	
 	
 }

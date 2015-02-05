@@ -13,10 +13,11 @@ public class AlertManager {
 		if (scores < 50)
 			alerts.add(AlertsInReport.NUTRITION_ALERT1);
 				
-		//weight alert-- the first question in nutrition survey
+		
 		if ((qList != null)&&(qList.size()>0))
 		{
-			ans = qList.get(1);
+			//weight alert-- the first question in nutrition survey
+			ans = qList.get(0);			
 			ans = ans.trim();		
 			
 			if (!Utils.isNullOrEmpty(ans)) {
@@ -27,20 +28,27 @@ public class AlertManager {
 				else if (ans.equals("6"))
 					alerts.add(AlertsInReport.NUTRITION_ALERT2C);
 			}
+			
+			//weight changed alert --- second question
+			ans = qList.get(2);
+			ans = ans.trim();
+			if (!Utils.isNullOrEmpty(ans) && ans.equals("3"))
+				alerts.add(AlertsInReport.NUTRITION_ALERT2);
+			
 			//meal alert -- forth question in nutrition survey		
-			ans = qList.get(4);
+			ans = qList.get(3);
 			ans = ans.trim();
 			if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
 				alerts.add(AlertsInReport.NUTRITION_ALERT3);
 			
 			//Appetitive alert --- sixth question in nutrition survey
-			ans = qList.get(6);
+			ans = qList.get(5);
 			ans = ans.trim();
 			if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
 				alerts.add(AlertsInReport.NUTRITION_ALERT4);
 			
-			//cough, choke and pain alert --- ninth question in nutrition survey
-			ans = qList.get(11);
+			//cough, choke and pain alert --- eleventh question in nutrition survey
+			ans = qList.get(10);
 			ans = ans.trim();
 			if (!Utils.isNullOrEmpty(ans) && ans.equals("4"))
 				alerts.add(AlertsInReport.NUTRITION_ALERT5);
@@ -54,11 +62,11 @@ public class AlertManager {
 		String key = "";
 		String value = "";
 		String a2aValue = "";
-		String a2bValue = ""; 
+//		String a2bValue = ""; 
 		String a3aValue = "";
-		String a3bValue ="";
+//		String a3bValue ="";
 		String a4aValue = ""; 
-		String a4bValue = "";
+//		String a4bValue = "";
 		
 		Iterator iterator = mMobilitySurvey.entrySet().iterator();
 		while (iterator.hasNext()) {
@@ -69,58 +77,78 @@ public class AlertManager {
 			if ("a2a".equalsIgnoreCase(key))
 				a2aValue = value;
 			
-			if ("a2b".equalsIgnoreCase(key))
-				a2bValue = value;
+//			if ("a2b".equalsIgnoreCase(key))
+//				a2bValue = value;
 			
 			if ("a3a".equalsIgnoreCase(key))
 				a3aValue = value;
 			
-			if ("a3b".equalsIgnoreCase(key))
-				a3bValue = value;
+//			if ("a3b".equalsIgnoreCase(key))
+//				a3bValue = value;
 			
 			if ("a4a".equalsIgnoreCase(key))
 				a4aValue = value;
 			
-			if ("a4b".equalsIgnoreCase(key))
-				a4bValue = value;			
+//			if ("a4b".equalsIgnoreCase(key))
+//				a4bValue = value;			
 		}
-			
-		if (("1".equals(a2aValue))&&(("2".equals(a2bValue))||("3".equals(a2bValue))||("4".equals(a2bValue))||("5".equals(a2bValue))))
+		if ("4".equals(a2aValue))
 			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT1);
-				
-		if ("2".equals(a2aValue))
+		if ("4".equals(a3aValue))
 			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT2);
-		
-		if (("3".equals(a2aValue))||("4".equals(a2aValue))||("5".equals(a2aValue)))
-			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT3);
-		
-		if (("1".equals(a3aValue))&&(("2".equals(a3bValue))||("3".equals(a3bValue))||("4".equals(a3bValue))||("5".equals(a3bValue))
-				||("6".equals(a3bValue))))
-			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT4);
-		
-		if ("2".equals(a3aValue))
-			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT5);
-		
-		if (("3".equals(a3aValue))||("4".equals(a3aValue))||("5".equals(a3aValue)))
-			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT6);
-		
-		if (("1".equals(a4aValue))&&(("2".equals(a4bValue))||("3".equals(a4bValue))||("4".equals(a4bValue))||("5".equals(a4bValue))
-				||("6".equals(a4bValue))||("7".equals(a4bValue))))
-			alerts.add(AlertsInReport.MOBILITY_CLIMBING_ALERT1);
-		
-		if ("2".equals(a4aValue))
-			alerts.add(AlertsInReport.MOBILITY_CLIMBING_ALERT2);
-		
-		if (("3".equals(a4aValue))||("4".equals(a4aValue))||("5".equals(a4aValue)))
-			alerts.add(AlertsInReport.MOBILITY_CLIMBING_ALERT3);
+		if ("4".equals(a4aValue))
+			alerts.add(AlertsInReport.MOBILITY_CLIMBING_ALERT);
+			
+//		if (("1".equals(a2aValue))&&(("2".equals(a2bValue))||("3".equals(a2bValue))||("4".equals(a2bValue))||("5".equals(a2bValue))))
+//			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT1);
+//				
+//		if ("2".equals(a2aValue))
+//			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT2);
+//		
+//		if (("3".equals(a2aValue))||("4".equals(a2aValue))||("5".equals(a2aValue)))
+//			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT3);
+//		
+//		if (("1".equals(a3aValue))&&(("2".equals(a3bValue))||("3".equals(a3bValue))||("4".equals(a3bValue))||("5".equals(a3bValue))
+//				||("6".equals(a3bValue))))
+//			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT4);
+//		
+//		if ("2".equals(a3aValue))
+//			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT5);
+//		
+//		if (("3".equals(a3aValue))||("4".equals(a3aValue))||("5".equals(a3aValue)))
+//			alerts.add(AlertsInReport.MOBILITY_WALKING_ALERT6);
+//		
+//		if (("1".equals(a4aValue))&&(("2".equals(a4bValue))||("3".equals(a4bValue))||("4".equals(a4bValue))||("5".equals(a4bValue))
+//				||("6".equals(a4bValue))||("7".equals(a4bValue))))
+//			alerts.add(AlertsInReport.MOBILITY_CLIMBING_ALERT1);
+//		
+//		if ("2".equals(a4aValue))
+//			alerts.add(AlertsInReport.MOBILITY_CLIMBING_ALERT2);
+//		
+//		if (("3".equals(a4aValue))||("4".equals(a4aValue))||("5".equals(a4aValue)))
+//			alerts.add(AlertsInReport.MOBILITY_CLIMBING_ALERT3);
 				
 		return alerts;
 	}
 	
-	public static List<String> getGeneralHealthyAlerts(int score, List<String> alerts){
+	public static List<String> getGeneralHealthyAlerts(int score, List<String> alerts, List<String> qList){
 		if (score >= 7)
-			alerts.add(AlertsInReport.EDMONTON_FRAIL_SCALE_ALERT);
+			alerts.add(AlertsInReport.EDMONTON_FRAIL_SCALE_ALERT1);
+				
+		if ("2".equals(qList.get(5)))
+			alerts.add(AlertsInReport.EDMONTON_FRAIL_SCALE_ALERT2);
 		
+		if ("2".equals(qList.get(6)))
+			alerts.add(AlertsInReport.EDMONTON_FRAIL_SCALE_ALERT3);
+		
+		if ("3".equals(qList.get(0)))
+			alerts.add(AlertsInReport.EDMONTON_FRAIL_SCALE_ALERT4);
+		
+		if ("3".equals(qList.get(10)) )
+			alerts.add(AlertsInReport.EDMONTON_FRAIL_SCALE_ALERT5);
+		
+		if ("4".equals(qList.get(10)))
+			alerts.add(AlertsInReport.EDMONTON_FRAIL_SCALE_ALERT6);
 		return alerts;
 	}
 	

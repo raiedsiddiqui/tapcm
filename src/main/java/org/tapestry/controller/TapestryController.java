@@ -1,6 +1,10 @@
 package org.tapestry.controller;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,6 +17,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
+import javax.crypto.SecretKey;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -1181,8 +1186,9 @@ public class TapestryController{
 			else 
 				scores.setTimeUpGoTest("5 (Patient is unwilling)");
 		}		
-		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
-		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert);
+
+		int generalHealthyScore = CalculationManager.getGeneralHealthyScaleScore(qList);		
+		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert, qList);
 		
 		if (generalHealthyScore < 5)
 			scores.setEdmontonFrailScale(String.valueOf(generalHealthyScore) + " (Robust)");
@@ -1209,7 +1215,7 @@ public class TapestryController{
 		{
 			int satisfactionScore = CalculationManager.getScoreByQuestionsList(qList.subList(0, 6));
 			scores.setSocialSatisfication(satisfactionScore);
-			int networkScore = CalculationManager.getScoreByQuestionsList(qList.subList(6, 10));
+			int networkScore = CalculationManager.getScoreByQuestionsList(qList.subList(7, 10));
 			scores.setSocialNetwork(networkScore);
 		}
 		   		   		
@@ -1225,7 +1231,7 @@ public class TapestryController{
 		//get scores for nutrition survey based on answer list
 		if ((qList != null)&&(qList.size()>0))
 		{
-			int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
+			int nutritionScore = CalculationManager.getNutritionScore(qList);
 			scores.setNutritionScreen(nutritionScore);
 			
 			//high nutrition risk alert
@@ -1270,17 +1276,18 @@ public class TapestryController{
 		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);    		
 		
 		//summary tools for Mobility
-		for (int i = 0; i < lAlert.size(); i++)
-		{
-			if (lAlert.get(i).contains("2.0"))
-				scores.setMobilityWalking2(lAlert.get(i));
-		   			
-			if (lAlert.get(i).contains("0.5"))
-				scores.setMobilityWalkingHalf(lAlert.get(i));
-		   			
-			if (lAlert.get(i).contains("climbing"))
-				scores.setMobilityClimbing(lAlert.get(i));   			
-		}		   		
+		scores = CalculationManager.getMobilityScore(qMap, scores);
+//		for (int i = 0; i < lAlert.size(); i++)
+//		{
+//			if (lAlert.get(i).contains("2.0"))
+//				scores.setMobilityWalking2(lAlert.get(i));
+//		   			
+//			if (lAlert.get(i).contains("0.5"))
+//				scores.setMobilityWalkingHalf(lAlert.get(i));
+//		   			
+//			if (lAlert.get(i).contains("climbing"))
+//				scores.setMobilityClimbing(lAlert.get(i));   			
+//		}		   		
 		String noLimitation = "No Limitation";   		
 		if (Utils.isNullOrEmpty(scores.getMobilityWalking2()))
 			scores.setMobilityWalking2(noLimitation);		   		
@@ -1313,7 +1320,22 @@ public class TapestryController{
 		report.setVolunteerInformations(volunteerInfos);		
 		//populate hl7 message		
 		String messageText = Hl7Utils.populateORUMessage(report);   
+		//////////////////////////////////
+		/*  
+		//string.getBytes(Charset.forName("UTF-8"));
+		InputStream is = new BufferedInputStream(new ByteArrayInputStream(messageText.getBytes()));
+		is.mark(is.available()+1);
+		// Encrypt the message and the key used to encrypt it			
+		SecretKey sKey = Hl7Utils.createSecretKey();
+		System.out.println("secret key is === " + sKey.toString());
+		Hl7Utils.encryptFile(is, sKey, patient.getDisplayName()+"_test");
 		
+		is.close();
+*/
+//		Hl7Utils myTest = new Hl7Utils();
+//		myTest.test();
+		
+		///////////////////////////////////
 		//save hl7 message in a file store on tomcat/webapps/hl7
 //		StringBuffer sb = new StringBuffer();
 //		sb.append(String.valueOf(patient.getPatientID()));		
@@ -1341,18 +1363,12 @@ public class TapestryController{
    		sb.append(loggedInUser.getName());
    		sb.append(" download ");
    		sb.append(patient.getDisplayName());
-//   		sb.append(patient.getFirstName());
-//   		sb.append(" ");
-//   		sb.append(patient.getLastName());
    		sb.append(" report at ");		
    		java.util.Date date= new java.util.Date();		
    		sb.append(new Timestamp(date.getTime()));
    		userManager.addUserLog(sb.toString(), loggedInUser);	
    		
    		return messageText;
-
-//   		model.addAttribute("message",messageText);
-//   		return "/admin/hl7Test";
 	}
 	@RequestMapping(value="/download_report/{patientID}", method=RequestMethod.GET)
 	public String downloadReport(@PathVariable("patientID") int id,
@@ -1410,7 +1426,7 @@ public class TapestryController{
 
 		//Survey---  goals setting
 		List<SurveyResult> surveyResultList = surveyManager.getCompletedSurveysByPatientID(id);
-//		SurveyResult healthGoalsSurvey = new SurveyResult();
+
 		SurveyResult dailyLifeActivitySurvey = new SurveyResult();	
 		SurveyResult nutritionSurvey = new SurveyResult();
 		SurveyResult rAPASurvey = new SurveyResult();
@@ -1423,10 +1439,7 @@ public class TapestryController{
 		
 		for(SurveyResult survey: surveyResultList){			
 			String title = survey.getSurveyTitle();
-						
-//			if (title.equalsIgnoreCase("Goal Setting"))//Goal Setting survey
-//				healthGoalsSurvey = survey;
-							            
+					            
 			if (title.equalsIgnoreCase("1. Daily Life Activities"))//Daily life activity survey
 				dailyLifeActivitySurvey = survey;
 			
@@ -1459,26 +1472,7 @@ public class TapestryController{
 		List<String> qList = new ArrayList<String>();
    		List<String> questionTextList = new ArrayList<String>();
    		Map<String, String> sMap = new TreeMap<String, String>();
-		/*
-		//Healthy Goals
-   		try{
-   			xml = new String(healthGoalsSurvey.getResults(), "UTF-8");
-   		} catch (Exception e) {
-   			xml = "";
-   		}
-   		
-   		LinkedHashMap<String, String> mHealthGoalsSurvey = ResultParser.getResults(xml);
-   		List<String> qList = new ArrayList<String>();
-   		List<String> questionTextList = new ArrayList<String>();
-   		questionTextList = ResultParser.getSurveyQuestions(xml);
-   		//get answer list
-		qList = TapestryHelper.getQuestionList(mHealthGoalsSurvey);   
 		
-   		Map<String, String> sMap = new TreeMap<String, String>();
-   		sMap = TapestryHelper.getSurveyContentMap(questionTextList, qList);
-   		   		   		
-  		report.setHealthGoals(sMap);   		
-  		*/
    		//Additional Information
   		//Memory
    		try{
@@ -1492,10 +1486,50 @@ public class TapestryController{
    		questionTextList = new ArrayList<String>();
    		questionTextList = ResultParser.getSurveyQuestions(xml);
    		   		
-   		//only keep the second and forth question text in the list
+   		//only keep the second and forth question text in the list for memory
+//   		if ((questionTextList != null) && (questionTextList.size() > 0))
+//   		{
+//   			List<String> displayQuestionTextList = new ArrayList<String>();
+//   	   		displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(1)));
+//   	   		displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(3)));
+//   	   		
+//   	   		displayQuestionTextList = TapestryHelper.removeRedundantFromQuestionText(displayQuestionTextList, "of 2");
+//   	   	
+//   	   		//get answer list
+//   			qList = TapestryHelper.getQuestionListForMemorySurvey(mMemorySurvey);   
+//   			sMap = new TreeMap<String, String>(); 	
+//   	   		
+//   	   		//Care Plan/Advanced_Directive
+//   	   		try{
+//   	   			xml = new String(carePlanSurvey.getResults(), "UTF-8");
+//   	   		} catch (Exception e) {
+//   	   			xml = "";
+//   	   		}
+//   	   		
+//   	   		LinkedHashMap<String, String> mCarePlanSurvey = ResultParser.getResults(xml);
+//
+//   	   		questionTextList = new ArrayList<String>();
+//   	   		questionTextList = ResultParser.getSurveyQuestions(xml);   	   		
+//   	   		
+//   	   		//take 3 question text from the list
+//   	   		if ((questionTextList != null)&&(questionTextList.size() > 0))
+//   	   		{
+//	   	   		for (int i = 1; i <= 3; i++)
+//	   	   			displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(i)));
+//	   	   		
+//	   	   		displayQuestionTextList = TapestryHelper.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");	
+//	   	   		
+//	   	   		//get answer list   		
+//	   	   		qList.addAll(TapestryHelper.getQuestionList(mCarePlanSurvey));   	   	   		
+//	   	   		
+//	   	   		sMap = TapestryHelper.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
+//	   	   			   	   		
+//	   	   		report.setAdditionalInfos(sMap);
+//   	   		}   
+//   		}
+   		List<String> displayQuestionTextList = new ArrayList<String>();
    		if ((questionTextList != null) && (questionTextList.size() > 0))
-   		{
-   			List<String> displayQuestionTextList = new ArrayList<String>();
+   		{   			
    	   		displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(1)));
    	   		displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(3)));
    	   		
@@ -1504,34 +1538,42 @@ public class TapestryController{
    	   		//get answer list
    			qList = TapestryHelper.getQuestionListForMemorySurvey(mMemorySurvey);   
    			sMap = new TreeMap<String, String>(); 	
-   	   		
-   	   		//Care Plan/Advanced_Directive
-   	   		try{
-   	   			xml = new String(carePlanSurvey.getResults(), "UTF-8");
-   	   		} catch (Exception e) {
-   	   			xml = "";
-   	   		}
-   	   		
-   	   		LinkedHashMap<String, String> mCarePlanSurvey = ResultParser.getResults(xml);
-
-   	   		questionTextList = new ArrayList<String>();
-   	   		questionTextList = ResultParser.getSurveyQuestions(xml);   	   		
-   	   		
-   	   		//take 3 question text from the list
-   	   		if ((questionTextList != null)&&(questionTextList.size() > 0))
-   	   		{
-	   	   		for (int i = 1; i <= 3; i++)
-	   	   			displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(i)));
-	   	   		
-	   	   		displayQuestionTextList = TapestryHelper.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");	   	   		
-	   	   		//get answer list   		
-	   	   		qList.addAll(TapestryHelper.getQuestionList(mCarePlanSurvey));   		   	   		
-	   	   		sMap = TapestryHelper.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
-	   	   			   	   		
-	   	   		report.setAdditionalInfos(sMap);
-   	   		}   
-   		}
    			
+   			//make map for memory survey
+   			sMap = TapestryHelper.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
+   			 
+   			report.setMemory(sMap);
+   		}
+   	   		
+   		//Care Plan/Advanced_Directive
+   		try{
+   			xml = new String(carePlanSurvey.getResults(), "UTF-8");
+   	   	} catch (Exception e) {
+   	   		xml = "";
+   	   	}
+   	   	displayQuestionTextList = new ArrayList<String>();
+   	   	qList = new ArrayList<String>();
+   	   	LinkedHashMap<String, String> mCarePlanSurvey = ResultParser.getResults(xml);
+
+   	   	questionTextList = new ArrayList<String>();
+   	   	questionTextList = ResultParser.getSurveyQuestions(xml);   	   		
+   	   		
+   	   	//take 3 question text from the list
+   	   	if ((questionTextList != null)&&(questionTextList.size() > 0))
+   	   	{
+   	   		for (int i = 1; i <= 3; i++)
+   	   			displayQuestionTextList.add(TapestryHelper.removeObserverNotes(questionTextList.get(i)));
+	   	   		
+	   	   	displayQuestionTextList = TapestryHelper.removeRedundantFromQuestionText(displayQuestionTextList, "of 3");	
+	   	   		
+	   	   	//get answer list   	   	  	   	
+	   	   	qList = TapestryHelper.getQuestionList(mCarePlanSurvey);
+	   	   		
+	   	   	sMap = TapestryHelper.getSurveyContentMapForMemorySurvey(displayQuestionTextList, qList);
+	   	   			   	   		
+	   	   	report.setCaringPlan(sMap);
+   	   	}      
+   	
    		//Daily Life Activities---Tapestry Questions
    		try{
    			xml = new String(dailyLifeActivitySurvey.getResults(), "UTF-8");
@@ -1592,8 +1634,9 @@ public class TapestryController{
 			else 
 				scores.setTimeUpGoTest("5 (Patient is unwilling)");
 		}		
-		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
-		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert);
+
+		int generalHealthyScore = CalculationManager.getGeneralHealthyScaleScore(qList);		
+		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert, qList);
 		
 		if (generalHealthyScore < 5)
 			scores.setEdmontonFrailScale(String.valueOf(generalHealthyScore) + " (Robust)");
@@ -1622,7 +1665,7 @@ public class TapestryController{
 		{
 			int satisfactionScore = CalculationManager.getScoreByQuestionsList(qList.subList(0, 6));
 			scores.setSocialSatisfication(satisfactionScore);
-			int networkScore = CalculationManager.getScoreByQuestionsList(qList.subList(6, 10));
+			int networkScore = CalculationManager.getScoreByQuestionsList(qList.subList(7, 10));
 	   		scores.setSocialNetwork(networkScore);
 		}
    		   		
@@ -1641,7 +1684,7 @@ public class TapestryController{
 		//get scores for nutrition survey based on answer list
 		if ((qList != null)&&(qList.size()>0))
 		{
-			int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
+			int nutritionScore = CalculationManager.getNutritionScore(qList);
 			scores.setNutritionScreen(nutritionScore);
 			
 			//high nutrition risk alert
@@ -1688,18 +1731,20 @@ public class TapestryController{
    		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);    		
    		
    		//summary tools for Mobility
-   		for (int i = 0; i < lAlert.size(); i++)
-   		{
-   			if (lAlert.get(i).contains("2.0"))
-   				scores.setMobilityWalking2(lAlert.get(i));
-   			
-   			if (lAlert.get(i).contains("0.5"))
-   				scores.setMobilityWalkingHalf(lAlert.get(i));
-   			
-   			if (lAlert.get(i).contains("climbing"))
-   				scores.setMobilityClimbing(lAlert.get(i));   			
-   		}
+   		scores = CalculationManager.getMobilityScore(qMap, scores);
    		
+//   		for (int i = 0; i < lAlert.size(); i++)
+//   		{
+//   			if (lAlert.get(i).contains("2.0"))
+//   				scores.setMobilityWalking2(lAlert.get(i));
+//   			
+//   			if (lAlert.get(i).contains("0.5"))
+//   				scores.setMobilityWalkingHalf(lAlert.get(i));
+//   			
+//   			if (lAlert.get(i).contains("climbing"))
+//   				scores.setMobilityClimbing(lAlert.get(i));   			
+//   		}
+//   		
    		String noLimitation = "No Limitation";   		
    		if (Utils.isNullOrEmpty(scores.getMobilityWalking2()))
    			scores.setMobilityWalking2(noLimitation);
@@ -1730,7 +1775,7 @@ public class TapestryController{
 		List<String> gAS = new ArrayList<String>();
 		if ((qList != null) && (qList.size()>0))
 		{
-			String lifeGoals = "Life Goals: " + qList.get(1);
+			String lifeGoals = "Life Goals: " + qList.get(1);		
 			gAS.add(lifeGoals);
 			String healthyGoals = "Health Goals : " + qList.get(4);
 			gAS.add(healthyGoals);
@@ -1746,19 +1791,19 @@ public class TapestryController{
 		Map<String, String> vMap = new TreeMap<String, String>();
 		
 		if (!Utils.isNullOrEmpty(volunteer))
-			vMap.put(" 1", volunteer);
+			vMap.put(" Volunteer 1", volunteer);
 		else
-			vMap.put(" 1", "");
+			vMap.put(" Volunteer 1", "");
 		
 		if (!Utils.isNullOrEmpty(partner))
-			vMap.put(" 2", partner);
+			vMap.put(" Volunteer 2", partner);
 		else
-			vMap.put(" 2", "");
+			vMap.put(" Volunteer2", "");
 		
 		if (!Utils.isNullOrEmpty(comments))
-			vMap.put(" V", comments);					
+			vMap.put(" Volunteer Notes", comments);					
 		else
-			vMap.put(" V", " ");
+			vMap.put(" Volunteer Notes", " ");
 		
 		report.setVolunteerInformations(vMap);		
 		model.addAttribute("report", report);	
