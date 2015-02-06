@@ -1216,7 +1216,7 @@ public class TapestryHelper {
 //			Phrase comb = new Phrase(); 
 //			comb.add(new Phrase("     ALERT :", rbFont));
 //			comb.add(new Phrase(" For Case Review wirh IP-TEAM", wbLargeFont));	    
-			cell = new PdfPCell(new Phrase("For Case Review wirh IP-TEAM)", wbLargeFont));
+			cell = new PdfPCell(new Phrase("For Case Review wirh IP-TEAM", wbLargeFont));
 //			cell.addElement(comb);	
 			cell.setBackgroundColor(BaseColor.BLACK);	           
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1248,7 +1248,7 @@ public class TapestryHelper {
 			else
 				cell = new PdfPCell(new Phrase(keyObservation));
 			table.addCell(cell);
-			table.addCell(new PdfPCell(new Phrase(" ")));
+	//		table.addCell(new PdfPCell(new Phrase(" ")));
 			document.add(table);
 	
 			//Plan
