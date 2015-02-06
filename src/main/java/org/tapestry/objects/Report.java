@@ -17,6 +17,7 @@ public class Report {
 	private List<String> patientGoals; // patient goal(s)
 	private Map<String, String> caringPlan;
 	private Map<String, String> memory;
+	private Map<String, String> goals;
 
 	public Report(){}
 	
@@ -107,6 +108,14 @@ public class Report {
 
 	public void setMemory(Map<String, String> memory) {
 		this.memory = memory;
+	}
+
+	public Map<String, String> getGoals() {
+		return goals;
+	}
+
+	public void setGoals(Map<String, String> goals) {
+		this.goals = goals;
 	}
 	
 	

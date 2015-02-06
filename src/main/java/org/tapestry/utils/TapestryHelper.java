@@ -82,8 +82,7 @@ import com.itextpdf.text.pdf.PdfWriter;
  * @author lxie
  *
  */
-public class TapestryHelper {
-	
+public class TapestryHelper {	
 	//Mail-related settings
    	private static String mailAddress = "";
    	private static Session session;
@@ -1283,6 +1282,7 @@ public class TapestryHelper {
 			table.setWidths(new float[]{1f, 18f});
 			document.add(table);
 			document.add(new Phrase("    "));	 
+			document.newPage();	
 			//Memory Screen
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
@@ -1321,8 +1321,8 @@ public class TapestryHelper {
 			}
 			float[] aWidths = {24f, 3f};
 			table.setWidths(aWidths);
-			document.add(table);
-			document.newPage();			
+			document.add(table);		
+//			document.newPage();			
 			//Advance Directives/Care plan
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
@@ -1396,7 +1396,8 @@ public class TapestryHelper {
 			float[] aaWidths = {24f, 3f};
 			table.setWidths(aaWidths);
 			document.add(table);
-			document.newPage();
+			document.add(new Phrase("    "));	
+//			document.newPage();
 			
 //			//Additional Information
 //			table = new PdfPTable(2);
@@ -1601,7 +1602,7 @@ public class TapestryHelper {
 			cell.setBackgroundColor(BaseColor.LIGHT_GRAY);	 
 			table.addCell(cell);
 	            
-			////Mobility
+			//Mobility
 			PdfPTable nest_table1 = new PdfPTable(1);			
 			cell = new PdfPCell(new Phrase("Mobility ", mFont));	               
 			cell.setVerticalAlignment(Element.ALIGN_TOP);		         
@@ -1718,7 +1719,39 @@ public class TapestryHelper {
 			table.addCell(cell);
 	            
 			document.add(table);
-			document.add(new Phrase("    "));	            
+			document.add(new Phrase("    "));	
+			document.newPage();
+			//Goals			
+			table = new PdfPTable(2);
+			table.setWidthPercentage(100);
+			cell = new PdfPCell(new Phrase("GOALS", bMediumFont));
+			cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);	
+			cell.setColspan(2);
+			table.addCell(cell);
+	            
+			String key;
+			for (Map.Entry<String, String> entry : report.getGoals().entrySet()) {
+				key = entry.getKey().toString();
+				if (key.equals("3") || key.equals("4") || key.equals("6") || key.equals("7") || key.equals("8"))
+					key = "";
+				
+				if (key.equals("5") )
+					key = "3";
+				if (key.equals("9") )
+					key = "4";
+				cell = new PdfPCell(new Phrase(key, sFont));
+				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);	            	
+	            
+				cell = new PdfPCell(new Phrase(entry.getValue(), sFont));
+				table.addCell(cell); 
+			}	           
+			table.setWidths(cWidths);
+			document.add(table);			
+			//
 			//Tapestry Questions
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
@@ -1729,13 +1762,17 @@ public class TapestryHelper {
 			cell.setColspan(2);
 			table.addCell(cell);
 	            
+			String value;
 			for (Map.Entry<String, String> entry : report.getDailyActivities().entrySet()) {
 				cell = new PdfPCell(new Phrase(entry.getKey(), sFont));
 				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 				table.addCell(cell);	            	
 	            
-				cell = new PdfPCell(new Phrase(entry.getValue(), sFont));
+				value = entry.getValue().toString();
+				if (value.startsWith("Question "))
+					value = value.substring(16);
+				cell = new PdfPCell(new Phrase(value, sFont));
 				table.addCell(cell); 
 			}	           
 			table.setWidths(cWidths);

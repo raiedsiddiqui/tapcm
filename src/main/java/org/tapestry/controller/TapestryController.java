@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -1767,11 +1768,12 @@ public class TapestryController{
    		}
    		
    		LinkedHashMap<String, String> mGoals = ResultParser.getResults(xml);
-   	
+   		questionTextList = new ArrayList<String>();
    		questionTextList = ResultParser.getSurveyQuestions(xml);
+   	
    		//get answer list
 		qList = TapestryHelper.getQuestionList(mGoals);   
-		
+		//set life goals and health goals on Patient Goals section  in the report
 		List<String> gAS = new ArrayList<String>();
 		if ((qList != null) && (qList.size()>0))
 		{
@@ -1782,7 +1784,36 @@ public class TapestryController{
 			
 			report.setPatientGoals(gAS);
 		}
+		//set goals on the Goals close to Tapestry question section
+		sMap = new TreeMap<String, String>();
+   		sMap = TapestryHelper.getSurveyContentMap(questionTextList, qList);   		
+   		
+   		Iterator iterator = sMap.entrySet().iterator();
+   		String key, value;
+   		int index;
+   		while (iterator.hasNext()) {
+   			Map.Entry mapEntry = (Map.Entry) iterator.next();
+   			key = mapEntry.getKey().toString();
+   			value = mapEntry.getValue().toString();
+   			index = value.indexOf("?");
+   			value = value.substring(index + 1);
+   			if ("2".equals(key))
+   			{
+//   				index = value.indexOf("?");
+//   				value = value.substring(index + 1);
+   				mapEntry.setValue("LIFE GOALS:" + value);
+   			}
+   			else if ("5".equals(key))
+   			{
+//   				index = value.indexOf("?");
+//   				value = value.substring(index);
+   				mapEntry.setValue("HEALTH GOALS:" + value);
+   			}
+   				
+   		}
+   		report.setGoals(sMap);
 		
+		/////
 		//get volunteer information
 		String volunteer = appointment.getVolunteer();
 		String partner = appointment.getPartner();
