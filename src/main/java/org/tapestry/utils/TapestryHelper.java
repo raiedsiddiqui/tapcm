@@ -1113,23 +1113,23 @@ public class TapestryHelper {
 			Font bmFont = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
 			Font blFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD);	
 			//set multiple images as header
-			List<Image> imageHeader = new ArrayList<Image>();      	
+//			List<Image> imageHeader = new ArrayList<Image>();      	
 	            
-			Image imageLogo = Image.getInstance("webapps/tapestry/resources/images/logo.png"); 
-			imageLogo.scalePercent(25f);
-			imageHeader.add(imageLogo);			
-				            
-			Image imageDegroote = Image.getInstance("webapps/tapestry/resources/images/degroote.png");
-			imageDegroote.scalePercent(25f);
-			imageHeader.add(imageDegroote);	
-			
-			Image imageFhs = Image.getInstance("webapps/tapestry/resources/images/fhs.png");
-			imageFhs.scalePercent(25f);	
-			imageHeader.add(imageFhs);
+//			Image imageLogo = Image.getInstance("webapps/tapestry/resources/images/logo.png"); 
+//			imageLogo.scalePercent(25f);
+//			imageHeader.add(imageLogo);			
+//				            
+//			Image imageDegroote = Image.getInstance("webapps/tapestry/resources/images/degroote.png");
+//			imageDegroote.scalePercent(25f);
+//			imageHeader.add(imageDegroote);	
+//			
+//			Image imageFhs = Image.getInstance("webapps/tapestry/resources/images/fhs.png");
+//			imageFhs.scalePercent(25f);	
+//			imageHeader.add(imageFhs);
 						
-			ReportHeader event = new ReportHeader();
+//			ReportHeader event = new ReportHeader();
 	//		event.setHeader(imageHeader);
-			writer.setPageEvent(event);			
+	//		writer.setPageEvent(event);			
 			
 			document.open(); 
 			//Patient info
@@ -1781,7 +1781,8 @@ public class TapestryHelper {
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
 			
-			cell = new PdfPCell(new Phrase("VOLUNTEER INFORMATION & NOTES", gbMediumFont));
+//			cell = new PdfPCell(new Phrase("VOLUNTEER INFORMATION & NOTES", gbMediumFont));  
+			cell = new PdfPCell(new Phrase("VOLUNTEER INFORMATION & NOTES", wbLargeFont)); 
 			cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);	
