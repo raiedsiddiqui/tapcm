@@ -38,7 +38,7 @@
 				
 				if (isNaN(element.value)) 
 				  {
-				    alert("Must input numbers" );
+				    alert("Please input numeric data" );
 				    element.value="";
 				  }
 			}

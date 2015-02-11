@@ -17,6 +17,16 @@
 		}
 	</style>
 	<script type="text/javascript">
+		function checkNumericInput(id)
+		{				
+			var element = document.getElementById(id);
+			
+			if (isNaN(element.value)) 
+			  {
+			    alert("Please input numeric data" );
+			    element.value="";
+			  }
+		}
 		function validateVolunteer(){
 			var selectedVolunteer = document.getElementById("search_volunteer");
 			var vValue =selectedVolunteer.options[selectedVolunteer.selectedIndex].value;
@@ -177,7 +187,7 @@
 					</div>
 					<div class="col-md-6">
 						<label>MRP:</label>
-						<input type="text" name="mrp" class="form-control" required/>
+						<input type="text" id="mrp" name="mrp" class="form-control" onchange="checkNumericInput(this.id);" required/>
 					</div>		
 					<div class="col-md-6">
 						<label>MRP Firstname:</label>

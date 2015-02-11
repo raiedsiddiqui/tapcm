@@ -758,8 +758,8 @@ public class TapestryHelper {
 		Map<String, String> map = new HashMap<String, String>();
 		
 		String[] displayTime = {"08:00:00 AM", "08:30:00 AM", "09:00:00 AM","09:30:00 AM", "10:00:00 AM", "10:30:00 AM",
-				"11:00:00 AM","11:30:00 AM", "13:00:00 PM", "13:30:00 PM", "14:00:00 PM", "14:30:00 PM", "15:00:00 PM",
-				"15:30:00 PM", "16:00:00 PM"};
+				"11:00:00 AM","11:30:00 AM", "12:00:00 PM", "12:30:00 PM",  "13:00:00 PM", "13:30:00 PM", "14:00:00 PM", 
+				"14:30:00 PM", "15:00:00 PM", "15:30:00 PM", "16:00:00 PM", "16:30:00 PM", "17:00:00 PM", "17:30:00 PM", "18:00:00 PM"};
 		
 		for (int i= 1; i <= displayTime.length; i++){
 			map.put(String.valueOf(i), displayTime[i-1]);
