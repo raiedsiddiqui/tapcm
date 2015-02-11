@@ -1,13 +1,42 @@
 package org.tapestry.hl7;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Properties;
 
+import javax.annotation.Resource;
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
 import org.tapestry.objects.Appointment;
 import org.tapestry.objects.HL7Report;
 import org.tapestry.objects.Patient;
@@ -23,9 +52,11 @@ import ca.uhn.hl7v2.model.v23.segment.OBR;
 import ca.uhn.hl7v2.model.v23.segment.OBX;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.parser.PipeParser;
-
+@Component
 public class Hl7Utils {
-		
+	@Resource(name="keyLocation")
+    private Properties keyProps;
+	
 	public static String populateORUMessage(HL7Report report) throws HL7Exception, Exception{
 		ORU_R01 message = new ORU_R01();
 		//format obr date
@@ -57,14 +88,16 @@ public class Hl7Utils {
 		pid.getPatientIDInternalID(0).getID().setValue(String.valueOf(patientId));//patientId	
 		pid.getPatientName().getFamilyName().setValue(p.getLastName());//last name		
 		pid.getPatientName().getGivenName().setValue(p.getFirstName());//first name
-		pid.getDateOfBirth().getTimeOfAnEvent().setValue(p.getBod());// birth date	
+		pid.getDateOfBirth().getTimeOfAnEvent().setValue("1976-06-15");// birth date
+//		pid.getDateOfBirth().getTimeOfAnEvent().setValue(p.getBod());// birth date	
 //		pid.getDateOfBirth().getDegreeOfPrecision().setValue(p.getBod()); // birth date	
 //		pid.getDateOfBirth().getDegreeOfPrecision().setValue("19301201"); // birth date	
-		pid.getPatientAddress(0).getStreetAddress().setValue(" 11 Hunter Street S");
+		
+		pid.getPatientAddress(0).getStreetAddress().setValue("111 Sunny St");
 		pid.getPatientAddress(0).getCity().setValue("Hamilton");				 
 		pid.getPatientAddress(0).getCountry().setValue("Canada");
 		pid.getPatientAddress(0).getStateOrProvince().setValue("Ontario");
-		pid.getPatientAddress(0).getZipOrPostalCode().setValue("L7B 3C2");
+		pid.getPatientAddress(0).getZipOrPostalCode().setValue("L9H 1N1");
 						 
 		//PV1 Segment
 		ca.uhn.hl7v2.model.v23.segment.PV1 pv = message.getRESPONSE().getPATIENT().getVISIT().getPV1();
@@ -88,83 +121,87 @@ public class Hl7Utils {
 		orc.getOrc12_OrderingProvider(0).getIDNumber().setValue("05808");//provider Id number
 		orc.getOrc12_OrderingProvider(0).getFamilyName().setValue("Admin");//family name
 		orc.getOrc12_OrderingProvider(0).getGivenName().setValue("Admin");//first name
-		orc.getOrc15_OrderEffectiveDateTime().getTimeOfAnEvent().setValue(orbDate);
+		orc.getOrc15_OrderEffectiveDateTime().getTimeOfAnEvent().setValue(orbDate);	
 	
 		/*
 		 * The OBR segment is contained within a group called ORDER_OBSERVATION, 
 		 * which is itself in a group called PATIENT_RESULT. These groups are
 		 * reached using named accessors.
 		 */
-		//patient goals
-		List<String> list = report.getPatientGoals();
+		//patient goals goals survey Q8
+		List<String> goalsList = report.getPatientGoals();
 		ORU_R01_ORDER_OBSERVATION orderObservation = message.getRESPONSE().getORDER_OBSERVATION(0);
-		fillOBXAndOBRField(1, list.get(0), orderObservation, message, "TPLG", patientId, orbDate);
+		fillOBXAndOBRField(1, goalsList.get(0), orderObservation, message, "TPLG", patientId, orbDate);
 		      
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(1);
-		fillOBXAndOBRField(2, list.get(1), orderObservation, message, "TPHG", patientId, orbDate); 
 		//For case Review with IP-TEAM                 
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(2);
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(1);
 		
-		list = new ArrayList<String>();
+		List<String> list = new ArrayList<String>();
 		list = report.getAlerts(); 
 		String[] alerts = list.toArray(new String[0]);
-		fillOBXAndOBRField(3, alerts, orderObservation, message, "TPCR", alerts.length, patientId, orbDate); 
+		fillOBXAndOBRField(2, alerts, orderObservation, message, "TPCR", alerts.length, patientId, orbDate); 
 		         
 		//Social Context
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(3);       
-		fillOBXAndOBRField(4, a.getKeyObservation(), orderObservation, message, "TPSC", patientId, orbDate); 
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(2);       
+		fillOBXAndOBRField(3, a.getKeyObservation(), orderObservation, message, "TPSC", patientId, orbDate); 
 		         
 		//volunteer follow up plan
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(4);   
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(3);   
 		String[] plans;
 		if (a.getPlans() != null && a.getPlans() != "") 
 			plans = a.getPlans().split(";");     
 		else
 			plans = new String[]{""};
-		fillOBXAndOBRField(5, plans, orderObservation, message, "TPVP", plans.length, patientId, orbDate); 
+		fillOBXAndOBRField(4, plans, orderObservation, message, "TPVP", plans.length, patientId, orbDate); 
 				         
 		//memory screen        
 		list = report.getAdditionalInfos(); 
 		if (list.size() >= 2)
 		{
-			orderObservation = message.getRESPONSE().getORDER_OBSERVATION(5);
+			orderObservation = message.getRESPONSE().getORDER_OBSERVATION(4);
 			String[] memorys = new String[]{list.get(0), list.get(1)};
-			fillOBXAndOBRField(6, memorys, orderObservation, message, "TPMS", 2, patientId, orbDate); 
+			fillOBXAndOBRField(5, memorys, orderObservation, message, "TPMS", 2, patientId, orbDate); 
 		}          
 		//advance directives
 		if (list.size() >=5)
 		{
-			orderObservation = message.getRESPONSE().getORDER_OBSERVATION(6);
+			orderObservation = message.getRESPONSE().getORDER_OBSERVATION(5);
 			String[] aDirectives = {list.get(2), list.get(3), list.get(4)};
-			fillOBXAndOBRField(7, aDirectives, orderObservation, message, "TPAD", 3, patientId, orbDate);
+			fillOBXAndOBRField(6, aDirectives, orderObservation, message, "TPAD", 3, patientId, orbDate);
 		}               
 		//Summary of tapestry tools
 		//function status
 		ScoresInReport scores = report.getScores();
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(7);
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(6);
 		String[] functionStatus= new String[]{scores.getClockDrawingTest(), scores.getTimeUpGoTest(), scores.getEdmontonFrailScale()};
-		fillOBXAndOBRField(8, functionStatus, orderObservation, message, "TPFS", 3, patientId, orbDate);
+		fillOBXAndOBRField(7, functionStatus, orderObservation, message, "TPFS", 3, patientId, orbDate);
 		
 		//nutritional status
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(8);     
-		fillOBXAndOBRField(9, String.valueOf(scores.getNutritionScreen()), orderObservation, message, "TPNS", patientId, orbDate);
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(7);     
+		fillOBXAndOBRField(8, String.valueOf(scores.getNutritionScreen()), orderObservation, message, "TPNS", patientId, orbDate);
 		
 		//social supports
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(9);
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(8);
 		String[] socialSupport= new String[]{String.valueOf(scores.getSocialSatisfication()), String.valueOf(scores.getSocialNetwork())};
-		fillOBXAndOBRField(10, socialSupport, orderObservation, message, "TPSS", 2, patientId, orbDate);
+		fillOBXAndOBRField(9, socialSupport, orderObservation, message, "TPSS", 2, patientId, orbDate);
 		
 		//mobility
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(10);
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(9);
 		String[] mobility= new String[]{scores.getMobilityWalking2(),scores.getMobilityWalkingHalf(), scores.getMobilityClimbing()};
-		fillOBXAndOBRField(11, mobility, orderObservation, message, "TPMB", 3, patientId, orbDate);
+		fillOBXAndOBRField(10, mobility, orderObservation, message, "TPMB", 3, patientId, orbDate);
 		         
 		//physical activity
-		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(11);
-		String[] physicalActivity= new String[]{String.valueOf(scores.getpAAerobic()),String.valueOf(scores.getpAStrengthAndFlexibility())};
-		fillOBXAndOBRField(12, physicalActivity, orderObservation, message, "TPPA", 2, patientId, orbDate);
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(10);
+//		String[] physicalActivity= new String[]{String.valueOf(scores.getpAAerobic()),String.valueOf(scores.getpAStrengthAndFlexibility())};
+		String[] physicalActivity= new String[]{String.valueOf(scores.getAerobicMessage()),String.valueOf(scores.getpAStrengthAndFlexibility())};
+		fillOBXAndOBRField(11, physicalActivity, orderObservation, message, "TPPA", 2, patientId, orbDate);
 		//end of summary tools
 		                  
+		//Three goals from Goals survey Q3
+		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(11);
+		String[] threeGoals = new String[]{goalsList.get(1).toString(), goalsList.get(2).toString(), goalsList.get(3).toString()};
+		fillOBXAndOBRField(12, threeGoals, orderObservation, message, "TPHG", 3, patientId, orbDate); 
+		
 		//Tapesty questions
 		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(12);
 		String[] questions = report.getDailyActivities().toArray(new String[0]);  
@@ -230,10 +267,12 @@ public class Hl7Utils {
 		 obr.getObr7_ObservationDateTime().getTimeOfAnEvent().setValue(obrDate);
 		 obr.getPlacerOrderNumber(0).getEi1_EntityIdentifier().setValue("TR" + patientId);
 		 obr.getOrderingProvider(0).getAssigningAuthority().getUniversalID().setValue("Tapestry");
-		 obr.getOrderingProvider(0).getIDNumber().setValue("05808");//provider Id number
-		 obr.getOrderingProvider(0).getFamilyName().setValue("Admin");//family name
+		 obr.getUniversalServiceIdentifier().getText().setValue("OBR Name");
+		 //provider Id number--- provider billing#,  Oscar will map it to that provider(s) inbox.
+		 obr.getOrderingProvider(0).getIDNumber().setValue("05808");
+		 obr.getOrderingProvider(0).getFamilyName().setValue("Tapestry Admin");//family name
 		 obr.getOrderingProvider(0).getGivenName().setValue("Admin");//first name
-		 obr.getPlacerField1().setValue(tagName);	
+		 obr.getPlacerField1().setValue(tagName);			
 	 }
 	 
 	 public static boolean save(String message, String appendix) throws HL7Exception
@@ -256,5 +295,166 @@ public class Hl7Utils {
 	        }		        
 	        return true;
 		}
+	 
+	 /*
+	  *	Encrypts the message so it can be transfered securely
+	  */
+	 public static File encryptFile(InputStream is, SecretKey skey, String fileName) throws Exception{
+		 fileName = fileName+".enc";
+		 //Encode file
+		 try{
+			 OutputStream fos = new FileOutputStream(fileName);
+			 byte[] buf = new byte[1024];
+
+			 SecretKeySpec skeySpec = new SecretKeySpec(skey.getEncoded(), "AES");
+			 Cipher cipher = Cipher.getInstance("AES");
+			 cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+			 fos = new CipherOutputStream(fos, cipher);
+
+			 // Read in the cleartext bytes and write to out to encrypt
+			 int numRead = 0;
+			 while ((numRead = is.read(buf)) >= 0) {
+				 fos.write(buf, 0, numRead);
+			 }
+			 fos.close();
+
+		 }catch(Exception e){
+			 throw e;
+		 }	
+		 return(new File(fileName));				
+	 }
+	 
+	 /*
+	  *	Creates the secret key used to encrypt the message
+	  */
+	public static SecretKey createSecretKey() throws Exception {
+		// Create key for ecryption
+		try{
+			KeyGenerator kgen = KeyGenerator.getInstance("AES");
+			kgen.init(128);
+			return(kgen.generateKey());
+		}catch(Exception e){
+			//return(null);
+			throw e;		
+		}
+	}
+	
+	public  void test() throws Exception{		
+		ClassPathResource propertyFile = new ClassPathResource("keyLocation.properties");
+//		Map<String, String> config = (Map<String, String>) propertyFile.load(propertyFile.getInputStream());
+	
+	    InputStream inputStream = this.getClass().getClassLoader()  
+	              .getResourceAsStream("/keyLocation.properties");  
+        
+//	      Properties properties = new Properties();  	    
+//	        
+//	      //load the inputStream using the Properties  
+//	      properties.load(inputStream);  
+//	      //get the value of the property  
+//	      String pivateKey = properties.getProperty("private_key");  	    
+//	      String publicKey = properties.getProperty("public_key");
+//	      String serviceName = properties.getProperty("serviceName"); 
+	      
+	      List keyPairInfo = new ArrayList();
+	      
+	      for (int i = 0; i<keyPairInfo.size(); i++)
+	    	  System.out.println("key pair info...." + keyPairInfo.get(i));
+//	      keyPairInfo.add(serviceName);
+//	      keyPairInfo.add(pivateKey);
+//	      keyPairInfo.add(publicKey);
+//	      System.out.println("pivateKey value is: " + pivateKey);  
+//	      System.out.println("================================================");
+//	      System.out.println("publicKey value is: " + publicKey);  
+//	      System.out.println("================================================");
+//	      System.out.println("serviceName value is: " + serviceName);  
+
+	      keyPairInfo = parseKeyFile("/keyLocation.properties");
+	}
+	
+	List parseKeyFile(String fileName) throws Exception{
+		String serviceName = null;
+		String privateKey = null;
+		String publicKey = null;
+		PrivateKey privKey = null;
+		PublicKey pubKey = null;
+
+		Base64 base64 = new Base64();
+		ArrayList keyInfo = new ArrayList();
+
+		try{
+			 InputStream input = this.getClass().getClassLoader()  
+		              .getResourceAsStream(fileName); 
+	//		InputStream input = new FileInputStream(fileName);
+			BufferedReader br = new BufferedReader(new InputStreamReader(input));
+
+			Properties properties = new Properties(); 
+			//load the inputStream using the Properties  
+			properties.load(input);  
+			
+//	        String line = null;		
+//			int lineCount = 0;
+//			while ((line = br.readLine()) != null) {
+//				if (lineCount == 1)
+//					serviceName = line;
+//				else if (lineCount == 4)
+//					privateKey = line;
+//				else if (lineCount == 7)
+//					publicKey = line;
+//			    lineCount++;
+//			}
+			if (serviceName == null)
+				serviceName = properties.getProperty("service_Name");  
+			
+			if (privateKey == null)
+				privateKey = properties.getProperty("private_key");
+			
+			if (publicKey == null)
+				publicKey = properties.getProperty("public_key");
+			
+			System.out.println("ServiceName "+serviceName);
+			System.out.println("privateKey "+privateKey);
+			System.out.println("publicKey "+publicKey);
+			
+			//create private key from string
+			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(base64.decode(privateKey.getBytes("ASCII")));
+      		KeyFactory privKeyFactory = KeyFactory.getInstance("RSA");      		
+			privKey = privKeyFactory.generatePrivate(privKeySpec);
+
+			
+			//create public key from string
+	//		X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(base64.decode(publicKey.getBytes("ASCII")));
+			pubKey = generateKeys();
+			System.out.println("generating....publicKey "+publicKey);
+			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(base64.decode(publicKey.getBytes("ASCII")));
+			KeyFactory pubKeyFactory = KeyFactory.getInstance("RSA");
+			pubKey = pubKeyFactory.generatePublic(pubKeySpec);
+
+			keyInfo.add(serviceName);
+			keyInfo.add(privKey);
+			keyInfo.add(pubKey);
+			
+		}catch(Exception e){
+			System.out.println("Could not get key info from file '"+fileName+"': "+e);
+                        e.printStackTrace();
+			throw e;
+		}
+		return(keyInfo);
+	}
+	
+	public PublicKey generateKeys() throws Exception{
+		try{
+			KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+			kpg.initialize(2048);
+			KeyPair kp = kpg.genKeyPair();
+			PublicKey publicKey = kp.getPublic();
+	//		PrivateKey privateKey = kp.getPrivate();
+			return publicKey;
+		}
+		catch(Exception e){
+			System.out.println("Could not get key info from file ' "+e);
+			e.printStackTrace();
+			throw e;
+		}
+	}
 	
 }

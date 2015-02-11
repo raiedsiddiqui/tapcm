@@ -1202,10 +1202,18 @@ public class TapestryHelper {
 			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 			table.addCell(cell);
 			
-			cell = new PdfPCell(new Phrase(report.getPatientGoals().get(0).toString()));
+			StringBuffer sb = new StringBuffer();
+			sb.append("Goal I Am MOST Willing To Work On Over The Next 6 Months - Either By Myself Or With Support From My Doctor: ");
+			sb.append(report.getPatientGoals().get(0).toString());		
+			
+			cell = new PdfPCell(new Phrase(sb.toString(), rMediumFont));
 			table.addCell(cell);
-			cell = new PdfPCell(new Phrase(report.getPatientGoals().get(1).toString(),rMediumFont));
-			table.addCell(cell);	            
+//			cell = new PdfPCell(new Phrase(report.getPatientGoals().get(0).toString(),rMediumFont));
+//			table.addCell(cell);
+//			cell = new PdfPCell(new Phrase(report.getPatientGoals().get(0).toString()));
+//			table.addCell(cell);
+//			cell = new PdfPCell(new Phrase(report.getPatientGoals().get(1).toString(),rMediumFont));
+//			table.addCell(cell);	            
 
 			document.add(table);			
 			//alerts
@@ -1333,16 +1341,16 @@ public class TapestryHelper {
 			cell.setColspan(2);
 			table.addCell(cell);
 			
-			String cQuestionText = "Do you have a set of written";
+			String cQuestionText = "Are you interested in";
 			for (Map.Entry<String, String> entry : report.getCaringPlan().entrySet()) {
 				if (entry.getKey().contains(cQuestionText)){
 					if ("YES".equalsIgnoreCase(entry.getValue())){
-						cell = new PdfPCell(new Phrase(entry.getKey(), mFont));		            	
+						cell = new PdfPCell(new Phrase(entry.getKey(), rMediumFont));		            	
 						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 						cell.setPaddingBottom(5);
 						table.addCell(cell);	            	
 			            	
-						cell = new PdfPCell(new Phrase(entry.getValue(), mFont));
+						cell = new PdfPCell(new Phrase(entry.getValue(), rMediumFont));
 						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 						cell.setPaddingBottom(5);
@@ -1350,12 +1358,12 @@ public class TapestryHelper {
 					}
 					else
 					{
-						cell = new PdfPCell(new Phrase(entry.getKey(), rMediumFont));		            	
+						cell = new PdfPCell(new Phrase(entry.getKey(), mFont));		            	
 						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);	
 						cell.setPaddingBottom(5);
 						table.addCell(cell);	            	
 			            	
-						cell = new PdfPCell(new Phrase(entry.getValue(), rMediumFont));
+						cell = new PdfPCell(new Phrase(entry.getValue(), mFont));
 						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 						cell.setPaddingBottom(5);
@@ -1365,21 +1373,8 @@ public class TapestryHelper {
 				else
 				{
 					if ("YES".equalsIgnoreCase(entry.getValue())){	            		
-						cell = new PdfPCell(new Phrase(entry.getKey(), rMediumFont));		            	
-						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);	
-						cell.setPaddingBottom(5);
-						table.addCell(cell);	            	
-			            	
-						cell = new PdfPCell(new Phrase(entry.getValue(), rMediumFont));
-						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-						cell.setPaddingBottom(5);
-						table.addCell(cell); 
-					}
-					else 
-					{
 						cell = new PdfPCell(new Phrase(entry.getKey(), mFont));		            	
-						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);	
 						cell.setPaddingBottom(5);
 						table.addCell(cell);	            	
 			            	
@@ -1389,9 +1384,20 @@ public class TapestryHelper {
 						cell.setPaddingBottom(5);
 						table.addCell(cell); 
 					}
-				}
-				
-				
+					else 
+					{
+						cell = new PdfPCell(new Phrase(entry.getKey(), rMediumFont));		            	
+						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+						cell.setPaddingBottom(5);
+						table.addCell(cell);	            	
+			            	
+						cell = new PdfPCell(new Phrase(entry.getValue(), rMediumFont));
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+						cell.setPaddingBottom(5);
+						table.addCell(cell); 
+					}
+				}				
 			}
 			float[] aaWidths = {24f, 3f};
 			table.setWidths(aaWidths);
@@ -1478,7 +1484,7 @@ public class TapestryHelper {
 			cell.setMinimumHeight(45f);
 			table.addCell(cell);	            
 	           
-			StringBuffer sb = new StringBuffer();
+			sb = new StringBuffer();
 			sb.append("Clock drawing test: ");
 			sb.append(report.getScores().getClockDrawingTest());
 			sb.append("\n");
@@ -1692,7 +1698,7 @@ public class TapestryHelper {
 	           
 			sb = new StringBuffer();
 			sb.append("Aerobic Score =  ");
-			sb.append(report.getScores().getpAAerobic());
+			sb.append(report.getScores().getAerobicMessage());
 			sb.append("\n");
 			sb.append("Strength & Flexibility Score = ");
 			sb.append(report.getScores().getpAStrengthAndFlexibility());        
@@ -1730,25 +1736,73 @@ public class TapestryHelper {
 			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);	
 			cell.setColspan(2);
 			table.addCell(cell);
-	            
-			String key;
-			for (Map.Entry<String, String> entry : report.getGoals().entrySet()) {
-				key = entry.getKey().toString();
-				if (key.equals("3") || key.equals("4") || key.equals("6") || key.equals("7") || key.equals("8"))
-					key = "";
-				
-				if (key.equals("5") )
-					key = "3";
-				if (key.equals("9") )
-					key = "4";
-				cell = new PdfPCell(new Phrase(key, sFont));
+			
+			cell = new PdfPCell(new Phrase("Of the list of both life and health goals we just went through, can you pick 3 that you would like to focus on in the next 6 months?", sFont));
+			cell.setColspan(2);
+			table.addCell(cell);
+			
+			
+			if (report.getPatientGoals() != null && report.getPatientGoals().get(1) != null)
+			{
+				cell = new PdfPCell(new Phrase("1", sFont));
 				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
 				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);	            	
-	            
-				cell = new PdfPCell(new Phrase(entry.getValue(), sFont));
-				table.addCell(cell); 
-			}	           
+				table.addCell(cell);
+		
+				cell = new PdfPCell(new Phrase(report.getPatientGoals().get(1), sFont));
+				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
+				
+			}
+			
+			if (report.getPatientGoals() != null && report.getPatientGoals().get(1) != null)
+			{
+				cell = new PdfPCell(new Phrase("2", sFont));
+				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
+		
+				cell = new PdfPCell(new Phrase(report.getPatientGoals().get(2), sFont));
+				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
+			}
+			
+			if (report.getPatientGoals() != null && report.getPatientGoals().get(1) != null)
+			{
+				cell = new PdfPCell(new Phrase("3", sFont));
+				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
+		
+				cell = new PdfPCell(new Phrase(report.getPatientGoals().get(3), sFont));
+				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+				table.addCell(cell);
+			}
+			
+//			String key;
+//			for (Map.Entry<String, String> entry : report.getGoals().entrySet()) {
+//				key = entry.getKey().toString();
+//				if (key.equals("3") || key.equals("4") || key.equals("6") || key.equals("7") || key.equals("8"))
+//					key = "";
+//				
+//				if (key.equals("5") )
+//					key = "3";
+//				if (key.equals("9") )
+//					key = "4";
+//				cell = new PdfPCell(new Phrase(key, sFont));
+//				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+//				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+//				table.addCell(cell);	            	
+//	            
+//				cell = new PdfPCell(new Phrase(entry.getValue(), sFont));
+//				table.addCell(cell); 
+//			}	  
+			cell = new PdfPCell(new Phrase(" "));
+			table.addCell(cell); 
+			
 			table.setWidths(cWidths);
 			document.add(table);			
 			//
@@ -1781,8 +1835,7 @@ public class TapestryHelper {
 			table = new PdfPTable(2);
 			table.setWidthPercentage(100);
 			
-//			cell = new PdfPCell(new Phrase("VOLUNTEER INFORMATION & NOTES", gbMediumFont));  
-			cell = new PdfPCell(new Phrase("VOLUNTEER INFORMATION & NOTES", wbLargeFont)); 
+			cell = new PdfPCell(new Phrase("VOLUNTEER INFORMATION & NOTES", bMediumFont)); 
 			cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
 			cell.setHorizontalAlignment(Element.ALIGN_CENTER);
 			cell.setVerticalAlignment(Element.ALIGN_MIDDLE);	
@@ -1885,14 +1938,20 @@ public class TapestryHelper {
 		if (questionTextList != null && questionTextList.size() > 0)
    		{//remove the first element which is description about whole survey
    			questionTextList.remove(0);
+   			//combine Q2 and Q3 question text
+   			StringBuffer sb = new StringBuffer();
+   	   		sb.append(questionTextList.get(1));
+   	   		sb.append("; ");
+   	   		sb.append(questionTextList.get(2));
+   	   		questionTextList.set(1, sb.toString());
+   	   		questionTextList.remove(2);
    			
    	   		if (questionAnswerList != null && questionAnswerList.size() > 0)
    	   		{//remove the first element which is empty or "-"
 	   	   	//	questionAnswerList.remove(0);
 	   	   	
 	   	   		content = new TreeMap<String, String>(); 
-		   	   	StringBuffer sb;
-	   	   		
+		   	   		
 	   	   		for (int i = 0; i < questionAnswerList.size(); i++){
 	   	   			text = questionTextList.get(i);	   	   			
 	   	   			//remove observer notes
@@ -2157,6 +2216,15 @@ public class TapestryHelper {
    		String fallingQA = qList.get(qList.size() -1);
    		if (fallingQA.startsWith("yes")||fallingQA.startsWith("Yes"))
    			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);  
+   		
+   		//combine Q2 and Q3
+   		StringBuffer sb = new StringBuffer();
+   		sb.append(qList.get(1));
+   		sb.append("; ");
+   		sb.append(qList.get(2));
+   		qList.set(1, sb.toString());
+   		qList.remove(2);
+   		report.setDailyActivities(qList);
    		report.setDailyActivities(qList);
    		
    		//alerts   		
@@ -2192,7 +2260,7 @@ public class TapestryHelper {
 			else 
 				scores.setTimeUpGoTest("5 (Patient is unwilling)");
 		}		
-		int generalHealthyScore = CalculationManager.getScoreByQuestionsList(qList);
+		int generalHealthyScore = CalculationManager.getGeneralHealthyScaleScore(qList);
 		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert, qList);
 		
 		if (generalHealthyScore < 5)
@@ -2220,7 +2288,7 @@ public class TapestryHelper {
 		{
 			int satisfactionScore = CalculationManager.getScoreByQuestionsList(qList.subList(0, 6));
 			scores.setSocialSatisfication(satisfactionScore);
-			int networkScore = CalculationManager.getScoreByQuestionsList(qList.subList(6, 10));
+			int networkScore = CalculationManager.getScoreByQuestionsList(qList.subList(7, 10));
 			scores.setSocialNetwork(networkScore);
 		}
 		   		   		
@@ -2236,7 +2304,7 @@ public class TapestryHelper {
 		//get scores for nutrition survey based on answer list
 		if ((qList != null)&&(qList.size()>0))
 		{
-			int nutritionScore = CalculationManager.getScoreByQuestionsList(qList);
+			int nutritionScore = CalculationManager.getNutritionScore(qList);
 			scores.setNutritionScreen(nutritionScore);
 			
 			//high nutrition risk alert
@@ -2262,11 +2330,14 @@ public class TapestryHelper {
 
 		int rAPAScore = CalculationManager.getAScoreForRAPA(qList);
 		int sFPAScore = CalculationManager.getSFScoreForRAPA(qList);
+		String aerobicMsg = CalculationManager.getAerobicMsg(rAPAScore);
+		
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
 				
 		scores.setpAAerobic(rAPAScore);
 		scores.setpAStrengthAndFlexibility(sFPAScore);
+		scores.setAerobicMessage(aerobicMsg);
 						
 		//Mobility Alerts
 		try{
@@ -2280,17 +2351,18 @@ public class TapestryHelper {
 		lAlert = AlertManager.getMobilityAlerts(qMap, lAlert);    		
 		
 		//summary tools for Mobility
-		for (int i = 0; i < lAlert.size(); i++)
-		{
-			if (lAlert.get(i).contains("2.0"))
-				scores.setMobilityWalking2(lAlert.get(i));
-		   			
-			if (lAlert.get(i).contains("0.5"))
-				scores.setMobilityWalkingHalf(lAlert.get(i));
-		   			
-			if (lAlert.get(i).contains("climbing"))
-				scores.setMobilityClimbing(lAlert.get(i));   			
-		}
+		scores = CalculationManager.getMobilityScore(qMap, scores);
+//		for (int i = 0; i < lAlert.size(); i++)
+//		{
+//			if (lAlert.get(i).contains("2.0"))
+//				scores.setMobilityWalking2(lAlert.get(i));
+//		   			
+//			if (lAlert.get(i).contains("0.5"))
+//				scores.setMobilityWalkingHalf(lAlert.get(i));
+//		   			
+//			if (lAlert.get(i).contains("climbing"))
+//				scores.setMobilityClimbing(lAlert.get(i));   			
+//		}
 		   		
 		String noLimitation = "No Limitation";   		
 		if (Utils.isNullOrEmpty(scores.getMobilityWalking2()))
@@ -2313,8 +2385,18 @@ public class TapestryHelper {
    		//get answer list
 		qList = new ArrayList<String>();
 		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));   
-		report.setPatientGoals(qList);
 		
+		List<String> gAS = new ArrayList<String>();
+		if ((qList != null) && (qList.size()>0))
+		{
+			// for the patient goals on the top of report from Q8
+			String patientGoals = CalculationManager.getPatientGoalsMsg(Integer.valueOf(qList.get(7)), qList);			
+			gAS.add(patientGoals);
+			// three goals above tapestry questions from Q3
+			CalculationManager.setPatientGoalsMsg(qList.get(2), gAS);			
+			report.setPatientGoals(gAS);
+		}
+				
 		//get volunteer information
 		List<String> volunteerInfos = new ArrayList<String>();
 		volunteerInfos.add(a.getVolunteer());

@@ -1830,7 +1830,7 @@ public class VolunteerController {
 						
 		sb = new StringBuffer();
 		sb.append(patientName);
-		sb.append("'s hl7 report is ready to be downloaded. ");				
+		sb.append("'s hl7/PDF report is ready to be downloaded. ");				
 		
 		if (coordinators != null)			
 		{	//send message to all coordinators in the organization					
@@ -1842,8 +1842,18 @@ public class VolunteerController {
 			logger.error("Can't find any coordinator in organization id# " + organizationId);
 		}
 		
+		List<User> admins = userManager.getAllUsersWithRole("ROLE_ADMIN");
+		if (admins != null && admins.size() > 0)
+		{//send notification to all admins
+			for (User u: admins)
+				TapestryHelper.sendMessageToInbox("PDF Report", sb.toString(), userId, u.getUserID(), messageManager);
+		}
+		else{
+			System.out.println("Can't find any admin" );
+			logger.error("Can't find any admin ");
+		}		
+		
 		///////////////////////
-	
 		//todo:generate tapestry reprot, send it to MRP in Oscar, and send message to patient in MyOscar
 //		Appointment a = appointmentManager.getAppointmentById(appointmentId);
 //		Patient p = patientManager.getPatientByID(a.getPatientID());

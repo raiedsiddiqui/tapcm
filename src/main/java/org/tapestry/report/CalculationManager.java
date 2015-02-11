@@ -30,20 +30,19 @@ public class CalculationManager {
 	
 	public static int getGeneralHealthyScaleScore(List<String> qList){
 		int score = 0;
-	
 		int iAnswer = 0;
 		
 		for (int i = 0; i < qList.size(); i++)
 		{
 			iAnswer = Integer.valueOf(qList.get(i).toString());
 			if (i == 0 || i == 1 || i ==3 || i ==4)
-				score = score + countPoints(iAnswer,new int[]{0,1,2}, 3);
+				score = score + countPoints(iAnswer,new int[]{0,1,2}, 3);				
 			else if (i == 2)
-				score = score + countPoints(iAnswer, new int[]{0,0,0,1,2}, 5);
-			else if (i > 4 && iAnswer < 10)
-				score = score + countPoints(iAnswer, new int[]{0,1},2);
+				score = score + countPoints(iAnswer, new int[]{0,0,0,1,2}, 5);				
+			else if (i > 4 && i <= 9)			
+				score = score + countPoints(iAnswer, new int[]{0,1},2);						
 			else if (i == 10)
-				score = score + countPoints(iAnswer, new int[]{0,1,2,2,2}, 5);
+				score = score + countPoints(iAnswer, new int[]{0,1,2,2,2}, 5);			
 		}		
 		
 		return score;		
@@ -74,256 +73,160 @@ public class CalculationManager {
 				default:break;
 			}	
 		}
+		else if (n == 4)
+		{
+			switch (a) {
+				case 1: result = result + b[0];
+						break;
+				case 2: result = result + b[1];
+						break;
+				case 3: result = result + b[2];
+						break;	
+				case 4: result = result + b[3];
+						break;			
+				default:break;
+			}		
+		}
 		else if (n == 5)
 		{
 			switch (a) {
-			case 1: result = result + b[0];
-					break;
-			case 2: result = result + b[1];
-					break;
-			case 3: result = result + b[2];
-					break;	
-			case 4: result = result + b[3];
-					break;
-			case 5: result = result + b[4];
-					break;
-			default:break;
-		}		
+				case 1: result = result + b[0];
+						break;
+				case 2: result = result + b[1];
+						break;
+				case 3: result = result + b[2];
+						break;	
+				case 4: result = result + b[3];
+						break;
+				case 5: result = result + b[4];
+						break;
+				default:break;
+			}		
 		}
+		else if (n == 8)
+		{
+			switch (a) {
+				case 1: result = result + b[0];
+						break;
+				case 2: result = result + b[1];
+						break;
+				case 3: result = result + b[2];
+						break;	
+				case 4: result = result + b[3];
+						break;
+				case 5: result = result + b[4];
+						break;
+				case 6: result = result + b[5];
+						break;	
+				case 7: result = result + b[6];
+						break;
+				case 8: result = result + b[7];
+						break;
+				default:break;
+			}
+		}
+	
 		return result;
 	}
 	
-
-	
 	public static int getNutritionScore(List<String> qList){
 		int score = 0;
-		//first answer
-		int answer = Integer.valueOf(qList.get(0));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: break;
-			case 3: break;
-			case 4: score = score + 1;
-					break;
-			case 5: score = score + 2;
-					break;
-			case 6: break;
-			case 7: score = score + 1;
-					break;
-			case 8: score = score + 2;
-					break;			
-			default:break;
-		}
-			
-		//second answer		
-		if (!"3".equals(qList.get(1)))
-			score = score + 4;
+		int iAnswer = 0;
 		
-		//third answer
-		if(!"2".equals(qList.get(2)))			
+		for (int i = 0; i < qList.size(); i++)
+		{
+			iAnswer = Integer.valueOf(qList.get(i).toString());
 			
-		//4	
-		answer = Integer.valueOf(qList.get(3));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 2;
-					break;
-			case 3: score = score + 1;
-					break;
-			case 4: break;				
-			default:break;
+			if (i == 0)
+				score = score + countPoints(iAnswer,new int[]{4,0,0,1,2,0,1,2}, 8);		
+			else if (i == 1)
+				score = score + countPoints(iAnswer,new int[]{4,4,0}, 3);
+			else if (i == 2)
+				score = score + countPoints(iAnswer,new int[]{0,4,0}, 3);
+			else if (i == 3 || i == 16)
+				score = score + countPoints(iAnswer,new int[]{4,2,1,0}, 4);
+			else if (i == 4 || i == 12)
+				score = score + countPoints(iAnswer,new int[]{4,2,0}, 3);
+			else if (i == 5 || i == 11)
+				score = score + countPoints(iAnswer,new int[]{4,3,2,0}, 4);
+			else if (i == 6 || i == 8 || i == 9)
+				score = score + countPoints(iAnswer,new int[]{4,3,2,1,0}, 5);
+			else if (i == 7 || i == 10)
+				score = score + countPoints(iAnswer,new int[]{4,3,1,0}, 4);
+			else if (i == 13)
+				score = score + countPoints(iAnswer,new int[]{0,2,3,4}, 4);
+			else if (i == 15)
+				score = score + countPoints(iAnswer,new int[]{4,2,0,4,0}, 5);
 		}
-		//5
-		answer = Integer.valueOf(qList.get(4));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 2;
-					break;
-			case 3: break;
-						
-			default:break;
-		}
-		//6
-		answer = Integer.valueOf(qList.get(5));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 3;
-					break;
-			case 3: score = score + 2;
-					break;
-			case 4: break;				
-			default:break;
-		}
-		//7
-		answer = Integer.valueOf(qList.get(6));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 3;
-					break;
-			case 3: score = score + 2;
-					break;
-			case 4: score = score + 1;
-					break;
-			case 5: break;				
-			default:break;
-		}
-		//8
-		answer = Integer.valueOf(qList.get(7));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 3;
-					break;
-			case 3: score = score + 1;
-					break;
-			case 4: break;
-					
-			default:break;
-		}
-		//9
-		answer = Integer.valueOf(qList.get(8));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 3;
-					break;
-			case 3: score = score + 2;
-					break;
-			case 4: score = score + 1;
-					break;
-			case 5: break;				
-			default:break;
-		}
-		//10
-		answer = Integer.valueOf(qList.get(9));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 3;
-					break;
-			case 3: score = score + 2;
-					break;
-			case 4: score = score + 1;
-					break;
-			case 5: break;				
-			default:break;
-		}
-		//11
-		answer = Integer.valueOf(qList.get(10));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 3;
-					break;
-			case 3: score = score + 1;
-					break;
-			case 4: break;					
-			default:break;
-		}
-		//12
-		answer = Integer.valueOf(qList.get(11));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 3;
-					break;
-			case 3: score = score + 2;
-					break;
-			case 4: break;				
-			default:break;
-		}
-		//13
-		answer = Integer.valueOf(qList.get(12));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 2;
-					break;
-			case 3: break;
-						
-			default:break;
-		}
-		//14
-		answer = Integer.valueOf(qList.get(13));
-		switch (answer) {
-			case 1: break;
-			case 2: score = score + 2;
-					break;
-			case 3: score = score + 3;
-					break;
-			case 4: score = score + 4;
-					break;				
-			default:break;
-		}
-		//16
-		answer = Integer.valueOf(qList.get(15));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 2;
-					break;
-			case 3: break;
-			case 4: score = score + 4;
-					break;
-			case 5: break;				
-			default:break;
-		}
-		//17
-		answer = Integer.valueOf(qList.get(16));
-		switch (answer) {
-			case 1: score = score + 4;
-					break;
-			case 2: score = score + 2;
-					break;
-			case 3: score = score + 1;
-					break;
-			case 4: break;				
-			default:break;
-		}		
-		return score;
+		return score;			
+	}
+	
+	public static String getAerobicMsg(int score)
+	{
+		String strScore;
+		if (score == 0)
+			strScore = "sedentary";
+		else if (score == 1)
+			strScore = "under-active";
+		else if (score == 2)
+			strScore = "under-active regular-light activities";
+		else if (score == 3 || score == 4)
+			strScore = "under-active regular";
+		else if (score == 5 || score == 6)
+			strScore = "active";
+		else 
+			strScore = "";
+		
+		return strScore;
 	}
 	
 	public static int getAScoreForRAPA(List<String> qList){
 		int score = 0;		
-		Integer[] answerArray = new Integer[6];
-		//set answer into an array from first 6 questions
-		for(int i = 0; i < 6; i++)
-			answerArray[i] = Integer.valueOf(qList.get(i));	
 		
-		Integer[] otherAnswers = removeFirstElementInArray(answerArray);
-		
-		if ((answerArray[0].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			score = 2;
-		
-		otherAnswers = removeFirstElementInArray(otherAnswers);
-		
-		if ((answerArray[1].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			score = 3;
-		
-		otherAnswers = removeFirstElementInArray(otherAnswers);
-		
-		if ((answerArray[2].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			score = 4;
-		
-		otherAnswers = removeFirstElementInArray(otherAnswers);
-		
-		if ((answerArray[3].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			score = 5;
-		
-		otherAnswers = removeFirstElementInArray(otherAnswers);
-		
-		if ((answerArray[4].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
-			score = 6;		
-	
-		if (answerArray[5].intValue() == 1) 
-			score = 7;		
+		for (int i = 0; i < 7; i++)
+		{	
+			if (qList.get(i).equals("1") && i > score)
+				score = i;
+		}
 		
 		return score;
+		
+		
+//		Integer[] answerArray = new Integer[6];
+		//set answer into an array from first 6 questions
+//		for(int i = 0; i < 6; i++)
+//			answerArray[i] = Integer.valueOf(qList.get(i));	
+		
+		
+//		Integer[] otherAnswers = removeFirstElementInArray(answerArray);
+//		
+//		if ((answerArray[0].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+//			score = 2;
+//		
+//		otherAnswers = removeFirstElementInArray(otherAnswers);
+//		
+//		if ((answerArray[1].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+//			score = 3;
+//		
+//		otherAnswers = removeFirstElementInArray(otherAnswers);
+//		
+//		if ((answerArray[2].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+//			score = 4;
+//		
+//		otherAnswers = removeFirstElementInArray(otherAnswers);
+//		
+//		if ((answerArray[3].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+//			score = 5;
+//		
+//		otherAnswers = removeFirstElementInArray(otherAnswers);
+//		
+//		if ((answerArray[4].intValue() == 1) && isAllOtherAnswersNo(otherAnswers))
+//			score = 6;		
+//	
+//		if (answerArray[5].intValue() == 1) 
+//			score = 7;		
+		
+//		return score;
 	}
 	
 	public static int getSFScoreForRAPA(List<String> qList){
@@ -455,6 +358,46 @@ public class CalculationManager {
 			score.setMobilityClimbing(sb.toString());
 		
 		return score;
+	}
+	
+	public static String getPatientGoalsMsg(int iAnswer, List<String> qList)
+	{
+		String msg="";
+				
+		switch (iAnswer) {
+			case 1: msg = getGoalMsg(qList.get(4));
+					break;
+			case 2: msg = getGoalMsg(qList.get(5));
+					break;
+			case 3: msg = getGoalMsg(qList.get(6));
+					break;				
+			default:break;
+		}	
+		
+		return msg;
+	}
+	
+	public static List<String> setPatientGoalsMsg(String answer, List<String> goals)
+	{
+		String seperator = "<br>";
+		List<String> myList = new ArrayList<String>();
+		if (answer.contains(seperator))
+		{
+			myList = new ArrayList<String>(Arrays.asList(answer.split(seperator)));
+			goals.addAll(myList);
+		}
+		
+		return goals;
+	}
+	
+	private static String getGoalMsg(String msg)
+	{
+		int index = msg.indexOf("<br>");
+		
+		if (index != 0)
+			msg = msg.substring(0, index);
+		
+		return msg;
 	}
 	
 	private static StringBuffer getModificationInfo(StringBuffer sb, String bAnswer){

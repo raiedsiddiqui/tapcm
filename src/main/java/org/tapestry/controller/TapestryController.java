@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -1152,6 +1153,14 @@ public class TapestryController{
    		String fallingQA = qList.get(qList.size() -1);
    		if (fallingQA.startsWith("yes")||fallingQA.startsWith("Yes"))
    			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);  
+   		
+   		//combine Q2 and Q3
+   		StringBuffer sb = new StringBuffer();
+   		sb.append(qList.get(1));
+   		sb.append("; ");
+   		sb.append(qList.get(2));
+   		qList.set(1, sb.toString());
+   		qList.remove(2);
    		report.setDailyActivities(qList);
    		
    		//alerts   		
@@ -1256,13 +1265,15 @@ public class TapestryController{
 		qList = new ArrayList<String>();   		
 		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));  		
 
-		int rAPAScore = CalculationManager.getAScoreForRAPA(qList);
+		int rAPAScore = CalculationManager.getAScoreForRAPA(qList);		
 		int sFPAScore = CalculationManager.getSFScoreForRAPA(qList);
-	
+		String aerobicMsg = CalculationManager.getAerobicMsg(rAPAScore);
+		
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
 
 		scores.setpAAerobic(rAPAScore);
+		scores.setAerobicMessage(aerobicMsg);
 		scores.setpAStrengthAndFlexibility(sFPAScore);
 						
 		//Mobility Alerts
@@ -1293,8 +1304,7 @@ public class TapestryController{
 		if (Utils.isNullOrEmpty(scores.getMobilityWalking2()))
 			scores.setMobilityWalking2(noLimitation);		   		
 		if (Utils.isNullOrEmpty(scores.getMobilityWalkingHalf()))
-			scores.setMobilityWalkingHalf(noLimitation);
-		   		
+			scores.setMobilityWalkingHalf(noLimitation);		   		
 		if (Utils.isNullOrEmpty(scores.getMobilityClimbing()))
 			scores.setMobilityClimbing(noLimitation);		   		
 		report.setScores(scores);
@@ -1310,8 +1320,18 @@ public class TapestryController{
    		//get answer list
 		qList = new ArrayList<String>();
 		qList = TapestryHelper.getQuestionList(ResultParser.getResults(xml));   
-		report.setPatientGoals(qList);
 		
+		List<String> gAS = new ArrayList<String>();
+		if ((qList != null) && (qList.size()>0))
+		{
+			// for the patient goals on the top of report from Q8
+			String patientGoals = CalculationManager.getPatientGoalsMsg(Integer.valueOf(qList.get(7)), qList);			
+			gAS.add(patientGoals);
+			// three goals above tapestry questions from Q3
+			CalculationManager.setPatientGoalsMsg(qList.get(2), gAS);			
+			report.setPatientGoals(gAS);
+		}
+			
 		//get volunteer information
 		List<String> volunteerInfos = new ArrayList<String>();
 		volunteerInfos.add(appointment.getVolunteer());
@@ -1343,7 +1363,7 @@ public class TapestryController{
 	//	Hl7Utils.save(messageText, sb.toString());
 		
 		//save or open hl7 message in local file system
-		StringBuffer sb = new StringBuffer();
+		sb = new StringBuffer();
 		sb.append("TR");
 		sb.append(patient.getPatientID());
 		sb.append(".hl7");
@@ -1593,7 +1613,15 @@ public class TapestryController{
    		List<String> lAlert = new ArrayList<String>();
    		String fallingQA = qList.get(qList.size() -1);
    		if (fallingQA.startsWith("yes")||fallingQA.startsWith("Yes"))
-   			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT);   		
+   			lAlert.add(AlertsInReport.DAILY_ACTIVITY_ALERT); 
+   		
+   		//combine Q2 and Q3 answer
+   		StringBuffer sb = new StringBuffer();
+   		sb.append(qList.get(1));
+   		sb.append("; ");
+   		sb.append(qList.get(2));
+   		qList.set(1, sb.toString());
+   		qList.remove(2);
    		   		
    		sMap = new TreeMap<String, String>();
    		sMap = TapestryHelper.getSurveyContentMap(questionTextList, qList);
@@ -1636,7 +1664,7 @@ public class TapestryController{
 				scores.setTimeUpGoTest("5 (Patient is unwilling)");
 		}		
 
-		int generalHealthyScore = CalculationManager.getGeneralHealthyScaleScore(qList);		
+		int generalHealthyScore = CalculationManager.getGeneralHealthyScaleScore(qList);				
 		lAlert = AlertManager.getGeneralHealthyAlerts(generalHealthyScore, lAlert, qList);
 		
 		if (generalHealthyScore < 5)
@@ -1713,11 +1741,13 @@ public class TapestryController{
 
 		int rAPAScore = CalculationManager.getAScoreForRAPA(qList);
 		int sFPAScore = CalculationManager.getSFScoreForRAPA(qList);
+		String aerobicMsg = CalculationManager.getAerobicMsg(rAPAScore);
 		if (rAPAScore < 6)
 			lAlert.add(AlertsInReport.PHYSICAL_ACTIVITY_ALERT);
 		
 		scores.setpAAerobic(rAPAScore);
-		scores.setpAStrengthAndFlexibility(sFPAScore);
+		scores.setpAStrengthAndFlexibility(sFPAScore);		
+		scores.setAerobicMessage(aerobicMsg);		
 				
 		//Mobility Alerts
 		try{
@@ -1777,41 +1807,39 @@ public class TapestryController{
 		List<String> gAS = new ArrayList<String>();
 		if ((qList != null) && (qList.size()>0))
 		{
-			String lifeGoals = "Life Goals: " + qList.get(1);		
-			gAS.add(lifeGoals);
-			String healthyGoals = "Health Goals : " + qList.get(4);
-			gAS.add(healthyGoals);
+//			String lifeGoals = "Life Goals: " + qList.get(1);		
+//			gAS.add(lifeGoals);
+//			String healthyGoals = "Health Goals : " + qList.get(4);
+//			gAS.add(healthyGoals);
+//			report.setPatientGoals(gAS);			
+			// for the patient goals on the top of report
+			String patientGoals = CalculationManager.getPatientGoalsMsg(Integer.valueOf(qList.get(7)), qList);			
+			gAS.add(patientGoals);
 			
+			CalculationManager.setPatientGoalsMsg(qList.get(2), gAS);			
 			report.setPatientGoals(gAS);
 		}
-		//set goals on the Goals close to Tapestry question section
-		sMap = new TreeMap<String, String>();
-   		sMap = TapestryHelper.getSurveyContentMap(questionTextList, qList);   		
-   		
-   		Iterator iterator = sMap.entrySet().iterator();
-   		String key, value;
-   		int index;
-   		while (iterator.hasNext()) {
-   			Map.Entry mapEntry = (Map.Entry) iterator.next();
-   			key = mapEntry.getKey().toString();
-   			value = mapEntry.getValue().toString();
-   			index = value.indexOf("?");
-   			value = value.substring(index + 1);
-   			if ("2".equals(key))
-   			{
-//   				index = value.indexOf("?");
-//   				value = value.substring(index + 1);
-   				mapEntry.setValue("LIFE GOALS:" + value);
-   			}
-   			else if ("5".equals(key))
-   			{
-//   				index = value.indexOf("?");
-//   				value = value.substring(index);
-   				mapEntry.setValue("HEALTH GOALS:" + value);
-   			}
-   				
-   		}
-   		report.setGoals(sMap);
+		
+//		//set goals on the Goals close to Tapestry question section
+//		sMap = new TreeMap<String, String>();
+//   		sMap = TapestryHelper.getSurveyContentMap(questionTextList, qList);   		
+//   		
+//   		Iterator iterator = sMap.entrySet().iterator();
+//   		String key, value;
+//   		int index;
+//   		while (iterator.hasNext()) {
+//   			Map.Entry mapEntry = (Map.Entry) iterator.next();
+//   			key = mapEntry.getKey().toString();
+//   			value = mapEntry.getValue().toString();
+//   			index = value.indexOf("?");
+//   			value = value.substring(index + 1);
+//   			if ("2".equals(key))
+//   				mapEntry.setValue("LIFE GOALS:" + value);
+//   			else if ("5".equals(key))
+//   				mapEntry.setValue("HEALTH GOALS:" + value);
+//   				
+//   		}
+//   		report.setGoals(sMap);
 		
 		/////
 		//get volunteer information
@@ -1842,7 +1870,7 @@ public class TapestryController{
 		
 		//add log
 		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
-		StringBuffer sb = new StringBuffer();
+		sb = new StringBuffer();
 		sb.append(loggedInUser.getName());
 		sb.append(" download/view ");
 		sb.append(patient.getFirstName());

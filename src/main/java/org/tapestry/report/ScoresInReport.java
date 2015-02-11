@@ -12,6 +12,7 @@ public class ScoresInReport {
 	private String mobilityClimbing;
 	private int pAAerobic;
 	private int pAStrengthAndFlexibility;
+	private String aerobicMessage;
 	
 	public ScoresInReport(){
 		
@@ -103,6 +104,14 @@ public class ScoresInReport {
 
 	public void setpAStrengthAndFlexibility(int pAStrengthAndFlexibility) {
 		this.pAStrengthAndFlexibility = pAStrengthAndFlexibility;
+	}
+
+	public String getAerobicMessage() {
+		return aerobicMessage;
+	}
+
+	public void setAerobicMessage(String aerobicMessage) {
+		this.aerobicMessage = aerobicMessage;
 	}
 	
 }
