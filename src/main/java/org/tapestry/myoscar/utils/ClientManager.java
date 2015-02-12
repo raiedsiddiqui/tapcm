@@ -44,8 +44,20 @@ public class ClientManager {
 				loginResultTransfer.getSecurityTokenKey(), "fake sessionId, not from browser", Locale.ENGLISH);		
 		
 		//--- this will retrieve an account and print some of the patients demographic information ---
-		
+		System.out.println("username  === carolchou.test?====" + userName);
 		PersonTransfer3 client = AccountManager.getPerson(credentials, userName);	
+		
+		////todo:remove
+		if (client != null)
+		{
+			System.out.println("client carolchou.test Name ====" + client.getFirstName() + " " + client.getLastName());
+			System.out.println("client carolchou.test birthDate ====" + client.getBirthDate());
+			System.out.println("client carolchou.test address ====" + client.getStreetAddress1() + " " + client.getCity());
+			
+		}
+		else
+			System.out.println(" Can't not get client info from MyOscar...." );
+		////////////
 		
 		return client;
 	}
@@ -71,10 +83,12 @@ public class ClientManager {
 		MiscUtils.setJvmDefaultSSLSocketFactoryAllowAllCertificates();
 	
 		Long lGroupId  = new Long(groupId);
+		System.out.println("groupId === "+ groupId + "user ==== " + user);
+		
 		LoginResultTransfer3 loginResultTransfer = AccountManager.login(serverUrl, user, password);		
 		
 		MyOscarCredentialsImpl credentials=new MyOscarCredentialsImpl(serverUrl, loginResultTransfer.getPerson().getId(), 
-				loginResultTransfer.getSecurityTokenKey(), "fake sessionId, not from browser", Locale.ENGLISH);		
+				loginResultTransfer.getSecurityTokenKey(), "fake sessionId, not from browser", Locale.ENGLISH);	
 	
 		List<Long> patientIds = GroupManager.getMembersByPeopleGroupId(credentials, lGroupId, 0, 100);
 		
