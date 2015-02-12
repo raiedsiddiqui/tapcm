@@ -1740,23 +1740,25 @@ public class TapestryHelper {
 			cell = new PdfPCell(new Phrase("Of the list of both life and health goals we just went through, can you pick 3 that you would like to focus on in the next 6 months?", sFont));
 			cell.setColspan(2);
 			table.addCell(cell);
-			
-			
-			if (report.getPatientGoals() != null && report.getPatientGoals().get(1) != null)
+						
+			if (report.getPatientGoals() != null )
 			{
-				cell = new PdfPCell(new Phrase("1", sFont));
-				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);
-		
-				cell = new PdfPCell(new Phrase(report.getPatientGoals().get(1), sFont));
-				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);
-				
+				String goal1 = report.getPatientGoals().get(1);
+				if (goal1 != null)
+				{
+					cell = new PdfPCell(new Phrase("1", sFont));
+					cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table.addCell(cell);
+			
+					cell = new PdfPCell(new Phrase(goal1, sFont));
+					cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+					table.addCell(cell);
+				}
 			}
 			
-			if (report.getPatientGoals() != null && report.getPatientGoals().get(1) != null)
+			if (report.getPatientGoals() != null && report.getPatientGoals().get(2) != null)
 			{
 				cell = new PdfPCell(new Phrase("2", sFont));
 				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -1769,7 +1771,7 @@ public class TapestryHelper {
 				table.addCell(cell);
 			}
 			
-			if (report.getPatientGoals() != null && report.getPatientGoals().get(1) != null)
+			if (report.getPatientGoals() != null && report.getPatientGoals().get(3) != null)
 			{
 				cell = new PdfPCell(new Phrase("3", sFont));
 				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
