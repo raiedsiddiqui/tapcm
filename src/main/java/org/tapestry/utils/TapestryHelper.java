@@ -1741,47 +1741,26 @@ public class TapestryHelper {
 			cell.setColspan(2);
 			table.addCell(cell);
 						
-			if (report.getPatientGoals() != null )
+			List<String> gList = report.getPatientGoals();
+			if (gList != null && gList.size() > 0)
 			{
-				String goal1 = report.getPatientGoals().get(1);
-				if (goal1 != null)
+				String goal;
+				for (int i = 1; i < gList.size(); i++)
 				{
-					cell = new PdfPCell(new Phrase("1", sFont));
-					cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-					table.addCell(cell);
-			
-					cell = new PdfPCell(new Phrase(goal1, sFont));
-					cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-					cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-					table.addCell(cell);
+					goal = report.getPatientGoals().get(i);
+					if (goal != null)
+					{
+						cell = new PdfPCell(new Phrase(String.valueOf(i), sFont));
+						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
+				
+						cell = new PdfPCell(new Phrase(goal, sFont));
+						cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+						cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+						table.addCell(cell);
+					}
 				}
-			}
-			
-			if (report.getPatientGoals() != null && report.getPatientGoals().get(2) != null)
-			{
-				cell = new PdfPCell(new Phrase("2", sFont));
-				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);
-		
-				cell = new PdfPCell(new Phrase(report.getPatientGoals().get(2), sFont));
-				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);
-			}
-			
-			if (report.getPatientGoals() != null && report.getPatientGoals().get(3) != null)
-			{
-				cell = new PdfPCell(new Phrase("3", sFont));
-				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);
-		
-				cell = new PdfPCell(new Phrase(report.getPatientGoals().get(3), sFont));
-				cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-				cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-				table.addCell(cell);
 			}
 			
 //			String key;

@@ -1342,17 +1342,7 @@ public class TapestryController{
 		//populate hl7 message		
 		String messageText = Hl7Utils.populateORUMessage(report);   
 		//////////////////////////////////
-		/*  
-		//string.getBytes(Charset.forName("UTF-8"));
-		InputStream is = new BufferedInputStream(new ByteArrayInputStream(messageText.getBytes()));
-		is.mark(is.available()+1);
-		// Encrypt the message and the key used to encrypt it			
-		SecretKey sKey = Hl7Utils.createSecretKey();
-		System.out.println("secret key is === " + sKey.toString());
-		Hl7Utils.encryptFile(is, sKey, patient.getDisplayName()+"_test");
 		
-		is.close();
-*/
 //		Hl7Utils myTest = new Hl7Utils();
 //		myTest.test();
 		

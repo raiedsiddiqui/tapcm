@@ -10,11 +10,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
@@ -31,6 +33,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMReader;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.beans.factory.xml.XmlBeanFactory;
@@ -199,8 +203,12 @@ public class Hl7Utils {
 		                  
 		//Three goals from Goals survey Q3
 		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(11);
-		String[] threeGoals = new String[]{goalsList.get(1).toString(), goalsList.get(2).toString(), goalsList.get(3).toString()};
-		fillOBXAndOBRField(12, threeGoals, orderObservation, message, "TPHG", 3, patientId, orbDate); 
+		
+		int goalsSize = goalsList.size();
+		String[] threeGoals = new String[goalsSize -1] ;
+		for (int i = 1; i < goalsSize; i++)
+			threeGoals[i-1] = goalsList.get(i);
+		fillOBXAndOBRField(12, threeGoals, orderObservation, message, "TPHG", goalsSize-1, patientId, orbDate); 
 		
 		//Tapesty questions
 		orderObservation = message.getRESPONSE().getORDER_OBSERVATION(12);
@@ -341,8 +349,6 @@ public class Hl7Utils {
 	
 	public  void test() throws Exception{		
 		ClassPathResource propertyFile = new ClassPathResource("keyLocation.properties");
-//		Map<String, String> config = (Map<String, String>) propertyFile.load(propertyFile.getInputStream());
-	
 	    InputStream inputStream = this.getClass().getClassLoader()  
 	              .getResourceAsStream("/keyLocation.properties");  
         
@@ -355,23 +361,80 @@ public class Hl7Utils {
 //	      String publicKey = properties.getProperty("public_key");
 //	      String serviceName = properties.getProperty("serviceName"); 
 	      
-	      List keyPairInfo = new ArrayList();
-	      
-	      for (int i = 0; i<keyPairInfo.size(); i++)
-	    	  System.out.println("key pair info...." + keyPairInfo.get(i));
-//	      keyPairInfo.add(serviceName);
-//	      keyPairInfo.add(pivateKey);
-//	      keyPairInfo.add(publicKey);
-//	      System.out.println("pivateKey value is: " + pivateKey);  
-//	      System.out.println("================================================");
-//	      System.out.println("publicKey value is: " + publicKey);  
-//	      System.out.println("================================================");
-//	      System.out.println("serviceName value is: " + serviceName);  
+	      List keyPairInfo = new ArrayList();   
 
-	      keyPairInfo = parseKeyFile("/keyLocation.properties");
+	//      keyPairInfo = parseKeyFile("/keyLocation.properties");
+	      keyPairInfo = parseKeyFile(inputStream);
 	}
 	
-	List parseKeyFile(String fileName) throws Exception{
+	ArrayList parseKeyFile(InputStream input) throws Exception{
+		String serviceName = null;
+		String privateKey = null;
+		String publicKey = null;
+		PrivateKey privKey = null;
+		PublicKey pubKey = null;
+
+		Base64 base64 = new Base64();
+		ArrayList keyInfo = new ArrayList();
+
+		try{
+	//		InputStream input = new FileInputStream(fileName);
+			BufferedReader br = new BufferedReader(new InputStreamReader(input));
+
+	        String line = null;		
+			int lineCount = 0;
+			while ((line = br.readLine()) != null) {
+				System.out.println("coming............" + lineCount);
+				if (lineCount == 0)
+				{
+					serviceName = line;
+					System.out.println("ServiceName "+serviceName);
+				}
+				else if (lineCount == 1)
+				{
+					privateKey = line;
+					System.out.println("privateKey "+privateKey);
+				}
+				else if (lineCount == 2)
+				{
+					publicKey = line;
+					System.out.println("publicKey "+publicKey);
+				}
+			    lineCount++;
+			}
+//			System.out.println("ServiceName "+serviceName);
+//			System.out.println("privateKey "+privateKey);
+//			System.out.println("publicKey "+publicKey);
+
+			//create private key from string          
+//			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(base64.decode(privateKey.getBytes("ASCII")));
+//      		KeyFactory privKeyFactory = KeyFactory.getInstance("RSA");
+//			privKey = privKeyFactory.generatePrivate(privKeySpec);
+
+			//create public key from string
+			java.security.Security.addProvider(
+			         new org.bouncycastle.jce.provider.BouncyCastleProvider()
+			);
+			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(base64.decode(publicKey.getBytes("ASCII")));
+			KeyFactory pubKeyFactory = KeyFactory.getInstance("RSA");
+			pubKey = pubKeyFactory.generatePublic(pubKeySpec);
+
+			keyInfo.add(serviceName);
+			keyInfo.add(privKey);
+			keyInfo.add(pubKey);
+		}catch(Exception e){
+			System.out.println("Could not get key info from file : "+e);
+            e.printStackTrace();
+           
+			throw e;
+		}
+
+		return(keyInfo);
+
+	}
+	
+	/*
+		List parseKeyFile111(String fileName) throws Exception{
 		String serviceName = null;
 		String privateKey = null;
 		String publicKey = null;
@@ -384,24 +447,11 @@ public class Hl7Utils {
 		try{
 			 InputStream input = this.getClass().getClassLoader()  
 		              .getResourceAsStream(fileName); 
-	//		InputStream input = new FileInputStream(fileName);
-			BufferedReader br = new BufferedReader(new InputStreamReader(input));
-
-			Properties properties = new Properties(); 
+	
+			 Properties properties = new Properties(); 
 			//load the inputStream using the Properties  
 			properties.load(input);  
-			
-//	        String line = null;		
-//			int lineCount = 0;
-//			while ((line = br.readLine()) != null) {
-//				if (lineCount == 1)
-//					serviceName = line;
-//				else if (lineCount == 4)
-//					privateKey = line;
-//				else if (lineCount == 7)
-//					publicKey = line;
-//			    lineCount++;
-//			}
+
 			if (serviceName == null)
 				serviceName = properties.getProperty("service_Name");  
 			
@@ -411,21 +461,18 @@ public class Hl7Utils {
 			if (publicKey == null)
 				publicKey = properties.getProperty("public_key");
 			
-			System.out.println("ServiceName "+serviceName);
-			System.out.println("privateKey "+privateKey);
-			System.out.println("publicKey "+publicKey);
+			System.out.println("ServiceName============= "+serviceName);
+			System.out.println("privateKey============= "+privateKey);
+			System.out.println("publicKey===================== "+publicKey);
 			
 			//create private key from string
-			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(base64.decode(privateKey.getBytes("ASCII")));
-      		KeyFactory privKeyFactory = KeyFactory.getInstance("RSA");      		
-			privKey = privKeyFactory.generatePrivate(privKeySpec);
 
+//			PKCS8EncodedKeySpec privKeySpec = new PKCS8EncodedKeySpec(base64.decode(privateKey.getBytes("ASCII")));
+//      		KeyFactory privKeyFactory = KeyFactory.getInstance("RSA");      		
+//			privKey = privKeyFactory.generatePrivate(privKeySpec);
 			
 			//create public key from string
-	//		X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(base64.decode(publicKey.getBytes("ASCII")));
-			pubKey = generateKeys();
-			System.out.println("generating....publicKey "+publicKey);
-			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(base64.decode(publicKey.getBytes("ASCII")));
+			X509EncodedKeySpec pubKeySpec = new X509EncodedKeySpec(base64.decode(publicKey.getBytes("ASCII")));			
 			KeyFactory pubKeyFactory = KeyFactory.getInstance("RSA");
 			pubKey = pubKeyFactory.generatePublic(pubKeySpec);
 
@@ -439,7 +486,7 @@ public class Hl7Utils {
 			throw e;
 		}
 		return(keyInfo);
-	}
+	}*/
 	
 	public PublicKey generateKeys() throws Exception{
 		try{
