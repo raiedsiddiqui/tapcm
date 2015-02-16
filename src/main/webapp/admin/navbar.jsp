@@ -23,7 +23,7 @@
  -->        </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-         			<li <c:if test="${pageContext.request.requestURI.contains('view_organizations')}">class="active"</c:if>><a href="<c:url value="/view_organizations"/>">Organizations <span class="glyphicon glyphicon-tower"></span></a></li>
+         			<li <c:if test="${pageContext.request.requestURI.contains('view_organizations')}">class="active"</c:if>><a href="<c:url value="/view_organizations"/>"><span class="glyphicon glyphicon-tower"></span> Organizations </a></li>
 					
 					
 					
@@ -32,7 +32,7 @@
 					
 
 					<li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Users <span class="glyphicon glyphicon-user"></span><span class="caret"></span></a>
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> Users<span class="caret"></span></a>
 			          <ul class="dropdown-menu" role="menu">
 						<li <c:if test="${pageContext.request.requestURI.contains('view_volunteers')}">class="active"</c:if>><a href="<c:url value="/view_volunteers"/>">Volunteers <span class="glyphicon glyphicon-user"></span></a></li>
 						<li <c:if test="${pageContext.request.requestURI.contains('manage_users')}">class="active"</c:if>><a href="<c:url value="/manage_users"/>">Admin/Research</a></li>
@@ -47,14 +47,14 @@
 
 			          	</ul>
 			        </li>
-			        <li <c:if test="${pageContext.request.requestURI.contains('manage_appointments')}">class="active"</c:if>><a href="<c:url value="/manage_appointments"/>">Appointments <span class="glyphicon glyphicon-time"></span></a></li>
+			        <li <c:if test="${pageContext.request.requestURI.contains('manage_appointments')}">class="active"</c:if>><a href="<c:url value="/manage_appointments"/>"><span class="glyphicon glyphicon-time"></span> Appointments</a></li>
 				<!-- 
 					<li <c:if test="${pageContext.request.requestURI.contains('manage_survey_templates')}">class="active"</c:if>><a href="<c:url value="/manage_survey_templates"/>">Survey Management... <span class="glyphicon glyphicon-list"></a></li>
 				 -->
 					
 					
 					<li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Surveys <span class="glyphicon glyphicon-list"></span><span class="caret"></span></a>
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-list"></span> Surveys <span class="caret"></span></a>
 			          <ul class="dropdown-menu" role="menu">
 			          	<li <c:if test="${pageContext.request.requestURI.contains('manage_surveys')}">class="active"</c:if>><a href="<c:url value="/manage_surveys"/>">Assign/View Survey</a></li>
 			            
@@ -63,11 +63,11 @@
 			          </ul>
 			        </li>
 
-					<li <c:if test="${pageContext.request.requestURI.contains('view_activity_admin')}">class="active"</c:if>><a href="<c:url value="/view_activity_admin"/>">Activity Log <span class="glyphicon glyphicon-pencil"></a></li>
-					<li <c:if test="${pageContext.request.requestURI.contains('inbox')}">class="active"</c:if>><a href="<c:url value="/inbox"/>">Messages <span class="glyphicon glyphicon-envelope"></span> <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a> </li>
-					<li <c:if test="${pageContext.request.requestURI.contains('user_logs')}">class="active"</c:if>><a href="<c:url value="/user_logs/1"/>">User Logs <span class="glyphicon glyphicon-stats"></a><li>
+					<li <c:if test="${pageContext.request.requestURI.contains('view_activity_admin')}">class="active"</c:if>><a href="<c:url value="/view_activity_admin"/>"><span class="glyphicon glyphicon-pencil"> Activity Log</a></li>
+					<li <c:if test="${pageContext.request.requestURI.contains('inbox')}">class="active"</c:if>><a href="<c:url value="/inbox"/>"><span class="glyphicon glyphicon-envelope"></span> Messages  <c:if test="${unread > 0}"> <span class="badge badge-info">${unread}</span> </c:if></a> </li>
+					<li <c:if test="${pageContext.request.requestURI.contains('user_logs')}">class="active"</c:if>><a href="<c:url value="/user_logs/1"/>"><span class="glyphicon glyphicon-stats"> User Logs </a><li>
 							
-					<li><a href="<c:url value="/logout"/>">Log Out <span class="glyphicon glyphicon-log-out"></a></li>
+					<li><a href="<c:url value="/logout"/>"><span class="glyphicon glyphicon-log-out"> Log Out</a></li>
           </ul>
         </div><!--/.nav-collapse -->
 </nav>
