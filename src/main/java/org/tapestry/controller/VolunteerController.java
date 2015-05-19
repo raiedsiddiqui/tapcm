@@ -485,6 +485,32 @@ public class VolunteerController {
 		return "/volunteer/profile";
 	}
 	
+	@RequestMapping(value="/tipps", method=RequestMethod.GET)
+	public String tipps(@RequestParam(value="error", required=false) String errorsPresent, 
+			@RequestParam(value="success", required=false) String success, SecurityContextHolderAwareRequestWrapper request, 
+			ModelMap model)
+	{	
+		User loggedInUser = TapestryHelper.getLoggedInUser(request, userManager);
+		model.addAttribute("loggedInUserId", loggedInUser.getUserID());
+		TapestryHelper.setUnreadMessage(request, model, messageManager);
+		
+		if (errorsPresent != null)
+			model.addAttribute("errors", errorsPresent);
+		if(success != null)
+			model.addAttribute("success", true);
+//		List<Picture> pics = pictureManager.getPicturesForUser(loggedInUser.getUserID());
+//		model.addAttribute("pictures", pics);
+		
+		
+				
+		//add log
+		StringBuffer sb = new StringBuffer();
+		sb.append(loggedInUser.getName());
+		sb.append(" is viewing Resource Section ");		
+		userManager.addUserLog(sb.toString(), loggedInUser);
+		return "/volunteer/tipps";
+	}
+	
 	@RequestMapping(value="/volunteerList.html")
 	@ResponseBody
 	public List<Volunteer> getVolunteerByOrganization(@RequestParam(value="volunteerId") int vId){		

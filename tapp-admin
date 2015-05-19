@@ -7,7 +7,7 @@ import optparse
 import glob
 
 ##### EDIT THESE VALUES IF NECESSARY
-WEBAPP_DIR = "/var/lib/tomcat7/webapps/"
+WEBAPP_DIR = "/Library/Tomcat/webapps/"
 
 ##### DO NOT EDIT THESE VALUES
 DEPENDENCIES = ["maven2", "tomcat7", "openjdk-7-jdk", "mysql-server"]
@@ -52,7 +52,7 @@ def deploy(option, opt, value, parser):
     print("Deploying WAR file...")
     os.chdir("target")
     f = glob.glob("*.war")[0]
-    subprocess.call(["sudo", "cp", f, WEBAPP_DIR + "tapestry.war"])
+    subprocess.call(["sudo", "cp", f, WEBAPP_DIR + "tapcm.war"])
 
 def initial_install(option, opt, value, parser):
     """Convenience function, runs all of the above plus some helpful prompts"""
