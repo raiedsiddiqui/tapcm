@@ -334,11 +334,11 @@
 	</script> -->
   
 </div>
-<div id="footer">
+<!-- <div id="footer">
 	<div class="col-md-12">
 	    <img id="logofhs" src="${pageContext.request.contextPath}/resources/images/fhs.png"/>
 	    <img id="logodeg" src="${pageContext.request.contextPath}/resources/images/degroote.png"/>
 	</div>
-</div>
+</div> -->
 </body>
 </html>

@@ -101,6 +101,8 @@
 
 <p><a class="tips_links" href="<c:url value="/resources/tips_sheets/32.Personal%20Health%20Record.pdf"/>"/>32.Personal Health Record User Manual</a></p>
 
+<p><a class="tips_links" href="<c:url value="/resources/tips_sheets/33.Complications%20of%20Diabetes.pdf"/>"/>33.Complications of Diabetes</a></p>
+
 </div>
 </body>
 </html>
